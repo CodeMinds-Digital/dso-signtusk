@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/pdf-sign-darwin-x64",
+  "name": "@signtusk/pdf-sign-darwin-x64",
   "version": "0.1.0",
   "os": [
     "darwin"

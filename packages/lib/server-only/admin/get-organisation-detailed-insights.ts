@@ -117,7 +117,7 @@ async function getTeamInsights(
   const teamsQuery = kyselyPrisma.$kysely
     .selectFrom('Team as t')
     .where('t.organisationId', '=', organisationId)
-    .select((eb) => [
+    .select((eb: any) => [
       't.id',
       't.name',
       't.createdAt',
@@ -134,7 +134,7 @@ async function getTeamInsights(
         .whereRef('e.teamId', '=', 't.id')
         .where('e.deletedAt', 'is', null)
         .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
-        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .$if(!!createdAtFrom, (qb: any) => qb.where('e.createdAt', '>=', createdAtFrom!))
         .select(sql<number>`count(e.id)`.as('count'))
         .as('documentCount'),
     ])
@@ -145,7 +145,7 @@ async function getTeamInsights(
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Team as t')
     .where('t.organisationId', '=', organisationId)
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(({ fn }: any) => [fn.countAll().as('count')]);
 
   const [teams, countResult] = await Promise.all([teamsQuery.execute(), countQuery.execute()]);
   const count = Number(countResult[0]?.count || 0);
@@ -168,7 +168,7 @@ async function getUserInsights(
     .selectFrom('OrganisationMember as om')
     .innerJoin('User as u', 'u.id', 'om.userId')
     .where('om.organisationId', '=', organisationId)
-    .select((eb) => [
+    .select((eb: any) => [
       'u.id',
       'u.name',
       'u.email',
@@ -180,7 +180,7 @@ async function getUserInsights(
         .where('t.organisationId', '=', organisationId)
         .where('e.deletedAt', 'is', null)
         .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
-        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .$if(!!createdAtFrom, (qb: any) => qb.where('e.createdAt', '>=', createdAtFrom!))
         .select(sql<number>`count(e.id)`.as('count'))
         .as('documentCount'),
       eb
@@ -192,7 +192,7 @@ async function getUserInsights(
         .where('t.organisationId', '=', organisationId)
         .where('e.deletedAt', 'is', null)
         .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
-        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .$if(!!createdAtFrom, (qb: any) => qb.where('e.createdAt', '>=', createdAtFrom!))
         .select(sql<number>`count(e.id)`.as('count'))
         .as('signedDocumentCount'),
     ])
@@ -204,7 +204,7 @@ async function getUserInsights(
     .selectFrom('OrganisationMember as om')
     .innerJoin('User as u', 'u.id', 'om.userId')
     .where('om.organisationId', '=', organisationId)
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(({ fn }: any) => [fn.countAll().as('count')]);
 
   const [users, countResult] = await Promise.all([usersQuery.execute(), countQuery.execute()]);
   const count = Number(countResult[0]?.count || 0);
@@ -258,7 +258,7 @@ async function getDocumentInsights(
     countQuery = countQuery.where('e.createdAt', '>=', createdAtFrom);
   }
 
-  countQuery = countQuery.select(({ fn }) => [fn.countAll().as('count')]);
+  countQuery = countQuery.select(({ fn }: any) => [fn.countAll().as('count')]);
 
   const [documents, countResult] = await Promise.all([
     documentsQuery.execute(),
@@ -270,7 +270,7 @@ async function getDocumentInsights(
   return {
     teams: [],
     users: [],
-    documents: documents.map((doc) => ({
+    documents: documents.map((doc: any) => ({
       ...doc,
       id: String((doc as { id: number }).id),
     })) as DocumentInsights[],

@@ -1,6 +1,8 @@
 /// <reference types="@signtusk/prisma/types/types.d.ts" />
 import { PrismaClient } from '@prisma/client';
-import { sql } from 'kysely';
+import { Kysely, PostgresDialect, sql } from 'kysely';
+import { Pool } from 'pg';
+import type { DB } from './generated/types';
 
 // Simple database URL helper (inline to avoid import issues)
 const getDatabaseUrl = () => {
@@ -51,13 +53,28 @@ export const prisma = remember('prisma', () =>
   })
 );
 
-// For compatibility with existing code, export a simple version without Kysely
-export const kyselyPrisma = prisma;
+// Create Kysely instance for direct SQL queries
+export const kysely = remember('kysely', () => 
+  new Kysely<DB>({
+    dialect: new PostgresDialect({
+      pool: new Pool({
+        connectionString: getDatabaseUrl(),
+      }),
+    }),
+  })
+);
+
+// For compatibility with existing code that expects kyselyPrisma.$kysely
+export const kyselyPrisma = {
+  $kysely: kysely,
+};
+
 export const prismaWithLogging = prisma;
 
 // Export sql function
 export { sql };
 
 // Export types for compatibility
-export type { PrismaClient } from '@prisma/client';
-export * from '@prisma/client';
+    export * from '@prisma/client';
+    export type { PrismaClient } from '@prisma/client';
+    export type { DB } from './generated/types';

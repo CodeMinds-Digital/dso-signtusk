@@ -37,7 +37,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.android-arm64.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-android-arm64');
+            nativeBinding = require('@signtusk/pdf-sign-android-arm64');
           }
         } catch (e) {
           loadError = e;
@@ -49,7 +49,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.android-arm-eabi.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-android-arm-eabi');
+            nativeBinding = require('@signtusk/pdf-sign-android-arm-eabi');
           }
         } catch (e) {
           loadError = e;
@@ -67,7 +67,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.win32-x64-msvc.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-win32-x64-msvc');
+            nativeBinding = require('@signtusk/pdf-sign-win32-x64-msvc');
           }
         } catch (e) {
           loadError = e;
@@ -79,7 +79,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.win32-ia32-msvc.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-win32-ia32-msvc');
+            nativeBinding = require('@signtusk/pdf-sign-win32-ia32-msvc');
           }
         } catch (e) {
           loadError = e;
@@ -91,7 +91,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.win32-arm64-msvc.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-win32-arm64-msvc');
+            nativeBinding = require('@signtusk/pdf-sign-win32-arm64-msvc');
           }
         } catch (e) {
           loadError = e;
@@ -107,7 +107,7 @@ switch (platform) {
       if (localFileExisted) {
         nativeBinding = require('./pdf-sign.darwin-universal.node');
       } else {
-        nativeBinding = require('@documenso/pdf-sign-darwin-universal');
+        nativeBinding = require('@signtusk/pdf-sign-darwin-universal');
       }
       break;
     } catch {}
@@ -118,7 +118,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.darwin-x64.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-darwin-x64');
+            nativeBinding = require('@signtusk/pdf-sign-darwin-x64');
           }
         } catch (e) {
           loadError = e;
@@ -130,7 +130,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.darwin-arm64.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-darwin-arm64');
+            nativeBinding = require('@signtusk/pdf-sign-darwin-arm64');
           }
         } catch (e) {
           loadError = e;
@@ -149,7 +149,7 @@ switch (platform) {
       if (localFileExisted) {
         nativeBinding = require('./pdf-sign.freebsd-x64.node');
       } else {
-        nativeBinding = require('@documenso/pdf-sign-freebsd-x64');
+        nativeBinding = require('@signtusk/pdf-sign-freebsd-x64');
       }
     } catch (e) {
       loadError = e;
@@ -164,7 +164,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-x64-musl.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-x64-musl');
+              nativeBinding = require('@signtusk/pdf-sign-linux-x64-musl');
             }
           } catch (e) {
             loadError = e;
@@ -175,7 +175,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-x64-gnu.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-x64-gnu');
+              nativeBinding = require('@signtusk/pdf-sign-linux-x64-gnu');
             }
           } catch (e) {
             loadError = e;
@@ -189,7 +189,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-arm64-musl.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-arm64-musl');
+              nativeBinding = require('@signtusk/pdf-sign-linux-arm64-musl');
             }
           } catch (e) {
             loadError = e;
@@ -200,7 +200,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-arm64-gnu.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-arm64-gnu');
+              nativeBinding = require('@signtusk/pdf-sign-linux-arm64-gnu');
             }
           } catch (e) {
             loadError = e;
@@ -213,7 +213,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.linux-arm-gnueabihf.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-linux-arm-gnueabihf');
+            nativeBinding = require('@signtusk/pdf-sign-linux-arm-gnueabihf');
           }
         } catch (e) {
           loadError = e;
@@ -226,7 +226,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-riscv64-musl.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-riscv64-musl');
+              nativeBinding = require('@signtusk/pdf-sign-linux-riscv64-musl');
             }
           } catch (e) {
             loadError = e;
@@ -237,7 +237,7 @@ switch (platform) {
             if (localFileExisted) {
               nativeBinding = require('./pdf-sign.linux-riscv64-gnu.node');
             } else {
-              nativeBinding = require('@documenso/pdf-sign-linux-riscv64-gnu');
+              nativeBinding = require('@signtusk/pdf-sign-linux-riscv64-gnu');
             }
           } catch (e) {
             loadError = e;
@@ -250,7 +250,7 @@ switch (platform) {
           if (localFileExisted) {
             nativeBinding = require('./pdf-sign.linux-s390x-gnu.node');
           } else {
-            nativeBinding = require('@documenso/pdf-sign-linux-s390x-gnu');
+            nativeBinding = require('@signtusk/pdf-sign-linux-s390x-gnu');
           }
         } catch (e) {
           loadError = e;

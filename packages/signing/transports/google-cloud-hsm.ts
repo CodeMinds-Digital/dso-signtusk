@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 import { env } from '@signtusk/lib/utils/env';
-import { signWithGCloud } from '@documenso/pdf-sign';
+import { signWithGCloud } from '@signtusk/pdf-sign';
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
 import { updateSigningPlaceholder } from '../helpers/update-signing-placeholder';

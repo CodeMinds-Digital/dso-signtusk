@@ -9,7 +9,7 @@
     "dev": "tsup --watch",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "type-check": "tsc --noEmit"
+    "type-check": "NODE_OPTIONS='--max-old-space-size=8192' npx tsc --noEmit"
   },
   "dependencies": {
     "@signtusk/lib": "*",

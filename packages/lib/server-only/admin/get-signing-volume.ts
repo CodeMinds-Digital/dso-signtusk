@@ -33,7 +33,7 @@ export async function getSigningVolume({
 
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .where((eb) =>
+    .where((eb: any) =>
       eb.or([
         eb('o.name', 'ilike', `%${search}%`),
         eb.exists(
@@ -44,7 +44,7 @@ export async function getSigningVolume({
         ),
       ]),
     )
-    .select((eb) => [
+    .select((eb: any) => [
       'o.id as id',
       'o.createdAt as createdAt',
       'o.customerId as customerId',
@@ -78,7 +78,7 @@ export async function getSigningVolume({
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .where((eb) =>
+    .where((eb: any) =>
       eb.or([
         eb('o.name', 'ilike', `%${search}%`),
         eb.exists(
@@ -89,7 +89,7 @@ export async function getSigningVolume({
         ),
       ]),
     )
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(({ fn }: any) => [fn.countAll().as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 
@@ -149,7 +149,7 @@ export async function getOrganisationInsights({
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
     .leftJoin('Subscription as s', 'o.id', 's.organisationId')
-    .where((eb) =>
+    .where((eb: any) =>
       eb.or([
         eb('o.name', 'ilike', `%${search}%`),
         eb.exists(
@@ -160,7 +160,7 @@ export async function getOrganisationInsights({
         ),
       ]),
     )
-    .select((eb) => [
+    .select((eb: any) => [
       'o.id as id',
       'o.createdAt as createdAt',
       'o.customerId as customerId',
@@ -208,7 +208,7 @@ export async function getOrganisationInsights({
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .where((eb) =>
+    .where((eb: any) =>
       eb.or([
         eb('o.name', 'ilike', `%${search}%`),
         eb.exists(
@@ -219,7 +219,7 @@ export async function getOrganisationInsights({
         ),
       ]),
     )
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(({ fn }: any) => [fn.countAll().as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 

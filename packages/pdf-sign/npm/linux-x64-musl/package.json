@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/pdf-sign-linux-x64-gnu",
+  "name": "@signtusk/pdf-sign-linux-x64-musl",
   "version": "0.1.0",
   "os": [
     "linux"
@@ -7,15 +7,15 @@
   "cpu": [
     "x64"
   ],
-  "main": "pdf-sign.linux-x64-gnu.node",
+  "main": "pdf-sign.linux-x64-musl.node",
   "files": [
-    "pdf-sign.linux-x64-gnu.node"
+    "pdf-sign.linux-x64-musl.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
   },
   "libc": [
-    "glibc"
+    "musl"
   ]
 }

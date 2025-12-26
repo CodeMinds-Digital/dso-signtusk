@@ -1,29 +1,19 @@
 // Named exports for better ESM compatibility
 export {
-    PrismaClient,
-    Prisma,
+    DocumentStatus, EmailDomainStatus, EnvelopeType,
     // Enums commonly used in the codebase
-    FieldType,
-    RecipientRole,
-    DocumentStatus,
-    SendStatus,
-    SigningStatus,
-    EnvelopeType,
-    SubscriptionStatus,
-    UserSecurityAuditLogType,
-    OrganisationMemberInviteStatus,
-    OrganisationType,
-    EmailDomainStatus,
+    FieldType, OrganisationMemberInviteStatus,
+    OrganisationType, Prisma, PrismaClient, RecipientRole, SendStatus,
+    SigningStatus, SubscriptionStatus,
+    UserSecurityAuditLogType
 } from '@prisma/client';
 
 // Type exports
 export type {
-    PrismaPromise,
-    Envelope,
-    Recipient,
-    User,
-    OrganisationEmail,
+    DocumentMeta,
+    EmailDomain, Envelope, Organisation, OrganisationClaim, OrganisationEmail, OrganisationGlobalSettings, PrismaPromise, Recipient,
+    User
 } from '@prisma/client';
 
 // Re-export the main client instance from index
-export { prisma, kyselyPrisma, prismaWithLogging } from './index';
+export { kyselyPrisma, prisma, prismaWithLogging } from './index';

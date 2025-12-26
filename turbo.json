@@ -10,7 +10,9 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**",
-        "build/**"
+        "build/**",
+        "npm/**",
+        "*.node"
       ]
     },
     "prebuild": {
@@ -168,6 +170,9 @@
     "REDIS_URL",
     "JWT_SECRET",
     "ENCRYPTION_KEY",
-    "SESSION_SECRET"
+    "SESSION_SECRET",
+    "CARGO_TARGET_DIR",
+    "RUSTFLAGS",
+    "CARGO_BUILD_TARGET"
   ]
 }

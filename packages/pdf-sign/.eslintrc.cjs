@@ -1,11 +1,7 @@
 module.exports = {
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
 
-  plugins: ['prettier'],
+  plugins: ['@typescript-eslint', 'prettier'],
 
   env: {
     node: true,
@@ -17,6 +13,8 @@ module.exports = {
 
   parserOptions: {
     project: './tsconfig.json',
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
 
   rules: {

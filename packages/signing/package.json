@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "ts-pattern": "^5.9.0",
-    "@documenso/pdf-sign": "^0.1.0",
+    "@signtusk/pdf-sign": "*",
     "@signtusk/tsconfig": "*"
   },
   "devDependencies": {

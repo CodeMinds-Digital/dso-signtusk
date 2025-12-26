@@ -118,3 +118,6 @@ playwright/.cache/
 
 # Reference projects
 documenso-main/
+package-lock.json
+/.kiro
+/.kiro/specs
