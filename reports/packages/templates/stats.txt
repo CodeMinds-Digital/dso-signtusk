@@ -1,0 +1,5 @@
+=== Code Statistics ===
+TypeScript files:       31
+JavaScript files:        0
+Total lines of code:    22114 total
+Test files:      101

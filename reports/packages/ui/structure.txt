@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/ui/node_modules/tailwind-merge/dist/tailwind-merge.cjs.development.js
+packages/ui/node_modules/tailwind-merge/dist/tailwind-merge.cjs.production.min.js
+packages/ui/node_modules/tailwind-merge/dist/index.js
+packages/ui/node_modules/tailwind-merge/dist/lib/extend-tailwind-merge.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/merge-configs.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/types.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/class-utils.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/modifier-utils.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/config-utils.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/validators.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/lru-cache.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/default-config.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/create-tailwind-merge.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/from-theme.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/tw-merge.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/tw-join.d.ts
+packages/ui/node_modules/tailwind-merge/dist/lib/merge-classlist.d.ts
+packages/ui/node_modules/tailwind-merge/dist/index.d.ts
+packages/ui/node_modules/tailwind-merge/src/lib/tw-join.ts
+packages/ui/node_modules/tailwind-merge/src/lib/extend-tailwind-merge.ts

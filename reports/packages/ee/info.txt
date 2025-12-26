@@ -1,0 +1,20 @@
+=== Package Information ===
+Name: @docusign-alternative/ee
+Version: 0.0.0
+Description: N/A
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+clean: rimraf node_modules
+
+=== Dependencies ===
+@aws-sdk/client-sesv2
+@docusign-alternative/lib
+@docusign-alternative/prisma
+luxon
+react
+ts-pattern
+zod
+
+=== Dev Dependencies ===

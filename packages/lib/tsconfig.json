@@ -1,0 +1,20 @@
+{
+  "extends": "@signtusk/tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": [
+      "@signtusk/tsconfig/process-env.d.ts",
+      "vite/client"
+    ],
+    "moduleResolution": "Bundler"
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules"
+  ]
+}

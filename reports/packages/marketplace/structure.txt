@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/marketplace/node_modules/vitest/globals.d.ts
+packages/marketplace/node_modules/vitest/mocker.d.ts
+packages/marketplace/node_modules/vitest/environments.d.ts
+packages/marketplace/node_modules/vitest/dist/execute.js
+packages/marketplace/node_modules/vitest/dist/mocker.d.ts
+packages/marketplace/node_modules/vitest/dist/spy.js
+packages/marketplace/node_modules/vitest/dist/coverage.js
+packages/marketplace/node_modules/vitest/dist/mocker.js
+packages/marketplace/node_modules/vitest/dist/environments.d.ts
+packages/marketplace/node_modules/vitest/dist/config.d.ts
+packages/marketplace/node_modules/vitest/dist/worker.js
+packages/marketplace/node_modules/vitest/dist/runners.d.ts
+packages/marketplace/node_modules/vitest/dist/index.js
+packages/marketplace/node_modules/vitest/dist/suite.js
+packages/marketplace/node_modules/vitest/dist/snapshot.d.ts
+packages/marketplace/node_modules/vitest/dist/config.js
+packages/marketplace/node_modules/vitest/dist/suite.d.ts
+packages/marketplace/node_modules/vitest/dist/execute.d.ts
+packages/marketplace/node_modules/vitest/dist/chunks/utils.C8RiOc4B.js
+packages/marketplace/node_modules/vitest/dist/chunks/node.AKq966Jp.js

@@ -1,0 +1,31 @@
+=== Package Information ===
+Name: @docusign-alternative/trpc
+Version: 0.0.0
+Description: N/A
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+lint: eslint .
+lint:fix: eslint . --fix
+clean: rimraf node_modules
+
+=== Dependencies ===
+@docusign-alternative/lib
+@docusign-alternative/prisma
+@tanstack/react-query
+@trpc/client
+@trpc/react-query
+@trpc/server
+@ts-rest/core
+formidable
+luxon
+superjson
+trpc-to-openapi
+ts-pattern
+zod
+zod-form-data
+zod-openapi
+
+=== Dev Dependencies ===
+@types/formidable

@@ -1,0 +1,25 @@
+=== Build Test ===
+npm warn Unknown project config "link-workspace-packages". This will stop working in the next major version of npm.
+
+> @docusign-alternative/analytics@0.1.0 build
+> tsup --dts
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/naveenselvam/Desktop/ai_pair_programming/documenso/docusign-alternative-implementation/packages/analytics/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+ESM dist/index.mjs     111.13 KB
+ESM dist/index.mjs.map 261.18 KB
+ESM ⚡️ Build success in 27ms
+CJS dist/index.js     118.16 KB
+CJS dist/index.js.map 263.38 KB
+CJS ⚡️ Build success in 27ms
+DTS Build start
+DTS ⚡️ Build success in 1567ms
+DTS dist/index.d.ts  199.68 KB
+DTS dist/index.d.mts 199.68 KB
+✅ Build successful

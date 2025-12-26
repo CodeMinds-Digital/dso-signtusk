@@ -1,0 +1,37 @@
+=== Package Information ===
+Name: @docusign-alternative/performance
+Version: 1.0.0
+Description: N/A
+Main: ./src/index.ts
+Types: ./src/index.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@opentelemetry/api
+@opentelemetry/auto-instrumentations-node
+@opentelemetry/exporter-jaeger
+@opentelemetry/exporter-prometheus
+@opentelemetry/instrumentation
+@opentelemetry/instrumentation-express
+@opentelemetry/instrumentation-http
+@opentelemetry/instrumentation-redis
+@opentelemetry/resources
+@opentelemetry/sdk-node
+@opentelemetry/semantic-conventions
+ioredis
+node-cron
+prom-client
+zod
+
+=== Dev Dependencies ===
+@types/node
+@types/node-cron
+fast-check
+typescript
+vitest

@@ -1,0 +1,37 @@
+=== Package Information ===
+Name: @docusign-alternative/prisma
+Version: 0.0.0
+Description: N/A
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+build: prisma generate
+prebuild: prisma generate
+format: prisma format
+clean: rimraf node_modules
+post-install: prisma generate
+prisma:generate: prisma generate
+prisma:migrate-dev: prisma migrate dev --skip-seed
+prisma:migrate-deploy: prisma migrate deploy
+prisma:migrate-reset: prisma migrate reset
+prisma:seed: prisma db seed
+prisma:studio: prisma studio
+
+=== Dependencies ===
+@prisma/client
+kysely
+nanoid
+prisma
+prisma-extension-kysely
+prisma-json-types-generator
+prisma-kysely
+ts-pattern
+zod
+zod-prisma-types
+
+=== Dev Dependencies ===
+dotenv
+dotenv-cli
+tsx
+typescript

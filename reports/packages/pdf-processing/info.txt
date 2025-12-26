@@ -1,0 +1,28 @@
+=== Package Information ===
+Name: @docusign-alternative/pdf-processing
+Version: 0.1.0
+Description: Server-side PDF processing package for certificates and audit logs
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint .
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+
+=== Dependencies ===
+luxon
+pdf-lib
+qrcode
+zod
+
+=== Dev Dependencies ===
+@types/luxon
+@types/qrcode
+eslint
+fast-check
+typescript
+vitest

@@ -1,0 +1,25 @@
+=== Build Test ===
+npm warn Unknown project config "link-workspace-packages". This will stop working in the next major version of npm.
+
+> @docusign-alternative/notifications@1.0.0 build
+> tsup src/index.ts --format cjs,esm --dts --clean
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/naveenselvam/Desktop/ai_pair_programming/documenso/docusign-alternative-implementation/packages/notifications/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS dist/index.js     125.46 KB
+CJS dist/index.js.map 255.01 KB
+CJS ⚡️ Build success in 40ms
+ESM dist/index.mjs     120.54 KB
+ESM dist/index.mjs.map 254.76 KB
+ESM ⚡️ Build success in 39ms
+DTS Build start
+DTS ⚡️ Build success in 1895ms
+DTS dist/index.d.ts  47.94 KB
+DTS dist/index.d.mts 47.94 KB
+✅ Build successful

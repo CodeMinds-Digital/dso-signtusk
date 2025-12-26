@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/lib/advanced-fields-validation/validate-fields.ts
+packages/lib/advanced-fields-validation/validate-text.ts
+packages/lib/advanced-fields-validation/validate-checkbox.ts
+packages/lib/advanced-fields-validation/validate-number.ts
+packages/lib/advanced-fields-validation/validate-dropdown.ts
+packages/lib/advanced-fields-validation/validate-radio.ts
+packages/lib/types/organisation-email.ts
+packages/lib/types/envelope.ts
+packages/lib/types/search-params.ts
+packages/lib/types/folder-type.ts
+packages/lib/types/webhook-payload.ts
+packages/lib/types/email-domain.ts
+packages/lib/types/document-meta.ts
+packages/lib/types/document-email.ts
+packages/lib/types/template.ts
+packages/lib/types/document.ts
+packages/lib/types/webauthn.ts
+packages/lib/types/envelope-attachment.ts
+packages/lib/types/font.d.ts
+packages/lib/types/document-audit-logs.ts

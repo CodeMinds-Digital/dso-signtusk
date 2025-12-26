@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/file-processing/node_modules/@types/node/compatibility/indexable.d.ts
+packages/file-processing/node_modules/@types/node/compatibility/index.d.ts
+packages/file-processing/node_modules/@types/node/compatibility/iterators.d.ts
+packages/file-processing/node_modules/@types/node/compatibility/disposable.d.ts
+packages/file-processing/node_modules/@types/node/path.d.ts
+packages/file-processing/node_modules/@types/node/constants.d.ts
+packages/file-processing/node_modules/@types/node/domain.d.ts
+packages/file-processing/node_modules/@types/node/diagnostics_channel.d.ts
+packages/file-processing/node_modules/@types/node/globals.d.ts
+packages/file-processing/node_modules/@types/node/sea.d.ts
+packages/file-processing/node_modules/@types/node/string_decoder.d.ts
+packages/file-processing/node_modules/@types/node/tls.d.ts
+packages/file-processing/node_modules/@types/node/tty.d.ts
+packages/file-processing/node_modules/@types/node/punycode.d.ts
+packages/file-processing/node_modules/@types/node/readline.d.ts
+packages/file-processing/node_modules/@types/node/crypto.d.ts
+packages/file-processing/node_modules/@types/node/trace_events.d.ts
+packages/file-processing/node_modules/@types/node/events.d.ts
+packages/file-processing/node_modules/@types/node/os.d.ts
+packages/file-processing/node_modules/@types/node/buffer.d.ts

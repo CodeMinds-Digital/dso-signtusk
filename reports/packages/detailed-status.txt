@@ -1,0 +1,99 @@
+
+DETAILED PACKAGE STATUS REPORT - Wed Dec 24 19:12:10 IST 2025
+=========================================
+
+BUILD SUCCESSFUL PACKAGES (26):
+-----------------------------------
+✅ ai
+✅ analytics
+✅ billing
+✅ blockchain
+✅ cache
+✅ compliance
+✅ database
+✅ file-processing
+✅ i18n
+✅ infrastructure
+✅ integrations
+✅ jobs
+✅ marketplace
+✅ notifications
+✅ pdf-processing
+✅ pdf
+✅ performance
+✅ prisma
+✅ realtime
+✅ sdk
+✅ search
+✅ security
+✅ storage
+✅ templates
+✅ webhooks
+✅ white-label
+
+BUILD FAILED PACKAGES (0):
+-----------------------------
+
+TEST SUCCESSFUL PACKAGES (0):
+----------------------------------
+
+TEST FAILED PACKAGES (26):
+----------------------------
+❌ ai
+❌ analytics
+❌ billing
+❌ blockchain
+❌ cache
+❌ compliance
+❌ database
+❌ file-processing
+❌ i18n
+❌ infrastructure
+❌ integrations
+❌ jobs
+❌ marketplace
+❌ notifications
+❌ pdf-processing
+❌ pdf
+❌ performance
+❌ realtime
+❌ sdk
+❌ search
+❌ security
+❌ signing
+❌ storage
+❌ templates
+❌ webhooks
+❌ white-label
+
+NO BUILD SCRIPT PACKAGES (13):
+--------------------------------
+⚪ api
+⚪ assets
+⚪ auth
+⚪ ee
+⚪ email
+⚪ eslint-config
+⚪ lib
+⚪ prettier-config
+⚪ signing
+⚪ tailwind-config
+⚪ trpc
+⚪ tsconfig
+⚪ ui
+
+NO TEST SCRIPT PACKAGES (13):
+-------------------------------
+⚪ api
+⚪ assets
+⚪ auth
+⚪ ee
+⚪ email
+⚪ eslint-config
+⚪ lib
+⚪ prettier-config
+⚪ prisma
+⚪ tailwind-config
+⚪ trpc
+⚪ tsconfig
+⚪ ui

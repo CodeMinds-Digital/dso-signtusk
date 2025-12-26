@@ -1,0 +1,31 @@
+=== Package Information ===
+Name: @docusign-alternative/white-label
+Version: 0.1.0
+Description: White-label customization and branding system
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup --dts
+dev: tsup --watch
+test: vitest
+test:coverage: vitest --coverage
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@docusign-alternative/database
+@docusign-alternative/lib
+@docusign-alternative/storage
+color
+css-tree
+handlebars
+node-forge
+sharp
+zod
+
+=== Dev Dependencies ===
+@types/color
+@types/node
+fast-check
+typescript
+vitest

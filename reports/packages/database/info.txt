@@ -1,0 +1,37 @@
+=== Package Information ===
+Name: @docusign-alternative/database
+Version: 1.0.0
+Description: Database schema and migrations for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+clean: rm -rf dist
+type-check: tsc --noEmit
+db:generate: prisma generate
+db:push: prisma db push
+db:migrate: prisma migrate dev
+db:migrate:deploy: prisma migrate deploy
+db:migrate:reset: prisma migrate reset
+db:migrate:run: tsx src/migrate.ts run
+db:migrate:status: tsx src/migrate.ts status
+db:migrate:rollback: tsx src/migrate.ts rollback
+db:seed: tsx seed/index.ts
+db:studio: prisma studio
+test: vitest --run
+test:watch: vitest
+test:coverage: vitest --coverage
+
+=== Dependencies ===
+@prisma/client
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+prisma
+tsx
+typescript
+vitest

@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/i18n/dist/translation-service.d.ts
+packages/i18n/dist/cultural-adaptation.js
+packages/i18n/dist/languages.d.ts
+packages/i18n/dist/types.js
+packages/i18n/dist/server.d.ts
+packages/i18n/dist/cache.js
+packages/i18n/dist/react.js
+packages/i18n/dist/types.d.ts
+packages/i18n/dist/server.js
+packages/i18n/dist/cultural-adaptation.d.ts
+packages/i18n/dist/config.d.ts
+packages/i18n/dist/index.js
+packages/i18n/dist/config.js
+packages/i18n/dist/rtl.d.ts
+packages/i18n/dist/react.d.ts
+packages/i18n/dist/rtl.js
+packages/i18n/dist/__tests__/setup.d.ts
+packages/i18n/dist/__tests__/setup.js
+packages/i18n/dist/cache.d.ts
+packages/i18n/dist/utils.d.ts

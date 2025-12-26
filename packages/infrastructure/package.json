@@ -1,0 +1,28 @@
+{
+  "name": "@signtusk/infrastructure",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@signtusk/lib": "*",
+    "@signtusk/auth": "*",
+    "@signtusk/cache": "*",
+    "@signtusk/jobs": "*",
+    "@signtusk/storage": "*",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "fast-check": "^3.15.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

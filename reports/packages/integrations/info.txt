@@ -1,0 +1,35 @@
+=== Package Information ===
+Name: @docusign-alternative/integrations
+Version: 1.0.0
+Description: Third-party integrations for DocuSign Alternative - Zapier, Microsoft 365, Google Workspace, Salesforce
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup --dts
+build:tsc: tsc
+dev: tsup --watch
+clean: rm -rf dist
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+test:coverage: vitest --coverage
+
+=== Dependencies ===
+@docusign-alternative/auth
+@docusign-alternative/database
+@docusign-alternative/lib
+@docusign-alternative/webhooks
+@google-cloud/storage
+@microsoft/microsoft-graph-client
+axios
+googleapis
+jsforce
+zod
+
+=== Dev Dependencies ===
+@types/jsforce
+@types/node
+fast-check
+typescript
+vitest

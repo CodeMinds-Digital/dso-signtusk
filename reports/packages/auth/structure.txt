@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/auth/node_modules/jose/dist/types/jws/compact/verify.d.ts
+packages/auth/node_modules/jose/dist/types/jws/compact/sign.d.ts
+packages/auth/node_modules/jose/dist/types/jws/general/verify.d.ts
+packages/auth/node_modules/jose/dist/types/jws/general/sign.d.ts
+packages/auth/node_modules/jose/dist/types/jws/flattened/verify.d.ts
+packages/auth/node_modules/jose/dist/types/jws/flattened/sign.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/verify.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/produce.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/encrypt.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/sign.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/decrypt.d.ts
+packages/auth/node_modules/jose/dist/types/jwt/unsecured.d.ts
+packages/auth/node_modules/jose/dist/types/util/runtime.d.ts
+packages/auth/node_modules/jose/dist/types/util/errors.d.ts
+packages/auth/node_modules/jose/dist/types/util/base64url.d.ts
+packages/auth/node_modules/jose/dist/types/util/decode_protected_header.d.ts
+packages/auth/node_modules/jose/dist/types/util/decode_jwt.d.ts
+packages/auth/node_modules/jose/dist/types/types.d.ts
+packages/auth/node_modules/jose/dist/types/key/export.d.ts
+packages/auth/node_modules/jose/dist/types/key/import.d.ts

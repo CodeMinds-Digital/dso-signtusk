@@ -1,0 +1,30 @@
+{
+  "name": "@signtusk/webhooks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Comprehensive webhook system for Signtusk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup --dts",
+    "build:tsc": "tsc",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@signtusk/database": "*",
+    "@signtusk/lib": "*",
+    "@signtusk/jobs": "*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "fast-check": "^3.15.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

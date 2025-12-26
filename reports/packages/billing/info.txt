@@ -1,0 +1,24 @@
+=== Package Information ===
+Name: @docusign-alternative/billing
+Version: 1.0.0
+Description: Billing and subscription management for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup src/index.ts --format cjs,esm --clean --external @docusign-alternative/database,@docusign-alternative/lib
+dev: tsup src/index.ts --format cjs,esm --watch --external @docusign-alternative/database,@docusign-alternative/lib
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+clean: rm -rf dist
+
+=== Dependencies ===
+stripe
+zod
+
+=== Dev Dependencies ===
+@docusign-alternative/tsconfig
+@types/node
+typescript
+vitest

@@ -1,0 +1,37 @@
+{
+  "name": "@signtusk/integrations",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Third-party integrations for Signtusk - Zapier, Microsoft 365, Google Workspace, Salesforce",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup --dts",
+    "build:tsc": "tsc",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@signtusk/database": "*",
+    "@signtusk/lib": "*",
+    "@signtusk/auth": "*",
+    "@signtusk/webhooks": "*",
+    "@google-cloud/storage": "^7.7.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "axios": "^1.6.2",
+    "googleapis": "^129.0.0",
+    "jsforce": "^2.0.0-beta.29",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/jsforce": "^1.11.0",
+    "@types/node": "^20.10.0",
+    "fast-check": "^3.15.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

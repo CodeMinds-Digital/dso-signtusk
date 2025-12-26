@@ -1,0 +1,26 @@
+=== Package Information ===
+Name: @docusign-alternative/templates
+Version: 0.1.0
+Description: Template management system for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup --dts
+dev: tsup --watch
+clean: rm -rf dist
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+
+=== Dependencies ===
+@docusign-alternative/database
+@docusign-alternative/lib
+pino
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+typescript
+vitest

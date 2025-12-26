@@ -1,0 +1,27 @@
+=== Package Information ===
+Name: @docusign-alternative/infrastructure
+Version: 1.0.0
+Description: N/A
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@docusign-alternative/auth
+@docusign-alternative/cache
+@docusign-alternative/jobs
+@docusign-alternative/lib
+@docusign-alternative/storage
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+typescript
+vitest

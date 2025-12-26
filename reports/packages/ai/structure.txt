@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/ai/dist/index.js
+packages/ai/dist/index.d.ts
+packages/ai/node_modules/chai/register-assert.js
+packages/ai/node_modules/chai/karma.sauce.js
+packages/ai/node_modules/chai/register-expect.js
+packages/ai/node_modules/chai/index.js
+packages/ai/node_modules/chai/register-should.js
+packages/ai/node_modules/chai/karma.conf.js
+packages/ai/node_modules/chai/lib/chai/interface/assert.js
+packages/ai/node_modules/chai/lib/chai/interface/expect.js
+packages/ai/node_modules/chai/lib/chai/interface/should.js
+packages/ai/node_modules/chai/lib/chai/assertion.js
+packages/ai/node_modules/chai/lib/chai/core/assertions.js
+packages/ai/node_modules/chai/lib/chai/utils/getEnumerableProperties.js
+packages/ai/node_modules/chai/lib/chai/utils/addChainableMethod.js
+packages/ai/node_modules/chai/lib/chai/utils/overwriteProperty.js
+packages/ai/node_modules/chai/lib/chai/utils/getOwnEnumerableProperties.js
+packages/ai/node_modules/chai/lib/chai/utils/test.js
+packages/ai/node_modules/chai/lib/chai/utils/getMessage.js
+packages/ai/node_modules/chai/lib/chai/utils/flag.js

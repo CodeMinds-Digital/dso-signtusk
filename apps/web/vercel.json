@@ -1,0 +1,93 @@
+{
+    "buildCommand": "cd ../.. && npm run build --filter=@signtusk/web",
+    "outputDirectory": ".next",
+    "installCommand": "cd ../.. && npm ci",
+    "framework": "nextjs",
+    "functions": {
+        "src/app/api/**/*.ts": {
+            "runtime": "nodejs18.x",
+            "maxDuration": 30
+        }
+    },
+    "env": {
+        "DATABASE_URL": "@database_url",
+        "REDIS_URL": "@redis_url",
+        "JWT_SECRET": "@jwt_secret",
+        "ENCRYPTION_KEY": "@encryption_key",
+        "RESEND_API_KEY": "@resend_api_key",
+        "SENTRY_DSN": "@sentry_dsn"
+    },
+    "build": {
+        "env": {
+            "NEXT_PUBLIC_APP_URL": "https://app.signtusk.com",
+            "NEXT_PUBLIC_API_URL": "https://api.signtusk.com",
+            "NEXT_PUBLIC_WEB_URL": "https://signtusk.com",
+            "NEXT_TELEMETRY_DISABLED": "1",
+            "TURBOPACK": "1"
+        }
+    },
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "https://app.signtusk.com"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type, Authorization"
+                },
+                {
+                    "key": "Access-Control-Max-Age",
+                    "value": "86400"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                }
+            ]
+        }
+    ],
+    "redirects": [
+        {
+            "source": "/app",
+            "destination": "https://app.signtusk.com",
+            "permanent": false
+        },
+        {
+            "source": "/app/(.*)",
+            "destination": "https://app.signtusk.com/$1",
+            "permanent": false
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/trpc/:path*",
+            "destination": "https://api.signtusk.com/trpc/:path*"
+        }
+    ],
+    "crons": [
+        {
+            "path": "/api/cron/cleanup",
+            "schedule": "0 2 * * *"
+        }
+    ]
+}

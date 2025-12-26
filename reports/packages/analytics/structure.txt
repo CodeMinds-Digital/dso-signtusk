@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/analytics/dist/index.js
+packages/analytics/dist/index.d.ts
+packages/analytics/node_modules/chai/register-assert.js
+packages/analytics/node_modules/chai/karma.sauce.js
+packages/analytics/node_modules/chai/register-expect.js
+packages/analytics/node_modules/chai/index.js
+packages/analytics/node_modules/chai/register-should.js
+packages/analytics/node_modules/chai/karma.conf.js
+packages/analytics/node_modules/chai/lib/chai/interface/assert.js
+packages/analytics/node_modules/chai/lib/chai/interface/expect.js
+packages/analytics/node_modules/chai/lib/chai/interface/should.js
+packages/analytics/node_modules/chai/lib/chai/assertion.js
+packages/analytics/node_modules/chai/lib/chai/core/assertions.js
+packages/analytics/node_modules/chai/lib/chai/utils/getEnumerableProperties.js
+packages/analytics/node_modules/chai/lib/chai/utils/addChainableMethod.js
+packages/analytics/node_modules/chai/lib/chai/utils/overwriteProperty.js
+packages/analytics/node_modules/chai/lib/chai/utils/getOwnEnumerableProperties.js
+packages/analytics/node_modules/chai/lib/chai/utils/test.js
+packages/analytics/node_modules/chai/lib/chai/utils/getMessage.js
+packages/analytics/node_modules/chai/lib/chai/utils/flag.js

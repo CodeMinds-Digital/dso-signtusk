@@ -1,0 +1,33 @@
+{
+  "name": "@signtusk/trpc",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "Private - Part of Signtusk Platform",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.90.10",
+    "@trpc/client": "11.7.1",
+    "@trpc/react-query": "11.7.1",
+    "@trpc/server": "11.7.1",
+    "@ts-rest/core": "^3.52.1",
+    "formidable": "^3.5.4",
+    "luxon": "^3.7.2",
+    "superjson": "^2.2.5",
+    "trpc-to-openapi": "2.4.0",
+    "ts-pattern": "^5.9.0",
+    "zod": "^3.25.76",
+    "zod-form-data": "^2.0.8",
+    "zod-openapi": "^4.2.4",
+    "@signtusk/lib": "*",
+    "@signtusk/prisma": "*"
+  },
+  "devDependencies": {
+    "@types/formidable": "^3.4.6"
+  },
+  "private": true
+}

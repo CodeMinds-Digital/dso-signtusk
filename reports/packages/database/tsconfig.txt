@@ -1,0 +1,16 @@
+=== TypeScript Configuration ===
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "."
+    },
+    "include": [
+        "src/**/*",
+        "seed/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
+}

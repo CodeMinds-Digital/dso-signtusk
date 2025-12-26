@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/ee/server-only/limits/schema.ts
+packages/ee/server-only/limits/errors.ts
+packages/ee/server-only/limits/provider/client.tsx
+packages/ee/server-only/limits/constants.ts
+packages/ee/server-only/limits/client.ts
+packages/ee/server-only/limits/handler.ts
+packages/ee/server-only/limits/server.ts
+packages/ee/server-only/lib/link-organisation-account.ts
+packages/ee/server-only/lib/delete-email-domain.ts
+packages/ee/server-only/lib/create-email-domain.ts
+packages/ee/server-only/lib/verify-email-domain.ts
+packages/ee/server-only/lib/send-organisation-account-link-confirmation-email.ts
+packages/ee/server-only/stripe/webhook/on-subscription-deleted.ts
+packages/ee/server-only/stripe/webhook/on-subscription-updated.ts
+packages/ee/server-only/stripe/webhook/handler.ts
+packages/ee/server-only/stripe/webhook/on-subscription-created.ts
+packages/ee/server-only/stripe/create-checkout-session.ts
+packages/ee/server-only/stripe/update-subscription-item-quantity.ts
+packages/ee/server-only/stripe/get-internal-claim-plans.ts
+packages/ee/server-only/stripe/get-customer.ts

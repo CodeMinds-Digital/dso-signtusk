@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/eslint-config/node_modules/eslint-config-next/core-web-vitals.js
+packages/eslint-config/node_modules/eslint-config-next/typescript.js
+packages/eslint-config/node_modules/eslint-config-next/index.js
+packages/eslint-config/node_modules/eslint-config-next/parser.js
+packages/eslint-config/node_modules/eslint-plugin-react-hooks/index.js
+packages/eslint-config/node_modules/eslint-plugin-react-hooks/index.d.ts
+packages/eslint-config/node_modules/eslint-plugin-react-hooks/cjs/eslint-plugin-react-hooks.production.js
+packages/eslint-config/node_modules/eslint-plugin-react-hooks/cjs/eslint-plugin-react-hooks.d.ts
+packages/eslint-config/node_modules/eslint-plugin-react-hooks/cjs/eslint-plugin-react-hooks.development.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/index.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/get-root-dirs.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/node-attributes.d.ts
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/url.d.ts
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/node-attributes.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/get-root-dirs.d.ts
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/define-rule.d.ts
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/url.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/utils/define-rule.js
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/rules/no-typos.d.ts
+packages/eslint-config/node_modules/@next/eslint-plugin-next/dist/rules/no-duplicate-head.d.ts

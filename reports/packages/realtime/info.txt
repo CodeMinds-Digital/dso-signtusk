@@ -1,0 +1,31 @@
+=== Package Information ===
+Name: @docusign-alternative/realtime
+Version: 1.0.0
+Description: Real-time API features with WebSocket and SSE support for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup src/index.ts --format cjs,esm --dts --clean
+build:tsc: tsc
+dev: tsup src/index.ts --format cjs,esm --dts --watch
+clean: rm -rf dist
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+test:coverage: vitest --coverage
+
+=== Dependencies ===
+@docusign-alternative/cache
+@docusign-alternative/lib
+eventemitter3
+ioredis
+ws
+zod
+
+=== Dev Dependencies ===
+@types/node
+@types/ws
+fast-check
+typescript
+vitest

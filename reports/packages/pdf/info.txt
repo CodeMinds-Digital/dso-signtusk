@@ -1,0 +1,41 @@
+=== Package Information ===
+Name: @docusign-alternative/pdf
+Version: 0.1.0
+Description: PDF processing engine for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsup --watch
+test: vitest --run
+test:watch: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@azure/identity
+@azure/keyvault-keys
+@google-cloud/kms
+@napi-rs/canvas
+aws-sdk
+axios
+jszip
+mammoth
+node-forge
+pdf-lib
+pkcs11js
+puppeteer
+qrcode
+sharp
+zod
+
+=== Dev Dependencies ===
+@types/jszip
+@types/node
+@types/node-forge
+@types/qrcode
+fast-check
+puppeteer
+tsup
+typescript
+vitest

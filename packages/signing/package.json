@@ -1,0 +1,23 @@
+{
+  "name": "@signtusk/signing",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "Private - Part of Signtusk Platform",
+  "files": [
+    "transports/",
+    "index.ts"
+  ],
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "ts-pattern": "^5.9.0",
+    "@documenso/pdf-sign": "^0.1.0",
+    "@signtusk/tsconfig": "*"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "private": true
+}

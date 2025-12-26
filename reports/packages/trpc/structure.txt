@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/trpc/server/schema.ts
+packages/trpc/server/auth-router/schema.ts
+packages/trpc/server/auth-router/delete-passkey.types.ts
+packages/trpc/server/auth-router/create-passkey-signin-options.ts
+packages/trpc/server/auth-router/router.ts
+packages/trpc/server/auth-router/find-passkeys.types.ts
+packages/trpc/server/auth-router/delete-passkey.ts
+packages/trpc/server/auth-router/create-passkey.ts
+packages/trpc/server/auth-router/create-passkey-registration-options.types.ts
+packages/trpc/server/auth-router/update-passkey.types.ts
+packages/trpc/server/auth-router/update-passkey.ts
+packages/trpc/server/auth-router/create-passkey-authentication-options.ts
+packages/trpc/server/auth-router/create-passkey-registration-options.ts
+packages/trpc/server/auth-router/find-passkeys.ts
+packages/trpc/server/auth-router/create-passkey.types.ts
+packages/trpc/server/auth-router/create-passkey-signin-options.types.ts
+packages/trpc/server/auth-router/create-passkey-authentication-options.types.ts
+packages/trpc/server/profile-router/schema.ts
+packages/trpc/server/profile-router/router.ts
+packages/trpc/server/team-router/schema.ts

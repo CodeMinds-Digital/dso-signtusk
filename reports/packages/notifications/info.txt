@@ -1,0 +1,48 @@
+=== Package Information ===
+Name: @docusign-alternative/notifications
+Version: 1.0.0
+Description: Advanced notification system with SMS, push notifications, email customization, scheduling, and analytics
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup src/index.ts --format cjs,esm --dts --clean
+dev: tsup src/index.ts --format cjs,esm --dts --watch
+lint: eslint src --ext .ts,.tsx
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+clean: rm -rf dist .turbo node_modules
+
+=== Dependencies ===
+@docusign-alternative/cache
+@docusign-alternative/database
+@docusign-alternative/email
+@docusign-alternative/jobs
+@docusign-alternative/lib
+@react-email/components
+@react-email/render
+date-fns
+firebase-admin
+handlebars
+ioredis
+node-cron
+pino
+react
+react-dom
+twilio
+web-push
+zod
+
+=== Dev Dependencies ===
+@types/handlebars
+@types/node
+@types/node-cron
+@types/react
+@types/react-dom
+@types/web-push
+eslint
+fast-check
+jsdom
+typescript
+vitest

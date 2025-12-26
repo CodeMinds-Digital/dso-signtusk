@@ -1,0 +1,36 @@
+=== Package Information ===
+Name: @docusign-alternative/file-processing
+Version: 1.0.0
+Description: N/A
+Main: ./src/index.ts
+Types: ./src/index.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+cheerio
+jimp
+mammoth
+mime-types
+p-limit
+p-queue
+pdf-lib
+sharp
+tesseract.js
+worker-threads
+xlsx
+zod
+
+=== Dev Dependencies ===
+@types/cheerio
+@types/fluent-ffmpeg
+@types/mime-types
+@types/node
+fast-check
+typescript
+vitest

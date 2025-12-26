@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/email/mailer.ts
+packages/email/template-components/template-document-recipient-signed.tsx
+packages/email/template-components/template-image.tsx
+packages/email/template-components/template-footer.tsx
+packages/email/template-components/template-document-rejected.tsx
+packages/email/template-components/template-document-super-delete.tsx
+packages/email/template-components/template-document-invite.tsx
+packages/email/template-components/template-access-auth-2fa.tsx
+packages/email/template-components/template-document-cancel.tsx
+packages/email/template-components/template-document-rejection-confirmed.tsx
+packages/email/template-components/template-reset-password.tsx
+packages/email/template-components/template-confirmation-email.tsx
+packages/email/template-components/template-document-self-signed.tsx
+packages/email/template-components/template-custom-message-body.tsx
+packages/email/template-components/template-document-image.tsx
+packages/email/template-components/template-document-completed.tsx
+packages/email/template-components/template-forgot-password.tsx
+packages/email/template-components/template-document-pending.tsx
+packages/email/tailwind.config.js
+packages/email/components.ts

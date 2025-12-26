@@ -1,0 +1,151 @@
+import { describe, it, expect } from 'vitest';
+import fc from 'fast-check';
+import { SearchEntityType, SearchQuery, SearchDocument } from '../types';
+import { searchService } from './setup';
+
+/**
+ * **Feature: docusign-alternative-comprehensive, Property 48: Performance Tracking Precision**
+ * 
+ * Property-based tests for the advanced search system implementation.
+ * These tests verify that search functionality works correctly across all valid inputs
+ * and maintains performance, accuracy, and reliability requirements.
+ */
+
+describe('Search Properties - Basic Tests', () => {
+
+    describe('Search Query Processing', () => {
+        it('should handle any valid search query without errors', async () => {
+            await fc.assert(fc.asyncProperty(
+                fc.record({
+                    query: fc.option(fc.string({ minLength: 1, maxLength: 200 })),
+                    entityTypes: fc.option(fc.array(fc.constantFrom(...Object.values(SearchEntityType)), { maxLength: 3 })),
+                    pagination: fc.option(fc.record({
+                        page: fc.integer({ min: 1, max: 100 }),
+                        limit: fc.integer({ min: 1, max: 100 })
+                    })),
+                    highlight: fc.boolean(),
+                    suggestions: fc.boolean(),
+                    personalize: fc.boolean()
+                }),
+                fc.string({ minLength: 1, maxLength: 50 }), // organizationId
+                fc.option(fc.string({ minLength: 1, maxLength: 50 })), // userId
+                async (query: any, organizationId: string, userId: string | null) => {
+                    // Property: Search should never throw errors for valid inputs
+                    const result = await searchService.search(query as SearchQuery, organizationId, userId);
+
+                    expect(result).toBeDefined();
+                    expect(result.documents).toBeInstanceOf(Array);
+                    expect(result.facets).toBeInstanceOf(Array);
+                    expect(result.suggestions).toBeInstanceOf(Array);
+                    expect(typeof result.total).toBe('number');
+                    expect(typeof result.searchTime).toBe('number');
+                    expect(result.searchTime).toBeGreaterThanOrEqual(0);
+                }
+            ));
+        });
+    });
+
+    describe('Document Indexing', () => {
+        it('should successfully index any valid document', async () => {
+            await fc.assert(fc.asyncProperty(
+                fc.record({
+                    id: fc.string({ minLength: 1, maxLength: 100 }),
+                    type: fc.constantFrom(...Object.values(SearchEntityType)),
+                    title: fc.string({ minLength: 1, maxLength: 200 }),
+                    content: fc.string({ minLength: 0, maxLength: 1000 }),
+                    organizationId: fc.string({ minLength: 1, maxLength: 50 }),
+                    userId: fc.option(fc.string({ minLength: 1, maxLength: 50 })),
+                    tags: fc.array(fc.string({ minLength: 1, maxLength: 50 }), { maxLength: 10 }),
+                    createdAt: fc.date(),
+                    updatedAt: fc.date(),
+                    permissions: fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1, maxLength: 5 }),
+                    metadata: fc.dictionary(fc.string(), fc.oneof(fc.string(), fc.integer(), fc.boolean()))
+                }),
+                async (document: any) => {
+                    // Property: Document indexing should never fail for valid documents
+                    await expect(searchService.indexDocument(document as SearchDocument)).resolves.not.toThrow();
+                }
+            ));
+        });
+    });
+
+    describe('Search Suggestions', () => {
+        it('should provide relevant suggestions for any query', async () => {
+            await fc.assert(fc.asyncProperty(
+                fc.string({ minLength: 1, maxLength: 100 }),
+                fc.string({ minLength: 1, maxLength: 50 }),
+                fc.option(fc.string({ minLength: 1, maxLength: 50 })),
+                async (query: string, organizationId: string, userId: string | null) => {
+                    // Property: Suggestions should always be returned as an array
+                    const suggestions = await searchService.getSuggestions(query, organizationId, userId);
+
+                    expect(Array.isArray(suggestions)).toBe(true);
+
+                    // Property: All suggestions should have required fields
+                    suggestions.forEach(suggestion => {
+                        expect(typeof suggestion.text).toBe('string');
+                        expect(suggestion.text.length).toBeGreaterThan(0);
+                        expect(['completion', 'correction', 'phrase']).toContain(suggestion.type);
+                        expect(typeof suggestion.score).toBe('number');
+                        expect(suggestion.score).toBeGreaterThanOrEqual(0);
+                        expect(suggestion.score).toBeLessThanOrEqual(1);
+                    });
+                }
+            ));
+        });
+    });
+
+    describe('Search Performance', () => {
+        it('should maintain reasonable response times', async () => {
+            await fc.assert(fc.asyncProperty(
+                fc.record({
+                    query: fc.option(fc.string({ minLength: 1, maxLength: 50 })),
+                    entityTypes: fc.option(fc.array(fc.constantFrom(...Object.values(SearchEntityType)), { maxLength: 2 })),
+                    pagination: fc.option(fc.record({
+                        page: fc.integer({ min: 1, max: 10 }),
+                        limit: fc.integer({ min: 1, max: 50 })
+                    })),
+                    highlight: fc.boolean(),
+                    suggestions: fc.boolean(),
+                    personalize: fc.boolean()
+                }),
+                fc.string({ minLength: 1, maxLength: 50 }),
+                async (query: any, organizationId: string) => {
+                    // Property: Search should complete within reasonable time
+                    const startTime = Date.now();
+                    const result = await searchService.search(query as SearchQuery, organizationId);
+                    const endTime = Date.now();
+
+                    // Performance property: Search should complete within 2 seconds
+                    expect(endTime - startTime).toBeLessThan(2000);
+
+                    // Property: Search should return valid results
+                    expect(result).toBeDefined();
+                    expect(typeof result.searchTime).toBe('number');
+                    expect(result.searchTime).toBeGreaterThanOrEqual(0);
+                }
+            ));
+        });
+    });
+
+    describe('Health Check', () => {
+        it('should always return a valid health status', async () => {
+            await fc.assert(fc.asyncProperty(
+                fc.constant(null), // No input needed for health check
+                async () => {
+                    // Property: Health check should always return valid status
+                    const health = await searchService.healthCheck();
+
+                    expect(health).toBeDefined();
+                    expect(['healthy', 'degraded', 'unhealthy']).toContain(health.status);
+                    expect(typeof health.components).toBe('object');
+
+                    // Property: All components should have status
+                    Object.values(health.components).forEach(component => {
+                        expect(typeof component.status).toBe('string');
+                    });
+                }
+            ));
+        });
+    });
+});

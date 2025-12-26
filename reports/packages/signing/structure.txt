@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/signing/constants/byte-range.ts
+packages/signing/transports/google-cloud-hsm.ts
+packages/signing/transports/local-cert.ts
+packages/signing/node_modules/strip-literal/dist/index.d.ts
+packages/signing/node_modules/vitest/globals.d.ts
+packages/signing/node_modules/vitest/mocker.d.ts
+packages/signing/node_modules/vitest/environments.d.ts
+packages/signing/node_modules/vitest/dist/execute.js
+packages/signing/node_modules/vitest/dist/mocker.d.ts
+packages/signing/node_modules/vitest/dist/spy.js
+packages/signing/node_modules/vitest/dist/coverage.js
+packages/signing/node_modules/vitest/dist/mocker.js
+packages/signing/node_modules/vitest/dist/environments.d.ts
+packages/signing/node_modules/vitest/dist/config.d.ts
+packages/signing/node_modules/vitest/dist/worker.js
+packages/signing/node_modules/vitest/dist/runners.d.ts
+packages/signing/node_modules/vitest/dist/index.js
+packages/signing/node_modules/vitest/dist/suite.js
+packages/signing/node_modules/vitest/dist/snapshot.d.ts
+packages/signing/node_modules/vitest/dist/config.js

@@ -1,0 +1,417 @@
+import { createPDFConversionEngine } from '../src/pdf-conversion-engine';
+import {
+    DOCXConversionOptions,
+    HTMLConversionOptions,
+    ImageConversionOptions,
+    PDFAConversionOptions,
+    BatchConversionOptions
+} from '../src/types';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+
+/**
+ * PDF Conversion System Example
+ * 
+ * This example demonstrates the comprehensive PDF conversion capabilities:
+ * - DOCX to PDF conversion with formatting preservation
+ * - HTML to PDF conversion for web content
+ * - Image to PDF conversion with optimization
+ * - PDF to PDF/A conversion for long-term archival
+ * - Batch conversion operations
+ */
+
+async function runPDFConversionExample() {
+    console.log('🔄 PDF Conversion System Example');
+    console.log('================================\n');
+
+    const conversionEngine = createPDFConversionEngine();
+
+    try {
+        // Example 1: DOCX to PDF Conversion
+        await demonstrateDOCXConversion(conversionEngine);
+
+        // Example 2: HTML to PDF Conversion
+        await demonstrateHTMLConversion(conversionEngine);
+
+        // Example 3: Image to PDF Conversion
+        await demonstrateImageConversion(conversionEngine);
+
+        // Example 4: PDF to PDF/A Conversion
+        await demonstratePDFAConversion(conversionEngine);
+
+        // Example 5: Batch Conversion
+        await demonstrateBatchConversion(conversionEngine);
+
+        // Example 6: Conversion Analysis
+        await demonstrateConversionAnalysis(conversionEngine);
+
+    } catch (error) {
+        console.error('❌ Error in PDF conversion example:', error);
+    } finally {
+        // Cleanup resources
+        await conversionEngine.cleanup();
+        console.log('\n✅ PDF Conversion example completed');
+    }
+}
+
+async function demonstrateDOCXConversion(engine: any) {
+    console.log('1. DOCX to PDF Conversion');
+    console.log('-------------------------');
+
+    try {
+        // Create a mock DOCX buffer (in real usage, you'd read from file)
+        const mockDOCXContent = Buffer.from('Mock DOCX content for demonstration');
+
+        const docxOptions: DOCXConversionOptions = {
+            preserveFormatting: true,
+            includeImages: true,
+            includeHeaders: true,
+            includeFooters: true,
+            pageSize: 'A4',
+            orientation: 'portrait',
+            imageQuality: 85,
+            fontEmbedding: true,
+            pageMargins: {
+                top: 25,
+                bottom: 25,
+                left: 20,
+                right: 20
+            }
+        };
+
+        console.log('📄 Converting DOCX with options:', JSON.stringify(docxOptions, null, 2));
+
+        const result = await engine.convertDOCXToPDF(mockDOCXContent, docxOptions);
+
+        if (result.success) {
+            console.log('✅ DOCX conversion successful!');
+            console.log(`   Original size: ${result.originalSize} bytes`);
+            console.log(`   Converted size: ${result.convertedSize} bytes`);
+            console.log(`   Processing time: ${result.processingTime}ms`);
+            console.log(`   Page count: ${result.metadata?.pageCount || 'Unknown'}`);
+
+            if (result.warnings && result.warnings.length > 0) {
+                console.log('⚠️  Warnings:', result.warnings);
+            }
+
+            // Save the result (in real usage)
+            // writeFileSync('output/converted-document.pdf', result.outputBuffer!);
+        } else {
+            console.log('❌ DOCX conversion failed:', result.error);
+        }
+
+    } catch (error) {
+        console.log('❌ DOCX conversion error:', error instanceof Error ? error.message : error);
+    }
+
+    console.log();
+}
+
+async function demonstrateHTMLConversion(engine: any) {
+    console.log('2. HTML to PDF Conversion');
+    console.log('-------------------------');
+
+    try {
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Sample Document</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    h1 { color: #333; border-bottom: 2px solid #007acc; }
+                    .highlight { background-color: #fff3cd; padding: 10px; }
+                    .footer { position: fixed; bottom: 0; width: 100%; text-align: center; }
+                </style>
+            </head>
+            <body>
+                <h1>Sample HTML Document</h1>
+                <p>This is a sample HTML document that will be converted to PDF.</p>
+                <div class="highlight">
+                    <p><strong>Important:</strong> This content is highlighted for emphasis.</p>
+                </div>
+                <ul>
+                    <li>Feature 1: High-quality conversion</li>
+                    <li>Feature 2: Formatting preservation</li>
+                    <li>Feature 3: Image support</li>
+                </ul>
+                <div class="footer">
+                    <p>Generated by PDF Conversion System</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const htmlOptions: HTMLConversionOptions = {
+            pageSize: 'A4',
+            orientation: 'portrait',
+            printBackground: true,
+            displayHeaderFooter: true,
+            headerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%;">Sample Document Header</div>',
+            footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
+            margins: {
+                top: '1in',
+                bottom: '1in',
+                left: '0.75in',
+                right: '0.75in'
+            },
+            scale: 1.0
+        };
+
+        console.log('🌐 Converting HTML with options:', JSON.stringify(htmlOptions, null, 2));
+
+        const result = await engine.convertHTMLToPDF(htmlContent, htmlOptions);
+
+        if (result.success) {
+            console.log('✅ HTML conversion successful!');
+            console.log(`   Original size: ${result.originalSize} bytes`);
+            console.log(`   Converted size: ${result.convertedSize} bytes`);
+            console.log(`   Processing time: ${result.processingTime}ms`);
+            console.log(`   Page count: ${result.metadata?.pageCount || 'Unknown'}`);
+            console.log(`   Has images: ${result.metadata?.hasImages ? 'Yes' : 'No'}`);
+
+            // Save the result (in real usage)
+            // writeFileSync('output/converted-html.pdf', result.outputBuffer!);
+        } else {
+            console.log('❌ HTML conversion failed:', result.error);
+        }
+
+    } catch (error) {
+        console.log('❌ HTML conversion error:', error instanceof Error ? error.message : error);
+    }
+
+    console.log();
+}
+
+async function demonstrateImageConversion(engine: any) {
+    console.log('3. Image to PDF Conversion');
+    console.log('--------------------------');
+
+    try {
+        // Create a mock image buffer (in real usage, you'd read from file)
+        const mockImageContent = Buffer.from('Mock PNG image content for demonstration');
+
+        const imageOptions: ImageConversionOptions = {
+            pageSize: 'A4',
+            orientation: 'portrait',
+            fitToPage: true,
+            maintainAspectRatio: true,
+            imageQuality: 90,
+            compression: 'jpeg',
+            centerImage: true,
+            margins: {
+                top: 20,
+                bottom: 20,
+                left: 20,
+                right: 20
+            }
+        };
+
+        console.log('🖼️  Converting PNG image with options:', JSON.stringify(imageOptions, null, 2));
+
+        const result = await engine.convertImageToPDF(mockImageContent, 'png', imageOptions);
+
+        if (result.success) {
+            console.log('✅ Image conversion successful!');
+            console.log(`   Original size: ${result.originalSize} bytes`);
+            console.log(`   Converted size: ${result.convertedSize} bytes`);
+            console.log(`   Processing time: ${result.processingTime}ms`);
+            console.log(`   Page count: ${result.metadata?.pageCount || 'Unknown'}`);
+
+            // Save the result (in real usage)
+            // writeFileSync('output/converted-image.pdf', result.outputBuffer!);
+        } else {
+            console.log('❌ Image conversion failed:', result.error);
+        }
+
+    } catch (error) {
+        console.log('❌ Image conversion error:', error instanceof Error ? error.message : error);
+    }
+
+    console.log();
+}
+
+async function demonstratePDFAConversion(engine: any) {
+    console.log('4. PDF to PDF/A Conversion');
+    console.log('--------------------------');
+
+    try {
+        // Create a simple PDF for conversion (in real usage, you'd read from file)
+        const { PDFDocument } = await import('pdf-lib');
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage();
+        page.drawText('Sample PDF for PDF/A conversion', {
+            x: 50,
+            y: 750,
+            size: 12
+        });
+        const pdfBuffer = await pdfDoc.save();
+
+        const pdfaOptions: PDFAConversionOptions = {
+            conformanceLevel: 'pdf-a2b',
+            embedFonts: true,
+            embedColorProfile: true,
+            validateCompliance: true,
+            metadata: {
+                title: 'Sample PDF/A Document',
+                author: 'PDF Conversion System',
+                subject: 'Demonstration of PDF/A conversion',
+                keywords: ['pdf-a', 'archival', 'conversion'],
+                creator: 'DocuSign Alternative'
+            }
+        };
+
+        console.log('📚 Converting PDF to PDF/A with options:', JSON.stringify(pdfaOptions, null, 2));
+
+        const result = await engine.convertToPDFA(Buffer.from(pdfBuffer), pdfaOptions);
+
+        if (result.success) {
+            console.log('✅ PDF/A conversion successful!');
+            console.log(`   Original size: ${result.originalSize} bytes`);
+            console.log(`   Converted size: ${result.convertedSize} bytes`);
+            console.log(`   Processing time: ${result.processingTime}ms`);
+            console.log(`   PDF version: ${result.metadata?.pdfVersion}`);
+            console.log(`   Conformance level: ${result.outputFormat}`);
+
+            if (result.warnings && result.warnings.length > 0) {
+                console.log('⚠️  Warnings:', result.warnings);
+            }
+
+            // Save the result (in real usage)
+            // writeFileSync('output/converted-pdfa.pdf', result.outputBuffer!);
+        } else {
+            console.log('❌ PDF/A conversion failed:', result.error);
+        }
+
+    } catch (error) {
+        console.log('❌ PDF/A conversion error:', error instanceof Error ? error.message : error);
+    }
+
+    console.log();
+}
+
+async function demonstrateBatchConversion(engine: any) {
+    console.log('5. Batch Conversion');
+    console.log('-------------------');
+
+    try {
+        const batchOptions: BatchConversionOptions = {
+            inputFormat: 'png',
+            outputFormat: 'pdf',
+            files: [
+                {
+                    name: 'image1.png',
+                    buffer: Buffer.from('Mock PNG image 1 content'),
+                    options: {
+                        pageSize: 'A4',
+                        fitToPage: true,
+                        centerImage: true
+                    } as ImageConversionOptions
+                },
+                {
+                    name: 'image2.png',
+                    buffer: Buffer.from('Mock PNG image 2 content'),
+                    options: {
+                        pageSize: 'Letter',
+                        fitToPage: false,
+                        centerImage: false
+                    } as ImageConversionOptions
+                },
+                {
+                    name: 'image3.png',
+                    buffer: Buffer.from('Mock PNG image 3 content')
+                }
+            ],
+            parallelProcessing: true,
+            maxConcurrency: 2
+        };
+
+        console.log('📦 Starting batch conversion of', batchOptions.files.length, 'files');
+        console.log('   Parallel processing:', batchOptions.parallelProcessing);
+        console.log('   Max concurrency:', batchOptions.maxConcurrency);
+
+        const result = await engine.batchConvert(batchOptions);
+
+        console.log('✅ Batch conversion completed!');
+        console.log(`   Total processing time: ${result.totalProcessingTime}ms`);
+        console.log(`   Success count: ${result.successCount}`);
+        console.log(`   Failure count: ${result.failureCount}`);
+        console.log(`   Total original size: ${result.totalOriginalSize} bytes`);
+        console.log(`   Total converted size: ${result.totalConvertedSize} bytes`);
+
+        // Show individual results
+        result.results.forEach((fileResult, index) => {
+            console.log(`   File ${index + 1} (${fileResult.fileName}):`);
+            console.log(`     Success: ${fileResult.success}`);
+            if (fileResult.success) {
+                console.log(`     Size: ${fileResult.originalSize} → ${fileResult.convertedSize} bytes`);
+                console.log(`     Time: ${fileResult.processingTime}ms`);
+            } else {
+                console.log(`     Error: ${fileResult.error}`);
+            }
+        });
+
+    } catch (error) {
+        console.log('❌ Batch conversion error:', error instanceof Error ? error.message : error);
+    }
+
+    console.log();
+}
+
+async function demonstrateConversionAnalysis(engine: any) {
+    console.log('6. Conversion Analysis');
+    console.log('---------------------');
+
+    try {
+        // Test conversion support validation
+        console.log('🔍 Testing conversion support:');
+
+        const supportTests = [
+            { input: 'docx', output: 'pdf' },
+            { input: 'html', output: 'pdf-a1' },
+            { input: 'png', output: 'pdf-a2' },
+            { input: 'jpg', output: 'pdf-a3' }
+        ];
+
+        for (const test of supportTests) {
+            const isSupported = await engine.validateConversionSupport(test.input, test.output);
+            console.log(`   ${test.input} → ${test.output}: ${isSupported ? '✅ Supported' : '❌ Not supported'}`);
+        }
+
+        console.log();
+
+        // Test conversion requirements analysis
+        console.log('📊 Analyzing conversion requirements:');
+
+        const analysisTests = [
+            { format: 'docx', content: 'Mock DOCX with complex formatting and images' },
+            { format: 'html', content: '<html><body><img src="test.png"><script>alert("test")</script></body></html>' },
+            { format: 'png', content: 'Mock PNG image content' }
+        ];
+
+        for (const test of analysisTests) {
+            const buffer = Buffer.from(test.content);
+            const analysis = await engine.analyzeConversionRequirements(buffer, test.format);
+
+            console.log(`   ${test.format.toUpperCase()} Analysis:`);
+            console.log(`     Estimated output size: ${analysis.estimatedOutputSize} bytes`);
+            console.log(`     Processing complexity: ${analysis.processingComplexity}`);
+            console.log(`     Supported outputs: ${analysis.supportedOutputFormats.join(', ')}`);
+
+            if (analysis.warnings.length > 0) {
+                console.log(`     Warnings: ${analysis.warnings.join(', ')}`);
+            }
+            console.log();
+        }
+
+    } catch (error) {
+        console.log('❌ Conversion analysis error:', error instanceof Error ? error.message : error);
+    }
+}
+
+// Run the example
+if (require.main === module) {
+    runPDFConversionExample().catch(console.error);
+}
+
+export { runPDFConversionExample };

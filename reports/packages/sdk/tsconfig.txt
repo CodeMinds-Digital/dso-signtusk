@@ -1,0 +1,19 @@
+=== TypeScript Configuration ===
+{
+    "extends": "@docusign-alternative/tsconfig/base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "incremental": false
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "build",
+        "node_modules",
+        "**/*.test.ts",
+        "**/*.spec.ts"
+    ]
+}

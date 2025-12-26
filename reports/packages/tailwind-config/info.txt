@@ -1,0 +1,19 @@
+=== Package Information ===
+Name: @docusign-alternative/tailwind-config
+Version: 0.0.0
+Description: N/A
+Main: index.cjs
+Types: index.d.ts
+
+=== Available Scripts ===
+clean: rimraf node_modules
+
+=== Dependencies ===
+@tailwindcss/container-queries
+@tailwindcss/typography
+autoprefixer
+postcss
+tailwindcss
+tailwindcss-animate
+
+=== Dev Dependencies ===

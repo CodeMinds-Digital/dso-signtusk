@@ -1,0 +1,52 @@
+=== Package Information ===
+Name: @docusign-alternative/sdk
+Version: 1.0.0
+Description: Official SDK for DocuSign Alternative - Multi-language client libraries
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup src/index.ts --format cjs,esm --dts --clean
+build:typescript: tsup src/typescript/index.ts --format cjs,esm --dts --out-dir dist/typescript --clean
+build:all: npm run build && npm run build:typescript && npm run build:python && npm run build:php && npm run build:dotnet
+build:python: cd python && python setup.py sdist bdist_wheel
+build:php: cd php && composer install --no-dev --optimize-autoloader
+build:dotnet: cd dotnet && dotnet build --configuration Release
+dev: tsup src/index.ts --format cjs,esm --dts --watch
+clean: rm -rf dist && rm -rf python/dist && rm -rf python/build && rm -rf php/vendor && rm -rf dotnet/bin && rm -rf dotnet/obj
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+test:coverage: vitest --coverage
+test:python: cd python && python -m pytest tests/
+test:php: cd php && ./vendor/bin/phpunit tests/
+test:dotnet: cd dotnet && dotnet test
+test:all: npm run test && npm run test:python && npm run test:php && npm run test:dotnet
+lint: eslint src --ext .ts,.tsx
+lint:fix: eslint src --ext .ts,.tsx --fix
+docs:generate: typedoc src/typescript/index.ts --out docs/typescript
+docs:python: cd python && sphinx-build -b html docs docs/_build
+docs:php: cd php && phpdoc -d src -t docs
+docs:dotnet: cd dotnet && docfx docfx.json
+publish:npm: npm publish --access public
+publish:python: cd python && python -m twine upload dist/*
+publish:php: cd php && composer publish
+publish:dotnet: cd dotnet && dotnet nuget push bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json
+
+=== Dependencies ===
+axios
+form-data
+ws
+zod
+
+=== Dev Dependencies ===
+@docusign-alternative/tsconfig
+@types/node
+@types/ws
+@typescript-eslint/eslint-plugin
+@typescript-eslint/parser
+eslint
+fast-check
+typedoc
+typescript
+vitest

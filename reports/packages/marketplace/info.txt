@@ -1,0 +1,31 @@
+=== Package Information ===
+Name: @docusign-alternative/marketplace
+Version: 1.0.0
+Description: N/A
+Main: ./src/index.ts
+Types: ./src/index.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@hono/zod-openapi
+dockerode
+semver
+stripe
+tar
+vm2
+zod
+
+=== Dev Dependencies ===
+@types/dockerode
+@types/node
+@types/semver
+@types/tar
+fast-check
+typescript
+vitest

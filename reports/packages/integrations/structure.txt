@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/integrations/dist/index.js
+packages/integrations/dist/index.d.ts
+packages/integrations/node_modules/@types/node/compatibility/indexable.d.ts
+packages/integrations/node_modules/@types/node/compatibility/index.d.ts
+packages/integrations/node_modules/@types/node/compatibility/iterators.d.ts
+packages/integrations/node_modules/@types/node/compatibility/disposable.d.ts
+packages/integrations/node_modules/@types/node/path.d.ts
+packages/integrations/node_modules/@types/node/constants.d.ts
+packages/integrations/node_modules/@types/node/domain.d.ts
+packages/integrations/node_modules/@types/node/diagnostics_channel.d.ts
+packages/integrations/node_modules/@types/node/globals.d.ts
+packages/integrations/node_modules/@types/node/sea.d.ts
+packages/integrations/node_modules/@types/node/string_decoder.d.ts
+packages/integrations/node_modules/@types/node/tls.d.ts
+packages/integrations/node_modules/@types/node/tty.d.ts
+packages/integrations/node_modules/@types/node/punycode.d.ts
+packages/integrations/node_modules/@types/node/readline.d.ts
+packages/integrations/node_modules/@types/node/crypto.d.ts
+packages/integrations/node_modules/@types/node/trace_events.d.ts
+packages/integrations/node_modules/@types/node/events.d.ts

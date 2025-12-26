@@ -1,0 +1,25 @@
+=== Package Information ===
+Name: @docusign-alternative/storage
+Version: 1.0.0
+Description: N/A
+Main: ./src/index.ts
+Types: ./src/index.ts
+
+=== Available Scripts ===
+build: tsc
+dev: tsc --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+@aws-sdk/client-s3
+@aws-sdk/s3-request-presigner
+@docusign-alternative/lib
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+typescript
+vitest

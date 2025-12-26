@@ -1,0 +1,12 @@
+=== TypeScript Configuration ===
+{
+  "extends": "@documenso/tsconfig/react-library.json",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules"
+  ]
+}

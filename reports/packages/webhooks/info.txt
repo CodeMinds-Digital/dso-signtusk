@@ -1,0 +1,29 @@
+=== Package Information ===
+Name: @docusign-alternative/webhooks
+Version: 1.0.0
+Description: Comprehensive webhook system for DocuSign Alternative
+Main: dist/index.js
+Types: dist/index.d.ts
+
+=== Available Scripts ===
+build: tsup --dts
+build:tsc: tsc
+dev: tsup --watch
+clean: rm -rf dist
+type-check: tsc --noEmit
+test: vitest --run
+test:watch: vitest
+test:coverage: vitest --coverage
+
+=== Dependencies ===
+@docusign-alternative/database
+@docusign-alternative/jobs
+@docusign-alternative/lib
+crypto
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+typescript
+vitest

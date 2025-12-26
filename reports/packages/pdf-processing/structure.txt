@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/pdf-processing/pdf-architecture.test.ts
+packages/pdf-processing/types/index.ts
+packages/pdf-processing/pdf-generation.test.ts
+packages/pdf-processing/dist/types/index.js
+packages/pdf-processing/dist/types/index.d.ts
+packages/pdf-processing/dist/vitest.config.d.ts
+packages/pdf-processing/dist/index.js
+packages/pdf-processing/dist/vitest.config.js
+packages/pdf-processing/dist/engines/audit-log-generator.js
+packages/pdf-processing/dist/engines/certificate-generator.d.ts
+packages/pdf-processing/dist/engines/audit-log-generator.d.ts
+packages/pdf-processing/dist/engines/certificate-generator.js
+packages/pdf-processing/dist/engines/base-generator.d.ts
+packages/pdf-processing/dist/engines/base-generator.js
+packages/pdf-processing/dist/index.d.ts
+packages/pdf-processing/node_modules/chai/register-assert.js
+packages/pdf-processing/node_modules/chai/karma.sauce.js
+packages/pdf-processing/node_modules/chai/register-expect.js
+packages/pdf-processing/node_modules/chai/index.js
+packages/pdf-processing/node_modules/chai/register-should.js

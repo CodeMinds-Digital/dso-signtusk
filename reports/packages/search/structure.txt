@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/search/dist/index.js
+packages/search/dist/index.d.ts
+packages/search/node_modules/pino-std-serializers/test/types/index.test-d.ts
+packages/search/node_modules/pino-std-serializers/test/err-with-cause.test.js
+packages/search/node_modules/pino-std-serializers/test/req.test.js
+packages/search/node_modules/pino-std-serializers/test/err.test.js
+packages/search/node_modules/pino-std-serializers/test/res.test.js
+packages/search/node_modules/pino-std-serializers/index.js
+packages/search/node_modules/pino-std-serializers/lib/res.js
+packages/search/node_modules/pino-std-serializers/lib/err-helpers.js
+packages/search/node_modules/pino-std-serializers/lib/req.js
+packages/search/node_modules/pino-std-serializers/lib/err-proto.js
+packages/search/node_modules/pino-std-serializers/lib/err.js
+packages/search/node_modules/pino-std-serializers/lib/err-with-cause.js
+packages/search/node_modules/pino-std-serializers/index.d.ts
+packages/search/node_modules/pino/test/hooks.test.js
+packages/search/node_modules/pino/test/redact.test.js
+packages/search/node_modules/pino/test/multistream.test.js
+packages/search/node_modules/pino/test/escaping.test.js
+packages/search/node_modules/pino/test/serializers.test.js

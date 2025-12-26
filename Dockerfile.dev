@@ -1,0 +1,102 @@
+# Multi-stage Dockerfile for Hybrid Architecture Development
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+RUN apk add --no-cache libc6-compat curl
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+COPY apps/web/package.json ./apps/web/
+COPY apps/app/package.json ./apps/app/
+COPY packages/*/package.json ./packages/*/
+
+RUN npm ci --only=development
+
+# Copy source code
+COPY . .
+
+# Development stage for Next.js Web App
+FROM base AS web-dev
+WORKDIR /app
+EXPOSE 3000
+EXPOSE 24678
+
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+
+# Enable hot reloading and performance optimizations
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+ENV FAST_REFRESH=true
+ENV TURBOPACK=1
+ENV WDS_SOCKET_HOST=localhost
+ENV WDS_SOCKET_PORT=24678
+ENV FORCE_COLOR=1
+
+# Install development tools for better debugging
+RUN npm install -g nodemon
+
+# Create necessary directories
+RUN mkdir -p /app/apps/web/.next
+RUN mkdir -p /app/uploads
+RUN mkdir -p /app/logs
+
+CMD ["sh", "-c", "cd apps/web && npm run dev -- --port 3000 --hostname 0.0.0.0"]
+
+# Development stage for Remix App
+FROM base AS app-dev
+WORKDIR /app
+EXPOSE 3001
+EXPOSE 24679
+EXPOSE 9229
+
+ENV NODE_ENV=development
+ENV PORT=3001
+
+# Enable hot reloading, debugging, and performance optimizations
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+ENV REMIX_DEV_SERVER_WS_PORT=24679
+ENV NODE_OPTIONS=--inspect=0.0.0.0:9229
+ENV FORCE_COLOR=1
+
+# Install development tools for better debugging
+RUN npm install -g nodemon
+
+# Create necessary directories
+RUN mkdir -p /app/apps/app/build
+RUN mkdir -p /app/uploads
+RUN mkdir -p /app/logs
+
+CMD ["sh", "-c", "cd apps/app && npm run dev -- --host 0.0.0.0 --port 3001"]
+
+# Development stage for tRPC API Server
+FROM base AS api-dev
+WORKDIR /app
+EXPOSE 3002
+EXPOSE 5555
+
+ENV NODE_ENV=development
+ENV PORT=3002
+
+CMD ["npm", "run", "dev:api"]
+
+# Default development stage
+FROM base AS development
+WORKDIR /app
+EXPOSE 3000
+EXPOSE 3001
+EXPOSE 3002
+EXPOSE 5555
+EXPOSE 9229
+EXPOSE 24678
+EXPOSE 24679
+
+ENV NODE_ENV=development
+
+# Install development tools
+RUN npm install -g nodemon concurrently
+
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/api/v1/schema.ts
+packages/api/v1/middleware/authenticated.ts
+packages/api/v1/contract.ts
+packages/api/v1/implementation.ts
+packages/api/v1/examples/03-update-a-field.ts
+packages/api/v1/examples/05-add-a-recipient.ts
+packages/api/v1/examples/07-remove-a-recipient.ts
+packages/api/v1/examples/06-update-a-recipient.ts
+packages/api/v1/examples/04-remove-a-field.ts
+packages/api/v1/examples/08-get-a-document.ts
+packages/api/v1/examples/09-paginate-all-documents.ts
+packages/api/v1/examples/01-create-and-send-document.ts
+packages/api/v1/examples/02-add-a-field.ts
+packages/api/v1/openapi.ts
+packages/api/node_modules/@types/swagger-ui-react/swagger-ui-react.d.ts
+packages/api/node_modules/@types/swagger-ui-react/index.d.ts
+packages/api/hono.ts
+packages/api/index.ts
+packages/api/vitest.config.ts
+packages/api/src/v1/index.ts

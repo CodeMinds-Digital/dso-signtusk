@@ -1,0 +1,12 @@
+=== Package Information ===
+Name: @docusign-alternative/assets
+Version: 0.1.0
+Description: N/A
+Main: N/A
+Types: N/A
+
+=== Available Scripts ===
+
+=== Dependencies ===
+
+=== Dev Dependencies ===

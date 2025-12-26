@@ -1,0 +1,23 @@
+=== Package Information ===
+Name: @docusign-alternative/compliance
+Version: 1.0.0
+Description: N/A
+Main: ./src/index.ts
+Types: ./src/index.ts
+
+=== Available Scripts ===
+build: tsup --dts
+dev: tsup --watch
+lint: eslint src/
+test: vitest
+type-check: tsc --noEmit
+
+=== Dependencies ===
+date-fns
+zod
+
+=== Dev Dependencies ===
+@types/node
+fast-check
+typescript
+vitest

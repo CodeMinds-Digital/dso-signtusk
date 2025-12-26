@@ -1,0 +1,17 @@
+{
+    "extends": "@signtusk/tsconfig/react-library.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "incremental": false,
+        "skipLibCheck": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "node_modules",
+        "**/*.test.ts",
+        "**/*.spec.ts"
+    ]
+}

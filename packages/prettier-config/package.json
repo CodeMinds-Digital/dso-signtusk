@@ -1,0 +1,16 @@
+{
+  "name": "@signtusk/prettier-config",
+  "version": "0.0.0",
+  "main": "./index.cjs",
+  "license": "Private - Part of Signtusk Platform",
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1"
+  },
+  "devDependencies": {},
+  "private": true
+}

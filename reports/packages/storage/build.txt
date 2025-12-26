@@ -1,0 +1,7 @@
+=== Build Test ===
+npm warn Unknown project config "link-workspace-packages". This will stop working in the next major version of npm.
+
+> @docusign-alternative/storage@1.0.0 build
+> tsc
+
+✅ Build successful

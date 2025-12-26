@@ -1,0 +1,54 @@
+Package Report Summary - Wed Dec 24 19:11:00 IST 2025
+Report Type: nuclear
+==============================
+ai - AI-powered features for document processing and analysis
+analytics - Organization analytics and reporting system
+api - No description
+assets - No description
+auth - No description
+billing - Billing and subscription management for DocuSign Alternative
+blockchain - Blockchain integration package for immutable document storage, audit trails, and smart contracts
+cache - No description
+compliance - No description
+database - Database schema and migrations for DocuSign Alternative
+ee - No description
+email - No description
+eslint-config - No description
+file-processing - No description
+i18n - Internationalization and localization package for DocuSign Alternative
+infrastructure - No description
+integrations - Third-party integrations for DocuSign Alternative - Zapier, Microsoft 365, Google Workspace, Salesforce
+jobs - No description
+lib - No description
+marketplace - No description
+notifications - Advanced notification system with SMS, push notifications, email customization, scheduling, and analytics
+pdf-processing - Server-side PDF processing package for certificates and audit logs
+pdf - PDF processing engine for DocuSign Alternative
+performance - No description
+prettier-config - No description
+prisma - No description
+realtime - Real-time API features with WebSocket and SSE support for DocuSign Alternative
+sdk - Official SDK for DocuSign Alternative - Multi-language client libraries
+search - Advanced search system with Elasticsearch integration, faceted search, and AI-powered suggestions
+security - No description
+signing - No description
+storage - No description
+tailwind-config - No description
+templates - Template management system for DocuSign Alternative
+trpc - No description
+tsconfig - No description
+ui - No description
+webhooks - Comprehensive webhook system for DocuSign Alternative
+white-label - White-label customization and branding system
+
+Total packages processed: 39
+
+=== BUILD SUMMARY ===
+✅ Successful builds: 26
+❌ Failed builds: 0
+⚪ No build script: 13
+
+=== TEST SUMMARY ===
+✅ Successful tests: 0
+❌ Failed tests: 26
+⚪ No test script: 13

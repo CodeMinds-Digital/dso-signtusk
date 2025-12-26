@@ -1,0 +1,4 @@
+=== Test Results ===
+⚠️  Test execution skipped to prevent hanging
+To run tests manually: cd packages/search/ && npm test
+❌ Tests skipped

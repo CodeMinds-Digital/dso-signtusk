@@ -1,0 +1,21 @@
+=== File Structure ===
+packages/prisma/generated/zod/inputTypeSchemas/SignatureScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/OrganisationMemberInviteScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/DocumentSigningOrderSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/EmailDomainStatusSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/RecipientRoleSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/OrganisationGroupTypeSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/FieldScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/DocumentDistributionMethodSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/SiteSettingsScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/BackgroundJobTaskScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/TeamMemberRoleSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/DecimalJsLikeSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/TeamGroupScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/UserScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/SubscriptionClaimScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/TeamEmailScalarFieldEnumSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/DocumentSourceSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/NullableJsonNullValueInputSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/BackgroundJobTaskStatusSchema.ts
+packages/prisma/generated/zod/inputTypeSchemas/EnvelopeScalarFieldEnumSchema.ts

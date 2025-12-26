@@ -1,0 +1,62 @@
+=== Package Information ===
+Name: @docusign-alternative/lib
+Version: 0.0.0
+Description: N/A
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+lint: eslint .
+lint:fix: eslint . --fix
+clean: rimraf node_modules
+
+=== Dependencies ===
+@ai-sdk/google-vertex
+@aws-sdk/client-s3
+@aws-sdk/client-sesv2
+@aws-sdk/cloudfront-signer
+@aws-sdk/s3-request-presigner
+@aws-sdk/signature-v4-crt
+@docusign-alternative/assets
+@docusign-alternative/email
+@docusign-alternative/prisma
+@docusign-alternative/signing
+@lingui/core
+@lingui/macro
+@lingui/react
+@napi-rs/canvas
+@noble/ciphers
+@noble/hashes
+@node-rs/bcrypt
+@pdf-lib/fontkit
+@scure/base
+@sindresorhus/slugify
+@team-plain/typescript-sdk
+@vvo/tzdb
+ai
+csv-parse
+inngest
+jose
+konva
+kysely
+luxon
+nanoid
+oslo
+p-map
+pg
+pino
+pino-pretty
+posthog-js
+posthog-node
+react
+react-pdf
+remeda
+sharp
+skia-canvas
+stripe
+ts-pattern
+zod
+
+=== Dev Dependencies ===
+@types/luxon
+@types/pg

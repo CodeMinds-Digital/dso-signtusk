@@ -1,0 +1,39 @@
+=== Package Information ===
+Name: @docusign-alternative/email
+Version: 0.0.0
+Description: N/A
+Main: ./index.ts
+Types: ./index.ts
+
+=== Available Scripts ===
+dev: email dev --port 3002 --dir templates
+clean: rimraf node_modules
+
+=== Dependencies ===
+@docusign-alternative/tailwind-config
+@react-email/body
+@react-email/button
+@react-email/code-block
+@react-email/code-inline
+@react-email/column
+@react-email/container
+@react-email/font
+@react-email/head
+@react-email/heading
+@react-email/hr
+@react-email/html
+@react-email/img
+@react-email/link
+@react-email/preview
+@react-email/render
+@react-email/row
+@react-email/section
+@react-email/tailwind
+@react-email/text
+nodemailer
+react-email
+resend
+
+=== Dev Dependencies ===
+@docusign-alternative/tsconfig
+@types/nodemailer

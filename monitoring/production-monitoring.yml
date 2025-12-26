@@ -1,0 +1,417 @@
+# Production Monitoring Configuration
+# Comprehensive monitoring and alerting for Signtusk Platform
+
+version: '3.8'
+
+# Application Performance Monitoring
+apm:
+  provider: "datadog" # or "newrelic", "dynatrace"
+  config:
+    api_key: "${DATADOG_API_KEY}"
+    app_key: "${DATADOG_APP_KEY}"
+    service_name: "signtusk"
+    environment: "${NODE_ENV}"
+    version: "${APP_VERSION}"
+    
+  # Metrics collection
+  metrics:
+    - name: "api.response_time"
+      type: "histogram"
+      tags: ["endpoint", "method", "status_code"]
+      
+    - name: "api.request_count"
+      type: "counter"
+      tags: ["endpoint", "method", "status_code"]
+      
+    - name: "document.processing_time"
+      type: "histogram"
+      tags: ["document_type", "size_category"]
+      
+    - name: "signature.completion_rate"
+      type: "gauge"
+      tags: ["organization", "template_type"]
+      
+    - name: "user.active_sessions"
+      type: "gauge"
+      tags: ["organization", "user_type"]
+
+# Infrastructure Monitoring
+infrastructure:
+  # Application servers
+  servers:
+    web_app:
+      host: "web-app-*.signtusk.com"
+      port: 3000
+      health_check: "/api/health"
+      metrics:
+        - cpu_usage
+        - memory_usage
+        - disk_usage
+        - network_io
+        - response_time
+        
+    main_app:
+      host: "main-app-*.signtusk.com"
+      port: 3001
+      health_check: "/health"
+      metrics:
+        - cpu_usage
+        - memory_usage
+        - disk_usage
+        - network_io
+        - response_time
+        
+    api_services:
+      host: "api-*.signtusk.com"
+      port: 3002
+      health_check: "/trpc/health"
+      metrics:
+        - cpu_usage
+        - memory_usage
+        - disk_usage
+        - network_io
+        - response_time
+
+  # Database monitoring
+  database:
+    postgresql:
+      host: "${DATABASE_HOST}"
+      port: 5432
+      metrics:
+        - connection_count
+        - query_duration
+        - lock_waits
+        - cache_hit_ratio
+        - replication_lag
+        - disk_usage
+        - cpu_usage
+        - memory_usage
+        
+  # Cache monitoring
+  cache:
+    redis:
+      host: "${REDIS_HOST}"
+      port: 6379
+      metrics:
+        - memory_usage
+        - hit_ratio
+        - connection_count
+        - operations_per_second
+        - latency
+        
+  # Storage monitoring
+  storage:
+    s3:
+      bucket: "${S3_BUCKET_NAME}"
+      metrics:
+        - storage_usage
+        - request_count
+        - error_rate
+        - transfer_rate
+
+# Log Management
+logging:
+  aggregation:
+    provider: "elasticsearch" # or "splunk", "datadog"
+    config:
+      cluster_url: "${ELASTICSEARCH_URL}"
+      index_pattern: "signtusk-logs-*"
+      
+  # Log sources
+  sources:
+    - name: "application_logs"
+      path: "/var/log/app/*.log"
+      format: "json"
+      tags: ["application", "production"]
+      
+    - name: "access_logs"
+      path: "/var/log/nginx/access.log"
+      format: "nginx"
+      tags: ["access", "nginx"]
+      
+    - name: "error_logs"
+      path: "/var/log/nginx/error.log"
+      format: "nginx"
+      tags: ["error", "nginx"]
+      
+    - name: "audit_logs"
+      path: "/var/log/audit/*.log"
+      format: "json"
+      tags: ["audit", "security"]
+
+# Alerting Rules
+alerts:
+  # Performance alerts
+  performance:
+    - name: "High API Response Time"
+      condition: "avg(api.response_time) > 500ms"
+      duration: "5m"
+      severity: "warning"
+      channels: ["slack", "email"]
+      
+    - name: "Critical API Response Time"
+      condition: "avg(api.response_time) > 1000ms"
+      duration: "2m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+      
+    - name: "High Error Rate"
+      condition: "rate(api.request_count{status_code=~'5..'}[5m]) > 0.01"
+      duration: "3m"
+      severity: "warning"
+      channels: ["slack", "email"]
+      
+    - name: "Critical Error Rate"
+      condition: "rate(api.request_count{status_code=~'5..'}[5m]) > 0.05"
+      duration: "1m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+
+  # Infrastructure alerts
+  infrastructure:
+    - name: "High CPU Usage"
+      condition: "avg(cpu_usage) > 80%"
+      duration: "10m"
+      severity: "warning"
+      channels: ["slack"]
+      
+    - name: "Critical CPU Usage"
+      condition: "avg(cpu_usage) > 90%"
+      duration: "5m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+      
+    - name: "High Memory Usage"
+      condition: "avg(memory_usage) > 85%"
+      duration: "10m"
+      severity: "warning"
+      channels: ["slack"]
+      
+    - name: "Critical Memory Usage"
+      condition: "avg(memory_usage) > 95%"
+      duration: "5m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+      
+    - name: "Disk Space Low"
+      condition: "avg(disk_usage) > 85%"
+      duration: "15m"
+      severity: "warning"
+      channels: ["slack", "email"]
+      
+    - name: "Disk Space Critical"
+      condition: "avg(disk_usage) > 95%"
+      duration: "5m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+
+  # Database alerts
+  database:
+    - name: "High Database Connections"
+      condition: "postgresql.connection_count > 80% of max_connections"
+      duration: "5m"
+      severity: "warning"
+      channels: ["slack", "email"]
+      
+    - name: "Slow Database Queries"
+      condition: "avg(postgresql.query_duration) > 1000ms"
+      duration: "5m"
+      severity: "warning"
+      channels: ["slack"]
+      
+    - name: "Database Replication Lag"
+      condition: "postgresql.replication_lag > 30s"
+      duration: "2m"
+      severity: "critical"
+      channels: ["slack", "email", "pagerduty"]
+
+  # Security alerts
+  security:
+    - name: "Multiple Failed Login Attempts"
+      condition: "rate(auth.failed_attempts[5m]) > 10"
+      duration: "1m"
+      severity: "warning"
+      channels: ["slack", "security-team"]
+      
+    - name: "Suspicious API Activity"
+      condition: "rate(api.request_count{status_code='401'}[5m]) > 50"
+      duration: "2m"
+      severity: "critical"
+      channels: ["slack", "email", "security-team"]
+      
+    - name: "Unusual Document Access Pattern"
+      condition: "rate(document.access_denied[10m]) > 20"
+      duration: "5m"
+      severity: "warning"
+      channels: ["slack", "security-team"]
+
+  # Business metrics alerts
+  business:
+    - name: "Low Signature Completion Rate"
+      condition: "avg(signature.completion_rate) < 0.8"
+      duration: "30m"
+      severity: "warning"
+      channels: ["slack", "business-team"]
+      
+    - name: "High Document Processing Failures"
+      condition: "rate(document.processing_failures[15m]) > 0.05"
+      duration: "10m"
+      severity: "warning"
+      channels: ["slack", "engineering-team"]
+
+# Notification Channels
+notifications:
+  slack:
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#alerts-production"
+    username: "Signtusk-Monitor"
+    
+  email:
+    smtp_host: "${SMTP_HOST}"
+    smtp_port: 587
+    username: "${SMTP_USERNAME}"
+    password: "${SMTP_PASSWORD}"
+    from: "alerts@signtusk.com"
+    to: ["ops-team@signtusk.com", "engineering@signtusk.com"]
+    
+  pagerduty:
+    integration_key: "${PAGERDUTY_INTEGRATION_KEY}"
+    service_key: "${PAGERDUTY_SERVICE_KEY}"
+
+# Dashboards
+dashboards:
+  # Executive dashboard
+  executive:
+    name: "Executive Overview"
+    panels:
+      - title: "System Health"
+        type: "status"
+        metrics: ["uptime", "error_rate", "response_time"]
+        
+      - title: "Business Metrics"
+        type: "graph"
+        metrics: ["active_users", "documents_processed", "signatures_completed"]
+        
+      - title: "Revenue Impact"
+        type: "single_stat"
+        metrics: ["monthly_revenue", "conversion_rate", "churn_rate"]
+
+  # Operations dashboard
+  operations:
+    name: "Operations Dashboard"
+    panels:
+      - title: "Infrastructure Health"
+        type: "heatmap"
+        metrics: ["cpu_usage", "memory_usage", "disk_usage"]
+        
+      - title: "Application Performance"
+        type: "graph"
+        metrics: ["api.response_time", "api.request_count", "api.error_rate"]
+        
+      - title: "Database Performance"
+        type: "graph"
+        metrics: ["postgresql.query_duration", "postgresql.connection_count"]
+        
+      - title: "Cache Performance"
+        type: "graph"
+        metrics: ["redis.hit_ratio", "redis.memory_usage"]
+
+  # Security dashboard
+  security:
+    name: "Security Monitoring"
+    panels:
+      - title: "Authentication Events"
+        type: "graph"
+        metrics: ["auth.login_attempts", "auth.failed_attempts", "auth.2fa_usage"]
+        
+      - title: "API Security"
+        type: "graph"
+        metrics: ["api.unauthorized_requests", "api.rate_limited_requests"]
+        
+      - title: "Audit Trail"
+        type: "table"
+        metrics: ["audit.events", "audit.user_actions", "audit.admin_actions"]
+
+# Health Checks
+health_checks:
+  # Application health
+  applications:
+    - name: "Web Application"
+      url: "https://app.signtusk.com/api/health"
+      interval: "30s"
+      timeout: "10s"
+      expected_status: 200
+      
+    - name: "Main Application"
+      url: "https://main.signtusk.com/health"
+      interval: "30s"
+      timeout: "10s"
+      expected_status: 200
+      
+    - name: "API Services"
+      url: "https://api.signtusk.com/trpc/health"
+      interval: "30s"
+      timeout: "10s"
+      expected_status: 200
+
+  # Database health
+  database:
+    - name: "PostgreSQL Primary"
+      host: "${DATABASE_HOST}"
+      port: 5432
+      query: "SELECT 1"
+      interval: "60s"
+      timeout: "5s"
+      
+    - name: "PostgreSQL Replica"
+      host: "${DATABASE_REPLICA_HOST}"
+      port: 5432
+      query: "SELECT 1"
+      interval: "60s"
+      timeout: "5s"
+
+  # Cache health
+  cache:
+    - name: "Redis Primary"
+      host: "${REDIS_HOST}"
+      port: 6379
+      command: "PING"
+      interval: "30s"
+      timeout: "5s"
+
+# SLA Monitoring
+sla:
+  targets:
+    uptime: 99.9 # %
+    response_time: 200 # ms (95th percentile)
+    error_rate: 0.1 # %
+    
+  reporting:
+    frequency: "monthly"
+    recipients: ["sre-team@signtusk.com", "management@signtusk.com"]
+    
+# Capacity Planning
+capacity:
+  auto_scaling:
+    enabled: true
+    metrics:
+      - cpu_usage > 70%
+      - memory_usage > 80%
+      - request_rate > 1000/s
+      
+  thresholds:
+    scale_up:
+      cpu: 70
+      memory: 80
+      requests_per_second: 1000
+      
+    scale_down:
+      cpu: 30
+      memory: 40
+      requests_per_second: 200
+      
+  limits:
+    min_instances: 2
+    max_instances: 20
+    scale_up_cooldown: "5m"
+    scale_down_cooldown: "10m"
