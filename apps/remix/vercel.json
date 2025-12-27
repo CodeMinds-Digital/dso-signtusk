@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && npm ci && npx turbo run build --filter=@signtusk/remix",
+  "buildCommand": "cd ../.. && npm ci --ignore-scripts && npx turbo run build --filter=@signtusk/remix",
   "outputDirectory": "build/client",
   "installCommand": "echo 'Dependencies handled by build command'",
   "framework": null,
