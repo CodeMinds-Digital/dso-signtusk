@@ -14,9 +14,6 @@ trap 'cd "$ORIGINAL_DIR"' EXIT
 
 cd "$WEB_APP_DIR"
 
-# Add node_modules/.bin to PATH for CLI tools
-export PATH="$PATH:../../node_modules/.bin:./node_modules/.bin"
-
 start_time=$(date +%s)
 
 echo "[Build]: Extracting and compiling translations (Vercel)"
@@ -29,8 +26,12 @@ else
 fi
 cd "$WEB_APP_DIR"
 
+echo "[Build]: Running typecheck"
+# Run typecheck with npx
+npx react-router typegen && npx tsc
+
 echo "[Build]: Building app"
-npm run build:app
+npx cross-env NODE_ENV=production npx react-router build
 
 echo "[Build]: Building server"
 npm run build:server
