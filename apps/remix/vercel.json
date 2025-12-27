@@ -1,7 +1,7 @@
 {
-  "buildCommand": "SKIP_PATCHES=true npm ci && npm run build --workspace=@signtusk/remix",
+  "buildCommand": "npm run build",
   "outputDirectory": "build/client",
-  "installCommand": "echo 'Using buildCommand for installation'",
+  "installCommand": "cd ../.. && SKIP_PATCHES=true npm ci",
   "framework": null,
   "functions": {
     "api/index.js": {
