@@ -3,7 +3,6 @@
   "outputDirectory": "build/client",
   "installCommand": "echo 'Using buildCommand for installation'",
   "framework": null,
-  "nodeVersion": "22",
   "functions": {
     "api/index.js": {
       "runtime": "nodejs20.x",
