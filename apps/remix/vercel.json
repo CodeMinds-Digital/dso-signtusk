@@ -1,7 +1,7 @@
 {
-  "buildCommand": "node build-vercel.cjs",
+  "buildCommand": "cd ../.. && npm ci && npx turbo run build --filter=@signtusk/remix",
   "outputDirectory": "build/client",
-  "installCommand": "echo 'Dependencies handled by build script'",
+  "installCommand": "echo 'Dependencies handled by build command'",
   "framework": null,
   "functions": {
     "api/index.js": {
