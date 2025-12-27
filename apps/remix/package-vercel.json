@@ -1,0 +1,11 @@
+{
+  "name": "@signtusk/remix-vercel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cd ../.. && npm run build --workspace=@signtusk/remix",
+    "postinstall": "echo 'Skipping postinstall for Vercel build'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
