@@ -14,6 +14,9 @@ trap 'cd "$ORIGINAL_DIR"' EXIT
 
 cd "$WEB_APP_DIR"
 
+# Add node_modules/.bin to PATH for CLI tools
+export PATH="$PATH:../../node_modules/.bin:./node_modules/.bin"
+
 start_time=$(date +%s)
 
 echo "[Build]: Extracting and compiling translations (Vercel)"
