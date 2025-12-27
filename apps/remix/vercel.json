@@ -1,0 +1,37 @@
+{
+  "buildCommand": "npm run build --workspace=@signtusk/remix",
+  "outputDirectory": "build/client",
+  "installCommand": "npm ci",
+  "framework": null,
+  "nodeVersion": "22",
+  "functions": {
+    "api/index.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/build/(.*)",
+      "destination": "/build/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "TURBO_TELEMETRY_DISABLED": "1"
+  }
+}
