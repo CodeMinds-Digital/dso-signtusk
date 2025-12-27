@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node build-vercel.js",
+  "buildCommand": "node build-vercel.cjs",
   "outputDirectory": "build/client",
   "installCommand": "echo 'Dependencies handled by build script'",
   "framework": null,
