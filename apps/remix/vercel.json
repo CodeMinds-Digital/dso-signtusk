@@ -1,8 +1,8 @@
 {
   "framework": null,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm install --ignore-scripts && npm run build",
   "outputDirectory": "build/client",
-  "installCommand": null,
+  "installCommand": "echo 'Using buildCommand for install'",
   "functions": {
     "api/index.js": {
       "maxDuration": 30
@@ -28,5 +28,9 @@
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "SKIP_PATCHES": "true",
+    "INSTALL_PLAYWRIGHT": "false"
+  }
 }
