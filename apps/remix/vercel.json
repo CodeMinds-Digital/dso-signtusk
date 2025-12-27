@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd ../.. && npm ci --ignore-scripts && cd apps/remix && npm run build:vercel",
-  "outputDirectory": "build/client",
-  "installCommand": "echo 'Dependencies handled by build command'",
   "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "build/client",
+  "installCommand": null,
   "functions": {
     "api/index.js": {
       "maxDuration": 30
@@ -28,15 +28,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "TURBO_TELEMETRY_DISABLED": "1",
-    "INSTALL_PLAYWRIGHT": "false",
-    "SKIP_PATCHES": "true",
-    "AWS_ACCESS_KEY_ID": "dummy",
-    "AWS_SECRET_ACCESS_KEY": "dummy", 
-    "AWS_REGION": "us-east-1",
-    "WEBHOOK_SECRET": "dummy",
-    "RATE_LIMIT_ENABLED": "false"
-  }
+  ]
 }

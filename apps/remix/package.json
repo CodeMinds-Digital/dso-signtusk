@@ -6,8 +6,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "./.bin/build.sh",
+    "build": "echo 'Simple build without translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
     "build:vercel": "./.bin/build-vercel.sh",
+    "build:standalone": "echo 'Skipping translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
     "build:app": "npm run typecheck && cross-env NODE_ENV=production react-router build",
     "build:server": "cross-env NODE_ENV=production rollup -c rollup.config.mjs",
     "dev": "npm run with:env -- react-router dev",
