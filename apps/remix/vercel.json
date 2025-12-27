@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "node build-vercel.js",
   "outputDirectory": "build/client",
-  "installCommand": "cd ../.. && SKIP_PATCHES=true npm ci",
+  "installCommand": "echo 'Dependencies handled by build script'",
   "framework": null,
   "functions": {
     "api/index.js": {
