@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "patch-package && if [ \"$INSTALL_PLAYWRIGHT\" = \"true\" ]; then npx playwright install; fi",
+    "postinstall": "if [ \"$SKIP_PATCHES\" != \"true\" ]; then patch-package; fi && if [ \"$INSTALL_PLAYWRIGHT\" = \"true\" ]; then npx playwright install; fi",
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@signtusk/remix",
     "dev:remix": "turbo run dev --filter=@signtusk/remix",
