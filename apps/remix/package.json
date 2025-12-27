@@ -2,6 +2,9 @@
   "name": "@signtusk/remix",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "./.bin/build.sh",
     "build:app": "npm run typecheck && cross-env NODE_ENV=production react-router build",
