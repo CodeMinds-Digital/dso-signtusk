@@ -13,10 +13,11 @@ try {
   process.env.NODE_ENV = 'production';
   
   const rootDir = path.join(__dirname, '../..');
+  const remixDir = __dirname;
   
   console.log('📦 Installing dependencies...');
   
-  // First, try to install with scripts to get patch-package
+  // Install dependencies from root
   try {
     execSync('npm ci', { 
       stdio: 'inherit',
@@ -43,11 +44,52 @@ try {
     }
   }
   
+  console.log('🌐 Extracting and compiling translations...');
+  // Run translation commands from root where lingui is available
+  try {
+    execSync('npm run translate', { 
+      stdio: 'inherit',
+      cwd: rootDir
+    });
+  } catch (translateError) {
+    console.warn('⚠️ Translation step failed, continuing without translations...');
+  }
+  
   console.log('🏗️ Building Remix application...');
-  execSync('npm run build --workspace=@signtusk/remix', { 
+  // Run the build commands directly from remix directory
+  execSync('npm run build:app', { 
     stdio: 'inherit',
-    cwd: rootDir
+    cwd: remixDir
   });
+  
+  execSync('npm run build:server', { 
+    stdio: 'inherit',
+    cwd: remixDir
+  });
+  
+  console.log('📁 Copying server files...');
+  // Copy over the entry point for the server
+  const serverMainSrc = path.join(remixDir, 'server/main.js');
+  const serverMainDest = path.join(remixDir, 'build/server/main.js');
+  
+  if (fs.existsSync(serverMainSrc)) {
+    fs.copyFileSync(serverMainSrc, serverMainDest);
+  }
+  
+  // Copy over translations if they exist
+  const translationsSrc = path.join(rootDir, 'packages/lib/translations');
+  const translationsDest = path.join(remixDir, 'build/server/hono/packages/lib/translations');
+  
+  if (fs.existsSync(translationsSrc)) {
+    // Create destination directory if it doesn't exist
+    const destDir = path.dirname(translationsDest);
+    fs.mkdirSync(destDir, { recursive: true });
+    
+    // Copy translations recursively
+    execSync(`cp -r "${translationsSrc}" "${translationsDest}"`, { 
+      stdio: 'inherit'
+    });
+  }
   
   console.log('✅ Build completed successfully!');
 } catch (error) {
