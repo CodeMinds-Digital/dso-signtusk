@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && npm ci --ignore-scripts && export PATH=$PATH:./node_modules/.bin && npx turbo run build --filter=@signtusk/remix --only",
+  "buildCommand": "cd ../.. && npm ci --ignore-scripts && cd apps/remix && npm run build:vercel",
   "outputDirectory": "build/client",
   "installCommand": "echo 'Dependencies handled by build command'",
   "framework": null,
