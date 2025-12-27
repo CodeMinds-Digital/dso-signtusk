@@ -1,0 +1,32 @@
+# Alternative simpler deployment workflow
+# Rename this file to .yml to use it instead of the CLI-based workflow
+
+name: Vercel Deployment (Simple)
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/remix/**'
+      - 'packages/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/remix/**'
+      - 'packages/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: apps/remix
+          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
