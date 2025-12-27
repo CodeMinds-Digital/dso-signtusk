@@ -19,7 +19,7 @@ start_time=$(date +%s)
 
 echo "[Build]: Extracting and compiling translations (Vercel)"
 # Try to run translations, but continue if it fails
-if npx lingui extract --clean 2>/dev/null && npx lingui compile 2>/dev/null; then
+if ./node_modules/.bin/lingui extract --clean 2>/dev/null && ./node_modules/.bin/lingui compile 2>/dev/null; then
     echo "[Build]: Translations completed successfully"
 else
     echo "[Build]: Translations skipped (lingui not available)"
@@ -28,12 +28,12 @@ fi
 echo "[Build]: Running typecheck"
 # Run typecheck from root, targeting remix
 cd apps/remix
-npx react-router typegen && npx tsc
+../../node_modules/.bin/react-router typegen && ../../node_modules/.bin/tsc
 cd ../../
 
 echo "[Build]: Building app"
 cd apps/remix
-npx cross-env NODE_ENV=production npx react-router build
+../../node_modules/.bin/cross-env NODE_ENV=production ../../node_modules/.bin/react-router build
 cd ../../
 
 echo "[Build]: Building server"
