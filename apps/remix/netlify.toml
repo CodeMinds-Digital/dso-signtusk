@@ -1,12 +1,12 @@
 [build]
   base = "apps/remix"
   command = "cd ../.. && NETLIFY_APP_NAME=remix node scripts/netlify-build.js"
-  publish = "apps/remix/build/client"
-  functions = "apps/remix/build/server"
+  publish = "build/client"
+  functions = "build/server"
 
 [build.environment]
   NODE_VERSION = "22"
-  NPM_VERSION = "10.7.0"
+  NPM_VERSION = "10"
   NODE_ENV = "production"
   
   # Skip patch-package during Netlify builds (patches not needed for production)
@@ -153,11 +153,11 @@
 
 # Netlify Functions configuration for SSR
 [functions]
-  directory = "apps/remix/build/server"
+  directory = "build/server"
   node_bundler = "esbuild"
 
 [functions."server"]
-  included_files = ["apps/remix/build/**/*"]
+  included_files = ["build/**/*"]
 
 # Build caching configuration
 [build.cache]

@@ -9,7 +9,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  NPM_VERSION = "10.7.0"
+  NPM_VERSION = "10"
   
   # Skip patch-package during Netlify builds (patches not needed for production)
   SKIP_PATCHES = "true"
