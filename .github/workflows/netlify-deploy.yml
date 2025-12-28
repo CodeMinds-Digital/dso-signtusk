@@ -1,0 +1,138 @@
+name: Netlify Multi-Site Deployment
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      marketing: ${{ steps.changes.outputs.marketing }}
+      remix: ${{ steps.changes.outputs.remix }}
+      docs: ${{ steps.changes.outputs.docs }}
+      packages: ${{ steps.changes.outputs.packages }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            marketing:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'turbo.json'
+            remix:
+              - 'apps/remix/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'turbo.json'
+            docs:
+              - 'apps/docs/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'turbo.json'
+            packages:
+              - 'packages/**'
+
+      - name: Log detected changes
+        run: |
+          echo "Marketing changed: ${{ steps.changes.outputs.marketing }}"
+          echo "Remix changed: ${{ steps.changes.outputs.remix }}"
+          echo "Docs changed: ${{ steps.changes.outputs.docs }}"
+          echo "Packages changed: ${{ steps.changes.outputs.packages }}"
+
+  deploy-marketing:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.marketing == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+    steps:
+      - name: Deploy Marketing Site
+        run: |
+          echo "Triggering Netlify deploy for Marketing Site"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            curl -X POST -d {} "${{ secrets.NETLIFY_MARKETING_HOOK_PROD }}"
+          else
+            curl -X POST -d {} "${{ secrets.NETLIFY_MARKETING_HOOK_PREVIEW }}"
+          fi
+
+      - name: Report deployment status
+        run: |
+          echo "Marketing site deployment triggered successfully"
+          echo "Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}"
+          echo "Commit: ${{ github.sha }}"
+
+  deploy-remix:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.remix == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+    steps:
+      - name: Deploy Remix App
+        run: |
+          echo "Triggering Netlify deploy for Remix App"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            curl -X POST -d {} "${{ secrets.NETLIFY_REMIX_HOOK_PROD }}"
+          else
+            curl -X POST -d {} "${{ secrets.NETLIFY_REMIX_HOOK_PREVIEW }}"
+          fi
+
+      - name: Report deployment status
+        run: |
+          echo "Remix app deployment triggered successfully"
+          echo "Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}"
+          echo "Commit: ${{ github.sha }}"
+
+  deploy-docs:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+    steps:
+      - name: Deploy Documentation Site
+        run: |
+          echo "Triggering Netlify deploy for Documentation Site"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            curl -X POST -d {} "${{ secrets.NETLIFY_DOCS_HOOK_PROD }}"
+          else
+            curl -X POST -d {} "${{ secrets.NETLIFY_DOCS_HOOK_PREVIEW }}"
+          fi
+
+      - name: Report deployment status
+        run: |
+          echo "Documentation site deployment triggered successfully"
+          echo "Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}"
+          echo "Commit: ${{ github.sha }}"
+
+  deployment-summary:
+    needs: [detect-changes, deploy-marketing, deploy-remix, deploy-docs]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Application | Changed | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Marketing | ${{ needs.detect-changes.outputs.marketing }} | ${{ needs.deploy-marketing.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Remix App | ${{ needs.detect-changes.outputs.remix }} | ${{ needs.deploy-remix.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation | ${{ needs.detect-changes.outputs.docs }} | ${{ needs.deploy-docs.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}" >> $GITHUB_STEP_SUMMARY

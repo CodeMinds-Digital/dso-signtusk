@@ -1,0 +1,55 @@
+{
+  "buildLimits": {
+    "timeout": {
+      "dependency_install": 600000,
+      "build_process": 1800000,
+      "cleanup": 300000
+    },
+    "memory": {
+      "default": 4096,
+      "remix": 6144,
+      "web": 4096,
+      "docs": 2048
+    },
+    "retries": {
+      "max_attempts": 3,
+      "base_delay": 5000,
+      "max_delay": 60000
+    }
+  },
+  "errorHandling": {
+    "retryable_errors": [
+      "ENOTFOUND",
+      "ECONNRESET",
+      "ETIMEDOUT",
+      "ECONNREFUSED",
+      "NETWORK_ERROR",
+      "DEPENDENCY_INSTALL_FAILED",
+      "COMMAND_TIMEOUT"
+    ],
+    "retryable_messages": [
+      "network error",
+      "connection reset",
+      "timeout",
+      "temporary failure",
+      "service unavailable",
+      "rate limit",
+      "npm ERR! network"
+    ],
+    "critical_errors": [
+      "MEMORY_LIMIT_EXCEEDED",
+      "UNSUPPORTED_NODE_VERSION",
+      "BUILD_DIR_ACCESS_ERROR"
+    ]
+  },
+  "logging": {
+    "levels": ["error", "warning", "info", "debug"],
+    "file_retention_days": 7,
+    "max_log_size_mb": 100
+  },
+  "monitoring": {
+    "memory_check_interval": 10000,
+    "disk_space_threshold": 1024,
+    "build_progress_timeout": 300000
+  }
+}

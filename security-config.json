@@ -1,0 +1,111 @@
+{
+  "securityHeaders": {
+    "marketing": {
+      "description": "Security headers for marketing site (Next.js SPA)",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Cross-Origin-Embedder-Policy": "require-corp",
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Resource-Policy": "same-origin",
+        "Content-Security-Policy": {
+          "default-src": "'self'",
+          "script-src": "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+          "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "img-src": "'self' data: https: blob:",
+          "font-src": "'self' data: https://fonts.gstatic.com",
+          "connect-src": "'self' https: wss:",
+          "media-src": "'self' https:",
+          "object-src": "'none'",
+          "base-uri": "'self'",
+          "form-action": "'self'",
+          "frame-ancestors": "'none'",
+          "upgrade-insecure-requests": true
+        }
+      }
+    },
+    "remix": {
+      "description": "Security headers for Remix application",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Cross-Origin-Embedder-Policy": "require-corp",
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Resource-Policy": "same-origin",
+        "Content-Security-Policy": {
+          "default-src": "'self'",
+          "script-src": "'self' 'unsafe-inline' 'unsafe-eval'",
+          "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "img-src": "'self' data: https: blob:",
+          "font-src": "'self' data: https://fonts.gstatic.com",
+          "connect-src": "'self' https: wss:",
+          "media-src": "'self' https:",
+          "object-src": "'none'",
+          "base-uri": "'self'",
+          "form-action": "'self'",
+          "frame-ancestors": "'none'",
+          "upgrade-insecure-requests": true
+        }
+      }
+    },
+    "docs": {
+      "description": "Security headers for documentation site (more permissive)",
+      "headers": {
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Cross-Origin-Embedder-Policy": "unsafe-none",
+        "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+        "Cross-Origin-Resource-Policy": "cross-origin",
+        "Content-Security-Policy": {
+          "default-src": "'self'",
+          "script-src": "'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+          "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+          "img-src": "'self' data: https: blob:",
+          "font-src": "'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+          "connect-src": "'self' https: wss:",
+          "media-src": "'self' https:",
+          "object-src": "'none'",
+          "base-uri": "'self'",
+          "form-action": "'self'",
+          "frame-ancestors": "'self' https://yourdomain.com https://app.yourdomain.com",
+          "upgrade-insecure-requests": true
+        }
+      }
+    }
+  },
+  "sslConfiguration": {
+    "certificateAuthority": "Let's Encrypt",
+    "minimumTLSVersion": "1.2",
+    "hstsMaxAge": 31536000,
+    "hstsIncludeSubdomains": true,
+    "hstsPreload": true,
+    "ocspStapling": true,
+    "certificateTransparency": true
+  },
+  "domainConfiguration": {
+    "forceHTTPS": true,
+    "redirectWWW": true,
+    "redirectHTTP": true,
+    "certificateRenewal": "automatic",
+    "dnsValidation": true
+  },
+  "securityBestPractices": {
+    "regularSecurityAudits": true,
+    "vulnerabilityScanning": true,
+    "dependencyUpdates": true,
+    "securityHeadersTesting": true,
+    "sslCertificateMonitoring": true
+  }
+}

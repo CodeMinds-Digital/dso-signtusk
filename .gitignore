@@ -11,10 +11,18 @@ dist/
 
 # Environment variables
 .env
+.env.*
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.staging
+.env.demo
+.env.netlify.*
+.env.domain.*
 
 # Logs
 npm-debug.log*

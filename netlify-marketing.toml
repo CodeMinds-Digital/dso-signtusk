@@ -1,0 +1,36 @@
+[build]
+  base = "apps/web"
+  command = "cd ../.. && npm ci --include=dev && npm run build --workspace=@signtusk/web"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_VERSION = "10.7.0"
+  NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
+  SKIP_PATCHES = "false"
+  INSTALL_PLAYWRIGHT = "false"
+  TURBO_TELEMETRY_DISABLED = "1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production]
+  command = "cd ../.. && npm ci --include=dev && npm run build --workspace=@signtusk/web"
+  [context.production.environment]
+    NODE_ENV = "production"
+    NPM_FLAGS = "--include=dev"
+
+[context.deploy-preview]
+  command = "cd ../.. && npm ci --include=dev && npm run build --workspace=@signtusk/web"
+  [context.deploy-preview.environment]
+    NODE_ENV = "development"
+    NPM_FLAGS = "--include=dev"
+
+[context.branch-deploy]
+  command = "cd ../.. && npm ci --include=dev && npm run build --workspace=@signtusk/web"
+  [context.branch-deploy.environment]
+    NODE_ENV = "development"
+    NPM_FLAGS = "--include=dev"

@@ -1,5 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "remoteCache": {
+    "signature": true
+  },
   "tasks": {
     "build": {
       "dependsOn": [
@@ -13,6 +16,20 @@
         "build/**",
         "npm/**",
         "*.node"
+      ],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "pages/**",
+        "components/**",
+        "lib/**",
+        "styles/**",
+        "public/**",
+        "package.json",
+        "next.config.js",
+        "remix.config.js",
+        "vite.config.ts",
+        "tsconfig.json"
       ]
     },
     "prebuild": {
@@ -176,3 +193,7 @@
     "CARGO_BUILD_TARGET"
   ]
 }
+# Test config change 1766915746127
+# Test config change 1766915746147
+# Test config change 1766915981202
+# Test config change 1766915981227
