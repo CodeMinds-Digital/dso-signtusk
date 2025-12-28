@@ -1,20 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CodeBlock } from '@/components/code-block';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+    ArrowRight,
     BookOpen,
+    Code,
+    FileText,
+    Globe,
+    Settings,
     Shield,
     Webhook,
-    Settings,
-    Globe,
-    Code,
-    Zap,
-    Users,
-    FileText,
-    ArrowRight
+    Zap
 } from 'lucide-react';
 import Link from 'next/link';
-import { CodeBlock } from '@/components/code-block';
 
 const guides = [
     {
@@ -240,7 +239,6 @@ export function IntegrationGuides() {
                             <h3 className="font-semibold">Cloud Platforms</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>• <Link href="/guides/aws-lambda" className="text-primary hover:underline">AWS Lambda</Link></li>
-                                <li>• <Link href="/guides/vercel" className="text-primary hover:underline">Vercel Functions</Link></li>
                                 <li>• <Link href="/guides/netlify" className="text-primary hover:underline">Netlify Functions</Link></li>
                                 <li>• <Link href="/guides/cloudflare" className="text-primary hover:underline">Cloudflare Workers</Link></li>
                                 <li>• <Link href="/guides/azure" className="text-primary hover:underline">Azure Functions</Link></li>

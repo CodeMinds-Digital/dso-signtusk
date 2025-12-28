@@ -112,6 +112,11 @@ Thumbs.db
 # Turbo
 .turbo
 
+# Vercel (removed platform)
+.vercel
+vercel.json
+.vercelignore
+
 # Database
 *.db
 *.sqlite

@@ -1,9 +1,9 @@
+import { CodeBlock } from '@/components/code-block';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Download, Github, Package, Code, BookOpen } from 'lucide-react';
-import { CodeBlock } from '@/components/code-block';
+import { BookOpen, Code, Download, ExternalLink, Github, Package } from 'lucide-react';
 import Link from 'next/link';
 
 const sdks = [
@@ -391,7 +391,6 @@ export function SDKDocumentation() {
                             <h3 className="font-semibold">Platform Guides</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>• <Link href="/guides/aws" className="text-primary hover:underline">AWS Lambda Integration</Link></li>
-                                <li>• <Link href="/guides/vercel" className="text-primary hover:underline">Vercel Functions Integration</Link></li>
                                 <li>• <Link href="/guides/netlify" className="text-primary hover:underline">Netlify Functions Integration</Link></li>
                                 <li>• <Link href="/guides/docker" className="text-primary hover:underline">Docker Deployment Guide</Link></li>
                                 <li>• <Link href="/guides/kubernetes" className="text-primary hover:underline">Kubernetes Deployment Guide</Link></li>

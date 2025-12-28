@@ -43,6 +43,6 @@ The applications are integrated with the existing Turbo monorepo:
 
 ### 🚀 Deployment
 
-- **Next.js (web)**: Optimized for Vercel deployment
-- **Remix (app)**: Optimized for Railway/Fly.io deployment
+- **Next.js (web)**: Optimized for Netlify deployment
+- **Remix (app)**: Optimized for Netlify deployment
 - Both applications share the same backend services and packages

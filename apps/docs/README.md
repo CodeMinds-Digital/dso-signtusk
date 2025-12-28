@@ -162,10 +162,10 @@ The playground integrates with the actual Signtusk API:
 
 ## Deployment
 
-### Vercel (Recommended)
+### Netlify (Recommended)
 
-1. **Connect your repository** to Vercel
-2. **Set environment variables** in the Vercel dashboard
+1. **Connect your repository** to Netlify
+2. **Set environment variables** in the Netlify dashboard
 3. **Deploy** - automatic deployments on push to main
 
 ### Docker
