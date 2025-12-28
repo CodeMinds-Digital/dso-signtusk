@@ -154,7 +154,7 @@
     "zod-openapi": "^4.2.4",
     "zod-prisma-types": "3.3.5"
   },
-  "packageManager": "npm@10",
+  "packageManager": "npm@10.0.0",
   "engines": {
     "npm": ">=10.0.0",
     "node": ">=22.0.0"

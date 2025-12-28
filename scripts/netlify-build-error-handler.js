@@ -282,11 +282,11 @@ class BuildErrorHandler {
   async installDependencies(options = {}) {
     const npmFlags = process.env.NPM_FLAGS || '--legacy-peer-deps --force';
     
-    // Check if package-lock.json exists to determine which command to use
-    const hasLockFile = fs.existsSync(path.join(process.cwd(), 'package-lock.json'));
-    const command = hasLockFile ? `npm ci ${npmFlags}` : `npm install ${npmFlags}`;
+    // Always use npm install for Netlify builds to avoid lock file sync issues
+    // Netlify may create package-lock.json during initial install, causing npm ci to fail
+    const command = `npm install ${npmFlags}`;
     
-    this.log('info', `Using ${hasLockFile ? 'npm ci' : 'npm install'} (lock file ${hasLockFile ? 'found' : 'not found'})`);
+    this.log('info', `Using npm install (avoiding npm ci for Netlify compatibility)`);
     
     try {
       await this.executeWithRetry(command, {
