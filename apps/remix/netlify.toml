@@ -9,6 +9,9 @@
   NPM_VERSION = "10.7.0"
   NODE_ENV = "production"
   
+  # Skip patch-package during Netlify builds (patches not needed for production)
+  SKIP_PATCHES = "true"
+  
   # Turbo cache configuration
   TURBO_CACHE_DIR = ".turbo"
   TURBO_TELEMETRY_DISABLED = "1"

@@ -10,6 +10,9 @@
 [build.environment]
   NODE_VERSION = "22"
   NPM_VERSION = "10.7.0"
+  
+  # Skip patch-package during Netlify builds (patches not needed for production)
+  SKIP_PATCHES = "true"
 
 # Note: This is a fallback configuration
 # Each application should be deployed separately using their specific netlify.toml files:
