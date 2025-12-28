@@ -1,12 +1,10 @@
 {
-  "buildCommand": "npm run build --workspace=@signtusk/remix",
-  "outputDirectory": "build/client",
-  "installCommand": "npm ci",
   "framework": null,
-  "nodeVersion": "22",
+  "buildCommand": "npm install --ignore-scripts && npm run build:simple",
+  "outputDirectory": "build/client",
+  "installCommand": "echo 'Using buildCommand for install'",
   "functions": {
-    "api/index.js": {
-      "runtime": "nodejs20.x",
+    "build/server/index.js": {
       "maxDuration": 30
     }
   },
@@ -17,7 +15,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/api"
+      "destination": "/build/server"
     }
   ],
   "headers": [
@@ -32,6 +30,8 @@
     }
   ],
   "env": {
-    "TURBO_TELEMETRY_DISABLED": "1"
+    "SKIP_PATCHES": "true",
+    "INSTALL_PLAYWRIGHT": "false",
+    "NODE_ENV": "production"
   }
 }
