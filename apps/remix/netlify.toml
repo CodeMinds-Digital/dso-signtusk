@@ -8,6 +8,18 @@
   NODE_VERSION = "22"
   NPM_VERSION = "10.7.0"
   NODE_ENV = "production"
+  
+  # Turbo cache configuration
+  TURBO_CACHE_DIR = ".turbo"
+  TURBO_TELEMETRY_DISABLED = "1"
+  
+  # NPM cache configuration
+  NPM_CONFIG_CACHE = "node_modules/.cache/npm"
+  NPM_CONFIG_FUND = "false"
+  NPM_CONFIG_AUDIT = "false"
+  
+  # Node.js optimizations
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Enhanced security headers for Remix app
 [[headers]]
@@ -186,16 +198,4 @@
   from = "build/.cache"
   to = "build/.cache"
 
-# Build environment optimizations
-[build.environment]
-  # Turbo cache configuration
-  TURBO_CACHE_DIR = ".turbo"
-  TURBO_TELEMETRY_DISABLED = "1"
-  
-  # NPM cache configuration
-  NPM_CONFIG_CACHE = "node_modules/.cache/npm"
-  NPM_CONFIG_FUND = "false"
-  NPM_CONFIG_AUDIT = "false"
-  
-  # Node.js optimizations
-  NODE_OPTIONS = "--max-old-space-size=4096"
+# Additional build environment optimizations are included in the main [build.environment] section above
