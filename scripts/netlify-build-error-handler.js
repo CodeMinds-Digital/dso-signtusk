@@ -280,8 +280,13 @@ class BuildErrorHandler {
    * Enhanced dependency installation with retry logic
    */
   async installDependencies(options = {}) {
-    const npmFlags = process.env.NPM_FLAGS || '--include=dev';
-    const command = `npm ci ${npmFlags}`;
+    const npmFlags = process.env.NPM_FLAGS || '--legacy-peer-deps --force';
+    
+    // Check if package-lock.json exists to determine which command to use
+    const hasLockFile = fs.existsSync(path.join(process.cwd(), 'package-lock.json'));
+    const command = hasLockFile ? `npm ci ${npmFlags}` : `npm install ${npmFlags}`;
+    
+    this.log('info', `Using ${hasLockFile ? 'npm ci' : 'npm install'} (lock file ${hasLockFile ? 'found' : 'not found'})`);
     
     try {
       await this.executeWithRetry(command, {
@@ -290,22 +295,25 @@ class BuildErrorHandler {
         env: {
           NPM_CONFIG_FUND: 'false',
           NPM_CONFIG_AUDIT: 'false',
-          NPM_CONFIG_PROGRESS: 'false'
+          NPM_CONFIG_PROGRESS: 'false',
+          NPM_CONFIG_LEGACY_PEER_DEPS: 'true',
+          NPM_CONFIG_FORCE: 'true'
         },
         ...options
       });
     } catch (error) {
       // Try alternative installation methods
-      this.log('warning', 'Standard npm ci failed, trying alternative methods...');
+      this.log('warning', 'Standard npm install failed, trying alternative methods...');
       
       try {
         // Clear npm cache and retry
         await this.executeWithRetry('npm cache clean --force', { maxRetries: 1 });
         await this.executeWithRetry(command, { maxRetries: 1, ...options });
       } catch (cacheError) {
-        // Try with --no-optional flag
+        // Try with different flags
         try {
-          await this.executeWithRetry(`npm ci ${npmFlags} --no-optional`, { 
+          const fallbackCommand = `npm install --legacy-peer-deps --force --no-optional`;
+          await this.executeWithRetry(fallbackCommand, { 
             maxRetries: 1, 
             ...options 
           });
