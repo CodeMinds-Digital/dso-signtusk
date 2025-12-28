@@ -6,20 +6,17 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  NPM_VERSION = "10"
   NODE_ENV = "production"
   
   # Skip patch-package during Netlify builds (patches not needed for production)
   SKIP_PATCHES = "true"
   
-  # Turbo cache configuration
-  TURBO_CACHE_DIR = ".turbo"
-  TURBO_TELEMETRY_DISABLED = "1"
-  
-  # NPM cache configuration
-  NPM_CONFIG_CACHE = "node_modules/.cache/npm"
+  # Force npm to ignore version conflicts and use legacy resolution
+  NPM_FLAGS = "--legacy-peer-deps --force"
+  NPM_CONFIG_LEGACY_PEER_DEPS = "true"
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_AUDIT = "false"
+  NPM_CONFIG_FORCE = "true"
   
   # Node.js optimizations
   NODE_OPTIONS = "--max-old-space-size=4096"
