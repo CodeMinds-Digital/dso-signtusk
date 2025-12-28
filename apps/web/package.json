@@ -1,6 +1,6 @@
 {
   "name": "@signtusk/web",
-  "version": "1.0.0-test-1766904853816-test-1766904853824-test-1766905271835-test-1766905271856-test-1766905501890-test-1766905922216-test-1766906088501-test-1766915980931",
+  "version": "1.0.0",
   "private": true,
   "description": "Next.js marketing website for Signtusk",
   "scripts": {

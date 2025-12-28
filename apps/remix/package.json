@@ -111,6 +111,6 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.2.6-test-1766905007858",
+  "version": "2.2.6",
   "license": "Private - Part of Signtusk Platform"
 }

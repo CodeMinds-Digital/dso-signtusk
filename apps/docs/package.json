@@ -1,6 +1,6 @@
 {
   "name": "@signtusk/docs",
-  "version": "1.0.0-test-1766905368578-test-1766905746857-test-1766908114443",
+  "version": "1.0.0",
   "description": "Interactive API documentation for Signtusk",
   "private": true,
   "scripts": {
