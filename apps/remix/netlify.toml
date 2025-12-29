@@ -12,7 +12,7 @@
   SKIP_PATCHES = "true"
   
   # Force npm to ignore version conflicts and use legacy resolution
-  NPM_FLAGS = "--legacy-peer-deps --force"
+  NPM_FLAGS = "--legacy-peer-deps --force --include=dev"
   NPM_CONFIG_LEGACY_PEER_DEPS = "true"
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_AUDIT = "false"
