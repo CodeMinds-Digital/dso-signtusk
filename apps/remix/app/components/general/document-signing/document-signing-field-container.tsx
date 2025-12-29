@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import { TooltipArrow } from '@radix-ui/react-tooltip';
 import { X } from 'lucide-react';
 
 import { type TRecipientActionAuth } from '@signtusk/lib/types/document-auth';
@@ -11,7 +10,7 @@ import type { FieldWithSignature } from '@signtusk/prisma/types/field-with-signa
 import { FieldRootContainer } from '@signtusk/ui/components/field/field';
 import { RECIPIENT_COLOR_STYLES } from '@signtusk/ui/lib/recipient-colors';
 import { cn } from '@signtusk/ui/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
+import { Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
