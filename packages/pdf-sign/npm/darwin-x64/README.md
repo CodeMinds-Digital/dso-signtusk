@@ -1,3 +1,0 @@
-# `@documenso/pdf-sign-darwin-x64`
-
-This is the **x86_64-apple-darwin** binary for `@documenso/pdf-sign`

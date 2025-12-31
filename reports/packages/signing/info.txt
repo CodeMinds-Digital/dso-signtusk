@@ -1,5 +1,5 @@
 === Package Information ===
-Name: @docusign-alternative/signing
+Name: @signtusk/signing
 Version: 0.0.0
 Description: N/A
 Main: ./index.ts
@@ -9,9 +9,12 @@ Types: ./index.ts
 test: vitest
 
 === Dependencies ===
-@docusign-alternative/pdf-sign
-@docusign-alternative/tsconfig
+@signtusk/tsconfig
 ts-pattern
+pdf-lib
+
+=== Runtime Dependencies (dynamically loaded) ===
+dso-pdf-sign (optional - graceful fallback if not available)
 
 === Dev Dependencies ===
 vitest

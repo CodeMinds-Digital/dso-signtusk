@@ -30,7 +30,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Runtime data
 pids
 *.pid
 *.seed
@@ -131,7 +130,9 @@ playwright/.cache/
 
 # Reference projects
 documenso-main/
+dso-pdf-sign/
 documenso-main.zip
 package-lock.json
 /.kiro
 /.kiro/specs
+packages/pdf-sign.zip

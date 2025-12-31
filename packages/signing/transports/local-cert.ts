@@ -2,7 +2,17 @@ import * as fs from 'node:fs';
 
 import { getCertificateStatus } from '@signtusk/lib/server-only/cert/cert-status';
 import { env } from '@signtusk/lib/utils/env';
-import { signWithP12 } from '@signtusk/pdf-sign';
+
+let signWithP12: any;
+try {
+  const pdfSign = require('dso-pdf-sign');
+  signWithP12 = pdfSign.signWithP12;
+} catch (error) {
+  console.warn('PDF signing module not available:', error.message);
+  signWithP12 = () => {
+    throw new Error('PDF signing functionality is not available in this deployment');
+  };
+}
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
 import { updateSigningPlaceholder } from '../helpers/update-signing-placeholder';
