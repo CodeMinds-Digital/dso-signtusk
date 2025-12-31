@@ -11,10 +11,18 @@ dist/
 
 # Environment variables
 .env
+.env.*
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.staging
+.env.demo
+.env.netlify.*
+.env.domain.*
 
 # Logs
 npm-debug.log*
@@ -104,6 +112,11 @@ Thumbs.db
 # Turbo
 .turbo
 
+# Vercel (removed platform)
+.vercel
+vercel.json
+.vercelignore
+
 # Database
 *.db
 *.sqlite
@@ -118,3 +131,7 @@ playwright/.cache/
 
 # Reference projects
 documenso-main/
+documenso-main.zip
+package-lock.json
+/.kiro
+/.kiro/specs

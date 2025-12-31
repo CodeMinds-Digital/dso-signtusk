@@ -5,7 +5,8 @@ import { RecipientRole } from '@prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';
 
-import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Button, Container, Head, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';

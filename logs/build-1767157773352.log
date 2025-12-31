@@ -1,0 +1,22 @@
+[2025-12-31T05:09:33.352Z] INFO: Attempt 1/2: npm ci
+[2025-12-31T05:09:33.354Z] ERROR: Attempt 1 failed: Multiple dependency conflicts
+[2025-12-31T05:09:33.354Z] ERROR: Error code: DEPENDENCY_CONFLICT
+ERROR: {
+  "timestamp": "2025-12-31T05:09:33.354Z",
+  "attempt": 1,
+  "maxAttempts": 2,
+  "error": {
+    "message": "Multiple dependency conflicts",
+    "code": "DEPENDENCY_CONFLICT",
+    "stack": "BuildError: Multiple dependency conflicts\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:133:15)\n    at BuildErrorHandler.Mock (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:141:33\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:145:11\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:26\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1243:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1209:10)"
+  },
+  "context": {
+    "conflicts": [
+      "react@17 vs react@18",
+      "typescript@4 vs typescript@5"
+    ]
+  },
+  "retryable": false
+}
+
+[2025-12-31T05:09:33.354Z] ERROR: Non-retryable error encountered, aborting retries

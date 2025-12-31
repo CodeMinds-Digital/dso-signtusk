@@ -6,7 +6,7 @@ export { Font } from '@react-email/font';
 export { Head } from '@react-email/head';
 export { Heading } from '@react-email/heading';
 export { Hr } from '@react-email/hr';
-export { Html } from '@react-email/html';
+// Html component removed to prevent Next.js conflicts - import directly from @react-email/html in templates
 export { Img } from '@react-email/img';
 export { Link } from '@react-email/link';
 export { Preview } from '@react-email/preview';
@@ -15,3 +15,4 @@ export { Row } from '@react-email/row';
 export { Section } from '@react-email/section';
 export { Tailwind } from '@react-email/tailwind';
 export { Text } from '@react-email/text';
+

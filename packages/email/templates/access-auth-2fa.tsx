@@ -1,7 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Img, Preview, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateAccessAuth2FA } from '../template-components/template-access-auth-2fa';
 import { TemplateFooter } from '../template-components/template-footer';

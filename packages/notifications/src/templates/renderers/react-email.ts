@@ -125,7 +125,8 @@ export class ReactEmailRenderer {
         buttonUrl?: string;
     }): string {
         return `
-import { Html, Head, Body, Container, Section, Text, Button, Img } from '@react-email/components';
+import { Html } from '@react-email/html';
+import { Head, Body, Container, Section, Text, Button, Img } from '@react-email/components';
 
 export default function EmailTemplate({ 
     title = "${options.title}",

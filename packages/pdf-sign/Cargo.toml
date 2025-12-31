@@ -1,0 +1,82 @@
+[package]
+name = "pdf-sign"
+version = "0.1.0"
+edition = "2021"
+authors = ["Documenso Team"]
+description = "A clean room PDF digital signature library"
+license = "MIT"
+repository = "https://github.com/documenso/documenso"
+keywords = ["pdf", "digital-signature", "cryptography", "pkcs7", "x509"]
+categories = ["cryptography", "parser-implementations"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# NAPI-RS for Node.js bindings
+napi = { version = "2.16", default-features = false, features = ["napi4", "async"] }
+napi-derive = "2.16"
+
+# Cryptographic dependencies
+ring = "0.17"
+x509-certificate = "0.23"
+rustls-pemfile = "2.0"
+p12 = "0.6"
+pkcs8 = "0.10"
+rsa = "0.9"
+p256 = "0.13"
+p384 = "0.13"
+sha2 = "0.10"
+sha3 = "0.10"
+rand = "0.8"
+ecdsa = "0.16"
+cms = { version = "0.2", features = ["builder"] }
+der = "0.7"
+spki = "0.7"
+const-oid = "0.9"
+
+# PDF processing dependencies
+nom = "7.1"
+flate2 = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Serialization and utilities
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+bytes = "1.5"
+tokio = { version = "1.0", features = ["rt", "rt-multi-thread"] }
+async-trait = "0.1"
+pem = "3.0"
+
+# Google Cloud dependencies (optional)
+# gcloud-sdk = { version = "0.1", optional = true }
+# tonic = { version = "0.10", optional = true }
+# cryptographic-message-syntax = { version = "0.1", optional = true }
+uuid = { version = "1.0", features = ["v4"] }
+log = "0.4"
+
+# HTTP client for timestamp requests
+reqwest = { version = "0.11", features = ["json"] }
+
+# Performance optimization dependencies
+num_cpus = "1.16"
+fastrand = "2.0"
+hex = "0.4"
+
+# Platform-specific dependencies
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["wincrypt", "minwindef", "winerror"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+security-framework = "2.9"
+
+[build-dependencies]
+napi-build = "2.1"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

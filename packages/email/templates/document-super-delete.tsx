@@ -1,11 +1,12 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Hr, Img, Preview, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import {
-  TemplateDocumentDelete,
-  type TemplateDocumentDeleteProps,
+    TemplateDocumentDelete,
+    type TemplateDocumentDeleteProps,
 } from '../template-components/template-document-super-delete';
 import { TemplateFooter } from '../template-components/template-footer';
 

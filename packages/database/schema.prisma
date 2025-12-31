@@ -14,174 +14,174 @@ datasource db {
 // ============================================================================
 
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  name              String
-  avatar            String?
-  emailVerified     DateTime?
-  password          String?
-  organizationId    String
-  isActive          Boolean  @default(true)
-  lastLoginAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String
+  avatar         String?
+  emailVerified  DateTime?
+  password       String?
+  organizationId String
+  isActive       Boolean   @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userRoles         UserRole[]
-  sessions          Session[]
-  apiTokens         ApiToken[]
-  twoFactorAuth     TwoFactorAuth?
-  passkeys          Passkey[]
-  teamMembers       TeamMember[]
-  
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userRoles     UserRole[]
+  sessions      Session[]
+  apiTokens     ApiToken[]
+  twoFactorAuth TwoFactorAuth?
+  passkeys      Passkey[]
+  teamMembers   TeamMember[]
+
   // Security relations
-  securityEvents    SecurityEvent[]
-  loginAttempts     LoginAttempt[]
-  accountLockouts   AccountLockout[]
-  securitySettings  SecuritySettings?
+  securityEvents     SecurityEvent[]
+  loginAttempts      LoginAttempt[]
+  accountLockouts    AccountLockout[]
+  securitySettings   SecuritySettings?
   loginNotifications LoginNotification[]
-  
+
   // Document relations
-  documentsCreated  Document[] @relation("DocumentCreator")
-  documentsOwned    Document[] @relation("DocumentOwner")
-  templatesCreated  Template[] @relation("TemplateCreator")
-  signingRequests   SigningRequest[] @relation("SigningRequestCreator")
-  recipients        Recipient[]
-  signatures        Signature[]
-  
+  documentsCreated Document[]       @relation("DocumentCreator")
+  documentsOwned   Document[]       @relation("DocumentOwner")
+  templatesCreated Template[]       @relation("TemplateCreator")
+  signingRequests  SigningRequest[] @relation("SigningRequestCreator")
+  recipients       Recipient[]
+  signatures       Signature[]
+
   // Activity and audit
-  auditEvents       AuditEvent[] @relation("AuditEventUser")
-  activities        Activity[]
-  
+  auditEvents AuditEvent[] @relation("AuditEventUser")
+  activities  Activity[]
+
   // Metadata relations
   customFieldsCreated     CustomMetadataField[] @relation("CustomFieldCreator")
   hierarchicalTagsCreated HierarchicalTag[]     @relation("HierarchicalTagCreator")
   documentMetadataCreated DocumentMetadata[]    @relation("DocumentMetadataCreator")
-  
+
   // Workflow relations
-  workflowsCreated        Workflow[]
-  
+  workflowsCreated Workflow[]
+
   // Template sharing relations
-  templateSharesCreated   TemplateShare[]         @relation("TemplateShareCreator")
-  templateSharesRevoked   TemplateShare[]         @relation("TemplateShareRevoker")
-  shareApprovalRequests   TemplateShareApproval[] @relation("TemplateShareApprovalRequester")
-  shareApprovalsGiven     TemplateShareApproval[] @relation("TemplateShareApprovalApprover")
-  shareApprovalsRejected  TemplateShareApproval[] @relation("TemplateShareApprovalRejector")
-  
+  templateSharesCreated  TemplateShare[]         @relation("TemplateShareCreator")
+  templateSharesRevoked  TemplateShare[]         @relation("TemplateShareRevoker")
+  shareApprovalRequests  TemplateShareApproval[] @relation("TemplateShareApprovalRequester")
+  shareApprovalsGiven    TemplateShareApproval[] @relation("TemplateShareApprovalApprover")
+  shareApprovalsRejected TemplateShareApproval[] @relation("TemplateShareApprovalRejector")
+
   // Enterprise template management relations
-  templateVersionsCreated    TemplateVersion[]     @relation("TemplateVersionCreator")
-  governancePoliciesCreated  GovernancePolicy[]    @relation("GovernancePolicyCreator")
-  complianceAuditsPerformed  ComplianceAudit[]     @relation("ComplianceAuditAuditor")
-  bulkOperationsCreated      BulkOperation[]       @relation("BulkOperationCreator")
-  templatesArchived          Template[]            @relation("TemplateArchiver")
-  templateRatings            TemplateRating[]      @relation("TemplateRating")
-  templatesLocked            Template[]            @relation("TemplateLocker")
-  
+  templateVersionsCreated   TemplateVersion[]  @relation("TemplateVersionCreator")
+  governancePoliciesCreated GovernancePolicy[] @relation("GovernancePolicyCreator")
+  complianceAuditsPerformed ComplianceAudit[]  @relation("ComplianceAuditAuditor")
+  bulkOperationsCreated     BulkOperation[]    @relation("BulkOperationCreator")
+  templatesArchived         Template[]         @relation("TemplateArchiver")
+  templateRatings           TemplateRating[]   @relation("TemplateRating")
+  templatesLocked           Template[]         @relation("TemplateLocker")
+
   // Template collaboration relations
-  templateComments           TemplateComment[]     @relation("TemplateCommentAuthor")
-  templateCommentsResolved   TemplateComment[]     @relation("TemplateCommentResolver")
-  templateReviewsRequested   TemplateReview[]      @relation("TemplateReviewRequester")
-  templateReviewsAssigned    TemplateReview[]      @relation("TemplateReviewer")
+  templateComments              TemplateComment[]            @relation("TemplateCommentAuthor")
+  templateCommentsResolved      TemplateComment[]            @relation("TemplateCommentResolver")
+  templateReviewsRequested      TemplateReview[]             @relation("TemplateReviewRequester")
+  templateReviewsAssigned       TemplateReview[]             @relation("TemplateReviewer")
   templateNotificationsReceived TemplateChangeNotification[] @relation("TemplateNotificationRecipient")
-  templateNotificationsSent  TemplateChangeNotification[] @relation("TemplateNotificationChanger")
-  templateCollaborations     TemplateCollaborator[] @relation("TemplateCollaboratorUser")
-  templateCollaborationsAdded TemplateCollaborator[] @relation("TemplateCollaboratorAdder")
-  templateEditSessions       TemplateEditSession[] @relation("TemplateEditSessionUser")
-  
+  templateNotificationsSent     TemplateChangeNotification[] @relation("TemplateNotificationChanger")
+  templateCollaborations        TemplateCollaborator[]       @relation("TemplateCollaboratorUser")
+  templateCollaborationsAdded   TemplateCollaborator[]       @relation("TemplateCollaboratorAdder")
+  templateEditSessions          TemplateEditSession[]        @relation("TemplateEditSessionUser")
+
   // Reminder system relations
-  reminderPreferences       ReminderPreference?
-  
+  reminderPreferences ReminderPreference?
+
   // Import/Export relations
-  templateExports           TemplateExport[]      @relation("TemplateExporter")
-  templateImports           TemplateImport[]      @relation("TemplateImporter")
-  templateMigrations        TemplateMigration[]   @relation("TemplateMigrator")
-  templateBackupsCreated    TemplateBackup[]      @relation("TemplateBackupCreator")
-  templateRestores          TemplateRestore[]     @relation("TemplateRestorer")
-  
+  templateExports        TemplateExport[]    @relation("TemplateExporter")
+  templateImports        TemplateImport[]    @relation("TemplateImporter")
+  templateMigrations     TemplateMigration[] @relation("TemplateMigrator")
+  templateBackupsCreated TemplateBackup[]    @relation("TemplateBackupCreator")
+  templateRestores       TemplateRestore[]   @relation("TemplateRestorer")
+
   @@map("users")
 }
 
 model Organization {
-  id                String   @id @default(cuid())
-  name              String
-  domain            String?  @unique
-  slug              String   @unique
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  domain    String?  @unique
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Configuration
-  settings          Json     @default("{}")
-  branding          Json     @default("{}")
-  
+  settings Json @default("{}")
+  branding Json @default("{}")
+
   // Relations
-  users             User[]
-  teams             Team[]
-  roles             Role[]
-  documents         Document[]
-  templates         Template[]
-  signingRequests   SigningRequest[]
-  folders           Folder[]
-  subscription      Subscription?
-  integrations      Integration[]
-  webhooks          Webhook[]
-  auditEvents       AuditEvent[]
-  securityEvents    SecurityEvent[]
-  
+  users           User[]
+  teams           Team[]
+  roles           Role[]
+  documents       Document[]
+  templates       Template[]
+  signingRequests SigningRequest[]
+  folders         Folder[]
+  subscription    Subscription?
+  integrations    Integration[]
+  webhooks        Webhook[]
+  auditEvents     AuditEvent[]
+  securityEvents  SecurityEvent[]
+
   // Metadata relations
-  customMetadataFields  CustomMetadataField[]
-  hierarchicalTags      HierarchicalTag[]
-  documentMetadata      DocumentMetadata[]
-  
+  customMetadataFields CustomMetadataField[]
+  hierarchicalTags     HierarchicalTag[]
+  documentMetadata     DocumentMetadata[]
+
   // Workflow relations
-  workflows             Workflow[]
-  
+  workflows Workflow[]
+
   // Enterprise template management relations
-  governancePolicies    GovernancePolicy[]
-  complianceAudits      ComplianceAudit[]
-  bulkOperations        BulkOperation[]
-  
+  governancePolicies GovernancePolicy[]
+  complianceAudits   ComplianceAudit[]
+  bulkOperations     BulkOperation[]
+
   // Import/Export relations
-  templateExports       TemplateExport[]
-  templateImports       TemplateImport[]
-  templateMigrations    TemplateMigration[]
-  templateBackups       TemplateBackup[]
-  templateRestores      TemplateRestore[]
-  
+  templateExports    TemplateExport[]
+  templateImports    TemplateImport[]
+  templateMigrations TemplateMigration[]
+  templateBackups    TemplateBackup[]
+  templateRestores   TemplateRestore[]
+
   @@map("organizations")
 }
 
 model Team {
-  id                String   @id @default(cuid())
-  name              String
-  description       String?
-  organizationId    String
-  parentTeamId      String?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  parentTeamId   String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  parentTeam        Team?        @relation("TeamHierarchy", fields: [parentTeamId], references: [id])
-  childTeams        Team[]       @relation("TeamHierarchy")
-  teamMembers       TeamMember[]
-  teamRoles         TeamRole[]
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parentTeam   Team?        @relation("TeamHierarchy", fields: [parentTeamId], references: [id])
+  childTeams   Team[]       @relation("TeamHierarchy")
+  teamMembers  TeamMember[]
+  teamRoles    TeamRole[]
+
   @@map("teams")
 }
 
 model TeamMember {
-  id                String   @id @default(cuid())
-  teamId            String
-  userId            String
-  joinedAt          DateTime @default(now())
-  
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
   // Relations
-  team              Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([teamId, userId])
   @@map("team_members")
 }
@@ -191,49 +191,49 @@ model TeamMember {
 // ============================================================================
 
 model Role {
-  id                String   @id @default(cuid())
-  name              String
-  description       String?
-  organizationId    String
-  isSystem          Boolean  @default(false)
-  permissions       Json     @default("[]")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  isSystem       Boolean  @default(false)
+  permissions    Json     @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userRoles         UserRole[]
-  teamRoles         TeamRole[]
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userRoles    UserRole[]
+  teamRoles    TeamRole[]
+
   @@unique([name, organizationId])
   @@map("roles")
 }
 
 model UserRole {
-  id                String   @id @default(cuid())
-  userId            String
-  roleId            String
-  assignedAt        DateTime @default(now())
-  assignedBy        String?
-  
+  id         String   @id @default(cuid())
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  assignedBy String?
+
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role              Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
   @@unique([userId, roleId])
   @@map("user_roles")
 }
 
 model TeamRole {
-  id                String   @id @default(cuid())
-  teamId            String
-  roleId            String
-  assignedAt        DateTime @default(now())
-  
+  id         String   @id @default(cuid())
+  teamId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+
   // Relations
-  team              Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  role              Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
   @@unique([teamId, roleId])
   @@map("team_roles")
 }
@@ -243,67 +243,67 @@ model TeamRole {
 // ============================================================================
 
 model Session {
-  id                String   @id @default(cuid())
-  userId            String
-  token             String   @unique
-  expiresAt         DateTime
-  ipAddress         String?
-  userAgent         String?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  lastAccessedAt    DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  token          String   @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  lastAccessedAt DateTime @default(now())
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("sessions")
 }
 
 model ApiToken {
-  id                String   @id @default(cuid())
-  userId            String
-  name              String
-  token             String   @unique
-  permissions       Json     @default("[]")
-  expiresAt         DateTime?
-  lastUsedAt        DateTime?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  token       String    @unique
+  permissions Json      @default("[]")
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("api_tokens")
 }
 
 model TwoFactorAuth {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  secret            String
-  backupCodes       Json     @default("[]")
-  isEnabled         Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  secret      String
+  backupCodes Json     @default("[]")
+  isEnabled   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("two_factor_auth")
 }
 
 model Passkey {
-  id                String   @id @default(cuid())
-  userId            String
-  credentialId      String   @unique
-  publicKey         String
-  counter           Int      @default(0)
-  name              String?
-  createdAt         DateTime @default(now())
-  lastUsedAt        DateTime?
+  id           String    @id @default(cuid())
+  userId       String
+  credentialId String    @unique
+  publicKey    String
+  counter      Int       @default(0)
+  name         String?
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("passkeys")
 }
 
@@ -312,25 +312,25 @@ model Passkey {
 // ============================================================================
 
 model SecurityEvent {
-  id                String   @id @default(cuid())
-  userId            String?
-  organizationId    String?
-  type              SecurityEventType
-  severity          SecuritySeverity @default(LOW)
-  description       String
-  ipAddress         String?
-  userAgent         String?
-  location          Json?    @default("{}")
-  metadata          Json     @default("{}")
-  resolved          Boolean  @default(false)
-  resolvedAt        DateTime?
-  resolvedBy        String?
-  timestamp         DateTime @default(now())
+  id             String            @id @default(cuid())
+  userId         String?
+  organizationId String?
+  type           SecurityEventType
+  severity       SecuritySeverity  @default(LOW)
+  description    String
+  ipAddress      String?
+  userAgent      String?
+  location       Json?             @default("{}")
+  metadata       Json              @default("{}")
+  resolved       Boolean           @default(false)
+  resolvedAt     DateTime?
+  resolvedBy     String?
+  timestamp      DateTime          @default(now())
 
   // Relations
-  user              User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@index([userId, timestamp])
   @@index([organizationId, timestamp])
   @@index([type, timestamp])
@@ -338,19 +338,19 @@ model SecurityEvent {
 }
 
 model LoginAttempt {
-  id                String   @id @default(cuid())
-  email             String
-  userId            String?
-  success           Boolean
-  ipAddress         String
-  userAgent         String?
-  location          Json?    @default("{}")
-  failureReason     String?
-  timestamp         DateTime @default(now())
+  id            String   @id @default(cuid())
+  email         String
+  userId        String?
+  success       Boolean
+  ipAddress     String
+  userAgent     String?
+  location      Json?    @default("{}")
+  failureReason String?
+  timestamp     DateTime @default(now())
 
   // Relations
-  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([email, timestamp])
   @@index([ipAddress, timestamp])
   @@index([userId, timestamp])
@@ -358,22 +358,22 @@ model LoginAttempt {
 }
 
 model AccountLockout {
-  id                String   @id @default(cuid())
-  userId            String?
-  email             String
-  ipAddress         String?
-  lockoutType       LockoutType
-  reason            String
-  lockedAt          DateTime @default(now())
-  expiresAt         DateTime
-  unlocked          Boolean  @default(false)
-  unlockedAt        DateTime?
-  unlockedBy        String?
-  attemptCount      Int      @default(0)
+  id           String      @id @default(cuid())
+  userId       String?
+  email        String
+  ipAddress    String?
+  lockoutType  LockoutType
+  reason       String
+  lockedAt     DateTime    @default(now())
+  expiresAt    DateTime
+  unlocked     Boolean     @default(false)
+  unlockedAt   DateTime?
+  unlockedBy   String?
+  attemptCount Int         @default(0)
 
   // Relations
-  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([email, expiresAt])
   @@index([ipAddress, expiresAt])
   @@index([userId, expiresAt])
@@ -381,42 +381,42 @@ model AccountLockout {
 }
 
 model SecuritySettings {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  loginNotifications Boolean  @default(true)
-  suspiciousActivityAlerts Boolean @default(true)
-  emailOnNewDevice  Boolean  @default(true)
-  emailOnLocationChange Boolean @default(true)
-  maxFailedAttempts Int      @default(5)
-  lockoutDuration   Int      @default(900) // 15 minutes in seconds
-  sessionTimeout    Int      @default(3600) // 1 hour in seconds
-  requireStrongPassword Boolean @default(true)
-  allowedIpRanges   Json     @default("[]")
-  trustedDevices    Json     @default("[]")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  userId                   String   @unique
+  loginNotifications       Boolean  @default(true)
+  suspiciousActivityAlerts Boolean  @default(true)
+  emailOnNewDevice         Boolean  @default(true)
+  emailOnLocationChange    Boolean  @default(true)
+  maxFailedAttempts        Int      @default(5)
+  lockoutDuration          Int      @default(900) // 15 minutes in seconds
+  sessionTimeout           Int      @default(3600) // 1 hour in seconds
+  requireStrongPassword    Boolean  @default(true)
+  allowedIpRanges          Json     @default("[]")
+  trustedDevices           Json     @default("[]")
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("security_settings")
 }
 
 model LoginNotification {
-  id                String   @id @default(cuid())
-  userId            String
-  type              NotificationType
-  title             String
-  message           String
-  read              Boolean  @default(false)
-  sent              Boolean  @default(false)
-  sentAt            DateTime?
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  sent      Boolean          @default(false)
+  sentAt    DateTime?
+  metadata  Json             @default("{}")
+  createdAt DateTime         @default(now())
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, createdAt])
   @@map("login_notifications")
 }
@@ -426,105 +426,105 @@ model LoginNotification {
 // ============================================================================
 
 model Document {
-  id                String   @id @default(cuid())
-  name              String
-  originalName      String
-  mimeType          String
-  size              Int
-  hash              String   @unique
-  status            DocumentStatus @default(DRAFT)
-  folderId          String?
-  organizationId    String
-  createdBy         String
-  ownedBy           String
-  isTemplate        Boolean  @default(false)
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String         @id @default(cuid())
+  name           String
+  originalName   String
+  mimeType       String
+  size           Int
+  hash           String         @unique
+  status         DocumentStatus @default(DRAFT)
+  folderId       String?
+  organizationId String
+  createdBy      String
+  ownedBy        String
+  isTemplate     Boolean        @default(false)
+  metadata       Json           @default("{}")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("DocumentCreator", fields: [createdBy], references: [id])
-  owner             User         @relation("DocumentOwner", fields: [ownedBy], references: [id])
-  folder            Folder?      @relation(fields: [folderId], references: [id])
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("DocumentCreator", fields: [createdBy], references: [id])
+  owner        User         @relation("DocumentOwner", fields: [ownedBy], references: [id])
+  folder       Folder?      @relation(fields: [folderId], references: [id])
+
   // Document content and processing
-  versions          DocumentVersion[]
-  fields            DocumentField[]
-  shares            DocumentShare[]
-  
+  versions DocumentVersion[]
+  fields   DocumentField[]
+  shares   DocumentShare[]
+
   // Signing workflow
-  signingRequests   SigningRequest[]
-  templates         Template[]
-  
+  signingRequests SigningRequest[]
+  templates       Template[]
+
   // Analytics and activity
-  analytics         DocumentAnalytics[]
-  activities        Activity[]
-  
+  analytics  DocumentAnalytics[]
+  activities Activity[]
+
   // Metadata relation
-  documentMetadata  DocumentMetadata?
-  
+  documentMetadata DocumentMetadata?
+
   // Workflow relations
-  workflows         Workflow[]
+  workflows          Workflow[]
   workflowExecutions WorkflowExecution[]
-  
+
   @@map("documents")
 }
 
 model DocumentVersion {
-  id                String   @id @default(cuid())
-  documentId        String
-  versionNumber     Int
-  fileUrl           String
-  thumbnailUrl      String?
-  size              Int
-  hash              String
-  changes           Json     @default("{}")
-  createdBy         String
-  createdAt         DateTime @default(now())
+  id            String   @id @default(cuid())
+  documentId    String
+  versionNumber Int
+  fileUrl       String
+  thumbnailUrl  String?
+  size          Int
+  hash          String
+  changes       Json     @default("{}")
+  createdBy     String
+  createdAt     DateTime @default(now())
 
   // Relations
-  document          Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
   @@unique([documentId, versionNumber])
   @@map("document_versions")
 }
 
 model Folder {
-  id                String   @id @default(cuid())
-  name              String
-  organizationId    String
-  parentFolderId    String?
-  createdBy         String
-  permissions       Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  organizationId String
+  parentFolderId String?
+  createdBy      String
+  permissions    Json     @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  parentFolder      Folder?      @relation("FolderHierarchy", fields: [parentFolderId], references: [id])
-  childFolders      Folder[]     @relation("FolderHierarchy")
-  documents         Document[]
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parentFolder Folder?      @relation("FolderHierarchy", fields: [parentFolderId], references: [id])
+  childFolders Folder[]     @relation("FolderHierarchy")
+  documents    Document[]
+
   @@map("folders")
 }
 
 model DocumentShare {
-  id                String   @id @default(cuid())
-  documentId        String
-  shareToken        String   @unique
-  permissions       Json     @default("{}")
-  expiresAt         DateTime?
-  password          String?
-  accessCount       Int      @default(0)
-  maxAccess         Int?
-  isActive          Boolean  @default(true)
-  createdBy         String
-  createdAt         DateTime @default(now())
+  id          String    @id @default(cuid())
+  documentId  String
+  shareToken  String    @unique
+  permissions Json      @default("{}")
+  expiresAt   DateTime?
+  password    String?
+  accessCount Int       @default(0)
+  maxAccess   Int?
+  isActive    Boolean   @default(true)
+  createdBy   String
+  createdAt   DateTime  @default(now())
 
   // Relations
-  document          Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
   @@map("document_shares")
 }
 
@@ -533,26 +533,26 @@ model DocumentShare {
 // ============================================================================
 
 model DocumentField {
-  id                String   @id @default(cuid())
-  documentId        String
-  type              FieldType
-  name              String
-  page              Int
-  x                 Float
-  y                 Float
-  width             Float
-  height            Float
-  properties        Json     @default("{}")
-  isRequired        Boolean  @default(false)
-  recipientId       String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String    @id @default(cuid())
+  documentId  String
+  type        FieldType
+  name        String
+  page        Int
+  x           Float
+  y           Float
+  width       Float
+  height      Float
+  properties  Json      @default("{}")
+  isRequired  Boolean   @default(false)
+  recipientId String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
-  document          Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  recipient         Recipient? @relation(fields: [recipientId], references: [id])
-  signatures        Signature[]
-  
+  document   Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  recipient  Recipient?  @relation(fields: [recipientId], references: [id])
+  signatures Signature[]
+
   @@map("document_fields")
 }
 
@@ -561,88 +561,88 @@ model DocumentField {
 // ============================================================================
 
 model SigningRequest {
-  id                String   @id @default(cuid())
-  documentId        String
-  templateId        String?
-  organizationId    String
-  createdBy         String
-  title             String
-  message           String?
-  status            SigningStatus @default(DRAFT)
-  workflow          Json      @default("{}")
-  settings          Json      @default("{}")
-  completedAt       DateTime?
-  expiresAt         DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id             String        @id @default(cuid())
+  documentId     String
+  templateId     String?
+  organizationId String
+  createdBy      String
+  title          String
+  message        String?
+  status         SigningStatus @default(DRAFT)
+  workflow       Json          @default("{}")
+  settings       Json          @default("{}")
+  completedAt    DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("SigningRequestCreator", fields: [createdBy], references: [id])
-  document          Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  template          Template?    @relation(fields: [templateId], references: [id])
-  
-  recipients        Recipient[]
-  auditEvents       AuditEvent[]
-  activities        Activity[]
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("SigningRequestCreator", fields: [createdBy], references: [id])
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  template     Template?    @relation(fields: [templateId], references: [id])
+
+  recipients  Recipient[]
+  auditEvents AuditEvent[]
+  activities  Activity[]
+
   // Reminder system relations
-  reminderSchedules ReminderSchedule[]
+  reminderSchedules   ReminderSchedule[]
   reminderEscalations ReminderEscalation[]
-  
+
   @@map("signing_requests")
 }
 
 model Recipient {
-  id                String   @id @default(cuid())
-  signingRequestId  String
-  userId            String?
-  email             String
-  name              String
-  role              String   @default("signer")
-  order             Int      @default(1)
-  status            RecipientStatus @default(PENDING)
-  authMethod        AuthMethod @default(EMAIL)
-  accessToken       String?  @unique
-  signedAt          DateTime?
-  viewedAt          DateTime?
-  deliveredAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String          @id @default(cuid())
+  signingRequestId String
+  userId           String?
+  email            String
+  name             String
+  role             String          @default("signer")
+  order            Int             @default(1)
+  status           RecipientStatus @default(PENDING)
+  authMethod       AuthMethod      @default(EMAIL)
+  accessToken      String?         @unique
+  signedAt         DateTime?
+  viewedAt         DateTime?
+  deliveredAt      DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   // Relations
-  signingRequest    SigningRequest @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
-  user              User?          @relation(fields: [userId], references: [id])
-  
-  documentFields    DocumentField[]
-  signatures        Signature[]
-  activities        Activity[]
-  
+  signingRequest SigningRequest @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
+  user           User?          @relation(fields: [userId], references: [id])
+
+  documentFields DocumentField[]
+  signatures     Signature[]
+  activities     Activity[]
+
   // Reminder system relations
-  reminderSchedules ReminderSchedule[]
+  reminderSchedules   ReminderSchedule[]
   reminderEscalations ReminderEscalation[]
-  
+
   @@map("recipients")
 }
 
 model Signature {
-  id                String   @id @default(cuid())
-  fieldId           String
-  recipientId       String
-  type              SignatureType
-  data              String   // Base64 encoded signature data
-  timestamp         DateTime @default(now())
-  ipAddress         String
-  userAgent         String
-  certificate       Json?    @default("{}")
-  biometricData     Json?    @default("{}")
-  isValid           Boolean  @default(true)
+  id            String        @id @default(cuid())
+  fieldId       String
+  recipientId   String
+  type          SignatureType
+  data          String // Base64 encoded signature data
+  timestamp     DateTime      @default(now())
+  ipAddress     String
+  userAgent     String
+  certificate   Json?         @default("{}")
+  biometricData Json?         @default("{}")
+  isValid       Boolean       @default(true)
 
   // Relations
-  field             DocumentField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  recipient         Recipient     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  user              User          @relation(fields: [recipientId], references: [id], map: "signatures_userId_fkey")
-  
+  field     DocumentField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  recipient Recipient     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [recipientId], references: [id], map: "signatures_userId_fkey")
+
   @@map("signatures")
 }
 
@@ -651,159 +651,159 @@ model Signature {
 // ============================================================================
 
 model Template {
-  id                String   @id @default(cuid())
-  name              String
-  description       String?
-  documentId        String
-  organizationId    String
-  createdBy         String
-  isPublic          Boolean  @default(false)
-  category          String?
-  tags              Json     @default("[]")
-  settings          Json     @default("{}")
-  workflow          Json     @default("{}")
-  isArchived        Boolean  @default(false)
-  archivedAt        DateTime?
-  archivedBy        String?
-  
+  id             String    @id @default(cuid())
+  name           String
+  description    String?
+  documentId     String
+  organizationId String
+  createdBy      String
+  isPublic       Boolean   @default(false)
+  category       String?
+  tags           Json      @default("[]")
+  settings       Json      @default("{}")
+  workflow       Json      @default("{}")
+  isArchived     Boolean   @default(false)
+  archivedAt     DateTime?
+  archivedBy     String?
+
   // Collaboration fields
-  isCollaborative   Boolean  @default(false)
-  lockStatus        TemplateLockStatus @default(UNLOCKED)
-  lockedBy          String?
-  lockedAt          DateTime?
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  isCollaborative Boolean            @default(false)
+  lockStatus      TemplateLockStatus @default(UNLOCKED)
+  lockedBy        String?
+  lockedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("TemplateCreator", fields: [createdBy], references: [id])
-  document          Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  archiver          User?        @relation("TemplateArchiver", fields: [archivedBy], references: [id])
-  locker            User?        @relation("TemplateLocker", fields: [lockedBy], references: [id])
-  
-  templateFields    TemplateField[]
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("TemplateCreator", fields: [createdBy], references: [id])
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  archiver     User?        @relation("TemplateArchiver", fields: [archivedBy], references: [id])
+  locker       User?        @relation("TemplateLocker", fields: [lockedBy], references: [id])
+
+  templateFields     TemplateField[]
   templateRecipients TemplateRecipient[]
-  templateShares    TemplateShare[]
-  shareApprovals    TemplateShareApproval[]
-  signingRequests   SigningRequest[]
-  analytics         TemplateAnalytics[]
-  ratings           TemplateRating[]
-  versions          TemplateVersion[]
-  complianceAudits  ComplianceAudit[]
-  
+  templateShares     TemplateShare[]
+  shareApprovals     TemplateShareApproval[]
+  signingRequests    SigningRequest[]
+  analytics          TemplateAnalytics[]
+  ratings            TemplateRating[]
+  versions           TemplateVersion[]
+  complianceAudits   ComplianceAudit[]
+
   // Collaboration relations
-  comments          TemplateComment[]
-  reviews           TemplateReview[]
+  comments            TemplateComment[]
+  reviews             TemplateReview[]
   changeNotifications TemplateChangeNotification[]
-  collaborators     TemplateCollaborator[]
-  editSessions      TemplateEditSession[]
-  
+  collaborators       TemplateCollaborator[]
+  editSessions        TemplateEditSession[]
+
   // Workflow relations
-  workflows         Workflow[]
-  
+  workflows Workflow[]
+
   // Import/Export relations
-  exports           TemplateExport[]
-  importResults     TemplateImportResult[]
-  migrationResults  TemplateMigrationResult[]
-  restoreResults    TemplateRestoreResult[]
-  
+  exports          TemplateExport[]
+  importResults    TemplateImportResult[]
+  migrationResults TemplateMigrationResult[]
+  restoreResults   TemplateRestoreResult[]
+
   @@map("templates")
 }
 
 model TemplateField {
-  id                String   @id @default(cuid())
-  templateId        String
-  type              FieldType
-  name              String
-  page              Int
-  x                 Float
-  y                 Float
-  width             Float
-  height            Float
-  properties        Json     @default("{}")
-  isRequired        Boolean  @default(false)
-  recipientRole     String?
-  createdAt         DateTime @default(now())
+  id            String    @id @default(cuid())
+  templateId    String
+  type          FieldType
+  name          String
+  page          Int
+  x             Float
+  y             Float
+  width         Float
+  height        Float
+  properties    Json      @default("{}")
+  isRequired    Boolean   @default(false)
+  recipientRole String?
+  createdAt     DateTime  @default(now())
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
   @@map("template_fields")
 }
 
 model TemplateRecipient {
-  id                String   @id @default(cuid())
-  templateId        String
-  role              String
-  name              String?
-  email             String?
-  order             Int      @default(1)
-  authMethod        AuthMethod @default(EMAIL)
-  isRequired        Boolean  @default(true)
-  createdAt         DateTime @default(now())
+  id         String     @id @default(cuid())
+  templateId String
+  role       String
+  name       String?
+  email      String?
+  order      Int        @default(1)
+  authMethod AuthMethod @default(EMAIL)
+  isRequired Boolean    @default(true)
+  createdAt  DateTime   @default(now())
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
   @@map("template_recipients")
 }
 
 model TemplateShare {
-  id                String   @id @default(cuid())
-  templateId        String
-  shareToken        String   @unique
-  shareType         String   @default("link") // user, team, organization, public, link
-  targetId          String?  // user ID, team ID, etc.
-  permissions       Json     @default("{}")
-  expiresAt         DateTime?
-  accessCount       Int      @default(0)
-  maxAccess         Int?
-  isActive          Boolean  @default(true)
-  password          String?
-  revokedAt         DateTime?
-  revokedBy         String?
-  revokeReason      String?
-  createdBy         String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id           String    @id @default(cuid())
+  templateId   String
+  shareToken   String    @unique
+  shareType    String    @default("link") // user, team, organization, public, link
+  targetId     String? // user ID, team ID, etc.
+  permissions  Json      @default("{}")
+  expiresAt    DateTime?
+  accessCount  Int       @default(0)
+  maxAccess    Int?
+  isActive     Boolean   @default(true)
+  password     String?
+  revokedAt    DateTime?
+  revokedBy    String?
+  revokeReason String?
+  createdBy    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  creator           User     @relation("TemplateShareCreator", fields: [createdBy], references: [id])
-  revoker           User?    @relation("TemplateShareRevoker", fields: [revokedBy], references: [id])
-  
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  creator  User     @relation("TemplateShareCreator", fields: [createdBy], references: [id])
+  revoker  User?    @relation("TemplateShareRevoker", fields: [revokedBy], references: [id])
+
   @@index([templateId, isActive])
   @@index([shareType, targetId])
   @@map("template_shares")
 }
 
 model TemplateShareApproval {
-  id                String   @id @default(cuid())
-  templateId        String
-  requestedBy       String
-  shareType         String   // user, team, organization, public, link
-  targetId          String?  // user ID, team ID, etc.
-  permissions       Json     @default("{}")
-  status            String   @default("pending") // pending, approved, rejected, expired
-  approvers         String[] @default([])
-  approvedBy        String?
-  rejectedBy        String?
-  reason            String?
-  message           String?
-  password          String?
-  maxUses           Int?
-  expiresAt         DateTime
-  processedAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String    @id @default(cuid())
+  templateId  String
+  requestedBy String
+  shareType   String // user, team, organization, public, link
+  targetId    String? // user ID, team ID, etc.
+  permissions Json      @default("{}")
+  status      String    @default("pending") // pending, approved, rejected, expired
+  approvers   String[]  @default([])
+  approvedBy  String?
+  rejectedBy  String?
+  reason      String?
+  message     String?
+  password    String?
+  maxUses     Int?
+  expiresAt   DateTime
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  requester         User     @relation("TemplateShareApprovalRequester", fields: [requestedBy], references: [id])
-  approver          User?    @relation("TemplateShareApprovalApprover", fields: [approvedBy], references: [id])
-  rejector          User?    @relation("TemplateShareApprovalRejector", fields: [rejectedBy], references: [id])
-  
+  template  Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  requester User     @relation("TemplateShareApprovalRequester", fields: [requestedBy], references: [id])
+  approver  User?    @relation("TemplateShareApprovalApprover", fields: [approvedBy], references: [id])
+  rejector  User?    @relation("TemplateShareApprovalRejector", fields: [rejectedBy], references: [id])
+
   @@index([templateId, status])
   @@index([requestedBy])
   @@index([status, expiresAt])
@@ -815,47 +815,47 @@ model TemplateShareApproval {
 // ============================================================================
 
 model DocumentAnalytics {
-  id                String   @id @default(cuid())
-  documentId        String
-  eventType         String
-  metadata          Json     @default("{}")
-  timestamp         DateTime @default(now())
-  userId            String?
-  ipAddress         String?
-  userAgent         String?
+  id         String   @id @default(cuid())
+  documentId String
+  eventType  String
+  metadata   Json     @default("{}")
+  timestamp  DateTime @default(now())
+  userId     String?
+  ipAddress  String?
+  userAgent  String?
 
   // Relations
-  document          Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
   @@map("document_analytics")
 }
 
 model TemplateAnalytics {
-  id                String   @id @default(cuid())
-  templateId        String
-  eventType         String
-  metadata          Json     @default("{}")
-  timestamp         DateTime @default(now())
-  userId            String?
+  id         String   @id @default(cuid())
+  templateId String
+  eventType  String
+  metadata   Json     @default("{}")
+  timestamp  DateTime @default(now())
+  userId     String?
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
   @@map("template_analytics")
 }
 
 model TemplateRating {
-  id                String   @id @default(cuid())
-  templateId        String
-  userId            String
-  rating            Int      // 1-5 stars
-  review            String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id         String   @id @default(cuid())
+  templateId String
+  userId     String
+  rating     Int // 1-5 stars
+  review     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  user              User     @relation("TemplateRating", fields: [userId], references: [id], onDelete: Cascade)
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User     @relation("TemplateRating", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([templateId, userId]) // One rating per user per template
   @@index([templateId])
@@ -868,25 +868,25 @@ model TemplateRating {
 // ============================================================================
 
 model TemplateComment {
-  id                String   @id @default(cuid())
-  templateId        String
-  userId            String
-  parentId          String?
-  content           String
-  mentions          Json     @default("[]") // Array of user IDs mentioned
-  attachments       Json     @default("[]") // Array of attachment objects
-  isResolved        Boolean  @default(false)
-  resolvedBy        String?
-  resolvedAt        DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String    @id @default(cuid())
+  templateId  String
+  userId      String
+  parentId    String?
+  content     String
+  mentions    Json      @default("[]") // Array of user IDs mentioned
+  attachments Json      @default("[]") // Array of attachment objects
+  isResolved  Boolean   @default(false)
+  resolvedBy  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  user              User     @relation("TemplateCommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
-  parent            TemplateComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies           TemplateComment[] @relation("CommentReplies")
-  resolver          User?    @relation("TemplateCommentResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+  template Template          @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User              @relation("TemplateCommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  parent   TemplateComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  TemplateComment[] @relation("CommentReplies")
+  resolver User?             @relation("TemplateCommentResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
 
   @@index([templateId])
   @@index([userId])
@@ -896,26 +896,26 @@ model TemplateComment {
 }
 
 model TemplateReview {
-  id                String   @id @default(cuid())
-  templateId        String
-  versionId         String?
-  reviewerId        String
-  status            TemplateReviewStatus @default(PENDING)
-  decision          TemplateReviewDecision?
-  comments          String?
-  checklist         Json     @default("[]") // Array of checklist items
-  requestedBy       String
-  requestedAt       DateTime @default(now())
-  completedAt       DateTime?
-  dueDate           DateTime?
-  priority          ReviewPriority @default(MEDIUM)
-  metadata          Json     @default("{}")
+  id          String                  @id @default(cuid())
+  templateId  String
+  versionId   String?
+  reviewerId  String
+  status      TemplateReviewStatus    @default(PENDING)
+  decision    TemplateReviewDecision?
+  comments    String?
+  checklist   Json                    @default("[]") // Array of checklist items
+  requestedBy String
+  requestedAt DateTime                @default(now())
+  completedAt DateTime?
+  dueDate     DateTime?
+  priority    ReviewPriority          @default(MEDIUM)
+  metadata    Json                    @default("{}")
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  version           TemplateVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
-  reviewer          User     @relation("TemplateReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
-  requester         User     @relation("TemplateReviewRequester", fields: [requestedBy], references: [id], onDelete: Cascade)
+  template  Template         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  version   TemplateVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+  reviewer  User             @relation("TemplateReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  requester User             @relation("TemplateReviewRequester", fields: [requestedBy], references: [id], onDelete: Cascade)
 
   @@index([templateId])
   @@index([reviewerId])
@@ -925,23 +925,23 @@ model TemplateReview {
 }
 
 model TemplateChangeNotification {
-  id                String   @id @default(cuid())
+  id                String             @id @default(cuid())
   templateId        String
   userId            String
   changeType        TemplateChangeType
   changeDescription String
   changedBy         String
   versionId         String?
-  isRead            Boolean  @default(false)
+  isRead            Boolean            @default(false)
   readAt            DateTime?
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
+  metadata          Json               @default("{}")
+  createdAt         DateTime           @default(now())
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  user              User     @relation("TemplateNotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
-  changer           User     @relation("TemplateNotificationChanger", fields: [changedBy], references: [id], onDelete: Cascade)
-  version           TemplateVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+  template Template         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User             @relation("TemplateNotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  changer  User             @relation("TemplateNotificationChanger", fields: [changedBy], references: [id], onDelete: Cascade)
+  version  TemplateVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
 
   @@index([templateId])
   @@index([userId])
@@ -950,20 +950,20 @@ model TemplateChangeNotification {
 }
 
 model TemplateCollaborator {
-  id                String   @id @default(cuid())
-  templateId        String
-  userId            String
-  role              CollaboratorRole @default(VIEWER)
-  permissions       Json     @default("{}")
-  addedBy           String
-  addedAt           DateTime @default(now())
-  lastActiveAt      DateTime?
-  isActive          Boolean  @default(true)
+  id           String           @id @default(cuid())
+  templateId   String
+  userId       String
+  role         CollaboratorRole @default(VIEWER)
+  permissions  Json             @default("{}")
+  addedBy      String
+  addedAt      DateTime         @default(now())
+  lastActiveAt DateTime?
+  isActive     Boolean          @default(true)
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  user              User     @relation("TemplateCollaboratorUser", fields: [userId], references: [id], onDelete: Cascade)
-  adder             User     @relation("TemplateCollaboratorAdder", fields: [addedBy], references: [id], onDelete: Cascade)
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User     @relation("TemplateCollaboratorUser", fields: [userId], references: [id], onDelete: Cascade)
+  adder    User     @relation("TemplateCollaboratorAdder", fields: [addedBy], references: [id], onDelete: Cascade)
 
   @@unique([templateId, userId])
   @@index([templateId])
@@ -973,18 +973,18 @@ model TemplateCollaborator {
 }
 
 model TemplateEditSession {
-  id                String   @id @default(cuid())
-  templateId        String
-  userId            String
-  startedAt         DateTime @default(now())
-  lastActivityAt    DateTime @default(now())
-  endedAt           DateTime?
-  isActive          Boolean  @default(true)
-  changes           Json     @default("[]") // Array of change objects
+  id             String    @id @default(cuid())
+  templateId     String
+  userId         String
+  startedAt      DateTime  @default(now())
+  lastActivityAt DateTime  @default(now())
+  endedAt        DateTime?
+  isActive       Boolean   @default(true)
+  changes        Json      @default("[]") // Array of change objects
 
   // Relations
-  template          Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  user              User     @relation("TemplateEditSessionUser", fields: [userId], references: [id], onDelete: Cascade)
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User     @relation("TemplateEditSessionUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([templateId])
   @@index([userId])
@@ -997,56 +997,56 @@ model TemplateEditSession {
 // ============================================================================
 
 model Integration {
-  id                String   @id @default(cuid())
-  organizationId    String
-  type              IntegrationType
-  name              String
-  configuration     Json     @default("{}")
-  status            IntegrationStatus @default(INACTIVE)
-  lastSync          DateTime?
-  errorLog          Json     @default("[]")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String            @id @default(cuid())
+  organizationId String
+  type           IntegrationType
+  name           String
+  configuration  Json              @default("{}")
+  status         IntegrationStatus @default(INACTIVE)
+  lastSync       DateTime?
+  errorLog       Json              @default("[]")
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@map("integrations")
 }
 
 model Webhook {
-  id                String   @id @default(cuid())
-  organizationId    String
-  url               String
-  events            Json     @default("[]")
-  secret            String
-  status            WebhookStatus @default(ACTIVE)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String        @id @default(cuid())
+  organizationId String
+  url            String
+  events         Json          @default("[]")
+  secret         String
+  status         WebhookStatus @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  deliveries        WebhookDelivery[]
-  
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
   @@map("webhooks")
 }
 
 model WebhookDelivery {
-  id                String   @id @default(cuid())
-  webhookId         String
-  eventType         String
-  payload           Json
-  status            DeliveryStatus @default(PENDING)
-  attempts          Int      @default(0)
-  lastAttemptAt     DateTime?
-  nextAttemptAt     DateTime?
-  responseStatus    Int?
-  responseBody      String?
-  createdAt         DateTime @default(now())
+  id             String         @id @default(cuid())
+  webhookId      String
+  eventType      String
+  payload        Json
+  status         DeliveryStatus @default(PENDING)
+  attempts       Int            @default(0)
+  lastAttemptAt  DateTime?
+  nextAttemptAt  DateTime?
+  responseStatus Int?
+  responseBody   String?
+  createdAt      DateTime       @default(now())
 
   // Relations
-  webhook           Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
-  
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
   @@map("webhook_deliveries")
 }
 
@@ -1055,35 +1055,35 @@ model WebhookDelivery {
 // ============================================================================
 
 model Subscription {
-  id                String   @id @default(cuid())
-  organizationId    String   @unique
-  planId            String
-  status            SubscriptionStatus @default(ACTIVE)
+  id                 String             @id @default(cuid())
+  organizationId     String             @unique
+  planId             String
+  status             SubscriptionStatus @default(ACTIVE)
   currentPeriodStart DateTime
-  currentPeriodEnd  DateTime
-  cancelAtPeriodEnd Boolean  @default(false)
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  metadata           Json               @default("{}")
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  usageRecords      UsageRecord[]
-  
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  usageRecords UsageRecord[]
+
   @@map("subscriptions")
 }
 
 model UsageRecord {
-  id                String   @id @default(cuid())
-  subscriptionId    String
-  metric            String
-  quantity          Int
-  timestamp         DateTime @default(now())
-  metadata          Json     @default("{}")
+  id             String   @id @default(cuid())
+  subscriptionId String
+  metric         String
+  quantity       Int
+  timestamp      DateTime @default(now())
+  metadata       Json     @default("{}")
 
   // Relations
-  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
   @@map("usage_records")
 }
 
@@ -1092,44 +1092,44 @@ model UsageRecord {
 // ============================================================================
 
 model AuditEvent {
-  id                String   @id @default(cuid())
-  organizationId    String
-  userId            String?
-  entityType        String
-  entityId          String
-  action            String
-  details           Json     @default("{}")
-  ipAddress         String?
-  userAgent         String?
-  timestamp         DateTime @default(now())
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  entityType     String
+  entityId       String
+  action         String
+  details        Json     @default("{}")
+  ipAddress      String?
+  userAgent      String?
+  timestamp      DateTime @default(now())
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user              User?        @relation("AuditEventUser", fields: [userId], references: [id])
-  signingRequest    SigningRequest? @relation(fields: [entityId], references: [id])
-  
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?           @relation("AuditEventUser", fields: [userId], references: [id])
+  signingRequest SigningRequest? @relation(fields: [entityId], references: [id])
+
   @@index([organizationId, timestamp])
   @@index([entityType, entityId])
   @@map("audit_events")
 }
 
 model Activity {
-  id                String   @id @default(cuid())
-  userId            String?
-  documentId        String?
-  signingRequestId  String?
-  recipientId       String?
-  type              ActivityType
-  description       String
-  metadata          Json     @default("{}")
-  timestamp         DateTime @default(now())
+  id               String       @id @default(cuid())
+  userId           String?
+  documentId       String?
+  signingRequestId String?
+  recipientId      String?
+  type             ActivityType
+  description      String
+  metadata         Json         @default("{}")
+  timestamp        DateTime     @default(now())
 
   // Relations
-  user              User?          @relation(fields: [userId], references: [id])
-  document          Document?      @relation(fields: [documentId], references: [id])
-  signingRequest    SigningRequest? @relation(fields: [signingRequestId], references: [id])
-  recipient         Recipient?     @relation(fields: [recipientId], references: [id])
-  
+  user           User?           @relation(fields: [userId], references: [id])
+  document       Document?       @relation(fields: [documentId], references: [id])
+  signingRequest SigningRequest? @relation(fields: [signingRequestId], references: [id])
+  recipient      Recipient?      @relation(fields: [recipientId], references: [id])
+
   @@index([userId, timestamp])
   @@index([documentId, timestamp])
   @@map("activities")
@@ -1298,44 +1298,44 @@ enum NotificationType {
 // ============================================================================
 
 model CustomMetadataField {
-  id              String   @id @default(cuid())
-  name            String
-  type            String   // MetadataFieldType enum as string
-  description     String?
-  required        Boolean  @default(false)
-  defaultValue    String?  // JSON string
-  validation      String?  // JSON string
-  organizationId  String
-  createdBy       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  type           String // MetadataFieldType enum as string
+  description    String?
+  required       Boolean  @default(false)
+  defaultValue   String? // JSON string
+  validation     String? // JSON string
+  organizationId String
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator         User         @relation("CustomFieldCreator", fields: [createdBy], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("CustomFieldCreator", fields: [createdBy], references: [id])
 
   @@unique([organizationId, name])
   @@map("custom_metadata_fields")
 }
 
 model HierarchicalTag {
-  id              String   @id @default(cuid())
-  name            String
-  parentId        String?
-  path            String   // Full path like "legal/contracts/employment"
-  level           Int      @default(0)
-  color           String?
-  description     String?
-  organizationId  String
-  createdBy       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  parentId       String?
+  path           String // Full path like "legal/contracts/employment"
+  level          Int      @default(0)
+  color          String?
+  description    String?
+  organizationId String
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator         User              @relation("HierarchicalTagCreator", fields: [createdBy], references: [id])
-  parent          HierarchicalTag?  @relation("TagHierarchy", fields: [parentId], references: [id])
-  children        HierarchicalTag[] @relation("TagHierarchy")
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User              @relation("HierarchicalTagCreator", fields: [createdBy], references: [id])
+  parent       HierarchicalTag?  @relation("TagHierarchy", fields: [parentId], references: [id])
+  children     HierarchicalTag[] @relation("TagHierarchy")
 
   @@unique([organizationId, path])
   @@unique([organizationId, parentId, name])
@@ -1343,23 +1343,23 @@ model HierarchicalTag {
 }
 
 model DocumentMetadata {
-  id                String   @id @default(cuid())
-  documentId        String   @unique
-  customFields      Json     @default("{}")
-  tags              String[] @default([])
-  hierarchicalTags  String[] @default([])
-  searchableText    String?
-  extractedText     String?
-  keywords          String[] @default([])
-  organizationId    String
-  createdBy         String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String   @id @default(cuid())
+  documentId       String   @unique
+  customFields     Json     @default("{}")
+  tags             String[] @default([])
+  hierarchicalTags String[] @default([])
+  searchableText   String?
+  extractedText    String?
+  keywords         String[] @default([])
+  organizationId   String
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relations
-  document          Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("DocumentMetadataCreator", fields: [createdBy], references: [id])
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("DocumentMetadataCreator", fields: [createdBy], references: [id])
 
   @@map("document_metadata")
 }
@@ -1369,27 +1369,27 @@ model DocumentMetadata {
 // ============================================================================
 
 model Workflow {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  type            String   // sequential, parallel, conditional, hybrid
-  documentId      String?
-  templateId      String?
-  organizationId  String
-  createdBy       String
-  status          String   @default("draft") // draft, active, paused, completed, cancelled, expired
-  definition      Json     // Full workflow definition
-  settings        Json     @default("{}")
-  metadata        Json     @default("{}")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  type           String // sequential, parallel, conditional, hybrid
+  documentId     String?
+  templateId     String?
+  organizationId String
+  createdBy      String
+  status         String   @default("draft") // draft, active, paused, completed, cancelled, expired
+  definition     Json // Full workflow definition
+  settings       Json     @default("{}")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator         User         @relation(fields: [createdBy], references: [id])
-  document        Document?    @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  template        Template?    @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  executions      WorkflowExecution[]
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User                @relation(fields: [createdBy], references: [id])
+  document     Document?           @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  template     Template?           @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  executions   WorkflowExecution[]
 
   @@index([organizationId, status])
   @@index([templateId])
@@ -1398,47 +1398,48 @@ model Workflow {
 }
 
 model WorkflowExecution {
-  id              String   @id @default(cuid())
-  workflowId      String
-  documentId      String
-  status          String   // active, paused, completed, cancelled, expired
-  currentStepId   String?
-  startedAt       DateTime?
-  completedAt     DateTime?
-  context         Json     @default("{}")
-  stepExecutions  Json     @default("[]")
-  auditTrail      Json     @default("[]")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(cuid())
+  workflowId     String
+  documentId     String
+  status         String // active, paused, completed, cancelled, expired
+  currentStepId  String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  context        Json      @default("{}")
+  stepExecutions Json      @default("[]")
+  auditTrail     Json      @default("[]")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relations
-  workflow        Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([workflowId, status])
   @@index([documentId])
   @@index([status, startedAt])
   @@map("workflow_executions")
 }
+
 // ============================================================================
 // ENTERPRISE TEMPLATE MANAGEMENT MODELS
 // ============================================================================
 
 model TemplateVersion {
-  id              String   @id @default(cuid())
-  templateId      String
-  version         Int
-  name            String
-  description     String?
-  changes         Json     @default("[]") // Array of TemplateChangeRecord
-  createdBy       String
-  createdAt       DateTime @default(now())
-  isActive        Boolean  @default(false)
+  id          String   @id @default(cuid())
+  templateId  String
+  version     Int
+  name        String
+  description String?
+  changes     Json     @default("[]") // Array of TemplateChangeRecord
+  createdBy   String
+  createdAt   DateTime @default(now())
+  isActive    Boolean  @default(false)
 
   // Relations
-  template        Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  creator         User     @relation("TemplateVersionCreator", fields: [createdBy], references: [id])
-  reviews         TemplateReview[]
+  template            Template                     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  creator             User                         @relation("TemplateVersionCreator", fields: [createdBy], references: [id])
+  reviews             TemplateReview[]
   changeNotifications TemplateChangeNotification[]
 
   @@unique([templateId, version])
@@ -1447,38 +1448,38 @@ model TemplateVersion {
 }
 
 model GovernancePolicy {
-  id              String   @id @default(cuid())
-  organizationId  String
-  name            String
-  description     String?
-  rules           Json     @default("[]") // Array of GovernanceRule
-  isActive        Boolean  @default(true)
-  createdBy       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  rules          Json     @default("[]") // Array of GovernanceRule
+  isActive       Boolean  @default(true)
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator         User         @relation("GovernancePolicyCreator", fields: [createdBy], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("GovernancePolicyCreator", fields: [createdBy], references: [id])
 
   @@index([organizationId, isActive])
   @@map("governance_policies")
 }
 
 model ComplianceAudit {
-  id                String   @id @default(cuid())
-  templateId        String
-  organizationId    String
-  complianceScore   Float
-  violations        Json     @default("[]") // Array of ComplianceViolation
-  recommendations   Json     @default("[]") // Array of ComplianceRecommendation
-  auditedBy         String
-  createdAt         DateTime @default(now())
+  id              String   @id @default(cuid())
+  templateId      String
+  organizationId  String
+  complianceScore Float
+  violations      Json     @default("[]") // Array of ComplianceViolation
+  recommendations Json     @default("[]") // Array of ComplianceRecommendation
+  auditedBy       String
+  createdAt       DateTime @default(now())
 
   // Relations
-  template          Template     @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  auditor           User         @relation("ComplianceAuditAuditor", fields: [auditedBy], references: [id])
+  template     Template     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  auditor      User         @relation("ComplianceAuditAuditor", fields: [auditedBy], references: [id])
 
   @@index([templateId, createdAt])
   @@index([organizationId, createdAt])
@@ -1487,24 +1488,24 @@ model ComplianceAudit {
 }
 
 model BulkOperation {
-  id                String   @id @default(cuid())
-  organizationId    String
-  operationType     String   // create, update, delete, duplicate, archive, restore
-  status            String   @default("pending") // pending, processing, completed, failed, cancelled
-  totalOperations   Int
-  processedCount    Int      @default(0)
-  failedCount       Int      @default(0)
-  results           Json     @default("[]") // Array of operation results
-  errors            Json     @default("[]") // Array of error messages
-  createdBy         String
-  startedAt         DateTime?
-  completedAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              String    @id @default(cuid())
+  organizationId  String
+  operationType   String // create, update, delete, duplicate, archive, restore
+  status          String    @default("pending") // pending, processing, completed, failed, cancelled
+  totalOperations Int
+  processedCount  Int       @default(0)
+  failedCount     Int       @default(0)
+  results         Json      @default("[]") // Array of operation results
+  errors          Json      @default("[]") // Array of error messages
+  createdBy       String
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("BulkOperationCreator", fields: [createdBy], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("BulkOperationCreator", fields: [createdBy], references: [id])
 
   @@index([organizationId, status])
   @@index([createdBy, createdAt])
@@ -1516,27 +1517,27 @@ model BulkOperation {
 // ============================================================================
 
 model ReminderSchedule {
-  id                String   @id @default(cuid())
-  signingRequestId  String
-  recipientId       String
-  organizationId    String
-  reminderType      ReminderType
-  status            ReminderStatus @default(SCHEDULED)
-  scheduledAt       DateTime
-  sentAt            DateTime?
-  deliveredAt       DateTime?
-  channels          ReminderChannel[] @default([EMAIL])
-  config            Json     @default("{}")
-  content           Json     @default("{}")
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String            @id @default(cuid())
+  signingRequestId String
+  recipientId      String
+  organizationId   String
+  reminderType     ReminderType
+  status           ReminderStatus    @default(SCHEDULED)
+  scheduledAt      DateTime
+  sentAt           DateTime?
+  deliveredAt      DateTime?
+  channels         ReminderChannel[] @default([EMAIL])
+  config           Json              @default("{}")
+  content          Json              @default("{}")
+  metadata         Json              @default("{}")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   // Relations
-  signingRequest    SigningRequest @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
-  recipient         Recipient      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  deliveries        ReminderDelivery[]
-  analytics         ReminderAnalyticsEvent[]
+  signingRequest SigningRequest           @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
+  recipient      Recipient                @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  deliveries     ReminderDelivery[]
+  analytics      ReminderAnalyticsEvent[]
 
   @@index([signingRequestId, recipientId])
   @@index([scheduledAt, status])
@@ -1545,21 +1546,21 @@ model ReminderSchedule {
 }
 
 model ReminderDelivery {
-  id                String   @id @default(cuid())
+  id                 String          @id @default(cuid())
   reminderScheduleId String
-  channel           ReminderChannel
-  status            DeliveryStatus @default(PENDING)
-  deliveredAt       DateTime?
-  errorMessage      String?
-  deliveryId        String?
-  trackingData      Json     @default("{}")
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  channel            ReminderChannel
+  status             DeliveryStatus  @default(PENDING)
+  deliveredAt        DateTime?
+  errorMessage       String?
+  deliveryId         String?
+  trackingData       Json            @default("{}")
+  metadata           Json            @default("{}")
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
   // Relations
-  reminderSchedule  ReminderSchedule @relation(fields: [reminderScheduleId], references: [id], onDelete: Cascade)
-  interactions      ReminderInteraction[]
+  reminderSchedule ReminderSchedule      @relation(fields: [reminderScheduleId], references: [id], onDelete: Cascade)
+  interactions     ReminderInteraction[]
 
   @@index([reminderScheduleId, channel])
   @@index([status, deliveredAt])
@@ -1567,17 +1568,17 @@ model ReminderDelivery {
 }
 
 model ReminderInteraction {
-  id                String   @id @default(cuid())
+  id                 String                  @id @default(cuid())
   reminderDeliveryId String
-  interactionType   ReminderInteractionType
-  timestamp         DateTime @default(now())
-  ipAddress         String?
-  userAgent         String?
-  location          Json?    @default("{}")
-  metadata          Json     @default("{}")
+  interactionType    ReminderInteractionType
+  timestamp          DateTime                @default(now())
+  ipAddress          String?
+  userAgent          String?
+  location           Json?                   @default("{}")
+  metadata           Json                    @default("{}")
 
   // Relations
-  reminderDelivery  ReminderDelivery @relation(fields: [reminderDeliveryId], references: [id], onDelete: Cascade)
+  reminderDelivery ReminderDelivery @relation(fields: [reminderDeliveryId], references: [id], onDelete: Cascade)
 
   @@index([reminderDeliveryId, interactionType])
   @@index([timestamp])
@@ -1585,23 +1586,23 @@ model ReminderInteraction {
 }
 
 model ReminderEscalation {
-  id                String   @id @default(cuid())
-  signingRequestId  String
-  recipientId       String
-  organizationId    String
-  escalationLevel   EscalationLevel
-  status            EscalationStatus @default(PENDING)
-  triggeredAt       DateTime @default(now())
-  processedAt       DateTime?
-  notifiedUsers     String[] @default([])
-  actions           Json     @default("[]")
-  metadata          Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String           @id @default(cuid())
+  signingRequestId String
+  recipientId      String
+  organizationId   String
+  escalationLevel  EscalationLevel
+  status           EscalationStatus @default(PENDING)
+  triggeredAt      DateTime         @default(now())
+  processedAt      DateTime?
+  notifiedUsers    String[]         @default([])
+  actions          Json             @default("[]")
+  metadata         Json             @default("{}")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   // Relations
-  signingRequest    SigningRequest @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
-  recipient         Recipient      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  signingRequest SigningRequest @relation(fields: [signingRequestId], references: [id], onDelete: Cascade)
+  recipient      Recipient      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([signingRequestId, recipientId])
   @@index([escalationLevel, status])
@@ -1610,18 +1611,18 @@ model ReminderEscalation {
 }
 
 model ReminderAnalyticsEvent {
-  id                String   @id @default(cuid())
+  id                 String            @id @default(cuid())
   reminderScheduleId String?
-  organizationId    String
-  eventType         ReminderEventType
-  eventData         Json     @default("{}")
-  timestamp         DateTime @default(now())
-  userId            String?
-  sessionId         String?
-  metadata          Json     @default("{}")
+  organizationId     String
+  eventType          ReminderEventType
+  eventData          Json              @default("{}")
+  timestamp          DateTime          @default(now())
+  userId             String?
+  sessionId          String?
+  metadata           Json              @default("{}")
 
   // Relations
-  reminderSchedule  ReminderSchedule? @relation(fields: [reminderScheduleId], references: [id], onDelete: Cascade)
+  reminderSchedule ReminderSchedule? @relation(fields: [reminderScheduleId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, eventType, timestamp])
   @@index([reminderScheduleId, eventType])
@@ -1629,16 +1630,16 @@ model ReminderAnalyticsEvent {
 }
 
 model ReminderOptimization {
-  id                String   @id @default(cuid())
-  organizationId    String
-  optimizationType  ReminderOptimizationType
-  analysisData      Json     @default("{}")
-  recommendations   Json     @default("[]")
-  implementedAt     DateTime?
-  results           Json?    @default("{}")
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String                   @id @default(cuid())
+  organizationId   String
+  optimizationType ReminderOptimizationType
+  analysisData     Json                     @default("{}")
+  recommendations  Json                     @default("[]")
+  implementedAt    DateTime?
+  results          Json?                    @default("{}")
+  isActive         Boolean                  @default(true)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
 
   @@index([organizationId, optimizationType])
   @@index([createdAt])
@@ -1646,21 +1647,21 @@ model ReminderOptimization {
 }
 
 model ReminderTemplate {
-  id                String   @id @default(cuid())
-  organizationId    String
-  name              String
-  reminderType      ReminderType
-  channel           ReminderChannel
-  subject           String?
-  content           String
-  variables         Json     @default("[]")
-  isDefault         Boolean  @default(false)
-  isActive          Boolean  @default(true)
-  usage             Json     @default("{}")
-  performance       Json     @default("{}")
-  createdBy         String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id             String          @id @default(cuid())
+  organizationId String
+  name           String
+  reminderType   ReminderType
+  channel        ReminderChannel
+  subject        String?
+  content        String
+  variables      Json            @default("[]")
+  isDefault      Boolean         @default(false)
+  isActive       Boolean         @default(true)
+  usage          Json            @default("{}")
+  performance    Json            @default("{}")
+  createdBy      String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@unique([organizationId, name, reminderType, channel])
   @@index([organizationId, isActive])
@@ -1669,21 +1670,21 @@ model ReminderTemplate {
 }
 
 model ReminderPreference {
-  id                String   @id @default(cuid())
-  userId            String   @unique
+  id                String            @id @default(cuid())
+  userId            String            @unique
   organizationId    String
   preferredChannels ReminderChannel[] @default([EMAIL])
   timezone          String?
-  businessHours     Json?    @default("{}")
+  businessHours     Json?             @default("{}")
   frequency         ReminderFrequency @default(NORMAL)
-  enabled           Boolean  @default(true)
-  doNotDisturb      Json?    @default("{}")
-  customSettings    Json     @default("{}")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  enabled           Boolean           @default(true)
+  doNotDisturb      Json?             @default("{}")
+  customSettings    Json              @default("{}")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@map("reminder_preferences")
@@ -1828,25 +1829,25 @@ enum CollaboratorRole {
 // ============================================================================
 
 model TemplateExport {
-  id                String   @id @default(cuid())
-  templateId        String?
-  templateIds       String[] @default([])
-  organizationId    String
-  exportedBy        String
-  format            TemplateExportFormat
-  size              Int
-  checksum          String
-  exportedAt        DateTime @default(now())
-  downloadCount     Int      @default(0)
-  lastDownloadAt    DateTime?
-  expiresAt         DateTime?
-  metadata          Json     @default("{}")
-  options           Json     @default("{}")
+  id             String               @id @default(cuid())
+  templateId     String?
+  templateIds    String[]             @default([])
+  organizationId String
+  exportedBy     String
+  format         TemplateExportFormat
+  size           Int
+  checksum       String
+  exportedAt     DateTime             @default(now())
+  downloadCount  Int                  @default(0)
+  lastDownloadAt DateTime?
+  expiresAt      DateTime?
+  metadata       Json                 @default("{}")
+  options        Json                 @default("{}")
 
   // Relations
-  template          Template? @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  exporter          User      @relation("TemplateExporter", fields: [exportedBy], references: [id])
+  template     Template?    @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  exporter     User         @relation("TemplateExporter", fields: [exportedBy], references: [id])
 
   @@index([organizationId, exportedAt])
   @@index([exportedBy, exportedAt])
@@ -1855,23 +1856,23 @@ model TemplateExport {
 }
 
 model TemplateImport {
-  id                String   @id @default(cuid())
-  organizationId    String
-  importedBy        String
-  sourceFormat      TemplateExportFormat
-  importedAt        DateTime @default(now())
-  totalTemplates    Int
-  importedCount     Int      @default(0)
-  skippedCount      Int      @default(0)
-  failedCount       Int      @default(0)
-  status            ImportStatus @default(PENDING)
-  errors            Json     @default("[]")
-  metadata          Json     @default("{}")
-  options           Json     @default("{}")
+  id             String               @id @default(cuid())
+  organizationId String
+  importedBy     String
+  sourceFormat   TemplateExportFormat
+  importedAt     DateTime             @default(now())
+  totalTemplates Int
+  importedCount  Int                  @default(0)
+  skippedCount   Int                  @default(0)
+  failedCount    Int                  @default(0)
+  status         ImportStatus         @default(PENDING)
+  errors         Json                 @default("[]")
+  metadata       Json                 @default("{}")
+  options        Json                 @default("{}")
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  importer          User      @relation("TemplateImporter", fields: [importedBy], references: [id])
+  organization      Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  importer          User                   @relation("TemplateImporter", fields: [importedBy], references: [id])
   importedTemplates TemplateImportResult[]
 
   @@index([organizationId, importedAt])
@@ -1881,20 +1882,20 @@ model TemplateImport {
 }
 
 model TemplateImportResult {
-  id                String   @id @default(cuid())
-  importId          String
-  originalId        String?
-  newTemplateId     String?
-  templateName      String
-  status            ImportResultStatus
-  errors            Json     @default("[]")
-  fieldsMigrated    Int      @default(0)
-  recipientsMigrated Int     @default(0)
-  createdAt         DateTime @default(now())
+  id                 String             @id @default(cuid())
+  importId           String
+  originalId         String?
+  newTemplateId      String?
+  templateName       String
+  status             ImportResultStatus
+  errors             Json               @default("[]")
+  fieldsMigrated     Int                @default(0)
+  recipientsMigrated Int                @default(0)
+  createdAt          DateTime           @default(now())
 
   // Relations
-  import            TemplateImport @relation(fields: [importId], references: [id], onDelete: Cascade)
-  newTemplate       Template?      @relation(fields: [newTemplateId], references: [id], onDelete: SetNull)
+  import      TemplateImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+  newTemplate Template?      @relation(fields: [newTemplateId], references: [id], onDelete: SetNull)
 
   @@index([importId, status])
   @@index([newTemplateId])
@@ -1902,25 +1903,25 @@ model TemplateImportResult {
 }
 
 model TemplateMigration {
-  id                String   @id @default(cuid())
-  sourceSystem      MigrationSourceSystem
+  id                   String                @id @default(cuid())
+  sourceSystem         MigrationSourceSystem
   targetOrganizationId String
-  migratedBy        String
-  migratedAt        DateTime @default(now())
-  totalTemplates    Int
-  migratedCount     Int      @default(0)
-  failedCount       Int      @default(0)
-  skippedCount      Int      @default(0)
-  status            MigrationStatus @default(PENDING)
-  isDryRun          Boolean  @default(false)
-  errors            Json     @default("[]")
-  metadata          Json     @default("{}")
-  options           Json     @default("{}")
+  migratedBy           String
+  migratedAt           DateTime              @default(now())
+  totalTemplates       Int
+  migratedCount        Int                   @default(0)
+  failedCount          Int                   @default(0)
+  skippedCount         Int                   @default(0)
+  status               MigrationStatus       @default(PENDING)
+  isDryRun             Boolean               @default(false)
+  errors               Json                  @default("[]")
+  metadata             Json                  @default("{}")
+  options              Json                  @default("{}")
 
   // Relations
-  targetOrganization Organization @relation(fields: [targetOrganizationId], references: [id], onDelete: Cascade)
-  migrator          User         @relation("TemplateMigrator", fields: [migratedBy], references: [id])
-  migrationResults  TemplateMigrationResult[]
+  targetOrganization Organization              @relation(fields: [targetOrganizationId], references: [id], onDelete: Cascade)
+  migrator           User                      @relation("TemplateMigrator", fields: [migratedBy], references: [id])
+  migrationResults   TemplateMigrationResult[]
 
   @@index([targetOrganizationId, migratedAt])
   @@index([migratedBy, migratedAt])
@@ -1929,20 +1930,20 @@ model TemplateMigration {
 }
 
 model TemplateMigrationResult {
-  id                String   @id @default(cuid())
-  migrationId       String
-  sourceId          String
-  targetTemplateId  String?
-  templateName      String
-  status            MigrationResultStatus
-  fieldsMigrated    Int      @default(0)
-  recipientsMigrated Int     @default(0)
-  errors            Json     @default("[]")
-  createdAt         DateTime @default(now())
+  id                 String                @id @default(cuid())
+  migrationId        String
+  sourceId           String
+  targetTemplateId   String?
+  templateName       String
+  status             MigrationResultStatus
+  fieldsMigrated     Int                   @default(0)
+  recipientsMigrated Int                   @default(0)
+  errors             Json                  @default("[]")
+  createdAt          DateTime              @default(now())
 
   // Relations
-  migration         TemplateMigration @relation(fields: [migrationId], references: [id], onDelete: Cascade)
-  targetTemplate    Template?         @relation(fields: [targetTemplateId], references: [id], onDelete: SetNull)
+  migration      TemplateMigration @relation(fields: [migrationId], references: [id], onDelete: Cascade)
+  targetTemplate Template?         @relation(fields: [targetTemplateId], references: [id], onDelete: SetNull)
 
   @@index([migrationId, status])
   @@index([targetTemplateId])
@@ -1950,27 +1951,27 @@ model TemplateMigrationResult {
 }
 
 model TemplateBackup {
-  id                String   @id @default(cuid())
-  organizationId    String
-  createdBy         String
-  templateCount     Int
-  size              Int
-  checksum          String
-  backupPath        String?
-  createdAt         DateTime @default(now())
-  retention         DateTime
-  isEncrypted       Boolean  @default(false)
-  compressionType   CompressionType @default(NONE)
-  status            BackupStatus @default(ACTIVE)
-  restoredCount     Int      @default(0)
-  lastRestoredAt    DateTime?
-  metadata          Json     @default("{}")
-  options           Json     @default("{}")
+  id              String          @id @default(cuid())
+  organizationId  String
+  createdBy       String
+  templateCount   Int
+  size            Int
+  checksum        String
+  backupPath      String?
+  createdAt       DateTime        @default(now())
+  retention       DateTime
+  isEncrypted     Boolean         @default(false)
+  compressionType CompressionType @default(NONE)
+  status          BackupStatus    @default(ACTIVE)
+  restoredCount   Int             @default(0)
+  lastRestoredAt  DateTime?
+  metadata        Json            @default("{}")
+  options         Json            @default("{}")
 
   // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator           User         @relation("TemplateBackupCreator", fields: [createdBy], references: [id])
-  restores          TemplateRestore[]
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User              @relation("TemplateBackupCreator", fields: [createdBy], references: [id])
+  restores     TemplateRestore[]
 
   @@index([organizationId, createdAt])
   @@index([createdBy, createdAt])
@@ -1979,25 +1980,25 @@ model TemplateBackup {
 }
 
 model TemplateRestore {
-  id                String   @id @default(cuid())
-  backupId          String
-  restoredBy        String
+  id                   String        @id @default(cuid())
+  backupId             String
+  restoredBy           String
   targetOrganizationId String?
-  restoredAt        DateTime @default(now())
-  totalTemplates    Int
-  restoredCount     Int      @default(0)
-  skippedCount      Int      @default(0)
-  failedCount       Int      @default(0)
-  status            RestoreStatus @default(PENDING)
-  errors            Json     @default("[]")
-  metadata          Json     @default("{}")
-  options           Json     @default("{}")
+  restoredAt           DateTime      @default(now())
+  totalTemplates       Int
+  restoredCount        Int           @default(0)
+  skippedCount         Int           @default(0)
+  failedCount          Int           @default(0)
+  status               RestoreStatus @default(PENDING)
+  errors               Json          @default("[]")
+  metadata             Json          @default("{}")
+  options              Json          @default("{}")
 
   // Relations
-  backup            TemplateBackup @relation(fields: [backupId], references: [id], onDelete: Cascade)
-  restorer          User           @relation("TemplateRestorer", fields: [restoredBy], references: [id])
-  targetOrganization Organization? @relation(fields: [targetOrganizationId], references: [id], onDelete: SetNull)
-  restoreResults    TemplateRestoreResult[]
+  backup             TemplateBackup          @relation(fields: [backupId], references: [id], onDelete: Cascade)
+  restorer           User                    @relation("TemplateRestorer", fields: [restoredBy], references: [id])
+  targetOrganization Organization?           @relation(fields: [targetOrganizationId], references: [id], onDelete: SetNull)
+  restoreResults     TemplateRestoreResult[]
 
   @@index([backupId, restoredAt])
   @@index([restoredBy, restoredAt])
@@ -2006,18 +2007,18 @@ model TemplateRestore {
 }
 
 model TemplateRestoreResult {
-  id                String   @id @default(cuid())
-  restoreId         String
-  originalId        String
-  newTemplateId     String?
-  templateName      String
-  status            RestoreResultStatus
-  errors            Json     @default("[]")
-  createdAt         DateTime @default(now())
+  id            String              @id @default(cuid())
+  restoreId     String
+  originalId    String
+  newTemplateId String?
+  templateName  String
+  status        RestoreResultStatus
+  errors        Json                @default("[]")
+  createdAt     DateTime            @default(now())
 
   // Relations
-  restore           TemplateRestore @relation(fields: [restoreId], references: [id], onDelete: Cascade)
-  newTemplate       Template?       @relation(fields: [newTemplateId], references: [id], onDelete: SetNull)
+  restore     TemplateRestore @relation(fields: [restoreId], references: [id], onDelete: Cascade)
+  newTemplate Template?       @relation(fields: [newTemplateId], references: [id], onDelete: SetNull)
 
   @@index([restoreId, status])
   @@index([newTemplateId])

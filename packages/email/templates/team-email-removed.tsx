@@ -4,7 +4,8 @@ import { Trans } from '@lingui/react/macro';
 
 import { formatTeamUrl } from '@signtusk/lib/utils/teams';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Hr, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';

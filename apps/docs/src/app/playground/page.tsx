@@ -1,7 +1,6 @@
-import { Metadata } from 'next';
 import { Header } from '@/components/header';
 import { Sidebar } from '@/components/sidebar';
-import { APIPlayground } from '@/components/api-playground';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'API Playground - Signtusk',
@@ -22,7 +21,7 @@ export default function PlaygroundPage() {
                                 Test Signtusk API endpoints interactively with authentication and real-time responses.
                             </p>
                         </div>
-                        <APIPlayground />
+                        <div>Playground component temporarily disabled for debugging</div>
                     </div>
                 </main>
             </div>

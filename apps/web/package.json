@@ -1,6 +1,6 @@
 {
   "name": "@signtusk/web",
-  "version": "1.0.0",
+  "version": "1.0.0-test-1767106224864",
   "private": true,
   "description": "Next.js marketing website for Signtusk",
   "scripts": {
@@ -14,9 +14,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@signtusk/ui": "*",
-    "@signtusk/lib": "*",
-    "@signtusk/trpc": "*",
     "@trpc/client": "^11.7.1",
     "@trpc/next": "^11.7.1",
     "@trpc/react-query": "^11.7.1",

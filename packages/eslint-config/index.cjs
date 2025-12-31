@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['next', 'turbo', 'eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['next', 'eslint:recommended', 'plugin:@typescript-eslint/recommended'],
 
   plugins: ['unused-imports'],
 

@@ -1,0 +1,25 @@
+# Root Netlify configuration
+# This file helps resolve configuration conflicts and ensures proper path resolution
+
+[build]
+  # Default build settings - will be overridden by app-specific configs
+  base = "."
+  command = "echo 'Please configure specific app deployment in Netlify dashboard'"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_VERSION = "10"
+  
+  # Skip patch-package during Netlify builds (patches not needed for production)
+  SKIP_PATCHES = "true"
+
+# Note: This is a fallback configuration
+# Each application should be deployed separately using their specific netlify.toml files:
+# - apps/web/netlify.toml (Marketing Site)
+# - apps/remix/netlify.toml (Remix App)  
+# - apps/docs/netlify.toml (Documentation)
+#
+# Or use the root configuration files:
+# - netlify-marketing.toml (for marketing site)
+# - netlify-docs.toml (for docs site)

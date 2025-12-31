@@ -60,25 +60,25 @@ export type GetMonthlyActiveUsersResult = Array<{
 export const getMonthlyActiveUsers = async () => {
   const qb = kyselyPrisma.$kysely
     .selectFrom('UserSecurityAuditLog')
-    .select(({ fn }) => [
-      fn<Date>('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']).as('month'),
+    .select(({ fn }: any) => [
+      fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']).as('month'),
       fn.count('userId').distinct().as('count'),
       fn
         .sum(fn.count('userId').distinct())
-        .over((ob) =>
+        .over((ob: any) =>
           // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
           ob.orderBy(fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']) as any),
         )
         .as('cume_count'),
     ])
     .where(() => sql`type = ${UserSecurityAuditLogType.SIGN_IN}::"UserSecurityAuditLogType"`)
-    .groupBy(({ fn }) => fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']))
+    .groupBy(({ fn }: any) => fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']))
     .orderBy('month', 'desc')
     .limit(12);
 
   const result = await qb.execute();
 
-  return result.map((row) => ({
+  return result.map((row: any) => ({
     month: DateTime.fromJSDate(row.month).toFormat('yyyy-MM'),
     count: Number(row.count),
     cume_count: Number(row.cume_count),

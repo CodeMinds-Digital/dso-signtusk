@@ -1,5 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "remoteCache": {
+    "signature": true
+  },
   "tasks": {
     "build": {
       "dependsOn": [
@@ -10,7 +13,23 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**",
-        "build/**"
+        "build/**",
+        "npm/**",
+        "*.node"
+      ],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "pages/**",
+        "components/**",
+        "lib/**",
+        "styles/**",
+        "public/**",
+        "package.json",
+        "next.config.js",
+        "remix.config.js",
+        "vite.config.ts",
+        "tsconfig.json"
       ]
     },
     "prebuild": {
@@ -168,6 +187,9 @@
     "REDIS_URL",
     "JWT_SECRET",
     "ENCRYPTION_KEY",
-    "SESSION_SECRET"
+    "SESSION_SECRET",
+    "CARGO_TARGET_DIR",
+    "RUSTFLAGS",
+    "CARGO_BUILD_TARGET"
   ]
 }

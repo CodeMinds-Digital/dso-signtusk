@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-12-31T05:09:33.357Z",
+  "buildDuration": 5,
+  "totalErrors": 1,
+  "retryAttempts": 0,
+  "environment": {
+    "nodeVersion": "v24.4.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "memory": {
+      "rss": 114278400,
+      "heapTotal": 71974912,
+      "heapUsed": 50446680,
+      "external": 4029831,
+      "arrayBuffers": 284807
+    },
+    "cwd": "/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk"
+  },
+  "errors": [
+    {
+      "timestamp": "2025-12-31T05:09:33.354Z",
+      "attempt": 1,
+      "maxAttempts": 2,
+      "error": {
+        "message": "Multiple dependency conflicts",
+        "code": "DEPENDENCY_CONFLICT",
+        "stack": "BuildError: Multiple dependency conflicts\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:133:15)\n    at BuildErrorHandler.Mock (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:141:33\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:145:11\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:26\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1243:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1209:10)"
+      },
+      "context": {
+        "conflicts": [
+          "react@17 vs react@18",
+          "typescript@4 vs typescript@5"
+        ]
+      },
+      "retryable": false
+    }
+  ],
+  "logFile": "/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/logs/build-1767157773352.log"
+}

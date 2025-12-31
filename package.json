@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "patch-package && if [ \"$INSTALL_PLAYWRIGHT\" = \"true\" ]; then npx playwright install; fi",
+    "postinstall": "if [ \"$SKIP_PATCHES\" != \"true\" ]; then patch-package; fi && if [ \"$INSTALL_PLAYWRIGHT\" = \"true\" ]; then npx playwright install; fi",
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@signtusk/remix",
     "dev:remix": "turbo run dev --filter=@signtusk/remix",
@@ -103,6 +103,7 @@
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@faker-js/faker": "^9.0.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@lingui/cli": "^5.6.0",
     "@prisma/client": "^6.19.0",
     "@testing-library/jest-dom": "^6.6.0",
@@ -113,6 +114,7 @@
     "@ts-rest/core": "^3.52.1",
     "@ts-rest/open-api": "^3.52.1",
     "@ts-rest/serverless": "^3.52.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/jszip": "^3.4.1",
     "@types/node": "^22.10.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -125,12 +127,12 @@
     "fast-check": "^3.23.2",
     "glob": "^13.0.0",
     "husky": "^9.1.7",
+    "js-yaml": "^4.1.1",
     "jsdom": "^25.0.1",
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
     "node-gyp": "^12.1.0",
     "nodemailer": "^7.0.10",
-    "patch-package": "^8.0.1",
     "pdfjs-dist": "5.4.449",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",
@@ -153,9 +155,9 @@
     "zod-openapi": "^4.2.4",
     "zod-prisma-types": "3.3.5"
   },
-  "packageManager": "npm@10.7.0",
+  "packageManager": "npm@10.0.0",
   "engines": {
-    "npm": ">=10.7.0",
+    "npm": ">=10.0.0",
     "node": ">=22.0.0"
   },
   "dependencies": {
@@ -171,6 +173,7 @@
     "jsonwebtoken": "^9.0.3",
     "jszip": "^3.10.1",
     "luxon": "^3.7.2",
+    "patch-package": "^8.0.1",
     "posthog-node": "4.18.0",
     "qrcode": "^1.5.3",
     "react": "^18",

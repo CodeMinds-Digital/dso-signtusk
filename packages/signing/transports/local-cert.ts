@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 
 import { getCertificateStatus } from '@signtusk/lib/server-only/cert/cert-status';
 import { env } from '@signtusk/lib/utils/env';
-import { signWithP12 } from '@documenso/pdf-sign';
+import { signWithP12 } from '@signtusk/pdf-sign';
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
 import { updateSigningPlaceholder } from '../helpers/update-signing-placeholder';

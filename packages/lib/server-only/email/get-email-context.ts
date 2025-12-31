@@ -3,23 +3,23 @@ import { P, match } from 'ts-pattern';
 import type { BrandingSettings } from '@signtusk/email/providers/branding';
 import { prisma } from '@signtusk/prisma';
 import type {
-  DocumentMeta,
-  EmailDomain,
-  Organisation,
-  OrganisationEmail,
-  OrganisationType,
+    DocumentMeta,
+    EmailDomain,
+    Organisation,
+    OrganisationClaim,
+    OrganisationEmail,
+    OrganisationGlobalSettings,
+    OrganisationType,
 } from '@signtusk/prisma/client';
 import {
-  EmailDomainStatus,
-  type OrganisationClaim,
-  type OrganisationGlobalSettings,
+    EmailDomainStatus,
 } from '@signtusk/prisma/client';
 
 import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
-  organisationGlobalSettingsToBranding,
-  teamGlobalSettingsToBranding,
+    organisationGlobalSettingsToBranding,
+    teamGlobalSettingsToBranding,
 } from '../../utils/team-global-settings-to-branding';
 import { extractDerivedTeamSettings } from '../../utils/teams';
 
@@ -237,6 +237,6 @@ const getAllowedEmails = (
   }
 
   return organisation.emailDomains
-    .filter((emailDomain) => emailDomain.status === EmailDomainStatus.ACTIVE)
-    .flatMap((emailDomain) => emailDomain.emails);
+    .filter((emailDomain: any) => emailDomain.status === EmailDomainStatus.ACTIVE)
+    .flatMap((emailDomain: any) => emailDomain.emails);
 };

@@ -1,7 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Img, Preview, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateDocumentRejected } from '../template-components/template-document-rejected';
 import { TemplateFooter } from '../template-components/template-footer';

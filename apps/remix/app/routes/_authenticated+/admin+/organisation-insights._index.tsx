@@ -5,8 +5,8 @@ import type { DateRange } from '@signtusk/lib/types/search-params';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
 import {
-  AdminOrganisationOverviewTable,
-  type OrganisationOverview,
+    AdminOrganisationOverviewTable,
+    type OrganisationOverview,
 } from '~/components/tables/admin-organisation-overview-table';
 
 import type { Route } from './+types/organisation-insights._index';
@@ -41,7 +41,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     dateRange,
   });
 
-  const typedOrganisations: OrganisationOverview[] = organisations.map((item) => ({
+  const typedOrganisations: OrganisationOverview[] = organisations.map((item: any) => ({
     id: String(item.id),
     name: item.name || '',
     signingVolume: item.signingVolume || 0,
