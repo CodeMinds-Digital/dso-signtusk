@@ -78,7 +78,6 @@ export default defineConfig({
       'node_modules',
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
-      '@signtusk/pdf-sign',
       '@signtusk/prisma',
       'prisma',
       'kysely',
@@ -108,7 +107,6 @@ export default defineConfig({
       external: [
         '@napi-rs/canvas',
         '@node-rs/bcrypt',
-        '@signtusk/pdf-sign',
         '@aws-sdk/cloudfront-signer',
         'nodemailer',
         /playwright/,

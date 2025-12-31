@@ -1,7 +1,17 @@
 import fs from 'node:fs';
 
 import { env } from '@signtusk/lib/utils/env';
-import { signWithGCloud } from '@signtusk/pdf-sign';
+
+let signWithGCloud: any;
+try {
+  const pdfSign = require('dso-pdf-sign');
+  signWithGCloud = pdfSign.signWithGCloud;
+} catch (error) {
+  console.warn('PDF signing module not available:', error.message);
+  signWithGCloud = () => {
+    throw new Error('PDF signing functionality is not available in this deployment');
+  };
+}
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
 import { updateSigningPlaceholder } from '../helpers/update-signing-placeholder';
