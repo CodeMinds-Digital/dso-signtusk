@@ -14,8 +14,7 @@
   "dependencies": {
     "ts-pattern": "^5.9.0",
     "@signtusk/tsconfig": "*",
-    "pdf-lib": "^1.17.1",
-    "dso-pdf-sign": "file:../../dso-pdf-sign"
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "vitest": "^3.2.4"
