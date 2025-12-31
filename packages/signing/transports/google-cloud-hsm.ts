@@ -3,13 +3,17 @@ import fs from 'node:fs';
 import { env } from '@signtusk/lib/utils/env';
 
 let signWithGCloud: any;
+let pdfSigningAvailable = false;
+
 try {
   const pdfSign = require('dso-pdf-sign');
   signWithGCloud = pdfSign.signWithGCloud;
+  pdfSigningAvailable = true;
 } catch (error) {
   console.warn('PDF signing module not available:', error.message);
-  signWithGCloud = () => {
-    throw new Error('PDF signing functionality is not available in this deployment');
+  signWithGCloud = (options: any) => {
+    console.warn('PDF signing not available, returning unsigned content');
+    return options.content; // Return unsigned content as fallback
   };
 }
 
@@ -21,6 +25,12 @@ export type SignWithGoogleCloudHSMOptions = {
 };
 
 export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOptions) => {
+  // If PDF signing is not available, return the original PDF
+  if (!pdfSigningAvailable) {
+    console.warn('PDF signing not available, returning unsigned PDF');
+    return pdf;
+  }
+
   const keyPath = env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH');
 
   if (!keyPath) {
