@@ -32,6 +32,9 @@
         "tsconfig.json"
       ]
     },
+    "@signtusk/prisma#build": {
+      "outputs": ["node_modules/.prisma/**", "generated/**"]
+    },
     "prebuild": {
       "cache": false,
       "dependsOn": [

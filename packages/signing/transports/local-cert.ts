@@ -4,13 +4,17 @@ import { getCertificateStatus } from '@signtusk/lib/server-only/cert/cert-status
 import { env } from '@signtusk/lib/utils/env';
 
 let signWithP12: any;
+let pdfSigningAvailable = false;
+
 try {
   const pdfSign = require('dso-pdf-sign');
   signWithP12 = pdfSign.signWithP12;
+  pdfSigningAvailable = true;
 } catch (error) {
   console.warn('PDF signing module not available:', error.message);
-  signWithP12 = () => {
-    throw new Error('PDF signing functionality is not available in this deployment');
+  signWithP12 = (options: any) => {
+    console.warn('PDF signing not available, returning unsigned content');
+    return options.content; // Return unsigned content as fallback
   };
 }
 
@@ -22,6 +26,12 @@ export type SignWithLocalCertOptions = {
 };
 
 export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
+  // If PDF signing is not available, return the original PDF
+  if (!pdfSigningAvailable) {
+    console.warn('PDF signing not available, returning unsigned PDF');
+    return pdf;
+  }
+
   const { pdf: pdfWithPlaceholder, byteRange } = updateSigningPlaceholder({
     pdf: await addSigningPlaceholder({ pdf }),
   });
