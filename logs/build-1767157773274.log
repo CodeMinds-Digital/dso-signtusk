@@ -1,0 +1,17 @@
+[2025-12-31T05:09:33.275Z] INFO: Attempt 1/2: npm ci
+[2025-12-31T05:09:33.277Z] ERROR: Attempt 1 failed: Syntax error in package.json
+[2025-12-31T05:09:33.277Z] ERROR: Error code: INVALID_JSON
+ERROR: {
+  "timestamp": "2025-12-31T05:09:33.276Z",
+  "attempt": 1,
+  "maxAttempts": 2,
+  "error": {
+    "message": "Syntax error in package.json",
+    "code": "INVALID_JSON",
+    "stack": "BuildError: Syntax error in package.json\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:83:15)\n    at BuildErrorHandler.Mock (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:89:38\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:145:11\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:26\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1243:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1209:10)"
+  },
+  "context": {},
+  "retryable": false
+}
+
+[2025-12-31T05:09:33.278Z] ERROR: Non-retryable error encountered, aborting retries

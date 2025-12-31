@@ -1,10 +1,10 @@
-import { Metadata } from 'next';
+import { FeaturedEndpoints } from '@/components/featured-endpoints';
 import { Header } from '@/components/header';
-import { Sidebar } from '@/components/sidebar';
 import { Hero } from '@/components/hero';
 import { QuickStart } from '@/components/quick-start';
-import { FeaturedEndpoints } from '@/components/featured-endpoints';
 import { SDKShowcase } from '@/components/sdk-showcase';
+import { Sidebar } from '@/components/sidebar';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Signtusk API Documentation',

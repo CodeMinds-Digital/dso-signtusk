@@ -131,6 +131,7 @@ playwright/.cache/
 
 # Reference projects
 documenso-main/
+documenso-main.zip
 package-lock.json
 /.kiro
 /.kiro/specs

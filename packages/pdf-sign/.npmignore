@@ -1,13 +1,18 @@
-target
+# Source files
+src/
+target/
+Cargo.toml
 Cargo.lock
-.cargo
-.github
-npm
-.eslintrc
-.prettierignore
-rustfmt.toml
-yarn.lock
+build.rs
+
+# Development files
+tests/
+vitest.config.ts
+.gitignore
+
+# Documentation
+README.md
+
+# Build artifacts (keep only the final .node file)
 *.node
-.yarn
-__test__
-renovate.json
+!pdf-sign.*.node

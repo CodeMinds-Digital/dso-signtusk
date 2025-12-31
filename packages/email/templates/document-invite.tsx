@@ -6,7 +6,8 @@ import { OrganisationType } from '@prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';
 
-import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Hr, Img, Link, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';

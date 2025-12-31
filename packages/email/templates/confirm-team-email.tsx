@@ -4,13 +4,13 @@ import { Trans } from '@lingui/react/macro';
 
 import { formatTeamUrl } from '@signtusk/lib/utils/teams';
 
+import { Html } from '@react-email/html';
 import {
   Body,
   Button,
   Container,
   Head,
   Hr,
-  Html,
   Img,
   Link,
   Preview,

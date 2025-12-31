@@ -2,7 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Hr, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
 import TemplateDocumentImage from '../template-components/template-document-image';

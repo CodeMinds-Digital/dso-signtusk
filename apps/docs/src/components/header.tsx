@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Menu, X, Github, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ExternalLink, Github, Menu, X } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,7 +76,6 @@ export function Header() {
                             Try it Live
                         </Link>
                     </Button>
-                    <ThemeToggle />
 
                     {/* Mobile menu button */}
                     <Button

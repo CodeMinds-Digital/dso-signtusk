@@ -1,105 +1,167 @@
 # @documenso/pdf-sign
 
-This package provides functionality to sign PDF documents using various signing methods, including private keys, P12 containers, and Google Cloud. It is designed to be used with the Documenso platform.
+A clean room PDF digital signature library built with Rust and NAPI-RS for Node.js integration.
+
+## Features
+
+- **Digital PDF Signing**: Sign PDF documents with X.509 certificates
+- **Signature Validation**: Verify existing digital signatures in PDF documents
+- **Multiple Formats**: Support for PKCS#12 and PEM certificate formats
+- **Standards Compliance**: PDF 1.7, PAdES, PKCS#7, and X.509 standards
+- **Cross-Platform**: Windows, macOS, and Linux support
+- **Performance**: Native Rust implementation with Node.js bindings
 
 ## Installation
-
-To install the package, run:
 
 ```bash
 npm install @documenso/pdf-sign
 ```
 
-## Usage
+## Quick Start
 
-### Signing with a Private Key
+```typescript
+import { PdfSigner } from '@documenso/pdf-sign';
+import { readFileSync } from 'fs';
 
-```javascript
-const { signWithPrivateKey } = require('@documenso/pdf-sign');
+const signer = new PdfSigner();
 
-const content = Buffer.from('...'); // PDF content
-const cert = Buffer.from('...'); // Certificate in PEM format
-const privateKey = Buffer.from('...'); // Private key in PEM format
+// Sign a PDF document
+const pdfData = readFileSync('document.pdf');
+const certData = readFileSync('certificate.p12');
 
-const signedPdf = await signWithPrivateKey({
-  content,
-  cert,
-  privateKey,
-  // Optional fields
-  signingTime: '2023-03-15T12:00:00Z', // ISO 8601 format
-  timestampServer: 'http://timestamp.server',
-});
+const signedPdf = await signer.signDocument(
+  pdfData,
+  certData,
+  Buffer.alloc(0), // key data (included in PKCS#12)
+  'password',
+  {
+    reason: 'Document approval',
+    location: 'New York, NY',
+    appearance: {
+      visible: true,
+      text: 'Digitally signed by John Doe'
+    }
+  }
+);
+
+// Validate signatures
+const validationResults = await signer.validateSignatures(signedPdf);
+console.log('Signature valid:', validationResults[0].isValid);
 ```
 
-### Signing with a P12 Container
+## API Reference
 
-```javascript
-const { signWithP12 } = require('@documenso/pdf-sign');
+### PdfSigner
 
-const content = Buffer.from('...'); // PDF content
-const p12 = Buffer.from('...'); // P12 container
+The main class for PDF signing operations.
 
-const signedPdf = await signWithP12({
-  content,
-  cert: p12,
-  // Optional fields
-  password: 'p12password',
-  signingTime: '2023-03-15T12:00:00Z', // ISO 8601 format
-  timestampServer: 'http://timestamp.server',
-});
+#### Methods
+
+- `signDocument(pdfData, certData, keyData, password?, options?)`: Sign a PDF document
+- `validateSignatures(pdfData)`: Validate all signatures in a PDF document
+- `loadPkcs12Credentials(p12Data, password)`: Load credentials from PKCS#12 data
+- `getCapabilities()`: Get library capabilities and supported features
+
+### Types
+
+#### SigningOptions
+
+```typescript
+interface SigningOptions {
+  reason?: string;
+  location?: string;
+  contactInfo?: string;
+  appearance?: SignatureAppearance;
+  timestampServer?: string;
+  hashAlgorithm?: string;
+  signatureAlgorithm?: string;
+}
 ```
 
-### Signing with Google Cloud
+#### SignatureAppearance
 
-```javascript
-const { signWithGCloud } = require('@documenso/pdf-sign');
-
-const content = Buffer.from('...'); // PDF content
-const cert = Buffer.from('...'); // Certificate in PEM format
-const keyPath = 'projects/project-id/locations/global/keyRings/keyring-name/cryptoKeys/key-name';
-
-const signedPdf = await signWithGCloud({
-  content,
-  cert,
-  keyPath,
-  // Optional fields
-  signingTime: '2023-03-15T12:00:00Z', // ISO 8601 format
-  timestampServer: 'http://timestamp.server',
-});
+```typescript
+interface SignatureAppearance {
+  visible: boolean;
+  page?: number;
+  bounds?: Rectangle;
+  text?: string;
+  image?: Buffer;
+  backgroundColor?: Color;
+  borderColor?: Color;
+}
 ```
 
-## API
+#### ValidationResult
 
-### `signWithPrivateKey(options)`
+```typescript
+interface ValidationResult {
+  isValid: boolean;
+  signatureIndex: number;
+  signerName: string;
+  signingTime: string;
+  certificateValid: boolean;
+  documentIntact: boolean;
+  errors: string[];
+  warnings: string[];
+}
+```
 
-- `options.content` (Buffer): The PDF content to be signed.
-- `options.cert` (Buffer): The certificate in PEM format.
-- `options.privateKey` (Buffer): The private key in PEM format.
-- `options.signingTime` (string, optional): The signing time in ISO 8601 format.
-- `options.timestampServer` (string, optional): The URL of the timestamp server.
+## Supported Algorithms
 
-Returns a Promise that resolves to a Buffer containing the signed PDF.
+### Hash Algorithms
+- SHA-256
+- SHA-384
+- SHA-512
 
-### `signWithP12(options)`
+### Signature Algorithms
+- RSA (2048, 3072, 4096 bits)
+- ECDSA (P-256, P-384, P-521)
 
-- `options.content` (Buffer): The PDF content to be signed.
-- `options.cert` (Buffer): The P12 container.
-- `options.password` (string, optional): The password for the P12 container.
-- `options.signingTime` (string, optional): The signing time in ISO 8601 format.
-- `options.timestampServer` (string, optional): The URL of the timestamp server.
+### Standards Compliance
+- PDF 1.7 (ISO 32000-1)
+- PAdES (PDF Advanced Electronic Signatures)
+- PKCS#7 (Cryptographic Message Syntax)
+- X.509 (Public Key Infrastructure)
+- RFC 3161 (Time-Stamp Protocol)
 
-Returns a Promise that resolves to a Buffer containing the signed PDF.
+## Platform Support
 
-### `signWithGCloud(options)`
+- **Windows**: x86_64, i686, ARM64
+- **macOS**: x86_64, ARM64 (Apple Silicon)
+- **Linux**: x86_64, ARM64, ARMv7, musl
 
-- `options.content` (Buffer): The PDF content to be signed.
-- `options.cert` (Buffer): The certificate in PEM format.
-- `options.keyPath` (string): The Google Cloud key path.
-- `options.signingTime` (string, optional): The signing time in ISO 8601 format.
-- `options.timestampServer` (string, optional): The URL of the timestamp server.
+## Development
 
-Returns a Promise that resolves to a Buffer containing the signed PDF.
+This package is built with Rust and uses NAPI-RS for Node.js bindings.
+
+### Prerequisites
+
+- Rust 1.70+
+- Node.js 16+
+- Platform-specific build tools
+
+### Building
+
+```bash
+# Install dependencies
+npm install
+
+# Build the native module
+npm run build
+
+# Run tests
+npm test
+```
 
 ## License
 
-This package is licensed under the [AGPL-3.0 License](LICENSE.txt).
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+Please read our contributing guidelines and code of conduct before submitting pull requests.
+
+## Security
+
+For security issues, please email security@documenso.com instead of using the issue tracker.

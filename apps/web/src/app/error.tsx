@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 
-
 export default function Error({
     error,
     reset,
@@ -34,3 +33,6 @@ export default function Error({
         </div>
     )
 }
+
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic'

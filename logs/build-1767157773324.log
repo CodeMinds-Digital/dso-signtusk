@@ -1,0 +1,20 @@
+[2025-12-31T05:09:33.325Z] INFO: Validating build environment...
+[2025-12-31T05:09:33.328Z] SUCCESS: Build environment validation passed
+[2025-12-31T05:09:33.328Z] INFO: Attempt 1/2: npx turbo run build --filter=@signtusk/remix
+[2025-12-31T05:09:33.343Z] ERROR: Attempt 1 failed: Build failed due to corrupted cache
+[2025-12-31T05:09:33.347Z] ERROR: Error code: BUILD_FAILED
+ERROR: {
+  "timestamp": "2025-12-31T05:09:33.331Z",
+  "attempt": 1,
+  "maxAttempts": 2,
+  "error": {
+    "message": "Build failed due to corrupted cache",
+    "code": "BUILD_FAILED",
+    "stack": "BuildError: Build failed due to corrupted cache\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:119:17)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at BuildErrorHandler.buildWithMonitoring (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:345:33)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:124:22\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:20"
+  },
+  "context": {},
+  "retryable": false
+}
+
+[2025-12-31T05:09:33.349Z] ERROR: Non-retryable error encountered, aborting retries
+[2025-12-31T05:09:33.350Z] WARNING: Build failed, attempting cleanup and retry...

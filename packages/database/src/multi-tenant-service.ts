@@ -1,14 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { prisma, withTransaction } from './client';
-import { createAuditEvent, type AuditContext } from './utils';
-import type {
-    Organization,
-    User,
-    Team,
-    Document,
-    Recipient,
-    Activity,
-} from '@prisma/client';
+import { type AuditContext } from './utils';
 
 // ============================================================================
 // TYPE DEFINITIONS

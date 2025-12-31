@@ -1,7 +1,8 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Preview, Section, Text } from '../components';
+import { Html } from '@react-email/html';
+import { Body, Container, Head, Preview, Section, Text } from '../components';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export interface BulkSendCompleteEmailProps {

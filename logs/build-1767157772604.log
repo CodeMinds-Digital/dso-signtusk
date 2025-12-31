@@ -1,0 +1,33 @@
+[2025-12-31T05:09:32.605Z] INFO: Attempt 1/2: npm ci
+[2025-12-31T05:09:32.609Z] ERROR: Attempt 1 failed: Network timeout
+[2025-12-31T05:09:32.609Z] ERROR: Error code: ETIMEDOUT
+ERROR: {
+  "timestamp": "2025-12-31T05:09:32.606Z",
+  "attempt": 1,
+  "maxAttempts": 2,
+  "error": {
+    "message": "Network timeout",
+    "code": "ETIMEDOUT",
+    "stack": "BuildError: Network timeout\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:64:17)\n    at BuildErrorHandler.Mock (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:72:46\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:145:11\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:26\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1243:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:1209:10)"
+  },
+  "context": {},
+  "retryable": true
+}
+
+[2025-12-31T05:09:32.609Z] WARNING: Retrying in 658.6660514303031ms...
+[2025-12-31T05:09:33.270Z] INFO: Attempt 2/2: npm ci
+[2025-12-31T05:09:33.271Z] ERROR: Attempt 2 failed: Network timeout
+[2025-12-31T05:09:33.271Z] ERROR: Error code: ETIMEDOUT
+ERROR: {
+  "timestamp": "2025-12-31T05:09:33.270Z",
+  "attempt": 2,
+  "maxAttempts": 2,
+  "error": {
+    "message": "Network timeout",
+    "code": "ETIMEDOUT",
+    "stack": "BuildError: Network timeout\n    at BuildErrorHandler.<anonymous> (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:64:17)\n    at BuildErrorHandler.Mock (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeCommand (file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/spy/dist/index.js:285:34)\n    at BuildErrorHandler.executeWithRetry (/Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/scripts/netlify-build-error-handler.js:46:35)\n    at /Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/test/integration-tests/netlify-error-handling.test.ts:72:22\n    at file:///Users/naveenselvam/Desktop/ai_pair_programming/dso-signtusk/node_modules/@vitest/runner/dist/index.js:915:20"
+  },
+  "context": {},
+  "retryable": true
+}
+
