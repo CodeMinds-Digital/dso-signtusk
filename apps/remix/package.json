@@ -8,16 +8,16 @@
   "scripts": {
     "build": "echo 'Simple build without translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
     "build:standalone": "echo 'Skipping translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
-    "build:app": "NODE_ENV=production npx react-router build",
-    "build:server": "NODE_ENV=production rollup -c rollup.config.mjs",
+    "build:app": "npm run with:env -- cross-env NODE_ENV=production npx react-router build",
+    "build:server": "npm run with:env -- cross-env NODE_ENV=production rollup -c rollup.config.mjs",
     "dev": "npm run with:env -- npx react-router dev",
     "dev:billing": "bash .bin/stripe-dev.sh",
     "start": "npm run with:env -- NODE_ENV=production node build/server/main.js",
     "clean": "rimraf .react-router && rimraf node_modules",
     "typecheck": "npx react-router typegen && tsc",
     "with:env": "dotenv -e ../../.env -e ../../.env.local --",
-    "build:simple": "NODE_ENV=production npx react-router build && NODE_ENV=production rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
-    "build:fallback": "npx react-router build && rollup -c rollup.config.mjs && cp server/main.js build/server/main.js"
+    "build:simple": "npm run with:env -- cross-env NODE_ENV=production npx react-router build && npm run with:env -- cross-env NODE_ENV=production rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
+    "build:fallback": "npm run with:env -- npx react-router build && npm run with:env -- rollup -c rollup.config.mjs && cp server/main.js build/server/main.js"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.5.3",
