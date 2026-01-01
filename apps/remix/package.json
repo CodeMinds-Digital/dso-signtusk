@@ -85,6 +85,8 @@
     "ts-pattern": "^5.9.0",
     "ua-parser-js": "^1.0.41",
     "uqr": "^0.1.2",
+    "@lingui/vite-plugin": "^5.6.0",
+    "@lingui/babel-plugin-lingui-macro": "^5.6.0",
     "@react-router/dev": "^7.11.0",
     "rollup": "^4.53.3",
     "typescript": "5.6.2"
@@ -93,8 +95,6 @@
     "@babel/core": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@lingui/babel-plugin-lingui-macro": "^5.6.0",
-    "@lingui/vite-plugin": "^5.6.0",
     "@react-router/remix-routes-option-adapter": "^7.9.6",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
