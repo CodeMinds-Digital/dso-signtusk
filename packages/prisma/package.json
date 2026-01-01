@@ -7,7 +7,9 @@
   "license": "Private - Part of Signtusk Platform",
   "scripts": {
     "build": "prisma generate",
+    "build:vercel": "node scripts/vercel-generate.js",
     "prebuild": "prisma generate",
+    "prebuild:vercel": "node scripts/vercel-generate.js",
     "format": "prisma format",
     "clean": "rimraf node_modules",
     "post-install": "prisma generate",

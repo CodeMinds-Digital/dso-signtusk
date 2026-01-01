@@ -8,11 +8,7 @@
   },
   "tasks": {
     "build": {
-      "dependsOn": [
-        "prebuild",
-        "@signtusk/prisma#build",
-        "^build"
-      ],
+      "dependsOn": ["prebuild", "@signtusk/prisma#build", "^build"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -43,11 +39,7 @@
       ]
     },
     "build:vercel": {
-      "dependsOn": [
-        "prebuild",
-        "@signtusk/prisma#build",
-        "^build"
-      ],
+      "dependsOn": ["prebuild", "@signtusk/prisma#build:vercel", "^build"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -104,11 +96,7 @@
         "../../node_modules/@prisma/client/**",
         "types.ts"
       ],
-      "inputs": [
-        "schema.prisma",
-        "migrations/**",
-        "package.json"
-      ],
+      "inputs": ["schema.prisma", "migrations/**", "package.json"],
       "env": [
         "DATABASE_URL",
         "NEXT_PRIVATE_DATABASE_URL",
@@ -120,7 +108,7 @@
         "NODE_ENV"
       ]
     },
-    "@signtusk/prisma#prebuild": {
+    "@signtusk/prisma#build:vercel": {
       "outputs": [
         "generated/**",
         "../../node_modules/@prisma/client/**",
@@ -129,8 +117,28 @@
       "inputs": [
         "schema.prisma",
         "migrations/**",
-        "package.json"
+        "package.json",
+        "scripts/vercel-generate.js"
       ],
+      "env": [
+        "DATABASE_URL",
+        "NEXT_PRIVATE_DATABASE_URL",
+        "NEXT_PRIVATE_DIRECT_DATABASE_URL",
+        "POSTGRES_PRISMA_URL",
+        "POSTGRES_URL",
+        "POSTGRES_URL_NON_POOLING",
+        "DATABASE_URL_UNPOOLED",
+        "NODE_ENV",
+        "CHECKPOINT_DISABLE"
+      ]
+    },
+    "@signtusk/prisma#prebuild": {
+      "outputs": [
+        "generated/**",
+        "../../node_modules/@prisma/client/**",
+        "types.ts"
+      ],
+      "inputs": ["schema.prisma", "migrations/**", "package.json"],
       "env": [
         "DATABASE_URL",
         "NEXT_PRIVATE_DATABASE_URL",
@@ -142,15 +150,33 @@
         "NODE_ENV"
       ]
     },
-    "prebuild": {
-      "dependsOn": [
-        "@signtusk/prisma#prebuild",
-        "^prebuild"
+    "@signtusk/prisma#prebuild:vercel": {
+      "outputs": [
+        "generated/**",
+        "../../node_modules/@prisma/client/**",
+        "types.ts"
       ],
       "inputs": [
+        "schema.prisma",
+        "migrations/**",
         "package.json",
-        "tsconfig.json"
+        "scripts/vercel-generate.js"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "NEXT_PRIVATE_DATABASE_URL",
+        "NEXT_PRIVATE_DIRECT_DATABASE_URL",
+        "POSTGRES_PRISMA_URL",
+        "POSTGRES_URL",
+        "POSTGRES_URL_NON_POOLING",
+        "DATABASE_URL_UNPOOLED",
+        "NODE_ENV",
+        "CHECKPOINT_DISABLE"
       ]
+    },
+    "prebuild": {
+      "dependsOn": ["@signtusk/prisma#prebuild:vercel", "^prebuild"],
+      "inputs": ["package.json", "tsconfig.json"]
     },
     "lint": {
       "cache": false
@@ -170,9 +196,7 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -184,9 +208,7 @@
       "persistent": true
     },
     "test:e2e": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false
     },
     "type-check": {
@@ -198,9 +220,7 @@
         "package.json",
         "tsconfig.json"
       ],
-      "env": [
-        "NODE_ENV"
-      ]
+      "env": ["NODE_ENV"]
     },
     "db:migrate": {
       "cache": false
