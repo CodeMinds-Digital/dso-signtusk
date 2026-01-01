@@ -1,14 +1,14 @@
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { stripe } from '@signtusk/lib/server-only/stripe';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { stripe } from "@signtusk/lib/server-only/stripe";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZUpdateOrganisationRequestSchema,
   ZUpdateOrganisationResponseSchema,
-} from './update-organisation.types';
+} from "./update-organisation.types";
 
 export const updateOrganisationRoute = authenticatedProcedure
   //   .meta(updateOrganisationMeta)
@@ -29,13 +29,13 @@ export const updateOrganisationRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
     });
 
     if (!existingOrganisation) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Organisation not found',
+        message: "Organisation not found",
       });
     }
 
@@ -49,7 +49,7 @@ export const updateOrganisationRoute = authenticatedProcedure
       },
     });
 
-    if (updatedOrganisation.customerId) {
+    if (updatedOrganisation.customerId && stripe) {
       await stripe.customers.update(updatedOrganisation.customerId, {
         metadata: {
           organisationName: data.name,

@@ -1,10 +1,10 @@
-import { OrganisationType, SubscriptionStatus } from '@prisma/client';
-import { match } from 'ts-pattern';
+import { OrganisationType, SubscriptionStatus } from "@prisma/client";
+import { match } from "ts-pattern";
 
-import { createOrganisationClaimUpsertData } from '@signtusk/lib/server-only/organisation/create-organisation';
-import { type Stripe, stripe } from '@signtusk/lib/server-only/stripe';
-import { INTERNAL_CLAIM_ID } from '@signtusk/lib/types/subscription';
-import { prisma } from '@signtusk/prisma';
+import { createOrganisationClaimUpsertData } from "@signtusk/lib/server-only/organisation/create-organisation";
+import { type Stripe, stripe } from "@signtusk/lib/server-only/stripe";
+import { INTERNAL_CLAIM_ID } from "@signtusk/lib/types/subscription";
+import { prisma } from "@signtusk/prisma";
 
 export type OnSubscriptionUpdatedOptions = {
   subscription: Stripe.Subscription;
@@ -21,18 +21,20 @@ export const onSubscriptionUpdated = async ({
   previousAttributes,
 }: OnSubscriptionUpdatedOptions) => {
   const customerId =
-    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
 
   // Todo: logging
   if (subscription.items.data.length !== 1) {
-    console.error('No support for multiple items');
+    console.error("No support for multiple items");
 
     throw Response.json(
       {
         success: false,
-        message: 'No support for multiple items',
+        message: "No support for multiple items",
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -52,7 +54,7 @@ export const onSubscriptionUpdated = async ({
         success: false,
         message: `Organisation not found`,
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -61,7 +63,7 @@ export const onSubscriptionUpdated = async ({
     organisation.subscription.status !== SubscriptionStatus.INACTIVE &&
     organisation.subscription.planId !== subscription.id
   ) {
-    console.error('[WARNING]: Organisation might have two subscriptions');
+    console.error("[WARNING]: Organisation might have two subscriptions");
   }
 
   const previousItem = previousAttributes?.items?.data[0];
@@ -80,20 +82,21 @@ export const onSubscriptionUpdated = async ({
         success: false,
         message: `Subscription claim on ${updatedItem.price.id} not found`,
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
-  const newClaimFound = previousSubscriptionClaimId !== updatedSubscriptionClaim.id;
+  const newClaimFound =
+    previousSubscriptionClaimId !== updatedSubscriptionClaim.id;
 
   const status = match(subscription.status)
-    .with('active', () => SubscriptionStatus.ACTIVE)
-    .with('trialing', () => SubscriptionStatus.ACTIVE)
-    .with('past_due', () => SubscriptionStatus.PAST_DUE)
+    .with("active", () => SubscriptionStatus.ACTIVE)
+    .with("trialing", () => SubscriptionStatus.ACTIVE)
+    .with("past_due", () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
   const periodEnd =
-    subscription.status === 'trialing' && subscription.trial_end
+    subscription.status === "trialing" && subscription.trial_end
       ? new Date(subscription.trial_end * 1000)
       : new Date(subscription.current_period_end * 1000);
 
@@ -157,7 +160,14 @@ export const extractStripeClaimId = async (priceId: Stripe.Price) => {
     return priceId.metadata.claimId;
   }
 
-  const productId = typeof priceId.product === 'string' ? priceId.product : priceId.product.id;
+  if (!stripe) {
+    throw new Error(
+      "Stripe is not configured. Please set NEXT_PRIVATE_STRIPE_API_KEY environment variable."
+    );
+  }
+
+  const productId =
+    typeof priceId.product === "string" ? priceId.product : priceId.product.id;
 
   const product = await stripe.products.retrieve(productId);
 

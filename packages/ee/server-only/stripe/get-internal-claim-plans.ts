@@ -1,13 +1,13 @@
-import { clone } from 'remeda';
-import type Stripe from 'stripe';
+import { clone } from "remeda";
+import type Stripe from "stripe";
 
-import { stripe } from '@signtusk/lib/server-only/stripe';
+import { stripe } from "@signtusk/lib/server-only/stripe";
 import {
   INTERNAL_CLAIM_ID,
   type InternalClaim,
   internalClaims,
-} from '@signtusk/lib/types/subscription';
-import { toHumanPrice } from '@signtusk/lib/universal/stripe/to-human-price';
+} from "@signtusk/lib/types/subscription";
+import { toHumanPrice } from "@signtusk/lib/universal/stripe/to-human-price";
 
 export type InternalClaimPlans = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim & {
@@ -28,9 +28,15 @@ export type InternalClaimPlans = {
  * Returns the main Documenso plans from Stripe.
  */
 export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
+  if (!stripe) {
+    throw new Error(
+      "Stripe is not configured. Please set NEXT_PRIVATE_STRIPE_API_KEY environment variable."
+    );
+  }
+
   const { data: prices } = await stripe.prices.search({
     query: `active:'true' type:'recurring'`,
-    expand: ['data.product'],
+    expand: ["data.product"],
     limit: 100,
   });
 
@@ -42,18 +48,23 @@ export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
     const product = price.product as Stripe.Product;
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const productClaimId = product.metadata.claimId as INTERNAL_CLAIM_ID | undefined;
-    const isVisibleInApp = price.metadata.visibleInApp === 'true';
+    const productClaimId = product.metadata.claimId as
+      | INTERNAL_CLAIM_ID
+      | undefined;
+    const isVisibleInApp = price.metadata.visibleInApp === "true";
 
-    if (!productClaimId || !Object.values(INTERNAL_CLAIM_ID).includes(productClaimId)) {
+    if (
+      !productClaimId ||
+      !Object.values(INTERNAL_CLAIM_ID).includes(productClaimId)
+    ) {
       return;
     }
 
     let usdPrice = toHumanPrice(price.unit_amount ?? 0);
 
-    if (price.recurring?.interval === 'month') {
-      if (product.metadata['isSeatBased'] === 'true') {
-        usdPrice = '50';
+    if (price.recurring?.interval === "month") {
+      if (product.metadata["isSeatBased"] === "true") {
+        usdPrice = "50";
       }
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -61,13 +72,16 @@ export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
         ...price,
         isVisibleInApp,
         product,
-        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace('.00', ''),
+        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace(
+          ".00",
+          ""
+        ),
       };
     }
 
-    if (price.recurring?.interval === 'year') {
-      if (product.metadata['isSeatBased'] === 'true') {
-        usdPrice = '480';
+    if (price.recurring?.interval === "year") {
+      if (product.metadata["isSeatBased"] === "true") {
+        usdPrice = "480";
       }
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -75,7 +89,10 @@ export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
         ...price,
         isVisibleInApp,
         product,
-        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace('.00', ''),
+        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace(
+          ".00",
+          ""
+        ),
       };
     }
   });
