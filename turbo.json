@@ -7,6 +7,7 @@
     "build": {
       "dependsOn": [
         "prebuild",
+        "@signtusk/prisma#build",
         "^build"
       ],
       "outputs": [
@@ -35,6 +36,7 @@
     "build:vercel": {
       "dependsOn": [
         "prebuild",
+        "@signtusk/prisma#build",
         "^build"
       ],
       "outputs": [
@@ -61,12 +63,37 @@
       ]
     },
     "@signtusk/prisma#build": {
-      "outputs": ["node_modules/.prisma/**", "generated/**"]
+      "outputs": [
+        "generated/**",
+        "../../node_modules/@prisma/client/**",
+        "types.ts"
+      ],
+      "inputs": [
+        "schema.prisma",
+        "migrations/**",
+        "package.json"
+      ]
+    },
+    "@signtusk/prisma#prebuild": {
+      "outputs": [
+        "generated/**",
+        "../../node_modules/@prisma/client/**",
+        "types.ts"
+      ],
+      "inputs": [
+        "schema.prisma",
+        "migrations/**",
+        "package.json"
+      ]
     },
     "prebuild": {
-      "cache": false,
       "dependsOn": [
+        "@signtusk/prisma#prebuild",
         "^prebuild"
+      ],
+      "inputs": [
+        "package.json",
+        "tsconfig.json"
       ]
     },
     "lint": {
@@ -107,7 +134,14 @@
       "cache": false
     },
     "type-check": {
-      "cache": false
+      "inputs": [
+        "src/**",
+        "app/**",
+        "components/**",
+        "lib/**",
+        "package.json",
+        "tsconfig.json"
+      ]
     },
     "db:migrate": {
       "cache": false

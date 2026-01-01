@@ -5,15 +5,20 @@ export * from './tenant-aware-operations';
 export * from './types';
 export * from './utils';
 
-// Re-export Prisma types
+// Re-export Prisma types that actually exist
 export type {
-    Activity, Document, Organization, Recipient,
-    Signature, SigningRequest, Subscription, Team, Template, UsageRecord, User
+    Document, Organization, Recipient,
+    Signature,
+    Subscription, Team, Template, User, Workflow,
+    WorkflowExecution
 } from '@prisma/client';
 
-// Re-export Prisma enums as both types and values
+// Re-export Prisma enums that actually exist
 export {
-    ActivityType, AuthMethod, DeliveryStatus, DocumentStatus, FieldType, RecipientStatus, SignatureType, SigningStatus, SubscriptionStatus
+    DocumentStatus,
+    SigningStatus,
+    SubscriptionStatus,
+    Role as UserRole
 } from '@prisma/client';
 
 // Re-export PrismaClient

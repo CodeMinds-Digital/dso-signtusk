@@ -132,6 +132,9 @@ playwright/.cache/
 documenso-main/
 dso-pdf-sign/
 documenso-main.zip
+logs/
+backups/
+
 package-lock.json
 /.kiro
 /.kiro/specs

@@ -1,12 +1,4 @@
 import { z } from 'zod';
-import type {
-    User,
-    Organization,
-    Document,
-    Recipient,
-    Signature,
-    Activity,
-} from '@prisma/client';
 
 // ============================================================================
 // VALIDATION SCHEMAS

@@ -1,6 +1,6 @@
 {
   "name": "@signtusk/web",
-  "version": "1.0.0-test-1767106224864",
+  "version": "1.0.0-test-1767106224864-test-1767233735698-test-1767233735704",
   "private": true,
   "description": "Next.js marketing website for Signtusk",
   "scripts": {
@@ -14,10 +14,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@swc/core": "^1.15.8",
+    "@swc/helpers": "^0.5.18",
+    "@tanstack/react-query": "^5.90.10",
     "@trpc/client": "^11.7.1",
     "@trpc/next": "^11.7.1",
     "@trpc/react-query": "^11.7.1",
-    "@tanstack/react-query": "^5.90.10",
     "next": "^14.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

@@ -6,11 +6,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "echo 'Vercel build without env wrapper' && cross-env NODE_ENV=production npx react-router build && cross-env NODE_ENV=production rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
+    "build": "echo 'Vercel build without env wrapper' && node ../../scripts/validate-build-env.js && cross-env NODE_ENV=production npx react-router build && cross-env NODE_ENV=production rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
+    "build:vercel": "echo 'Starting Vercel-specific build...' && node ../../scripts/validate-build-env.js && echo 'Step 1: React Router build' && cross-env NODE_ENV=production npx react-router build && echo 'Step 2: Rollup build' && cross-env NODE_ENV=production rollup -c rollup.config.mjs && echo 'Step 3: Copy server file' && cp server/main.js build/server/main.js && echo 'Vercel build completed successfully'",
     "build:standalone": "echo 'Skipping translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
     "build:app": "npm run with:env -- cross-env NODE_ENV=production npx react-router build",
     "build:server": "npm run with:env -- cross-env NODE_ENV=production rollup -c rollup.config.mjs",
-    "build:vercel": "echo 'Vercel build without env wrapper' && cross-env NODE_ENV=production npx react-router build && cross-env NODE_ENV=production rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
     "dev": "npm run with:env -- npx react-router dev",
     "dev:billing": "bash .bin/stripe-dev.sh",
     "start": "npm run with:env -- NODE_ENV=production node build/server/main.js",
@@ -115,6 +115,6 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.2.6-test-1767106062731-test-1767152849895-test-1767152849931",
+  "version": "2.2.6-test-1767106062731-test-1767152849895-test-1767152849931-test-1767238798435-test-1767238798444",
   "license": "Private - Part of Signtusk Platform"
 }

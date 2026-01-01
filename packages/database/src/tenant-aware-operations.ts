@@ -1,5 +1,4 @@
 import { MultiTenantService, type OrganizationConfig, type ResourceType } from './multi-tenant-service';
-import { prisma } from './client';
 import type { AuditContext } from './utils';
 
 // ============================================================================
@@ -34,7 +33,7 @@ export class TenantAwareOperationsService {
      */
     async createDocument(
         organizationId: string,
-        userId: string,
+        userId: number,
         documentData: {
             name: string;
             originalName: string;
@@ -69,7 +68,7 @@ export class TenantAwareOperationsService {
      */
     async listOrganizationDocuments(
         organizationId: string,
-        userId: string,
+        userId: number,
         options: {
             limit?: number;
             offset?: number;
@@ -103,7 +102,7 @@ export class TenantAwareOperationsService {
      */
     async createTemplate(
         organizationId: string,
-        userId: string,
+        userId: number,
         templateData: {
             name: string;
             description?: string;
@@ -141,7 +140,7 @@ export class TenantAwareOperationsService {
      */
     async addUserToOrganization(
         organizationId: string,
-        adminUserId: string,
+        adminUserId: number,
         userData: {
             email: string;
             name: string;
@@ -175,7 +174,7 @@ export class TenantAwareOperationsService {
      */
     async createTeam(
         organizationId: string,
-        userId: string,
+        userId: number,
         teamData: {
             name: string;
             description?: string;
@@ -209,7 +208,7 @@ export class TenantAwareOperationsService {
      */
     async updateOrganizationSettings(
         organizationId: string,
-        adminUserId: string,
+        adminUserId: number,
         settings: {
             general?: {
                 timezone?: string;
@@ -255,7 +254,7 @@ export class TenantAwareOperationsService {
     /**
      * Gets organization dashboard data with proper tenant isolation
      */
-    async getOrganizationDashboard(organizationId: string, userId: string) {
+    async getOrganizationDashboard(organizationId: string, userId: number) {
         // Validate user access to organization
         const hasAccess = await this.multiTenantService.validateOrganizationAccess(userId, organizationId);
         if (!hasAccess) {
@@ -316,7 +315,7 @@ export class TenantAwareOperationsService {
      */
     async bulkDeleteDocuments(
         organizationId: string,
-        userId: string,
+        userId: number,
         documentIds: string[],
         auditContext: AuditContext
     ) {
