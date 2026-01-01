@@ -5,17 +5,18 @@
  * Ensures environment variables are loaded programmatically and validates Vercel environment
  */
 
-import { spawn } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { spawn } from "child_process";
+import { existsSync, readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 class VercelBuildManager {
   constructor() {
-    this.rootPath = join(__dirname, '../../..');
+    this.rootPath = join(__dirname, "../../..");
+    this.remixPath = join(__dirname, "..");
     this.errors = [];
     this.warnings = [];
     this.info = [];
@@ -25,12 +26,12 @@ class VercelBuildManager {
    * Environment file precedence for Vercel builds
    */
   getEnvFilePrecedence() {
-    const nodeEnv = process.env.NODE_ENV || 'production';
-    
+    const nodeEnv = process.env.NODE_ENV || "production";
+
     return [
-      '.env',                    // Lowest priority - defaults
-      `.env.${nodeEnv}`,        // Environment-specific
-      '.env.local',             // Highest priority - local overrides (if exists)
+      ".env", // Lowest priority - defaults
+      `.env.${nodeEnv}`, // Environment-specific
+      ".env.local", // Highest priority - local overrides (if exists)
     ];
   }
 
@@ -39,18 +40,18 @@ class VercelBuildManager {
    */
   parseEnvFile(content) {
     const env = {};
-    const lines = content.split('\n');
+    const lines = content.split("\n");
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
+
       // Skip empty lines and comments
-      if (!trimmed || trimmed.startsWith('#')) {
+      if (!trimmed || trimmed.startsWith("#")) {
         continue;
       }
 
       // Parse key=value pairs
-      const equalIndex = trimmed.indexOf('=');
+      const equalIndex = trimmed.indexOf("=");
       if (equalIndex === -1) {
         continue;
       }
@@ -59,8 +60,10 @@ class VercelBuildManager {
       let value = trimmed.substring(equalIndex + 1).trim();
 
       // Remove surrounding quotes
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.slice(1, -1);
       }
 
@@ -81,24 +84,28 @@ class VercelBuildManager {
     // Load from files in order (later files override earlier ones)
     for (const envFile of envFiles) {
       const filePath = join(this.rootPath, envFile);
-      
+
       if (existsSync(filePath)) {
         try {
-          const content = readFileSync(filePath, 'utf8');
+          const content = readFileSync(filePath, "utf8");
           const fileEnv = this.parseEnvFile(content);
-          
+
           // Merge with existing env (file values override existing if not already set)
           Object.assign(env, fileEnv);
-          
+
           loadedFiles.push(envFile);
           this.info.push(`✓ Loaded environment from ${envFile}`);
         } catch (error) {
-          this.warnings.push(`Warning: Could not load ${envFile}: ${error.message}`);
+          this.warnings.push(
+            `Warning: Could not load ${envFile}: ${error.message}`
+          );
         }
       }
     }
 
-    this.info.push(`Environment loaded from: ${loadedFiles.join(', ') || 'system only'}`);
+    this.info.push(
+      `Environment loaded from: ${loadedFiles.join(", ") || "system only"}`
+    );
     return env;
   }
 
@@ -110,36 +117,42 @@ class VercelBuildManager {
 
     // Check for Vercel-specific variables
     if (process.env.VERCEL) {
-      this.info.push('✓ Running in Vercel environment');
-      
+      this.info.push("✓ Running in Vercel environment");
+
       // Validate Vercel-provided variables
-      const vercelVars = ['VERCEL', 'VERCEL_ENV', 'VERCEL_URL'];
+      const vercelVars = ["VERCEL", "VERCEL_ENV", "VERCEL_URL"];
       for (const varName of vercelVars) {
         if (process.env[varName]) {
-          this.info.push(`✓ Vercel variable ${varName}: ${process.env[varName]}`);
+          this.info.push(
+            `✓ Vercel variable ${varName}: ${process.env[varName]}`
+          );
         }
       }
     } else {
-      this.info.push('ℹ️ Not running in Vercel environment (local build)');
+      this.info.push("ℹ️ Not running in Vercel environment (local build)");
     }
 
     // Check required build-time variables
     const requiredBuildVars = [
-      'NODE_ENV',
-      'NEXT_PUBLIC_WEBAPP_URL',
-      'NEXT_PUBLIC_APP_URL'
+      "NODE_ENV",
+      "NEXT_PUBLIC_WEBAPP_URL",
+      "NEXT_PUBLIC_APP_URL",
     ];
 
     const missing = [];
     for (const varName of requiredBuildVars) {
-      if (!env[varName] || env[varName].trim() === '') {
+      if (!env[varName] || env[varName].trim() === "") {
         missing.push(varName);
       }
     }
 
     if (missing.length > 0) {
-      this.errors.push(`Missing required build-time variables: ${missing.join(', ')}`);
-      this.errors.push('Configure these variables in Vercel dashboard under Environment Variables');
+      this.errors.push(
+        `Missing required build-time variables: ${missing.join(", ")}`
+      );
+      this.errors.push(
+        "Configure these variables in Vercel dashboard under Environment Variables"
+      );
       valid = false;
     }
 
@@ -151,13 +164,13 @@ class VercelBuildManager {
    */
   async validateBuildDependencies() {
     const requiredCommands = [
-      { cmd: 'npx', args: ['--version'], name: 'npx' },
-      { cmd: 'node', args: ['--version'], name: 'Node.js' }
+      { cmd: "npx", args: ["--version"], name: "npx" },
+      { cmd: "node", args: ["--version"], name: "Node.js" },
     ];
 
     for (const { cmd, args, name } of requiredCommands) {
       try {
-        await this.executeCommand(cmd, args, { stdio: 'pipe' });
+        await this.executeCommand(cmd, args, { stdio: "pipe" });
         this.info.push(`✓ ${name} is available`);
       } catch (error) {
         this.errors.push(`✗ ${name} is not available: ${error.message}`);
@@ -166,14 +179,10 @@ class VercelBuildManager {
     }
 
     // Check for required packages in node_modules
-    const requiredPackages = [
-      'cross-env',
-      'react-router',
-      'rollup'
-    ];
+    const requiredPackages = ["cross-env", "react-router", "rollup"];
 
     for (const pkg of requiredPackages) {
-      const packagePath = join(this.rootPath, 'node_modules', pkg);
+      const packagePath = join(this.rootPath, "node_modules", pkg);
       if (!existsSync(packagePath)) {
         this.errors.push(`✗ Required package ${pkg} not found in node_modules`);
         return false;
@@ -191,12 +200,12 @@ class VercelBuildManager {
   executeCommand(command, args, options = {}) {
     return new Promise((resolve, reject) => {
       const child = spawn(command, args, {
-        stdio: 'inherit',
+        stdio: "inherit",
         shell: true,
-        ...options
+        ...options,
       });
 
-      child.on('close', (code) => {
+      child.on("close", (code) => {
         if (code === 0) {
           resolve();
         } else {
@@ -204,7 +213,7 @@ class VercelBuildManager {
         }
       });
 
-      child.on('error', (error) => {
+      child.on("error", (error) => {
         reject(error);
       });
     });
@@ -216,38 +225,44 @@ class VercelBuildManager {
   async executeBuildSteps(env) {
     const buildSteps = [
       {
-        name: 'React Router Build',
-        command: 'npx',
-        args: ['react-router', 'build'],
-        env: { ...env, NODE_ENV: 'production' }
+        name: "Prisma Generation (Vercel)",
+        command: "node",
+        args: ["../../packages/prisma/scripts/vercel-generate.js"],
+        env: { ...env, NODE_ENV: "production", CHECKPOINT_DISABLE: "1" },
       },
       {
-        name: 'Rollup Build',
-        command: 'npx',
-        args: ['rollup', '-c', 'rollup.config.mjs'],
-        env: { ...env, NODE_ENV: 'production' }
+        name: "React Router Build",
+        command: "npx",
+        args: ["react-router", "build"],
+        env: { ...env, NODE_ENV: "production" },
       },
       {
-        name: 'Copy Server File',
-        command: 'cp',
-        args: ['server/main.js', 'build/server/main.js'],
-        env
-      }
+        name: "Rollup Build",
+        command: "npx",
+        args: ["rollup", "-c", "rollup.config.mjs"],
+        env: { ...env, NODE_ENV: "production" },
+      },
+      {
+        name: "Copy Server File",
+        command: "cp",
+        args: ["server/main.js", "build/server/main.js"],
+        env,
+      },
     ];
 
     for (const step of buildSteps) {
       try {
         console.log(`\n🔨 ${step.name}...`);
-        
+
         const child = spawn(step.command, step.args, {
-          stdio: 'inherit',
+          stdio: "inherit",
           env: step.env,
           shell: true,
-          cwd: join(this.rootPath, 'apps/remix')
+          cwd: this.remixPath,
         });
 
         await new Promise((resolve, reject) => {
-          child.on('close', (code) => {
+          child.on("close", (code) => {
             if (code === 0) {
               console.log(`✅ ${step.name} completed successfully`);
               resolve();
@@ -256,11 +271,10 @@ class VercelBuildManager {
             }
           });
 
-          child.on('error', (error) => {
+          child.on("error", (error) => {
             reject(new Error(`${step.name} failed: ${error.message}`));
           });
         });
-
       } catch (error) {
         this.errors.push(`Build step "${step.name}" failed: ${error.message}`);
         throw error;
@@ -274,22 +288,22 @@ class VercelBuildManager {
   reportResults() {
     // Info messages
     if (this.info.length > 0) {
-      console.log('\nℹ️  Build Information:');
-      this.info.forEach(msg => console.log(`   ${msg}`));
+      console.log("\nℹ️  Build Information:");
+      this.info.forEach((msg) => console.log(`   ${msg}`));
     }
 
     // Warnings
     if (this.warnings.length > 0) {
-      console.log('\n⚠️  Build Warnings:');
-      this.warnings.forEach(msg => console.log(`   ${msg}`));
+      console.log("\n⚠️  Build Warnings:");
+      this.warnings.forEach((msg) => console.log(`   ${msg}`));
     }
 
     // Errors
     if (this.errors.length > 0) {
-      console.log('\n❌ Build Errors:');
-      this.errors.forEach(msg => console.log(`   ${msg}`));
-      console.log('\nBuild cannot proceed with these errors.');
-      console.log('Please fix the configuration and try again.');
+      console.log("\n❌ Build Errors:");
+      this.errors.forEach((msg) => console.log(`   ${msg}`));
+      console.log("\nBuild cannot proceed with these errors.");
+      console.log("Please fix the configuration and try again.");
     }
   }
 
@@ -298,40 +312,39 @@ class VercelBuildManager {
    */
   async build() {
     try {
-      console.log('🚀 Starting Vercel-compatible build process...\n');
+      console.log("🚀 Starting Vercel-compatible build process...\n");
 
       // Step 1: Load environment variables
-      console.log('📋 Loading environment variables...');
+      console.log("📋 Loading environment variables...");
       const env = this.loadEnvironmentFiles();
 
       // Step 2: Validate Vercel environment
-      console.log('\n🔍 Validating Vercel environment...');
+      console.log("\n🔍 Validating Vercel environment...");
       const envValid = this.validateVercelEnvironment(env);
-      
+
       if (!envValid) {
         this.reportResults();
         process.exit(1);
       }
 
       // Step 3: Validate build dependencies
-      console.log('\n🔧 Validating build dependencies...');
+      console.log("\n🔧 Validating build dependencies...");
       const depsValid = await this.validateBuildDependencies();
-      
+
       if (!depsValid) {
         this.reportResults();
         process.exit(1);
       }
 
       // Step 4: Execute build steps
-      console.log('\n🏗️  Executing build steps...');
+      console.log("\n🏗️  Executing build steps...");
       await this.executeBuildSteps(env);
 
       // Success
-      console.log('\n🎉 Vercel build completed successfully!');
+      console.log("\n🎉 Vercel build completed successfully!");
       this.reportResults();
-
     } catch (error) {
-      console.error('\n💥 Build failed:', error.message);
+      console.error("\n💥 Build failed:", error.message);
       this.reportResults();
       process.exit(1);
     }
