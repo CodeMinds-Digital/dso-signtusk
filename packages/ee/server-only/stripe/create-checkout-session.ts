@@ -1,7 +1,7 @@
-import type Stripe from 'stripe';
+import type Stripe from "stripe";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { stripe } from '@signtusk/lib/server-only/stripe';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { stripe } from "@signtusk/lib/server-only/stripe";
 
 export type CreateCheckoutSessionOptions = {
   customerId: string;
@@ -16,9 +16,16 @@ export const createCheckoutSession = async ({
   returnUrl,
   subscriptionMetadata,
 }: CreateCheckoutSessionOptions) => {
+  // Check if Stripe client is available
+  if (!stripe) {
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: "Stripe is not configured",
+    });
+  }
+
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
-    mode: 'subscription',
+    mode: "subscription",
     line_items: [
       {
         price: priceId,
@@ -34,7 +41,7 @@ export const createCheckoutSession = async ({
 
   if (!session.url) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: 'Failed to create checkout session',
+      message: "Failed to create checkout session",
     });
   }
 

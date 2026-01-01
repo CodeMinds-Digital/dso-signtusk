@@ -1,7 +1,10 @@
-import { PlainClient } from '@team-plain/typescript-sdk';
+import { PlainClient } from "@team-plain/typescript-sdk";
 
-import { env } from '@signtusk/lib/utils/env';
+import { env } from "@signtusk/lib/utils/env";
 
-export const plainClient = new PlainClient({
-  apiKey: env('NEXT_PRIVATE_PLAIN_API_KEY') ?? '',
-});
+// Create Plain client only if API key is provided
+const plainApiKey = env("NEXT_PRIVATE_PLAIN_API_KEY");
+
+export const plainClient = plainApiKey
+  ? new PlainClient({ apiKey: plainApiKey })
+  : null;

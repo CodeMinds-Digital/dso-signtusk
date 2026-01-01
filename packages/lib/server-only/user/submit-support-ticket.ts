@@ -1,9 +1,9 @@
-import { plainClient } from '@signtusk/lib/plain/client';
-import { prisma } from '@signtusk/prisma';
+import { plainClient } from "@signtusk/lib/plain/client";
+import { prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildOrganisationWhereQuery } from '../../utils/organisations';
-import { getTeamById } from '../team/get-team';
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { buildOrganisationWhereQuery } from "../../utils/organisations";
+import { getTeamById } from "../team/get-team";
 
 type SubmitSupportTicketOptions = {
   subject: string;
@@ -28,7 +28,7 @@ export const submitSupportTicket = async ({
 
   if (!user) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'User not found',
+      message: "User not found",
     });
   }
 
@@ -41,7 +41,7 @@ export const submitSupportTicket = async ({
 
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Organisation not found',
+      message: "Organisation not found",
     });
   }
 
@@ -54,9 +54,17 @@ export const submitSupportTicket = async ({
 
   const customMessage = `
 Organisation: ${organisation.name} (${organisation.id})
-Team: ${team ? `${team.name} (${team.id})` : 'No team provided'}
+Team: ${team ? `${team.name} (${team.id})` : "No team provided"}
 
 ${message}`;
+
+  // Check if Plain client is available
+  if (!plainClient) {
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message:
+        "Support ticket system is not configured. Please contact support directly.",
+    });
+  }
 
   const res = await plainClient.createThread({
     title: subject,
