@@ -17,11 +17,11 @@
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.3",
     "zod": "^3.22.4",
-    "luxon": "^3.4.4"
+    "luxon": "^3.4.4",
+    "@types/qrcode": "^1.5.5",
+    "@types/luxon": "^3.4.2"
   },
   "devDependencies": {
-    "@types/qrcode": "^1.5.5",
-    "@types/luxon": "^3.4.2",
     "typescript": "^5.3.3",
     "eslint": "^8.56.0",
     "vitest": "^1.6.0",
