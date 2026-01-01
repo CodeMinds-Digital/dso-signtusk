@@ -3,8 +3,31 @@
  * Ensures proper precedence order and validates build-time vs runtime variables
  */
 
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync } from "fs";
+import { join } from "path";
+
+// Vercel-compatible directory resolution
+function getWorkspaceRoot(): string {
+  if (typeof __dirname !== "undefined") {
+    // CommonJS environment - find workspace root
+    let currentDir = __dirname;
+    while (
+      currentDir !== "/" &&
+      !existsSync(join(currentDir, "package.json"))
+    ) {
+      currentDir = join(currentDir, "..");
+    }
+    return currentDir;
+  }
+
+  // ESM or serverless environment
+  try {
+    return process.cwd();
+  } catch {
+    // Fallback for serverless environments
+    return ".";
+  }
+}
 
 export interface EnvConfig {
   [key: string]: string | undefined;
@@ -39,19 +62,21 @@ export class EnvironmentLoader {
    * 4. .env (default values, committed to repo)
    */
   private getEnvFilePrecedence(): string[] {
-    const nodeEnv = process.env.NODE_ENV || 'development';
-    
+    const nodeEnv = process.env.NODE_ENV || "development";
+
     return [
-      '.env',                    // Lowest priority - defaults
-      `.env.${nodeEnv}`,        // Environment-specific
-      '.env.local',             // Highest priority - local overrides
+      ".env", // Lowest priority - defaults
+      `.env.${nodeEnv}`, // Environment-specific
+      ".env.local", // Highest priority - local overrides
     ];
   }
 
   /**
    * Load environment variables from files with proper precedence
    */
-  public loadEnvironmentFiles(rootPath: string = process.cwd()): EnvConfig {
+  public loadEnvironmentFiles(
+    rootPath: string = getWorkspaceRoot()
+  ): EnvConfig {
     const envFiles = this.getEnvFilePrecedence();
     const env: EnvConfig = {};
     this.loadedFiles = [];
@@ -62,19 +87,19 @@ export class EnvironmentLoader {
     // Load from files in reverse order (lowest to highest priority)
     for (const envFile of envFiles) {
       const filePath = join(rootPath, envFile);
-      
+
       if (existsSync(filePath)) {
         try {
-          const content = readFileSync(filePath, 'utf8');
+          const content = readFileSync(filePath, "utf8");
           const fileEnv = this.parseEnvFile(content);
-          
+
           // Merge with existing env (file values don't override existing)
           for (const [key, value] of Object.entries(fileEnv)) {
             if (env[key] === undefined) {
               env[key] = value;
             }
           }
-          
+
           this.loadedFiles.push(envFile);
         } catch (error) {
           console.warn(`Warning: Could not load ${envFile}: ${error}`);
@@ -91,18 +116,18 @@ export class EnvironmentLoader {
    */
   private parseEnvFile(content: string): EnvConfig {
     const env: EnvConfig = {};
-    const lines = content.split('\n');
+    const lines = content.split("\n");
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
+
       // Skip empty lines and comments
-      if (!trimmed || trimmed.startsWith('#')) {
+      if (!trimmed || trimmed.startsWith("#")) {
         continue;
       }
 
       // Parse key=value pairs
-      const equalIndex = trimmed.indexOf('=');
+      const equalIndex = trimmed.indexOf("=");
       if (equalIndex === -1) {
         continue;
       }
@@ -111,8 +136,10 @@ export class EnvironmentLoader {
       let value = trimmed.substring(equalIndex + 1).trim();
 
       // Remove surrounding quotes
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.slice(1, -1);
       }
 
@@ -127,11 +154,13 @@ export class EnvironmentLoader {
    */
   public getBuildTimeVariables(): EnvConfig {
     const buildTimeVars: EnvConfig = {};
-    
+
     for (const [key, value] of Object.entries(this.loadedEnv)) {
-      if (key.startsWith('NEXT_PUBLIC_') || 
-          key === 'NODE_ENV' || 
-          key === 'PORT') {
+      if (
+        key.startsWith("NEXT_PUBLIC_") ||
+        key === "NODE_ENV" ||
+        key === "PORT"
+      ) {
         buildTimeVars[key] = value;
       }
     }
@@ -144,16 +173,18 @@ export class EnvironmentLoader {
    */
   public getRuntimeVariables(): EnvConfig {
     const runtimeVars: EnvConfig = {};
-    
+
     for (const [key, value] of Object.entries(this.loadedEnv)) {
-      if (key.startsWith('NEXT_PRIVATE_') || 
-          key.startsWith('JWT_') ||
-          key.startsWith('ENCRYPTION_') ||
-          key.startsWith('SESSION_') ||
-          key.startsWith('DATABASE_') ||
-          key.startsWith('REDIS_') ||
-          key.startsWith('SMTP_') ||
-          key === 'NEXTAUTH_SECRET') {
+      if (
+        key.startsWith("NEXT_PRIVATE_") ||
+        key.startsWith("JWT_") ||
+        key.startsWith("ENCRYPTION_") ||
+        key.startsWith("SESSION_") ||
+        key.startsWith("DATABASE_") ||
+        key.startsWith("REDIS_") ||
+        key.startsWith("SMTP_") ||
+        key === "NEXTAUTH_SECRET"
+      ) {
         runtimeVars[key] = value;
       }
     }
@@ -170,9 +201,9 @@ export class EnvironmentLoader {
 
     // Required build-time variables
     const requiredBuildVars = [
-      'NODE_ENV',
-      'NEXT_PUBLIC_WEBAPP_URL',
-      'NEXT_PUBLIC_APP_URL'
+      "NODE_ENV",
+      "NEXT_PUBLIC_WEBAPP_URL",
+      "NEXT_PUBLIC_APP_URL",
     ];
 
     for (const varName of requiredBuildVars) {
@@ -183,9 +214,9 @@ export class EnvironmentLoader {
 
     // Required runtime variables
     const requiredRuntimeVars = [
-      'NEXTAUTH_SECRET',
-      'NEXT_PRIVATE_ENCRYPTION_KEY',
-      'NEXT_PRIVATE_DATABASE_URL'
+      "NEXTAUTH_SECRET",
+      "NEXT_PRIVATE_ENCRYPTION_KEY",
+      "NEXT_PRIVATE_DATABASE_URL",
     ];
 
     for (const varName of requiredRuntimeVars) {
@@ -196,11 +227,11 @@ export class EnvironmentLoader {
 
     // Validate encryption key lengths
     const encryptionKeys = [
-      'NEXTAUTH_SECRET',
-      'NEXT_PRIVATE_ENCRYPTION_KEY',
-      'NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY',
-      'JWT_SECRET',
-      'ENCRYPTION_KEY'
+      "NEXTAUTH_SECRET",
+      "NEXT_PRIVATE_ENCRYPTION_KEY",
+      "NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY",
+      "JWT_SECRET",
+      "ENCRYPTION_KEY",
     ];
 
     for (const key of encryptionKeys) {
@@ -212,9 +243,9 @@ export class EnvironmentLoader {
 
     // Validate URL formats
     const urlVars = [
-      'NEXT_PUBLIC_WEBAPP_URL',
-      'NEXT_PUBLIC_APP_URL',
-      'NEXT_PUBLIC_API_URL'
+      "NEXT_PUBLIC_WEBAPP_URL",
+      "NEXT_PUBLIC_APP_URL",
+      "NEXT_PUBLIC_API_URL",
     ];
 
     for (const key of urlVars) {
@@ -228,7 +259,7 @@ export class EnvironmentLoader {
       success: errors.length === 0,
       errors,
       warnings,
-      loadedFiles: this.loadedFiles
+      loadedFiles: this.loadedFiles,
     };
   }
 
