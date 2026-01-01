@@ -20,19 +20,29 @@ The Vercel build failure has been successfully resolved. The issue was that Verc
 15:56:07.756 Error: Cannot find package '@lingui/vite-plugin' imported from /vercel/path0/apps/remix/node_modules/.vite-temp/vite.config.ts.timestamp-1767263167752-b1f26c2616d2d8.mjs
 ```
 
+**Latest Build Error (January 1, 2026):**
+
+```
+16:19:43.065 [31mfailed to load config from /vercel/path0/apps/remix/vite.config.ts[39m
+16:19:43.068 Error: Cannot find package 'vite-plugin-babel-macros' imported from /vercel/path0/apps/remix/node_modules/.vite-temp/vite.config.ts.timestamp-1767264583023-975cbd5e62eb6.mjs
+```
+
 ## Solution Implemented
 
 ### 1. Dependency Resolution ✅
 
-**Problem**: `@lingui/vite-plugin` was in devDependencies but not available during Vercel build
-**Solution**: Moved `@lingui/vite-plugin` and `@lingui/babel-plugin-lingui-macro` to regular dependencies in `apps/remix/package.json`
+**Problem**: Build-time dependencies were in devDependencies but not available during Vercel build
+**Solution**: Moved critical build dependencies to regular dependencies in `apps/remix/package.json`
 
 ```json
 {
   "dependencies": {
     // ... other dependencies
     "@lingui/vite-plugin": "^5.6.0",
-    "@lingui/babel-plugin-lingui-macro": "^5.6.0"
+    "@lingui/babel-plugin-lingui-macro": "^5.6.0",
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vite-plugin-static-copy": "^3.1.4",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
 ```

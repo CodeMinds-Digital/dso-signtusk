@@ -89,7 +89,10 @@
     "@lingui/babel-plugin-lingui-macro": "^5.6.0",
     "@react-router/dev": "^7.11.0",
     "rollup": "^4.53.3",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vite-plugin-static-copy": "^3.1.4",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
@@ -113,9 +116,7 @@
     "esbuild": "^0.27.0",
     "remix-flat-routes": "^0.8.5",
     "tsx": "^4.20.6",
-    "vite": "^7.2.4",
-    "vite-plugin-babel-macros": "^1.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^7.2.4"
   },
   "version": "2.2.6-test-1767106062731-test-1767152849895-test-1767152849931-test-1767238798435-test-1767238798444",
   "license": "Private - Part of Signtusk Platform"
