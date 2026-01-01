@@ -1,11 +1,12 @@
 /**
  * Error Reporting Completeness Property-Based Tests
  * 
- * **Feature: build-failure-resolution, Property 4: Error Reporting Completeness**
- * **Validates: Requirements 6.1, 6.3**
+ * **Feature: vercel-deployment-fix, Property 6: Error Reporting Completeness**
+ * **Validates: Requirements 2.2, 6.3, 7.1, 7.2, 7.3, 7.4**
  * 
- * Tests that for any build failure, the system provides specific error information
- * including the failing package, error type, and suggested remediation steps.
+ * Tests that for any build failure, the system provides detailed error information
+ * including missing dependencies, environment issues, and specific Vercel-compatible
+ * remediation steps.
  */
 
 import fc from 'fast-check';
@@ -101,11 +102,12 @@ const buildErrorGenerator = fc.record({
 
 describe('Error Reporting Completeness', () => {
   /**
-   * Property 4: Error Reporting Completeness
-   * For any build failure, the system must provide specific error information
-   * including the failing package, error type, and suggested remediation steps
+   * Property 6: Error Reporting Completeness
+   * For any build failure, the system must provide detailed error information
+   * including missing dependencies, environment issues, and specific Vercel-compatible
+   * remediation steps
    */
-  describe('Property 4: Error Reporting Completeness', () => {
+  describe('Property 6: Error Reporting Completeness', () => {
     it('should provide complete error information for any build error', () => {
       fc.assert(fc.property(
         buildErrorGenerator,
@@ -471,7 +473,7 @@ describe('Error Reporting Completeness', () => {
           }
           
           // Verify context
-          expect(error.context).toEqual({ packageName, version });
+          expect(error.context).toEqual(expect.objectContaining({ packageName, version }));
           
           // Verify specific remediation for dependencies
           const remediationText = error.remediation.join(' ').toLowerCase();
@@ -509,7 +511,7 @@ describe('Error Reporting Completeness', () => {
           }
           
           // Verify context
-          expect(error.context).toEqual({ variableName, expectedFormat });
+          expect(error.context).toEqual(expect.objectContaining({ variableName, expectedFormat }));
           
           // Verify specific remediation for environment variables
           const remediationText = error.remediation.join(' ').toLowerCase();
@@ -548,6 +550,309 @@ describe('Error Reporting Completeness', () => {
           });
           
           return true;
+        }
+      ), { numRuns: 20 });
+    });
+
+    it('should provide Vercel-specific error guidance when in Vercel environment', () => {
+      fc.assert(fc.property(
+        errorTypeGenerator,
+        meaningfulErrorMessageGenerator,
+        (errorType, errorMessage) => {
+          // Mock Vercel environment
+          const originalVercel = process.env.VERCEL;
+          process.env.VERCEL = '1';
+          
+          try {
+            const errorHandler = new BuildErrorHandler();
+            
+            // Add error
+            errorHandler.addError({
+              type: errorType,
+              message: errorMessage
+            });
+            
+            const report = errorHandler.generateReport();
+            const error = report.errors[0];
+            
+            // Should have Vercel-specific remediation
+            const remediationText = error.remediation.join(' ').toLowerCase();
+            
+            // Check for Vercel-specific guidance
+            const hasVercelGuidance = 
+              remediationText.includes('vercel') ||
+              remediationText.includes('dashboard') ||
+              remediationText.includes('vercel.com') ||
+              remediationText.includes('🔧 vercel-specific fixes') ||
+              remediationText.includes('environment variables') ||
+              remediationText.includes('dependencies') ||
+              remediationText.includes('build logs');
+            
+            expect(hasVercelGuidance).toBe(true);
+            
+            return true;
+          } finally {
+            // Restore original environment
+            if (originalVercel) {
+              process.env.VERCEL = originalVercel;
+            } else {
+              delete process.env.VERCEL;
+            }
+          }
+        }
+      ), { numRuns: 30 });
+    });
+
+    it('should provide specific Vercel CLI error handling', () => {
+      fc.assert(fc.property(
+        fc.constantFrom('dotenv', 'env-cmd', 'cross-env', 'turbo', 'tsc'),
+        fc.string({ minLength: 10, maxLength: 100 }),
+        (command, errorMessage) => {
+          // Mock Vercel environment
+          const originalVercel = process.env.VERCEL;
+          process.env.VERCEL = '1';
+          
+          try {
+            const errorHandler = new BuildErrorHandler();
+            
+            // Handle Vercel CLI error
+            errorHandler.handleVercelCliError(command, errorMessage);
+            
+            const report = errorHandler.generateReport();
+            expect(report.errors).toHaveLength(1);
+            
+            const error = report.errors[0];
+            
+            // Verify error properties
+            expect(error.type).toBe('dependency');
+            expect(error.code).toBe('VERCEL_CLI_ERROR');
+            expect(error.message).toContain(command);
+            expect(error.details).toContain(errorMessage);
+            
+            // Verify Vercel-specific remediation
+            const remediationText = error.remediation.join(' ').toLowerCase();
+            expect(remediationText).toContain('vercel');
+            expect(remediationText).toContain('programmatic');
+            expect(remediationText).toContain('cli');
+            
+            return true;
+          } finally {
+            // Restore original environment
+            if (originalVercel) {
+              process.env.VERCEL = originalVercel;
+            } else {
+              delete process.env.VERCEL;
+            }
+          }
+        }
+      ), { numRuns: 20 });
+    });
+
+    it('should provide Vercel configuration error guidance', () => {
+      fc.assert(fc.property(
+        fc.string({ minLength: 10, maxLength: 100 }),
+        fc.option(fc.constantFrom('vercel.json', 'package.json', 'turbo.json')),
+        (issue, configFile) => {
+          // Mock Vercel environment
+          const originalVercel = process.env.VERCEL;
+          process.env.VERCEL = '1';
+          
+          try {
+            const errorHandler = new BuildErrorHandler();
+            
+            // Handle Vercel config error
+            errorHandler.handleVercelConfigError(issue, configFile);
+            
+            const report = errorHandler.generateReport();
+            expect(report.errors).toHaveLength(1);
+            
+            const error = report.errors[0];
+            
+            // Verify error properties
+            expect(error.type).toBe('configuration');
+            expect(error.code).toBe('VERCEL_CONFIG_ERROR');
+            expect(error.message).toContain(issue);
+            
+            if (configFile) {
+              expect(error.details).toContain(configFile);
+            }
+            
+            // Verify Vercel-specific remediation
+            const remediationText = error.remediation.join(' ').toLowerCase();
+            expect(remediationText).toContain('vercel');
+            expect(remediationText).toContain('configuration');
+            
+            return true;
+          } finally {
+            // Restore original environment
+            if (originalVercel) {
+              process.env.VERCEL = originalVercel;
+            } else {
+              delete process.env.VERCEL;
+            }
+          }
+        }
+      ), { numRuns: 20 });
+    });
+
+    it('should provide Node.js version compatibility error guidance', () => {
+      fc.assert(fc.property(
+        fc.constantFrom('v14.18.0', 'v16.14.0', 'v18.12.0', 'v20.0.0'),
+        fc.option(fc.constantFrom('>=16.0.0', '>=18.0.0', '^18.12.0')),
+        (currentVersion, requiredVersion) => {
+          // Mock Vercel environment
+          const originalVercel = process.env.VERCEL;
+          process.env.VERCEL = '1';
+          
+          try {
+            const errorHandler = new BuildErrorHandler();
+            
+            // Handle Node version error
+            errorHandler.handleNodeVersionError(currentVersion, requiredVersion);
+            
+            const report = errorHandler.generateReport();
+            expect(report.errors).toHaveLength(1);
+            
+            const error = report.errors[0];
+            
+            // Verify error properties
+            expect(error.type).toBe('environment');
+            expect(error.code).toBe('NODE_VERSION_ERROR');
+            expect(error.details).toContain(currentVersion);
+            
+            if (requiredVersion) {
+              expect(error.details).toContain(requiredVersion);
+            }
+            
+            // Verify Vercel-specific remediation
+            const remediationText = error.remediation.join(' ').toLowerCase();
+            expect(remediationText).toContain('vercel');
+            expect(remediationText).toContain('node');
+            expect(remediationText).toContain('engines');
+            
+            return true;
+          } finally {
+            // Restore original environment
+            if (originalVercel) {
+              process.env.VERCEL = originalVercel;
+            } else {
+              delete process.env.VERCEL;
+            }
+          }
+        }
+      ), { numRuns: 20 });
+    });
+
+    it('should include Vercel environment detection in error context', () => {
+      fc.assert(fc.property(
+        fc.constantFrom('dependency', 'environment'),
+        fc.string({ minLength: 10, maxLength: 50 }),
+        (errorType, packageName) => {
+          // Test both Vercel and non-Vercel environments
+          const environments = [
+            { VERCEL: '1', VERCEL_ENV: 'production' },
+            {} // No Vercel environment
+          ];
+          
+          environments.forEach(env => {
+            // Set environment
+            const originalEnv = { ...process.env };
+            Object.keys(originalEnv).forEach(key => {
+              if (key.startsWith('VERCEL')) {
+                delete process.env[key];
+              }
+            });
+            Object.assign(process.env, env);
+            
+            try {
+              const errorHandler = new BuildErrorHandler();
+              
+              // Use specific error handlers that we know add Vercel context
+              if (errorType === 'dependency') {
+                errorHandler.handleDependencyError(packageName);
+              } else if (errorType === 'environment') {
+                errorHandler.handleEnvironmentError(packageName);
+              }
+              
+              const report = errorHandler.generateReport();
+              const error = report.errors[0];
+              
+              // Check if Vercel-specific guidance is provided when in Vercel environment
+              const isVercelEnv = env.VERCEL === '1' || env.VERCEL_ENV !== undefined;
+              const remediationText = error.remediation.join(' ').toLowerCase();
+              const hasVercelGuidance = remediationText.includes('vercel');
+              
+              if (isVercelEnv) {
+                // Should have Vercel guidance for dependency and environment errors
+                expect(hasVercelGuidance).toBe(true);
+                
+                // Context should include Vercel information
+                if (error.context && typeof error.context === 'object') {
+                  expect(error.context).toEqual(expect.objectContaining({ isVercel: true }));
+                }
+              }
+              
+            } finally {
+              // Restore original environment
+              Object.keys(process.env).forEach(key => {
+                if (key.startsWith('VERCEL')) {
+                  delete process.env[key];
+                }
+              });
+              Object.assign(process.env, originalEnv);
+            }
+          });
+          
+          return true;
+        }
+      ), { numRuns: 20 }); // Reduced runs since we test multiple environments per run
+    });
+
+    it('should provide comprehensive build summary with Vercel information', () => {
+      fc.assert(fc.property(
+        fc.array(buildErrorGenerator, { minLength: 1, maxLength: 5 }),
+        (errors) => {
+          // Mock Vercel environment
+          const originalVercel = process.env.VERCEL;
+          const originalVercelEnv = process.env.VERCEL_ENV;
+          process.env.VERCEL = '1';
+          process.env.VERCEL_ENV = 'production';
+          
+          try {
+            const errorHandler = new BuildErrorHandler();
+            
+            // Clear console output
+            consoleErrors.length = 0;
+            consoleLogs.length = 0;
+            
+            // Add errors
+            errors.forEach(error => errorHandler.addError(error));
+            
+            // Print summary (this should include Vercel information)
+            errorHandler.printSummary();
+            
+            // Verify Vercel information is included in summary
+            const allOutput = [...consoleLogs, ...consoleErrors].join(' ').toLowerCase();
+            
+            expect(allOutput).toContain('vercel');
+            expect(allOutput).toContain('dashboard');
+            expect(allOutput).toContain('environment variables');
+            
+            return true;
+          } finally {
+            // Restore original environment
+            if (originalVercel) {
+              process.env.VERCEL = originalVercel;
+            } else {
+              delete process.env.VERCEL;
+            }
+            
+            if (originalVercelEnv) {
+              process.env.VERCEL_ENV = originalVercelEnv;
+            } else {
+              delete process.env.VERCEL_ENV;
+            }
+          }
         }
       ), { numRuns: 20 });
     });

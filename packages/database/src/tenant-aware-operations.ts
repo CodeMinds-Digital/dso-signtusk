@@ -33,7 +33,7 @@ export class TenantAwareOperationsService {
      */
     async createDocument(
         organizationId: string,
-        userId: number,
+        userId: string,
         documentData: {
             name: string;
             originalName: string;
@@ -68,7 +68,7 @@ export class TenantAwareOperationsService {
      */
     async listOrganizationDocuments(
         organizationId: string,
-        userId: number,
+        userId: string,
         options: {
             limit?: number;
             offset?: number;
@@ -102,7 +102,7 @@ export class TenantAwareOperationsService {
      */
     async createTemplate(
         organizationId: string,
-        userId: number,
+        userId: string,
         templateData: {
             name: string;
             description?: string;
@@ -140,7 +140,7 @@ export class TenantAwareOperationsService {
      */
     async addUserToOrganization(
         organizationId: string,
-        adminUserId: number,
+        adminUserId: string,
         userData: {
             email: string;
             name: string;
@@ -174,7 +174,7 @@ export class TenantAwareOperationsService {
      */
     async createTeam(
         organizationId: string,
-        userId: number,
+        userId: string,
         teamData: {
             name: string;
             description?: string;
@@ -208,7 +208,7 @@ export class TenantAwareOperationsService {
      */
     async updateOrganizationSettings(
         organizationId: string,
-        adminUserId: number,
+        adminUserId: string,
         settings: {
             general?: {
                 timezone?: string;
@@ -254,7 +254,7 @@ export class TenantAwareOperationsService {
     /**
      * Gets organization dashboard data with proper tenant isolation
      */
-    async getOrganizationDashboard(organizationId: string, userId: number) {
+    async getOrganizationDashboard(organizationId: string, userId: string) {
         // Validate user access to organization
         const hasAccess = await this.multiTenantService.validateOrganizationAccess(userId, organizationId);
         if (!hasAccess) {
@@ -315,7 +315,7 @@ export class TenantAwareOperationsService {
      */
     async bulkDeleteDocuments(
         organizationId: string,
-        userId: number,
+        userId: string,
         documentIds: string[],
         auditContext: AuditContext
     ) {

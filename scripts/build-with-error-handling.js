@@ -1,35 +1,45 @@
 #!/usr/bin/env node
 
 /**
- * Build Script with Enhanced Error Handling
- * Wraps the build process with comprehensive error reporting and diagnostics
+ * Build Script with Enhanced Error Handling and Fallback Strategies
+ * Wraps the build process with comprehensive error reporting and automatic fallbacks
  */
 
 const { execSync, spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Import our error handler (if available)
-let BuildErrorHandler;
+// Import our error handler and fallback manager (if available)
+let BuildErrorHandler, BuildFallbackManager;
 try {
-  const { BuildErrorHandler: Handler } = require('../packages/lib/src/build-error-handler');
-  BuildErrorHandler = Handler;
+  const errorModule = require('../packages/lib/src/build-error-handler');
+  const fallbackModule = require('../packages/lib/src/build-fallback-manager');
+  BuildErrorHandler = errorModule.BuildErrorHandler;
+  BuildFallbackManager = fallbackModule.BuildFallbackManager;
 } catch (error) {
-  console.warn('⚠️  Build error handler not available, using basic error reporting');
+  console.warn('⚠️  Advanced build tools not available, using basic error reporting');
   BuildErrorHandler = null;
+  BuildFallbackManager = null;
 }
 
 class EnhancedBuildRunner {
   constructor() {
     this.errorHandler = BuildErrorHandler ? new BuildErrorHandler() : null;
+    this.fallbackManager = BuildFallbackManager ? new BuildFallbackManager(this.errorHandler) : null;
     this.startTime = Date.now();
+    this.fallbacksUsed = [];
+
+    // Connect error handler and fallback manager
+    if (this.errorHandler && this.fallbackManager) {
+      this.errorHandler.setFallbackManager(this.fallbackManager);
+    }
   }
 
   /**
-   * Run the complete build process with error handling
+   * Run the complete build process with error handling and fallbacks
    */
   async runBuild() {
-    console.log('🚀 Starting enhanced build process...\n');
+    console.log('🚀 Starting enhanced build process with fallback support...\n');
 
     try {
       // Step 1: Pre-build validation
@@ -47,16 +57,49 @@ class EnhancedBuildRunner {
       console.log('\n✅ Build completed successfully!');
       this.printBuildSummary(true);
       
-      return { success: true };
+      return { success: true, fallbacksUsed: this.fallbacksUsed };
 
     } catch (error) {
-      console.error('\n❌ Build failed!');
+      console.error('\n❌ Primary build failed!');
       
       if (this.errorHandler) {
         this.errorHandler.handleJavaScriptError(error, {
           operation: 'build process',
           file: 'build-with-error-handling.js'
         });
+      }
+
+      // Try fallback strategies
+      if (this.fallbackManager) {
+        console.log('\n🔄 Attempting fallback strategies...');
+        
+        try {
+          const fallbackResult = await this.fallbackManager.executeFallbacks(error);
+          
+          if (fallbackResult.success) {
+            console.log(`\n✅ Build recovered using fallback: ${fallbackResult.strategyUsed}`);
+            this.fallbacksUsed = fallbackResult.fallbacksAttempted;
+            
+            // Try to complete the build with fallback
+            await this.runPostBuildValidation();
+            
+            this.printBuildSummary(true);
+            return { 
+              success: true, 
+              fallbacksUsed: this.fallbacksUsed,
+              recoveredWith: fallbackResult.strategyUsed 
+            };
+          } else {
+            console.log('\n❌ All fallback strategies failed');
+            this.fallbacksUsed = fallbackResult.fallbacksAttempted;
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback execution failed:', fallbackError.message);
+        }
+      }
+
+      // Final error handling
+      if (this.errorHandler) {
         this.errorHandler.printSummary();
         this.errorHandler.saveReport();
       } else {
@@ -67,7 +110,7 @@ class EnhancedBuildRunner {
       }
 
       this.printBuildSummary(false);
-      return { success: false, error };
+      return { success: false, error, fallbacksUsed: this.fallbacksUsed };
     }
   }
 
@@ -306,7 +349,7 @@ class EnhancedBuildRunner {
   }
 
   /**
-   * Print build summary
+   * Print build summary with fallback information
    */
   printBuildSummary(success) {
     const duration = Date.now() - this.startTime;
@@ -319,6 +362,10 @@ class EnhancedBuildRunner {
     console.log(`Status: ${success ? '✅ SUCCESS' : '❌ FAILED'}`);
     console.log(`Duration: ${minutes}m ${seconds}s`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    
+    if (this.fallbacksUsed.length > 0) {
+      console.log(`Fallbacks Used: ${this.fallbacksUsed.join(', ')}`);
+    }
     
     if (this.errorHandler) {
       const errorsByType = this.errorHandler.getErrorsByType();
@@ -335,6 +382,14 @@ class EnhancedBuildRunner {
       console.log('3. Try: npm run clean && npm install to reset dependencies');
       console.log('4. Check logs directory for detailed error reports');
       console.log('5. Review recent changes that might have caused issues');
+      
+      if (this.fallbackManager) {
+        console.log('6. Run: npm run build:fallback to try fallback strategies');
+      }
+    } else if (this.fallbacksUsed.length > 0) {
+      console.log('\n💡 BUILD RECOVERED WITH FALLBACKS:');
+      console.log('Consider fixing the underlying issues to avoid fallbacks in future builds');
+      console.log('Check the error logs to understand what was fixed automatically');
     }
   }
 }

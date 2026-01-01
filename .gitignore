@@ -139,3 +139,4 @@ package-lock.json
 /.kiro
 /.kiro/specs
 packages/pdf-sign.zip
+.env*.local

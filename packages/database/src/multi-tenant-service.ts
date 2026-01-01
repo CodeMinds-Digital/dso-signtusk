@@ -44,14 +44,13 @@ export class MultiTenantService {
      * Validates that a user has access to an organization
      * Ensures complete data isolation between tenants
      */
-    async validateOrganizationAccess(userId: number, organizationId: string): Promise<boolean> {
+    async validateOrganizationAccess(userId: string, organizationId: string): Promise<boolean> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: { id: userId },
                 select: {
                     id: true,
-                    // Note: User model doesn't have direct organizationId field
-                    // Need to check through organisationMember relationship
+                    organizationId: true
                 }
             });
 
@@ -59,15 +58,7 @@ export class MultiTenantService {
                 return false;
             }
 
-            // Check if user is a member of the organization
-            const membership = await this.prisma.teamMember.findFirst({
-                where: {
-                    userId: userId,
-                    organisationId: organizationId
-                }
-            });
-
-            return !!membership;
+            return user.organizationId === organizationId;
         } catch (error) {
             console.error('Error validating organization access:', error);
             return false;
@@ -106,12 +97,12 @@ export class MultiTenantService {
                         // Filter by organization through user relationship
                     }
                 }),
-                findUnique: (args: any) => self.prisma.envelope.findUnique(args),
-                findFirst: (args: any = {}) => self.prisma.envelope.findFirst(args),
-                create: (args: any) => self.prisma.envelope.create(args),
-                update: (args: any) => self.prisma.envelope.update(args),
-                delete: (args: any) => self.prisma.envelope.delete(args),
-                count: (args: any = {}) => self.prisma.envelope.count(args)
+                findUnique: (args: any) => self.prisma.document.findUnique(args),
+                findFirst: (args: any = {}) => self.prisma.document.findFirst(args),
+                create: (args: any) => self.prisma.document.create(args),
+                update: (args: any) => self.prisma.document.update(args),
+                delete: (args: any) => self.prisma.document.delete(args),
+                count: (args: any = {}) => self.prisma.document.count(args)
             },
             team: {
                 findMany: (args: any = {}) => self.prisma.team.findMany({
@@ -146,12 +137,13 @@ export class MultiTenantService {
                 return cached;
             }
 
-            const organization = await this.prisma.organisation.findUnique({
+            const organization = await this.prisma.organization.findUnique({
                 where: { id: organizationId },
                 select: {
                     id: true,
                     name: true,
-                    url: true,
+                    domain: true,
+                    slug: true,
                     createdAt: true,
                 }
             });
@@ -185,11 +177,12 @@ export class MultiTenantService {
     ): Promise<any | null> {
         try {
             const updatedOrg = await withTransaction(async (tx) => {
-                const organization = await tx.organisation.update({
+                const organization = await tx.organization.update({
                     where: { id: organizationId },
                     data: {
                         name: config.name,
-                        url: config.url,
+                        domain: config.domain,
+                        slug: config.slug,
                         updatedAt: new Date()
                     }
                 });
@@ -220,10 +213,10 @@ export class MultiTenantService {
                 return cached;
             }
 
-            const organization = await this.prisma.organisation.findUnique({
+            const organization = await this.prisma.organization.findUnique({
                 where: { id: organizationId },
                 include: {
-                    members: true
+                    users: true
                 }
             });
 

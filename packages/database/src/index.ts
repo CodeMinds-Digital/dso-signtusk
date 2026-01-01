@@ -14,7 +14,7 @@ export type {
 } from '@prisma/client';
 
 // Re-export Prisma enums that actually exist
-export {
+export type {
     DocumentStatus,
     SigningStatus,
     SubscriptionStatus,

@@ -1,0 +1,787 @@
+{
+  "summary": {
+    "total": 93,
+    "required_build": 1,
+    "required_runtime": 16,
+    "optional_build": 4,
+    "optional_runtime": 68,
+    "development_only": 1,
+    "testing_only": 3
+  },
+  "variables": {
+    "REQUIRED_BUILD": {
+      "description": "Required for build process",
+      "variables": [
+        {
+          "name": "NODE_ENV",
+          "description": "Node.js environment (production/development)",
+          "defaultValue": "production",
+          "sources": [
+            "Build process"
+          ]
+        }
+      ]
+    },
+    "REQUIRED_RUNTIME": {
+      "description": "Required for runtime operation",
+      "variables": [
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "description": "AWS access key for S3 operations",
+          "defaultValue": null,
+          "sources": [
+            "AWS S3"
+          ]
+        },
+        {
+          "name": "AWS_REGION",
+          "description": "AWS region for S3 bucket",
+          "defaultValue": "us-east-1",
+          "sources": [
+            "AWS S3"
+          ]
+        },
+        {
+          "name": "AWS_S3_BUCKET",
+          "description": "AWS S3 bucket name",
+          "defaultValue": null,
+          "sources": [
+            "AWS S3"
+          ]
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "description": "AWS secret key for S3 operations",
+          "defaultValue": null,
+          "sources": [
+            "AWS S3"
+          ]
+        },
+        {
+          "name": "DATABASE_URL",
+          "description": "Primary database connection URL",
+          "defaultValue": null,
+          "sources": [
+            "Database connection"
+          ]
+        },
+        {
+          "name": "ENCRYPTION_KEY",
+          "description": "32-character encryption key for data security",
+          "defaultValue": null,
+          "sources": [
+            "Security"
+          ]
+        },
+        {
+          "name": "JWT_SECRET",
+          "description": "JWT token signing secret",
+          "defaultValue": null,
+          "sources": [
+            "Authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_DATABASE_URL",
+          "description": "Private database URL for server-side operations",
+          "defaultValue": null,
+          "sources": [
+            "Prisma schema"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_ENCRYPTION_KEY",
+          "description": "Primary encryption key for sensitive data",
+          "defaultValue": null,
+          "sources": [
+            "Security"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_TRANSPORT",
+          "description": "Email transport method (resend/smtp)",
+          "defaultValue": "resend",
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_BUCKET",
+          "description": "S3 bucket name for file uploads",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_APP_URL",
+          "description": "Public application URL for client-side routing",
+          "defaultValue": null,
+          "sources": [
+            "Client-side routing"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_UPLOAD_TRANSPORT",
+          "description": "File upload transport method (s3/local)",
+          "defaultValue": "s3",
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_WEBAPP_URL",
+          "description": "Public web application URL",
+          "defaultValue": null,
+          "sources": [
+            "Application URLs"
+          ]
+        },
+        {
+          "name": "NEXTAUTH_SECRET",
+          "description": "NextAuth.js secret for session encryption",
+          "defaultValue": null,
+          "sources": [
+            "Authentication"
+          ]
+        },
+        {
+          "name": "POSTGRES_PRISMA_URL",
+          "description": "PostgreSQL connection URL for Prisma",
+          "defaultValue": null,
+          "sources": [
+            "Database connection"
+          ]
+        }
+      ]
+    },
+    "OPTIONAL_BUILD": {
+      "description": "Optional for build process",
+      "variables": [
+        {
+          "name": "CARGO_BUILD_TARGET",
+          "description": "Rust build target",
+          "defaultValue": null,
+          "sources": [
+            "Rust compilation"
+          ]
+        },
+        {
+          "name": "CARGO_TARGET_DIR",
+          "description": "Rust cargo target directory",
+          "defaultValue": null,
+          "sources": [
+            "Rust compilation"
+          ]
+        },
+        {
+          "name": "RUSTFLAGS",
+          "description": "Rust compiler flags",
+          "defaultValue": null,
+          "sources": [
+            "Rust compilation"
+          ]
+        },
+        {
+          "name": "SKIP_ENV_VALIDATION",
+          "description": "Skip environment variable validation",
+          "defaultValue": "false",
+          "sources": [
+            "Build process"
+          ]
+        }
+      ]
+    },
+    "OPTIONAL_RUNTIME": {
+      "description": "Optional for runtime operation",
+      "variables": [
+        {
+          "name": "AWS_S3_ENDPOINT",
+          "description": "Custom S3 endpoint URL",
+          "defaultValue": null,
+          "sources": [
+            "AWS S3"
+          ]
+        },
+        {
+          "name": "DATABASE_URL_UNPOOLED",
+          "description": "Unpooled database connection",
+          "defaultValue": null,
+          "sources": [
+            "Database connection"
+          ]
+        },
+        {
+          "name": "DISABLE_PDF_SIGNING",
+          "description": "Disable PDF signing functionality",
+          "defaultValue": "false",
+          "sources": [
+            "PDF processing"
+          ]
+        },
+        {
+          "name": "DOCUMENSO_DISABLE_TELEMETRY",
+          "description": "Disable telemetry collection",
+          "defaultValue": "false",
+          "sources": [
+            "Analytics"
+          ]
+        },
+        {
+          "name": "GOOGLE_APPLICATION_CREDENTIALS",
+          "description": "Google Cloud service account credentials",
+          "defaultValue": null,
+          "sources": [
+            "Google Cloud"
+          ]
+        },
+        {
+          "name": "GOOGLE_VERTEX_API_KEY",
+          "description": "Google Vertex AI API key",
+          "defaultValue": null,
+          "sources": [
+            "AI services"
+          ]
+        },
+        {
+          "name": "GOOGLE_VERTEX_LOCATION",
+          "description": "Google Vertex AI location",
+          "defaultValue": null,
+          "sources": [
+            "AI services"
+          ]
+        },
+        {
+          "name": "GOOGLE_VERTEX_PROJECT_ID",
+          "description": "Google Vertex AI project ID",
+          "defaultValue": null,
+          "sources": [
+            "AI services"
+          ]
+        },
+        {
+          "name": "INNGEST_EVENT_KEY",
+          "description": "Inngest event key",
+          "defaultValue": null,
+          "sources": [
+            "Job processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_DIRECT_DATABASE_URL",
+          "description": "Direct database connection URL (bypassing pooling)",
+          "defaultValue": null,
+          "sources": [
+            "Prisma schema"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY",
+          "description": "Secondary encryption key for key rotation",
+          "defaultValue": null,
+          "sources": [
+            "Security"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
+          "description": "Google OAuth client ID",
+          "defaultValue": null,
+          "sources": [
+            "OAuth authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_GOOGLE_CLIENT_SECRET",
+          "description": "Google OAuth client secret",
+          "defaultValue": null,
+          "sources": [
+            "OAuth authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_INNGEST_APP_ID",
+          "description": "Inngest application ID",
+          "defaultValue": null,
+          "sources": [
+            "Job processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_INNGEST_EVENT_KEY",
+          "description": "Private Inngest event key",
+          "defaultValue": null,
+          "sources": [
+            "Job processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_JOBS_PROVIDER",
+          "description": "Background job processing provider",
+          "defaultValue": null,
+          "sources": [
+            "Job processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_MAILCHANNELS_API_KEY",
+          "description": "MailChannels API key",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN",
+          "description": "MailChannels DKIM domain",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY",
+          "description": "MailChannels DKIM private key",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR",
+          "description": "MailChannels DKIM selector",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_MAILCHANNELS_ENDPOINT",
+          "description": "MailChannels endpoint URL",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_CLIENT_ID",
+          "description": "OIDC client ID",
+          "defaultValue": null,
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_CLIENT_SECRET",
+          "description": "OIDC client secret",
+          "defaultValue": null,
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_PROMPT",
+          "description": "OIDC authentication prompt",
+          "defaultValue": null,
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_PROVIDER_LABEL",
+          "description": "OIDC provider display label",
+          "defaultValue": null,
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_SKIP_VERIFY",
+          "description": "Skip OIDC certificate verification",
+          "defaultValue": "false",
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_OIDC_WELL_KNOWN",
+          "description": "OIDC well-known endpoint",
+          "defaultValue": null,
+          "sources": [
+            "OIDC authentication"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_RESEND_API_KEY",
+          "description": "Resend API key for email delivery",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_APIKEY",
+          "description": "SMTP API key",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_APIKEY_USER",
+          "description": "SMTP API key user",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
+          "description": "Email sender address",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_FROM_NAME",
+          "description": "Email sender name",
+          "defaultValue": "SignTusk",
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_HOST",
+          "description": "SMTP server hostname",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_PASSWORD",
+          "description": "SMTP password",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_PORT",
+          "description": "SMTP server port",
+          "defaultValue": "587",
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_SECURE",
+          "description": "Use secure SMTP connection",
+          "defaultValue": "true",
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_SERVICE",
+          "description": "SMTP service provider",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS",
+          "description": "Ignore TLS certificate errors",
+          "defaultValue": "false",
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_SMTP_USERNAME",
+          "description": "SMTP username",
+          "defaultValue": null,
+          "sources": [
+            "Email service"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_STRIPE_API_KEY",
+          "description": "Stripe secret API key for payments",
+          "defaultValue": null,
+          "sources": [
+            "Payment processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
+          "description": "Stripe webhook secret for event verification",
+          "defaultValue": null,
+          "sources": [
+            "Payment processing"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_TELEMETRY_HOST",
+          "description": "Telemetry service host",
+          "defaultValue": null,
+          "sources": [
+            "Analytics"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_TELEMETRY_KEY",
+          "description": "Telemetry service key",
+          "defaultValue": null,
+          "sources": [
+            "Analytics"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID",
+          "description": "Upload service access key",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN",
+          "description": "CDN distribution domain",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS",
+          "description": "CDN distribution key contents",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID",
+          "description": "CDN distribution key ID",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_ENDPOINT",
+          "description": "Custom upload endpoint",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE",
+          "description": "Force path-style S3 URLs",
+          "defaultValue": "false",
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_REGION",
+          "description": "Upload service region",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY",
+          "description": "Upload service secret key",
+          "defaultValue": null,
+          "sources": [
+            "File upload"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_DISABLE_SIGNUP",
+          "description": "Disable new user registration",
+          "defaultValue": "false",
+          "sources": [
+            "Security"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_DOCS_URL",
+          "description": "Documentation site URL",
+          "defaultValue": null,
+          "sources": [
+            "External links"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_MARKETING_URL",
+          "description": "Marketing site URL",
+          "defaultValue": null,
+          "sources": [
+            "External links"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_POSTHOG_HOST",
+          "description": "PostHog analytics host URL",
+          "defaultValue": "https://app.posthog.com",
+          "sources": [
+            "Analytics"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_POSTHOG_KEY",
+          "description": "PostHog analytics project key",
+          "defaultValue": null,
+          "sources": [
+            "Analytics"
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+          "description": "Stripe publishable key for client-side",
+          "defaultValue": null,
+          "sources": [
+            "Payment processing"
+          ]
+        },
+        {
+          "name": "PDF_EXTERNAL_SERVICE_URL",
+          "description": "External PDF service URL",
+          "defaultValue": null,
+          "sources": [
+            "PDF processing"
+          ]
+        },
+        {
+          "name": "PDF_GENERATION_METHOD",
+          "description": "PDF generation method",
+          "defaultValue": "local",
+          "sources": [
+            "PDF processing"
+          ]
+        },
+        {
+          "name": "PORT",
+          "description": "Server port number",
+          "defaultValue": "3000",
+          "sources": [
+            "Server startup"
+          ]
+        },
+        {
+          "name": "POSTGRES_URL",
+          "description": "Alternative PostgreSQL URL",
+          "defaultValue": null,
+          "sources": [
+            "Database connection"
+          ]
+        },
+        {
+          "name": "POSTGRES_URL_NON_POOLING",
+          "description": "Non-pooling PostgreSQL URL",
+          "defaultValue": null,
+          "sources": [
+            "Database connection"
+          ]
+        },
+        {
+          "name": "RATE_LIMIT_ENABLED",
+          "description": "Enable API rate limiting",
+          "defaultValue": "true",
+          "sources": [
+            "Security"
+          ]
+        },
+        {
+          "name": "REDIS_URL",
+          "description": "Redis connection URL for caching and sessions",
+          "defaultValue": null,
+          "sources": [
+            "Caching"
+          ]
+        },
+        {
+          "name": "SESSION_SECRET",
+          "description": "Session encryption secret",
+          "defaultValue": null,
+          "sources": [
+            "Authentication"
+          ]
+        },
+        {
+          "name": "STORAGE_LOCAL_PATH",
+          "description": "Local storage path",
+          "defaultValue": "./uploads",
+          "sources": [
+            "File storage"
+          ]
+        },
+        {
+          "name": "STORAGE_PROVIDER",
+          "description": "Storage provider type",
+          "defaultValue": "local",
+          "sources": [
+            "File storage"
+          ]
+        },
+        {
+          "name": "WEBHOOK_SECRET",
+          "description": "Webhook signature verification secret",
+          "defaultValue": null,
+          "sources": [
+            "Security"
+          ]
+        }
+      ]
+    },
+    "DEVELOPMENT_ONLY": {
+      "description": "Development environment only",
+      "variables": [
+        {
+          "name": "CI",
+          "description": "Continuous Integration environment flag",
+          "defaultValue": null,
+          "sources": [
+            "CI/CD"
+          ]
+        }
+      ]
+    },
+    "TESTING_ONLY": {
+      "description": "Testing environment only",
+      "variables": [
+        {
+          "name": "E2E_TEST_AUTHENTICATE_USER_EMAIL",
+          "description": "E2E test user email",
+          "defaultValue": null,
+          "sources": [
+            "Testing"
+          ]
+        },
+        {
+          "name": "E2E_TEST_AUTHENTICATE_USER_PASSWORD",
+          "description": "E2E test user password",
+          "defaultValue": null,
+          "sources": [
+            "Testing"
+          ]
+        },
+        {
+          "name": "E2E_TEST_AUTHENTICATE_USERNAME",
+          "description": "E2E test authentication username",
+          "defaultValue": null,
+          "sources": [
+            "Testing"
+          ]
+        }
+      ]
+    }
+  }
+}
