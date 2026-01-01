@@ -8,7 +8,7 @@
   },
   "tasks": {
     "build": {
-      "dependsOn": ["prebuild", "@signtusk/prisma#build", "^build"],
+      "dependsOn": ["prebuild", "^build"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -39,7 +39,7 @@
       ]
     },
     "build:vercel": {
-      "dependsOn": ["prebuild", "@signtusk/prisma#build:vercel", "^build"],
+      "dependsOn": ["prebuild:vercel", "^build"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -91,6 +91,7 @@
       ]
     },
     "@signtusk/prisma#build": {
+      "dependsOn": ["@signtusk/prisma#prebuild"],
       "outputs": [
         "generated/**",
         "../../node_modules/@prisma/client/**",
@@ -109,6 +110,7 @@
       ]
     },
     "@signtusk/prisma#build:vercel": {
+      "dependsOn": ["@signtusk/prisma#prebuild:vercel"],
       "outputs": [
         "generated/**",
         "../../node_modules/@prisma/client/**",
@@ -150,6 +152,43 @@
         "NODE_ENV"
       ]
     },
+    "@signtusk/remix#build:vercel": {
+      "dependsOn": ["prebuild:vercel", "^build:vercel"],
+      "outputs": ["build/**", ".react-router/**"],
+      "inputs": [
+        "app/**",
+        "server/**",
+        "scripts/**",
+        "package.json",
+        "remix.config.js",
+        "rollup.config.mjs",
+        "tsconfig.json"
+      ],
+      "env": [
+        "NODE_ENV",
+        "SKIP_ENV_VALIDATION",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_WEBAPP_URL",
+        "NEXT_PUBLIC_PROJECT",
+        "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
+        "NEXT_PUBLIC_DISABLE_SIGNUP",
+        "NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT",
+        "NEXT_PUBLIC_UPLOAD_TRANSPORT",
+        "NEXT_PUBLIC_POSTHOG_KEY",
+        "NEXT_PUBLIC_POSTHOG_HOST",
+        "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+        "NEXT_PUBLIC_MARKETING_URL",
+        "NEXT_PUBLIC_DOCS_URL"
+      ],
+      "cache": true,
+      "passThroughEnv": [
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "VERCEL_BRANCH_URL",
+        "VERCEL_REGION"
+      ]
+    },
     "@signtusk/prisma#prebuild:vercel": {
       "outputs": [
         "generated/**",
@@ -175,7 +214,11 @@
       ]
     },
     "prebuild": {
-      "dependsOn": ["@signtusk/prisma#prebuild:vercel", "^prebuild"],
+      "dependsOn": ["^prebuild"],
+      "inputs": ["package.json", "tsconfig.json"]
+    },
+    "prebuild:vercel": {
+      "dependsOn": ["@signtusk/prisma#prebuild:vercel", "^prebuild:vercel"],
       "inputs": ["package.json", "tsconfig.json"]
     },
     "lint": {
