@@ -36,13 +36,13 @@
     "@react-email/section": "0.0.16",
     "@react-email/tailwind": "^2.0.1",
     "@react-email/text": "0.1.5",
+    "@types/nodemailer": "^7.0.4",
     "nodemailer": "^7.0.10",
     "react-email": "^5.0.6",
     "resend": "^6.5.2",
     "@signtusk/tailwind-config": "*"
   },
   "devDependencies": {
-    "@types/nodemailer": "^7.0.4",
     "@signtusk/tsconfig": "*"
   },
   "private": true
