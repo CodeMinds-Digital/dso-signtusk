@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "echo 'Standard build without env wrapper' && node ../../scripts/validate-build-env.js && node scripts/build-with-env.js npx cross-env NODE_ENV=production npx react-router build && node scripts/build-with-env.js npx cross-env NODE_ENV=production npx rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
+    "build": "node scripts/vercel-build.js",
     "build:vercel": "node scripts/vercel-build.js",
     "build:vercel:fallback": "node scripts/vercel-build-fallback.js",
     "build:standalone": "echo 'Skipping translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
