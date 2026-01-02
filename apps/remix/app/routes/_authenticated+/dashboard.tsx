@@ -1,37 +1,54 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from "react";
 
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import {
+  Building2Icon,
+  InboxIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react";
+import { DateTime } from "luxon";
+import { Link, redirect } from "react-router";
 
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { canExecuteOrganisationAction } from '@signtusk/lib/utils/organisations';
-import { canExecuteTeamAction } from '@signtusk/lib/utils/teams';
-import { Avatar, AvatarFallback, AvatarImage } from '@signtusk/ui/primitives/avatar';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Card, CardContent } from '@signtusk/ui/primitives/card';
-import { ScrollArea, ScrollBar } from '@signtusk/ui/primitives/scroll-area';
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import { canExecuteOrganisationAction } from "@signtusk/lib/utils/organisations";
+import { canExecuteTeamAction } from "@signtusk/lib/utils/teams";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@signtusk/ui/primitives/avatar";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Card, CardContent } from "@signtusk/ui/primitives/card";
+import { ScrollArea, ScrollBar } from "@signtusk/ui/primitives/scroll-area";
 
-import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
-import { InboxTable } from '~/components/tables/inbox-table';
-import { appMetaTags } from '~/utils/meta';
+import { OrganisationInvitations } from "~/components/general/organisations/organisation-invitations";
+import { InboxTable } from "~/components/tables/inbox-table";
+import { appMetaTags } from "~/utils/meta";
 
 export function loader() {
-  throw redirect('/');
+  throw redirect("/");
 }
 
 export function meta() {
-  return appMetaTags('Dashboard');
+  return appMetaTags("Dashboard");
 }
 
 export default function DashboardPage() {
   const { t } = useLingui();
 
-  const { user, organisations } = useSession();
+  const { user, organisations, session } = useSession();
+
+  // Debug logging for session status
+  useEffect(() => {
+    console.log("[Dashboard] Session active:", !!session);
+    console.log("[Dashboard] Session data:", session);
+    console.log("[Dashboard] User:", user);
+    console.log("[Dashboard] Organisations count:", organisations?.length);
+  }, [session, user, organisations]);
 
   // Todo: Sort by recent access (TBD by cookies)
   // Teams, flattened with the organisation data still attached.
@@ -43,7 +60,7 @@ export default function DashboardPage() {
           ...org,
           teams: undefined,
         },
-      })),
+      }))
     );
   }, [organisations]);
 
@@ -109,7 +126,9 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10 border border-solid">
                             {org.avatarImageId && (
-                              <AvatarImage src={formatAvatarUrl(org.avatarImageId)} />
+                              <AvatarImage
+                                src={formatAvatarUrl(org.avatarImageId)}
+                              />
                             )}
                             <AvatarFallback className="text-sm text-gray-400">
                               {org.name.slice(0, 1).toUpperCase()}
@@ -124,7 +143,11 @@ export default function DashboardPage() {
                                 <span>
                                   {org.ownerUserId === user.id
                                     ? t`Owner`
-                                    : t(ORGANISATION_MEMBER_ROLE_MAP[org.currentOrganisationRole])}
+                                    : t(
+                                        ORGANISATION_MEMBER_ROLE_MAP[
+                                          org.currentOrganisationRole
+                                        ]
+                                      )}
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
@@ -145,8 +168,8 @@ export default function DashboardPage() {
                   </Link>
 
                   {canExecuteOrganisationAction(
-                    'MANAGE_ORGANISATION',
-                    org.currentOrganisationRole,
+                    "MANAGE_ORGANISATION",
+                    org.currentOrganisationRole
                   ) && (
                     <div className="text-muted-foreground absolute right-4 top-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <Link to={`/o/${org.url}/settings`}>
@@ -188,7 +211,9 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border border-solid">
                               {team.avatarImageId && (
-                                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
+                                <AvatarImage
+                                  src={formatAvatarUrl(team.avatarImageId)}
+                                />
                               )}
                               <AvatarFallback className="text-sm text-gray-400">
                                 {team.name.slice(0, 1).toUpperCase()}
@@ -202,26 +227,37 @@ export default function DashboardPage() {
                                   <UsersIcon className="h-3 w-3" />
                                   {team.organisation.ownerUserId === user.id
                                     ? t`Owner`
-                                    : t(TEAM_MEMBER_ROLE_MAP[team.currentTeamRole])}
+                                    : t(
+                                        TEAM_MEMBER_ROLE_MAP[
+                                          team.currentTeamRole
+                                        ]
+                                      )}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Building2Icon className="h-3 w-3" />
-                                  <span className="truncate">{team.organisation.name}</span>
+                                  <span className="truncate">
+                                    {team.organisation.name}
+                                  </span>
                                 </div>
                               </div>
                             </div>
                           </div>
                           <div className="text-muted-foreground mt-3 text-xs">
                             <Trans>
-                              Joined{' '}
-                              {DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })}
+                              Joined{" "}
+                              {DateTime.fromJSDate(team.createdAt).toRelative({
+                                style: "short",
+                              })}
                             </Trans>
                           </div>
                         </CardContent>
                       </Card>
                     </Link>
 
-                    {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
+                    {canExecuteTeamAction(
+                      "MANAGE_TEAM",
+                      team.currentTeamRole
+                    ) && (
                       <div className="text-muted-foreground absolute right-4 top-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                         <Link to={`/t/${team.url}/settings`}>
                           <SettingsIcon className="h-4 w-4" />
