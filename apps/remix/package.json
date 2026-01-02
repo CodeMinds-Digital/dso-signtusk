@@ -73,7 +73,8 @@
     "@signtusk/prisma": "*",
     "@signtusk/tailwind-config": "*",
     "@signtusk/trpc": "*",
-    "@signtusk/ui": "*"
+    "@signtusk/ui": "*",
+    "@react-router/dev": "^7.9.6"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
@@ -81,7 +82,6 @@
     "@babel/preset-typescript": "^7.28.5",
     "@lingui/babel-plugin-lingui-macro": "^5.6.0",
     "@lingui/vite-plugin": "^5.6.0",
-    "@react-router/dev": "^7.9.6",
     "@react-router/remix-routes-option-adapter": "^7.9.6",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
