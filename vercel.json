@@ -1,18 +1,30 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "build/client",
-  "installCommand": "cd ../.. && npm install",
+  "outputDirectory": "apps/remix/build/client",
+  "installCommand": "npm install",
   "framework": null,
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ../../",
-  "routes": [
+  "functions": {
+    "apps/remix/api/index.js": {
+      "includeFiles": "apps/remix/build/**/*",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
     {
-      "src": "/build/(.*)",
-      "dest": "/build/$1"
-    },
+      "source": "/((?!assets/).*)",
+      "destination": "/apps/remix/api"
+    }
+  ],
+  "headers": [
     {
-      "src": "/(.*)",
-      "dest": "/build/server/main.js"
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, immutable, max-age=31536000"
+        }
+      ]
     }
   ],
   "env": {
