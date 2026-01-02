@@ -21,8 +21,8 @@
     "@epic-web/remember": "^1.1.0",
     "@faker-js/faker": "^10.1.0",
     "@hono/node-server": "^1.19.6",
-    "@hono/standard-validator": "^0.2.0",
     "@hono/trpc-server": "^0.4.0",
+    "@hono/standard-validator": "^0.2.0",
     "@hookform/resolvers": "^3",
     "@lingui/babel-plugin-lingui-macro": "^5.6.0",
     "@lingui/core": "^5.6.0",
@@ -120,6 +120,6 @@
     "tsx": "^4.20.6",
     "vite": "^7.2.4"
   },
-  "version": "2.2.6-test-1767106062731-test-1767152849895-test-1767152849931-test-1767238798435-test-1767238798444-test-1767281974775",
+  "version": "2.2.6",
   "license": "Private - Part of Signtusk Platform"
 }
