@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '@signtusk/lib/constants/prisma-enums';
 
 export const isDocumentStatus = (value: unknown): value is DocumentStatus => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

@@ -1,5 +1,5 @@
-import type { Field } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { Field } from '@signtusk/lib/constants/prisma-enums';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 import { z } from 'zod';

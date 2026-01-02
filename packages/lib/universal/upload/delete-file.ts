@@ -1,4 +1,4 @@
-import { DocumentDataType } from '@prisma/client';
+import { DocumentDataType } from '@signtusk/lib/constants/prisma-enums';
 import { match } from 'ts-pattern';
 
 import { deleteS3File } from './server-actions';

@@ -1,4 +1,4 @@
-import type { SubscriptionClaim } from '@prisma/client';
+import type { SubscriptionClaim } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZOrganisationNameSchema } from '@signtusk/trpc/server/organisation-router/create-organisation.types';

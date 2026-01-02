@@ -1,43 +1,63 @@
-import type { I18n } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@prisma/client';
-import { RecipientRole } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
-import { match } from 'ts-pattern';
+import type { I18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import type { DocumentAuditLog } from "@prisma/client";
+import type {
+  DocumentMeta,
+  Field,
+  Recipient,
+} from "@signtusk/lib/constants/prisma-enums";
+import { RecipientRole } from "@signtusk/lib/constants/prisma-enums";
+import { isDeepEqual } from "remeda";
+import { match } from "ts-pattern";
 
 import type {
   TDocumentAuditLog,
   TDocumentAuditLogDocumentMetaDiffSchema,
   TDocumentAuditLogFieldDiffSchema,
   TDocumentAuditLogRecipientDiffSchema,
-} from '../types/document-audit-logs';
+} from "../types/document-audit-logs";
 import {
   DOCUMENT_AUDIT_LOG_TYPE,
   DOCUMENT_META_DIFF_TYPE,
   FIELD_DIFF_TYPE,
   RECIPIENT_DIFF_TYPE,
   ZDocumentAuditLogSchema,
-} from '../types/document-audit-logs';
-import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
-import type { ApiRequestMetadata, RequestMetadata } from '../universal/extract-request-metadata';
+} from "../types/document-audit-logs";
+import { ZRecipientAuthOptionsSchema } from "../types/document-auth";
+import type {
+  ApiRequestMetadata,
+  RequestMetadata,
+} from "../universal/extract-request-metadata";
 
-type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
+type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog["type"]> = {
   envelopeId: string;
   type: T;
-  data: Extract<TDocumentAuditLog, { type: T }>['data'];
-  user?: { email?: string | null; id?: number | null; name?: string | null } | null;
+  data: Extract<TDocumentAuditLog, { type: T }>["data"];
+  user?: {
+    email?: string | null;
+    id?: number | null;
+    name?: string | null;
+  } | null;
   requestMetadata?: RequestMetadata;
   metadata?: ApiRequestMetadata;
 };
 
 export type CreateDocumentAuditLogDataResponse = Pick<
   DocumentAuditLog,
-  'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'envelopeId'
+  | "type"
+  | "ipAddress"
+  | "userAgent"
+  | "email"
+  | "userId"
+  | "name"
+  | "envelopeId"
 > & {
-  data: TDocumentAuditLog['data'];
+  data: TDocumentAuditLog["data"];
 };
 
-export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>({
+export const createDocumentAuditLogData = <
+  T extends TDocumentAuditLog["type"],
+>({
   envelopeId,
   type,
   data,
@@ -56,8 +76,10 @@ export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>(
     name = user.name || null;
   }
 
-  const ipAddress = metadata?.requestMetadata.ipAddress ?? requestMetadata?.ipAddress ?? null;
-  const userAgent = metadata?.requestMetadata.userAgent ?? requestMetadata?.userAgent ?? null;
+  const ipAddress =
+    metadata?.requestMetadata.ipAddress ?? requestMetadata?.ipAddress ?? null;
+  const userAgent =
+    metadata?.requestMetadata.userAgent ?? requestMetadata?.userAgent ?? null;
 
   return {
     type,
@@ -76,50 +98,63 @@ export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>(
  *
  * @param auditLog raw audit log from Prisma.
  */
-export const parseDocumentAuditLogData = (auditLog: DocumentAuditLog): TDocumentAuditLog => {
+export const parseDocumentAuditLogData = (
+  auditLog: DocumentAuditLog
+): TDocumentAuditLog => {
   const data = ZDocumentAuditLogSchema.safeParse(auditLog);
 
   // Handle any required migrations here.
   if (!data.success) {
     // Todo: Alert us.
     console.error(data.error);
-    throw new Error('Migration required');
+    throw new Error("Migration required");
   }
 
   return data.data;
 };
 
-type PartialRecipient = Pick<Recipient, 'email' | 'name' | 'role' | 'authOptions'>;
+type PartialRecipient = Pick<
+  Recipient,
+  "email" | "name" | "role" | "authOptions"
+>;
 
 export const diffRecipientChanges = (
   oldRecipient: PartialRecipient,
-  newRecipient: PartialRecipient,
+  newRecipient: PartialRecipient
 ): TDocumentAuditLogRecipientDiffSchema[] => {
   const diffs: TDocumentAuditLogRecipientDiffSchema[] = [];
 
-  const oldAuthOptions = ZRecipientAuthOptionsSchema.parse(oldRecipient.authOptions);
+  const oldAuthOptions = ZRecipientAuthOptionsSchema.parse(
+    oldRecipient.authOptions
+  );
   const oldAccessAuth = oldAuthOptions.accessAuth;
   const oldActionAuth = oldAuthOptions.actionAuth;
 
-  const newAuthOptions = ZRecipientAuthOptionsSchema.parse(newRecipient.authOptions);
+  const newAuthOptions = ZRecipientAuthOptionsSchema.parse(
+    newRecipient.authOptions
+  );
   const newAccessAuth =
-    newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
+    newAuthOptions?.accessAuth === undefined
+      ? oldAccessAuth
+      : newAuthOptions.accessAuth;
   const newActionAuth =
-    newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
+    newAuthOptions?.actionAuth === undefined
+      ? oldActionAuth
+      : newAuthOptions.actionAuth;
 
   if (!isDeepEqual(oldAccessAuth, newAccessAuth)) {
     diffs.push({
       type: RECIPIENT_DIFF_TYPE.ACCESS_AUTH,
-      from: oldAccessAuth ?? '',
-      to: newAccessAuth ?? '',
+      from: oldAccessAuth ?? "",
+      to: newAccessAuth ?? "",
     });
   }
 
   if (!isDeepEqual(oldActionAuth, newActionAuth)) {
     diffs.push({
       type: RECIPIENT_DIFF_TYPE.ACTION_AUTH,
-      from: oldActionAuth ?? '',
-      to: newActionAuth ?? '',
+      from: oldActionAuth ?? "",
+      to: newActionAuth ?? "",
     });
   }
 
@@ -152,7 +187,7 @@ export const diffRecipientChanges = (
 
 export const diffFieldChanges = (
   oldField: Field,
-  newField: Field,
+  newField: Field
 ): TDocumentAuditLogFieldDiffSchema[] => {
   const diffs: TDocumentAuditLogFieldDiffSchema[] = [];
 
@@ -176,7 +211,10 @@ export const diffFieldChanges = (
     });
   }
 
-  if (!oldField.width.equals(newField.width) || !oldField.height.equals(newField.height)) {
+  if (
+    !oldField.width.equals(newField.width) ||
+    !oldField.height.equals(newField.height)
+  ) {
     diffs.push({
       type: FIELD_DIFF_TYPE.DIMENSION,
       from: {
@@ -195,24 +233,24 @@ export const diffFieldChanges = (
 
 export const diffDocumentMetaChanges = (
   oldData: Partial<DocumentMeta> = {},
-  newData: DocumentMeta,
+  newData: DocumentMeta
 ): TDocumentAuditLogDocumentMetaDiffSchema[] => {
   const diffs: TDocumentAuditLogDocumentMetaDiffSchema[] = [];
 
-  const oldDateFormat = oldData?.dateFormat ?? '';
-  const oldMessage = oldData?.message ?? '';
-  const oldSubject = oldData?.subject ?? '';
-  const oldTimezone = oldData?.timezone ?? '';
-  const oldRedirectUrl = oldData?.redirectUrl ?? '';
+  const oldDateFormat = oldData?.dateFormat ?? "";
+  const oldMessage = oldData?.message ?? "";
+  const oldSubject = oldData?.subject ?? "";
+  const oldTimezone = oldData?.timezone ?? "";
+  const oldRedirectUrl = oldData?.redirectUrl ?? "";
   const oldEmailId = oldData?.emailId || null;
   const oldEmailReplyTo = oldData?.emailReplyTo || null;
   const oldEmailSettings = oldData?.emailSettings || null;
 
-  const newDateFormat = newData?.dateFormat ?? '';
-  const newMessage = newData?.message ?? '';
-  const newSubject = newData?.subject ?? '';
-  const newTimezone = newData?.timezone ?? '';
-  const newRedirectUrl = newData?.redirectUrl ?? '';
+  const newDateFormat = newData?.dateFormat ?? "";
+  const newMessage = newData?.message ?? "";
+  const newSubject = newData?.subject ?? "";
+  const newTimezone = newData?.timezone ?? "";
+  const newRedirectUrl = newData?.redirectUrl ?? "";
   const newEmailId = newData?.emailId || null;
   const newEmailReplyTo = newData?.emailReplyTo || null;
   const newEmailSettings = newData?.emailSettings || null;
@@ -220,7 +258,7 @@ export const diffDocumentMetaChanges = (
   if (oldDateFormat !== newDateFormat) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.DATE_FORMAT,
-      from: oldData?.dateFormat ?? '',
+      from: oldData?.dateFormat ?? "",
       to: newData.dateFormat,
     });
   }
@@ -290,11 +328,14 @@ export const diffDocumentMetaChanges = (
  * Provide a userId to prefix the action with the user, example 'X did Y'.
  */
 export const formatDocumentAuditLogAction = (
-  _: I18n['_'],
+  _: I18n["_"],
   auditLog: TDocumentAuditLog,
-  userId?: number,
+  userId?: number
 ) => {
-  const prefix = userId === auditLog.userId ? _(msg`You`) : auditLog.name || auditLog.email || '';
+  const prefix =
+    userId === auditLog.userId
+      ? _(msg`You`)
+      : auditLog.name || auditLog.email || "";
 
   const description = match(auditLog)
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED }, () => ({
@@ -353,13 +394,16 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`${prefix} deleted the document`,
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED }, () => ({
-      anonymous: msg({
-        message: `System auto inserted fields`,
-        context: `Audit log format`,
-      }),
-      identified: msg`System auto inserted fields`,
-    }))
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED },
+      () => ({
+        anonymous: msg({
+          message: `System auto inserted fields`,
+          context: `Audit log format`,
+        }),
+        identified: msg`System auto inserted fields`,
+      })
+    )
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
       anonymous: msg({
         message: `Field signed`,
@@ -381,27 +425,36 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`${prefix} prefilled a field`,
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED }, () => ({
-      anonymous: msg({
-        message: `Document visibility updated`,
-        context: `Audit log format`,
-      }),
-      identified: msg`${prefix} updated the document visibility`,
-    }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED }, () => ({
-      anonymous: msg({
-        message: `Document access auth updated`,
-        context: `Audit log format`,
-      }),
-      identified: msg`${prefix} updated the document access auth requirements`,
-    }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED }, () => ({
-      anonymous: msg({
-        message: `Document signing auth updated`,
-        context: `Audit log format`,
-      }),
-      identified: msg`${prefix} updated the document signing auth requirements`,
-    }))
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED },
+      () => ({
+        anonymous: msg({
+          message: `Document visibility updated`,
+          context: `Audit log format`,
+        }),
+        identified: msg`${prefix} updated the document visibility`,
+      })
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED },
+      () => ({
+        anonymous: msg({
+          message: `Document access auth updated`,
+          context: `Audit log format`,
+        }),
+        identified: msg`${prefix} updated the document access auth requirements`,
+      })
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED },
+      () => ({
+        anonymous: msg({
+          message: `Document signing auth updated`,
+          context: `Audit log format`,
+        }),
+        identified: msg`${prefix} updated the document signing auth requirements`,
+      })
+    )
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED }, () => ({
       anonymous: msg({
         message: `Document updated`,
@@ -430,13 +483,16 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`${prefix} updated the document title`,
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED }, () => ({
-      anonymous: msg({
-        message: `Document external ID updated`,
-        context: `Audit log format`,
-      }),
-      identified: msg`${prefix} updated the document external ID`,
-    }))
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED },
+      () => ({
+        anonymous: msg({
+          message: `Document external ID updated`,
+          context: `Audit log format`,
+        }),
+        identified: msg`${prefix} updated the document external ID`,
+      })
+    )
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT }, () => ({
       anonymous: msg({
         message: `Document sent`,
@@ -451,61 +507,85 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`${prefix} moved the document to team`,
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED },
+      ({ data }) => {
+        const userName = prefix || _(msg`Recipient`);
 
-      const result = match(data.recipientRole)
-        .with(RecipientRole.SIGNER, () => msg`${userName} signed the document`)
-        .with(RecipientRole.VIEWER, () => msg`${userName} viewed the document`)
-        .with(RecipientRole.APPROVER, () => msg`${userName} approved the document`)
-        .with(RecipientRole.CC, () => msg`${userName} CC'd the document`)
-        .otherwise(() => msg`${userName} completed their task`);
+        const result = match(data.recipientRole)
+          .with(
+            RecipientRole.SIGNER,
+            () => msg`${userName} signed the document`
+          )
+          .with(
+            RecipientRole.VIEWER,
+            () => msg`${userName} viewed the document`
+          )
+          .with(
+            RecipientRole.APPROVER,
+            () => msg`${userName} approved the document`
+          )
+          .with(RecipientRole.CC, () => msg`${userName} CC'd the document`)
+          .otherwise(() => msg`${userName} completed their task`);
 
-      return {
-        anonymous: result,
-        identified: result,
-      };
-    })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+        return {
+          anonymous: result,
+          identified: result,
+        };
+      }
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED },
+      ({ data }) => {
+        const userName = prefix || _(msg`Recipient`);
 
-      const result = msg`${userName} rejected the document`;
+        const result = msg`${userName} rejected the document`;
 
-      return {
-        anonymous: result,
-        identified: result,
-      };
-    })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+        return {
+          anonymous: result,
+          identified: result,
+        };
+      }
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED },
+      ({ data }) => {
+        const userName = prefix || _(msg`Recipient`);
 
-      const result = msg`${userName} requested a 2FA token for the document`;
+        const result = msg`${userName} requested a 2FA token for the document`;
 
-      return {
-        anonymous: result,
-        identified: result,
-      };
-    })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+        return {
+          anonymous: result,
+          identified: result,
+        };
+      }
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED },
+      ({ data }) => {
+        const userName = prefix || _(msg`Recipient`);
 
-      const result = msg`${userName} validated a 2FA token for the document`;
+        const result = msg`${userName} validated a 2FA token for the document`;
 
-      return {
-        anonymous: result,
-        identified: result,
-      };
-    })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+        return {
+          anonymous: result,
+          identified: result,
+        };
+      }
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED },
+      ({ data }) => {
+        const userName = prefix || _(msg`Recipient`);
 
-      const result = msg`${userName} failed to validate a 2FA token for the document`;
+        const result = msg`${userName} failed to validate a 2FA token for the document`;
 
-      return {
-        anonymous: result,
-        identified: result,
-      };
-    })
+        return {
+          anonymous: result,
+          identified: result,
+        };
+      }
+    )
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => ({
       anonymous: data.isResending ? msg`Email resent` : msg`Email sent`,
       identified: data.isResending
@@ -522,14 +602,20 @@ export const formatDocumentAuditLogAction = (
         context: `Audit log format`,
       }),
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED }, ({ data }) => ({
-      anonymous: msg`Envelope item created`,
-      identified: msg`${prefix} created an envelope item with title ${data.envelopeItemTitle}`,
-    }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_DELETED }, ({ data }) => ({
-      anonymous: msg`Envelope item deleted`,
-      identified: msg`${prefix} deleted an envelope item with title ${data.envelopeItemTitle}`,
-    }))
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED },
+      ({ data }) => ({
+        anonymous: msg`Envelope item created`,
+        identified: msg`${prefix} created an envelope item with title ${data.envelopeItemTitle}`,
+      })
+    )
+    .with(
+      { type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_DELETED },
+      ({ data }) => ({
+        anonymous: msg`Envelope item deleted`,
+        identified: msg`${prefix} deleted an envelope item with title ${data.envelopeItemTitle}`,
+      })
+    )
     .exhaustive();
 
   return {

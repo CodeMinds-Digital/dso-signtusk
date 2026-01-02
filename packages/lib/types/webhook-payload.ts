@@ -1,4 +1,4 @@
-import type { DocumentMeta, Envelope, Recipient, WebhookTriggerEvents } from '@prisma/client';
+import type { DocumentMeta, Envelope, Recipient, WebhookTriggerEvents } from '@signtusk/lib/constants/prisma-enums';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -10,7 +10,7 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@prisma/client';
+} from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils/envelope';

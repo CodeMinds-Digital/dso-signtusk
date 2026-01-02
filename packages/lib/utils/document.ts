@@ -1,23 +1,31 @@
+import type { OrganisationGlobalSettings } from "@prisma/client";
 import type {
   DocumentMeta,
   Envelope,
-  OrganisationGlobalSettings,
   Recipient,
   Team,
   User,
-} from '@prisma/client';
-import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
+} from "@signtusk/lib/constants/prisma-enums";
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  DocumentStatus,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
-import type { TDocumentLite, TDocumentMany } from '../types/document';
-import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
-import { mapSecondaryIdToDocumentId } from './envelope';
-import { mapRecipientToLegacyRecipient } from './recipients';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from "../constants/time-zones";
+import type { TDocumentLite, TDocumentMany } from "../types/document";
+import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from "../types/document-email";
+import { mapSecondaryIdToDocumentId } from "./envelope";
+import { mapRecipientToLegacyRecipient } from "./recipients";
 
-export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
-  const status = typeof document === 'string' ? document : document.status;
+export const isDocumentCompleted = (
+  document: Pick<Envelope, "status"> | DocumentStatus
+) => {
+  const status = typeof document === "string" ? document : document.status;
 
-  return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
+  return (
+    status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED
+  );
 };
 
 /**
@@ -33,8 +41,8 @@ export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | Documen
  * @returns The derived document meta.
  */
 export const extractDerivedDocumentMeta = (
-  settings: Omit<OrganisationGlobalSettings, 'id'>,
-  overrideMeta: Partial<DocumentMeta> | undefined | null,
+  settings: Omit<OrganisationGlobalSettings, "id">,
+  overrideMeta: Partial<DocumentMeta> | undefined | null
 ) => {
   const meta = overrideMeta ?? {};
 
@@ -42,7 +50,8 @@ export const extractDerivedDocumentMeta = (
   // since there is custom work there which allows 3 overrides.
   return {
     language: meta.language || settings.documentLanguage,
-    timezone: meta.timezone || settings.documentTimezone || DEFAULT_DOCUMENT_TIME_ZONE,
+    timezone:
+      meta.timezone || settings.documentTimezone || DEFAULT_DOCUMENT_TIME_ZONE,
     dateFormat: meta.dateFormat || settings.documentDateFormat,
     message: meta.message || null,
     subject: meta.subject || null,
@@ -50,19 +59,25 @@ export const extractDerivedDocumentMeta = (
 
     signingOrder: meta.signingOrder || DocumentSigningOrder.PARALLEL,
     allowDictateNextSigner: meta.allowDictateNextSigner ?? false,
-    distributionMethod: meta.distributionMethod || DocumentDistributionMethod.EMAIL, // Todo: Make this a setting.
+    distributionMethod:
+      meta.distributionMethod || DocumentDistributionMethod.EMAIL, // Todo: Make this a setting.
 
     // Signature settings.
-    typedSignatureEnabled: meta.typedSignatureEnabled ?? settings.typedSignatureEnabled,
-    uploadSignatureEnabled: meta.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
-    drawSignatureEnabled: meta.drawSignatureEnabled ?? settings.drawSignatureEnabled,
+    typedSignatureEnabled:
+      meta.typedSignatureEnabled ?? settings.typedSignatureEnabled,
+    uploadSignatureEnabled:
+      meta.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
+    drawSignatureEnabled:
+      meta.drawSignatureEnabled ?? settings.drawSignatureEnabled,
 
     // Email settings.
     emailId: meta.emailId ?? settings.emailId,
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
-      meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-  } satisfies Omit<DocumentMeta, 'id'>;
+      meta.emailSettings ||
+      settings.emailDocumentSettings ||
+      DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+  } satisfies Omit<DocumentMeta, "id">;
 };
 
 /**
@@ -70,7 +85,9 @@ export const extractDerivedDocumentMeta = (
  *
  * Do not use spread operator here to avoid unexpected behavior.
  */
-export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => {
+export const mapEnvelopeToDocumentLite = (
+  envelope: Envelope
+): TDocumentLite => {
   const documentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
   return {
@@ -86,7 +103,7 @@ export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => 
     formValues: envelope.formValues,
     title: envelope.title,
     createdAt: envelope.createdAt,
-    documentDataId: '', // Backwards compatibility.
+    documentDataId: "", // Backwards compatibility.
     updatedAt: envelope.updatedAt,
     completedAt: envelope.completedAt,
     deletedAt: envelope.deletedAt,
@@ -98,8 +115,8 @@ export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => 
 };
 
 type MapEnvelopeToDocumentManyOptions = Envelope & {
-  user: Pick<User, 'id' | 'name' | 'email'>;
-  team: Pick<Team, 'id' | 'url'>;
+  user: Pick<User, "id" | "name" | "email">;
+  team: Pick<Team, "id" | "url">;
   recipients: Recipient[];
 };
 
@@ -109,7 +126,7 @@ type MapEnvelopeToDocumentManyOptions = Envelope & {
  * Do not use spread operator here to avoid unexpected behavior.
  */
 export const mapEnvelopesToDocumentMany = (
-  envelope: MapEnvelopeToDocumentManyOptions,
+  envelope: MapEnvelopeToDocumentManyOptions
 ): TDocumentMany => {
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
@@ -126,7 +143,7 @@ export const mapEnvelopesToDocumentMany = (
     formValues: envelope.formValues,
     title: envelope.title,
     createdAt: envelope.createdAt,
-    documentDataId: '', // Backwards compatibility.
+    documentDataId: "", // Backwards compatibility.
     updatedAt: envelope.updatedAt,
     completedAt: envelope.completedAt,
     deletedAt: envelope.deletedAt,
@@ -144,7 +161,7 @@ export const mapEnvelopesToDocumentMany = (
       url: envelope.team.url,
     },
     recipients: envelope.recipients.map((recipient) =>
-      mapRecipientToLegacyRecipient(recipient, envelope),
+      mapRecipientToLegacyRecipient(recipient, envelope)
     ),
   };
 };

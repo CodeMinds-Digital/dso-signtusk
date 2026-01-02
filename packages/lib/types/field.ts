@@ -1,7 +1,7 @@
-import { FieldType, Prisma } from '@prisma/client';
-import { z } from 'zod';
+import { FieldType } from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { FieldSchema } from '@signtusk/prisma/generated/zod/modelSchema/FieldSchema';
+import { FieldSchema } from "@signtusk/prisma/generated/zod/modelSchema/FieldSchema";
 
 import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
@@ -15,7 +15,7 @@ import {
   ZRadioFieldMeta,
   ZSignatureFieldMeta,
   ZTextFieldMeta,
-} from './field-meta';
+} from "./field-meta";
 
 /**
  * The full field response schema.
@@ -58,58 +58,69 @@ export const ZEnvelopeFieldSchema = ZFieldSchema.omit({
 export const ZFieldPageNumberSchema = z
   .number()
   .min(1)
-  .describe('The page number the field will be on.');
+  .describe("The page number the field will be on.");
 
 export const ZFieldPageXSchema = z
   .number()
   .min(0)
-  .describe('The X coordinate of where the field will be placed.');
+  .describe("The X coordinate of where the field will be placed.");
 
 export const ZFieldPageYSchema = z
   .number()
   .min(0)
-  .describe('The Y coordinate of where the field will be placed.');
+  .describe("The Y coordinate of where the field will be placed.");
 
-export const ZFieldWidthSchema = z.number().min(1).describe('The width of the field.');
+export const ZFieldWidthSchema = z
+  .number()
+  .min(1)
+  .describe("The width of the field.");
 
-export const ZFieldHeightSchema = z.number().min(1).describe('The height of the field.');
+export const ZFieldHeightSchema = z
+  .number()
+  .min(1)
+  .describe("The height of the field.");
 
 export const ZClampedFieldPositionXSchema = z
   .number()
   .min(0)
   .max(100)
-  .describe('The percentage based X coordinate where the field will be placed.');
+  .describe(
+    "The percentage based X coordinate where the field will be placed."
+  );
 
 export const ZClampedFieldPositionYSchema = z
   .number()
   .min(0)
   .max(100)
-  .describe('The percentage based Y coordinate where the field will be placed.');
+  .describe(
+    "The percentage based Y coordinate where the field will be placed."
+  );
 
 export const ZClampedFieldWidthSchema = z
   .number()
   .min(0)
   .max(100)
-  .describe('The percentage based width of the field on the page.');
+  .describe("The percentage based width of the field on the page.");
 
 export const ZClampedFieldHeightSchema = z
   .number()
   .min(0)
   .max(100)
-  .describe('The percentage based height of the field on the page.');
+  .describe("The percentage based height of the field on the page.");
 
 // ---------------------------------------------
 
-const PrismaDecimalSchema = z.preprocess(
-  (val) => (typeof val === 'string' ? new Prisma.Decimal(val) : val),
-  z.instanceof(Prisma.Decimal, { message: 'Must be a Decimal' }),
+// Browser-safe decimal schema - accepts string or number and coerces to number
+const DecimalSchema = z.preprocess(
+  (val) => (typeof val === "string" ? parseFloat(val) : val),
+  z.number()
 );
 
 export const BaseFieldSchemaUsingNumbers = ZFieldSchema.extend({
-  positionX: PrismaDecimalSchema,
-  positionY: PrismaDecimalSchema,
-  width: PrismaDecimalSchema,
-  height: PrismaDecimalSchema,
+  positionX: DecimalSchema,
+  positionY: DecimalSchema,
+  width: DecimalSchema,
+  height: DecimalSchema,
 });
 
 export const ZFieldTextSchema = BaseFieldSchemaUsingNumbers.extend({
@@ -189,7 +200,7 @@ export type TFieldDropdown = z.infer<typeof ZFieldDropdownSchema>;
 /**
  * The full field schema which will enforce all types and meta fields.
  */
-export const ZFullFieldSchema = z.discriminatedUnion('type', [
+export const ZFullFieldSchema = z.discriminatedUnion("type", [
   ZFieldTextSchema,
   ZFieldSignatureSchema,
   ZFieldInitialsSchema,

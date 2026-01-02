@@ -1,6 +1,6 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { type Envelope, type Field, FieldType } from '@prisma/client';
+import { type Envelope, type Field, FieldType } from '@signtusk/lib/constants/prisma-enums';
 
 import { extractLegacyIds } from '../universal/id';
 

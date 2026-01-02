@@ -1,4 +1,4 @@
-import { type Field, FieldType } from '@prisma/client';
+import { type Field, FieldType } from '@signtusk/lib/constants/prisma-enums';
 
 import { ZFieldMetaSchema } from '../types/field-meta';
 

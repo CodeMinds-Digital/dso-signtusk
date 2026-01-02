@@ -1,4 +1,4 @@
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@signtusk/lib/constants/prisma-enums';
 
 export enum STRIPE_PLAN_TYPE {
   FREE = 'free',

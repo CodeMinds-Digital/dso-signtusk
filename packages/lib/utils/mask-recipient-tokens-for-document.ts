@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@signtusk/lib/constants/prisma-enums';
 
 import type { EnvelopeWithRecipients } from '@signtusk/prisma/types/document-with-recipient';
 

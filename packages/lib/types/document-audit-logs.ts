@@ -4,7 +4,7 @@
 // data in Prisma.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////
-import { DocumentSource, FieldType } from '@prisma/client';
+import { DocumentSource, FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';

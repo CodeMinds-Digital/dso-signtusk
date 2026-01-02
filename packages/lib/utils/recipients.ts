@@ -1,5 +1,5 @@
-import type { Envelope } from '@prisma/client';
-import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
+import type { Envelope } from '@signtusk/lib/constants/prisma-enums';
+import { type Field, type Recipient, RecipientRole, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';

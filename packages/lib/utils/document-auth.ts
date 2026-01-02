@@ -1,4 +1,4 @@
-import type { Envelope, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@signtusk/lib/constants/prisma-enums';
 
 import type {
   TDocumentAuthOptions,

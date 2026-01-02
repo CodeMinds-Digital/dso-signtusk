@@ -1,4 +1,4 @@
-import type { User } from "@prisma/client";
+import type { User } from "@signtusk/lib/constants/prisma-enums";
 import { hash } from "bcryptjs";
 
 import { prisma } from "@signtusk/prisma";

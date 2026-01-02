@@ -1,5 +1,5 @@
-import type { DocumentMeta } from '@prisma/client';
-import { DocumentDistributionMethod } from '@prisma/client';
+import type { DocumentMeta } from '@signtusk/lib/constants/prisma-enums';
+import { DocumentDistributionMethod } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 export enum DocumentEmailEvents {

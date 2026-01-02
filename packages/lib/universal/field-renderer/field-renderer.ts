@@ -1,5 +1,5 @@
-import type { FieldType, Signature } from '@prisma/client';
-import { type Field } from '@prisma/client';
+import type { FieldType, Signature } from '@signtusk/lib/constants/prisma-enums';
+import { type Field } from '@signtusk/lib/constants/prisma-enums';
 import type Konva from 'konva';
 
 import type { TRecipientColor } from '@signtusk/ui/lib/recipient-colors';

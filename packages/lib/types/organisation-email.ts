@@ -1,4 +1,4 @@
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { OrganisationEmailSchema } from '@signtusk/prisma/generated/zod/modelSchema/OrganisationEmailSchema';

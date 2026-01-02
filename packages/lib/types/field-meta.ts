@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../constants/pdf';

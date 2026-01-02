@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@signtusk/lib/constants/date-formats';

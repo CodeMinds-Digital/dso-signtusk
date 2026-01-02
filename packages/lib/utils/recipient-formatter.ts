@@ -1,4 +1,4 @@
-import type { Recipient } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
 
 export const extractInitials = (text: string) =>
   text
