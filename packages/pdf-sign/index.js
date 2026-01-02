@@ -208,15 +208,28 @@ switch (platform) {
         }
         break;
       case 'arm':
-        localFileExisted = existsSync(join(__dirname, 'pdf-sign.linux-arm-gnueabihf.node'));
-        try {
-          if (localFileExisted) {
-            nativeBinding = require('./pdf-sign.linux-arm-gnueabihf.node');
-          } else {
-            nativeBinding = require('@signtusk/pdf-sign-linux-arm-gnueabihf');
+        if (isMusl()) {
+          localFileExisted = existsSync(join(__dirname, 'pdf-sign.linux-arm-musleabihf.node'));
+          try {
+            if (localFileExisted) {
+              nativeBinding = require('./pdf-sign.linux-arm-musleabihf.node');
+            } else {
+              nativeBinding = require('@signtusk/pdf-sign-linux-arm-musleabihf');
+            }
+          } catch (e) {
+            loadError = e;
           }
-        } catch (e) {
-          loadError = e;
+        } else {
+          localFileExisted = existsSync(join(__dirname, 'pdf-sign.linux-arm-gnueabihf.node'));
+          try {
+            if (localFileExisted) {
+              nativeBinding = require('./pdf-sign.linux-arm-gnueabihf.node');
+            } else {
+              nativeBinding = require('@signtusk/pdf-sign-linux-arm-gnueabihf');
+            }
+          } catch (e) {
+            loadError = e;
+          }
         }
         break;
       case 'riscv64':

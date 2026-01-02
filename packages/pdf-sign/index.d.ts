@@ -11,7 +11,7 @@ export interface SignWithPrivateKeyOptions {
   timestampServer?: string;
 }
 /** Sign data with the private key. */
-export function signWithPrivateKey(options: SignWithPrivateKeyOptions): Buffer;
+export declare function signWithPrivateKey(options: SignWithPrivateKeyOptions): Buffer;
 export interface SignWithP12Options {
   content: Buffer;
   cert: Buffer;
@@ -20,7 +20,7 @@ export interface SignWithP12Options {
   timestampServer?: string;
 }
 /** Sign data with a P12 container. */
-export function signWithP12(options: SignWithP12Options): Buffer;
+export declare function signWithP12(options: SignWithP12Options): Buffer;
 export interface SignWithGCloudOptions {
   content: Buffer;
   cert: Buffer;
@@ -29,4 +29,4 @@ export interface SignWithGCloudOptions {
   timestampServer?: string;
 }
 /** Sign data with Google Cloud. */
-export function signWithGCloud(options: SignWithGCloudOptions): Buffer;
+export declare function signWithGCloud(options: SignWithGCloudOptions): Buffer;
