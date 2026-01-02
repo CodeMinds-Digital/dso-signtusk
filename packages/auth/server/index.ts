@@ -1,57 +1,69 @@
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { extractRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { extractRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
 
-import { setCsrfCookie } from './lib/session/session-cookies';
-import { accountRoute } from './routes/account';
-import { callbackRoute } from './routes/callback';
-import { emailPasswordRoute } from './routes/email-password';
-import { oauthRoute } from './routes/oauth';
-import { passkeyRoute } from './routes/passkey';
-import { sessionRoute } from './routes/session';
-import { signOutRoute } from './routes/sign-out';
-import { ssoRoute } from './routes/sso';
-import { twoFactorRoute } from './routes/two-factor';
-import type { HonoAuthContext } from './types/context';
+import { setCsrfCookie } from "./lib/session/session-cookies";
+import { accountRoute } from "./routes/account";
+import { callbackRoute } from "./routes/callback";
+import { emailPasswordRoute } from "./routes/email-password";
+import { oauthRoute } from "./routes/oauth";
+import { passkeyRoute } from "./routes/passkey";
+import { sessionRoute } from "./routes/session";
+import { signOutRoute } from "./routes/sign-out";
+import { ssoRoute } from "./routes/sso";
+import { twoFactorRoute } from "./routes/two-factor";
+import type { HonoAuthContext } from "./types/context";
 
 // Note: You must chain routes for Hono RPC client to work.
 export const auth = new Hono<HonoAuthContext>()
   .use(async (c, next) => {
-    c.set('requestMetadata', extractRequestMetadata(c.req.raw));
+    c.set("requestMetadata", extractRequestMetadata(c.req.raw));
 
-    const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
-    const headerOrigin = c.req.header('Origin');
+    // On Vercel, allow requests from the same host (handles preview deployments)
+    const headerOrigin = c.req.header("Origin");
+    const headerHost = c.req.header("Host");
 
-    if (headerOrigin && headerOrigin !== validOrigin) {
-      return c.json(
-        {
-          message: 'Forbidden',
-          statusCode: 403,
-        },
-        403,
-      );
+    if (headerOrigin) {
+      const originUrl = new URL(headerOrigin);
+      const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
+
+      // Allow if origin matches configured URL OR if origin host matches request host
+      // This handles Vercel preview deployments where the host varies
+      const isValidOrigin =
+        headerOrigin === validOrigin ||
+        (headerHost && originUrl.host === headerHost);
+
+      if (!isValidOrigin) {
+        return c.json(
+          {
+            message: "Forbidden",
+            statusCode: 403,
+          },
+          403
+        );
+      }
     }
 
     await next();
   })
-  .get('/csrf', async (c) => {
+  .get("/csrf", async (c) => {
     const csrfToken = await setCsrfCookie(c);
 
     return c.json({ csrfToken });
   })
-  .route('/', sessionRoute)
-  .route('/', signOutRoute)
-  .route('/', accountRoute)
-  .route('/callback', callbackRoute)
-  .route('/oauth', oauthRoute)
-  .route('/email-password', emailPasswordRoute)
-  .route('/passkey', passkeyRoute)
-  .route('/sso', ssoRoute)
-  .route('/two-factor', twoFactorRoute);
+  .route("/", sessionRoute)
+  .route("/", signOutRoute)
+  .route("/", accountRoute)
+  .route("/callback", callbackRoute)
+  .route("/oauth", oauthRoute)
+  .route("/email-password", emailPasswordRoute)
+  .route("/passkey", passkeyRoute)
+  .route("/sso", ssoRoute)
+  .route("/two-factor", twoFactorRoute);
 
 /**
  * Handle errors.
@@ -64,7 +76,7 @@ auth.onError((err, c) => {
         message: err.message,
         statusCode: err.status,
       },
-      err.status,
+      err.status
     );
   }
 
@@ -78,19 +90,19 @@ auth.onError((err, c) => {
         message: err.message,
         statusCode: err.statusCode,
       },
-      statusCode,
+      statusCode
     );
   }
 
   // Handle other errors
-  console.error('Unknown Error:', err);
+  console.error("Unknown Error:", err);
   return c.json(
     {
       code: AppErrorCode.UNKNOWN_ERROR,
-      message: 'Internal Server Error',
+      message: "Internal Server Error",
       statusCode: 500,
     },
-    500,
+    500
   );
 });
 

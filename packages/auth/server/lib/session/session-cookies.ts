@@ -13,8 +13,13 @@ import { AUTH_SESSION_LIFETIME } from "../../config";
 import { extractCookieFromHeaders } from "../utils/cookies";
 import { generateSessionToken } from "./session";
 
-export const sessionCookieName = formatSecureCookieName("sessionId");
-export const csrfCookieName = formatSecureCookieName("csrfToken");
+// Make cookie names dynamic functions to ensure they're evaluated at runtime
+export const getSessionCookieName = () => formatSecureCookieName("sessionId");
+export const getCsrfCookieName = () => formatSecureCookieName("csrfToken");
+
+// Keep for backward compatibility
+export const sessionCookieName = getSessionCookieName();
+export const csrfCookieName = getCsrfCookieName();
 
 const getAuthSecret = () => {
   const authSecret = env("NEXTAUTH_SECRET");
@@ -34,8 +39,8 @@ export const getSessionCookieOptions = () =>
   ({
     httpOnly: true,
     path: "/",
-    sameSite: useSecureCookies ? "none" : "lax",
-    secure: useSecureCookies,
+    sameSite: useSecureCookies() ? "none" : "lax",
+    secure: useSecureCookies(),
     domain: getCookieDomain(),
     expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
   }) as const;
@@ -46,7 +51,7 @@ export const sessionCookieOptions = getSessionCookieOptions();
 export const extractSessionCookieFromHeaders = (
   headers: Headers
 ): string | null => {
-  return extractCookieFromHeaders(sessionCookieName, headers);
+  return extractCookieFromHeaders(getSessionCookieName(), headers);
 };
 
 /**
@@ -59,7 +64,7 @@ export const getSessionCookie = async (c: Context): Promise<string | null> => {
   const sessionId = await getSignedCookie(
     c,
     getAuthSecret(),
-    sessionCookieName
+    getSessionCookieName()
   );
 
   return sessionId || null;
@@ -74,7 +79,7 @@ export const getSessionCookie = async (c: Context): Promise<string | null> => {
 export const setSessionCookie = async (c: Context, sessionToken: string) => {
   await setSignedCookie(
     c,
-    sessionCookieName,
+    getSessionCookieName(),
     sessionToken,
     getAuthSecret(),
     getSessionCookieOptions()
@@ -92,11 +97,15 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
  * @param sessionToken - The session token to set.
  */
 export const deleteSessionCookie = (c: Context) => {
-  deleteCookie(c, sessionCookieName, getSessionCookieOptions());
+  deleteCookie(c, getSessionCookieName(), getSessionCookieOptions());
 };
 
 export const getCsrfCookie = async (c: Context) => {
-  const csrfToken = await getSignedCookie(c, getAuthSecret(), csrfCookieName);
+  const csrfToken = await getSignedCookie(
+    c,
+    getAuthSecret(),
+    getCsrfCookieName()
+  );
 
   return csrfToken || null;
 };
@@ -104,7 +113,7 @@ export const getCsrfCookie = async (c: Context) => {
 export const setCsrfCookie = async (c: Context) => {
   const csrfToken = generateSessionToken();
 
-  await setSignedCookie(c, csrfCookieName, csrfToken, getAuthSecret(), {
+  await setSignedCookie(c, getCsrfCookieName(), csrfToken, getAuthSecret(), {
     ...getSessionCookieOptions(),
 
     // Explicity set to undefined for session lived cookie.

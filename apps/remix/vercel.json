@@ -28,11 +28,13 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VERCEL": "1"
   },
   "build": {
     "env": {
       "NODE_ENV": "production",
+      "VERCEL": "1",
       "SKIP_ENV_VALIDATION": "true",
       "TURBO_TELEMETRY_DISABLED": "1",
       "SKIP_PATCHES": "true"

@@ -59,13 +59,13 @@ export const PASSKEY_TIMEOUT = 60000;
  */
 export const MAXIMUM_PASSKEYS = 50;
 
-export const useSecureCookies =
+export const useSecureCookies = () =>
   env("NODE_ENV") === "production" || env("VERCEL") === "1";
 
-const secureCookiePrefix = useSecureCookies ? "__Secure-" : "";
+const getSecureCookiePrefix = () => (useSecureCookies() ? "__Secure-" : "");
 
 export const formatSecureCookieName = (name: string) =>
-  `${secureCookiePrefix}${name}`;
+  `${getSecureCookiePrefix()}${name}`;
 
 export const getCookieDomain = () => {
   // In production on Vercel, don't set a specific domain to allow cookies to work
