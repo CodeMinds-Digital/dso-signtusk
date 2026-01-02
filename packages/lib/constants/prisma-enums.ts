@@ -526,3 +526,48 @@ export interface Session {
   ipAddress: string | null;
   userAgent: string | null;
 }
+
+export interface Organisation {
+  id: string;
+  name: string;
+  type: OrganisationType;
+  createdAt: Date;
+  avatarImageId: string | null;
+  customerId: string | null;
+  organisationGlobalSettingsId: string;
+}
+
+export interface OrganisationGlobalSettings {
+  id: string;
+  documentVisibility: DocumentVisibility;
+  documentLanguage: string;
+  documentTimezone: string | null;
+  documentDateFormat: string;
+  includeSenderDetails: boolean;
+  includeSigningCertificate: boolean;
+  includeAuditLog: boolean;
+  typedSignatureEnabled: boolean;
+  uploadSignatureEnabled: boolean;
+  drawSignatureEnabled: boolean;
+  emailId: string | null;
+  emailReplyTo: string | null;
+  emailDocumentSettings: AnyJson;
+  brandingEnabled: boolean;
+  brandingLogo: string;
+  brandingUrl: string;
+  brandingCompanyDetails: string;
+  aiFeaturesEnabled: boolean;
+}
+
+export interface DocumentAuditLog {
+  id: string;
+  createdAt: Date;
+  type: string;
+  data: AnyJson;
+  name: string | null;
+  email: string | null;
+  userId: number | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+  envelopeId: string;
+}

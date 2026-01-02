@@ -1,7 +1,7 @@
 import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { DocumentAuditLog } from "@prisma/client";
 import type {
+  DocumentAuditLog,
   DocumentMeta,
   Field,
   Recipient,

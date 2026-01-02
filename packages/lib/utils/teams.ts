@@ -1,10 +1,7 @@
 import type {
-  OrganisationGlobalSettings,
-  Prisma,
-  TeamGlobalSettings,
-} from "@prisma/client";
-import type {
   DocumentVisibility,
+  OrganisationGlobalSettings,
+  TeamGlobalSettings,
   TeamMemberRole,
 } from "@signtusk/lib/constants/prisma-enums";
 
@@ -147,11 +144,15 @@ export type BuildTeamWhereQueryOptions = {
   roles?: TeamMemberRole[];
 };
 
+// Browser-safe type for Prisma where input (used only on server-side)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TeamWhereUniqueInput = any;
+
 export const buildTeamWhereQuery = ({
   teamId,
   userId,
   roles,
-}: BuildTeamWhereQueryOptions): Prisma.TeamWhereUniqueInput => {
+}: BuildTeamWhereQueryOptions): TeamWhereUniqueInput => {
   // Note: Not using inline ternary since typesafety breaks for some reason.
   if (!roles) {
     return {

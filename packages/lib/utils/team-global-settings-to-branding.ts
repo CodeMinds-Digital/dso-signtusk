@@ -1,4 +1,4 @@
-import type { OrganisationGlobalSettings } from "@prisma/client";
+import type { OrganisationGlobalSettings } from "@signtusk/lib/constants/prisma-enums";
 
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants/app";
 

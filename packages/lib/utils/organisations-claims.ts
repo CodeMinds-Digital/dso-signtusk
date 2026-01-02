@@ -1,4 +1,4 @@
-import type { SubscriptionClaim } from "@prisma/client";
+import type { SubscriptionClaim } from "@signtusk/lib/constants/prisma-enums";
 
 import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT } from "@signtusk/ee/server-only/limits/constants";
 

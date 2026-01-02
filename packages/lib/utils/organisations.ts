@@ -1,13 +1,10 @@
 import type {
   Organisation,
   OrganisationGlobalSettings,
-  Prisma,
-} from "@prisma/client";
-import {
-  DocumentVisibility,
-  type OrganisationGroup,
-  type OrganisationMemberRole,
+  OrganisationGroup,
+  OrganisationMemberRole,
 } from "@signtusk/lib/constants/prisma-enums";
+import { DocumentVisibility } from "@signtusk/lib/constants/prisma-enums";
 
 import type { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
 
@@ -84,11 +81,15 @@ type BuildOrganisationWhereQueryOptions = {
   roles?: OrganisationMemberRole[];
 };
 
+// Browser-safe type for Prisma where input (used only on server-side)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type OrganisationWhereInput = any;
+
 export const buildOrganisationWhereQuery = ({
   organisationId,
   userId,
   roles,
-}: BuildOrganisationWhereQueryOptions): Prisma.OrganisationWhereInput => {
+}: BuildOrganisationWhereQueryOptions): OrganisationWhereInput => {
   // Note: Not using inline ternary since typesafety breaks for some reason.
   if (!roles) {
     return {

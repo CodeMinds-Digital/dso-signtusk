@@ -1,7 +1,7 @@
-import type { OrganisationGlobalSettings } from "@prisma/client";
 import type {
   DocumentMeta,
   Envelope,
+  OrganisationGlobalSettings,
   Recipient,
   Team,
   User,
