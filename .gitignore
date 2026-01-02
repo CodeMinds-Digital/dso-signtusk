@@ -125,3 +125,5 @@ package-lock.json
 logs/
 /.kiro
 /.kiro/specs
+dso-signtusk-re-structure.zip
+dso-signtusk-re-structure/
