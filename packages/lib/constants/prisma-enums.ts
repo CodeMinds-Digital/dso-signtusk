@@ -421,6 +421,14 @@ export interface TeamGroup {
   teamId: number;
 }
 
+export interface OrganisationGroup {
+  id: string;
+  name: string;
+  type: OrganisationGroupType;
+  organisationRole: OrganisationMemberRole;
+  organisationId: string;
+}
+
 export interface TeamProfile {
   id: string;
   enabled: boolean;

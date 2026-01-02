@@ -1,22 +1,28 @@
-import type { Organisation, OrganisationGlobalSettings, Prisma } from '@prisma/client';
+import type {
+  Organisation,
+  OrganisationGlobalSettings,
+  Prisma,
+} from "@prisma/client";
 import {
   DocumentVisibility,
   type OrganisationGroup,
   type OrganisationMemberRole,
-} from '@prisma/client';
+} from "@signtusk/lib/constants/prisma-enums";
 
-import type { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
+import type { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
 
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from "../constants/date-formats";
 import {
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
-} from '../constants/organisations';
-import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
+} from "../constants/organisations";
+import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from "../types/document-email";
 
-export const isPersonalLayout = (organisations: Pick<Organisation, 'type'>[]) => {
-  return organisations.length === 1 && organisations[0].type === 'PERSONAL';
+export const isPersonalLayout = (
+  organisations: Pick<Organisation, "type">[]
+) => {
+  return organisations.length === 1 && organisations[0].type === "PERSONAL";
 };
 
 /**
@@ -28,9 +34,11 @@ export const isPersonalLayout = (organisations: Pick<Organisation, 'type'>[]) =>
  */
 export const canExecuteOrganisationAction = (
   action: keyof typeof ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
-  role: keyof typeof ORGANISATION_MEMBER_ROLE_MAP,
+  role: keyof typeof ORGANISATION_MEMBER_ROLE_MAP
 ) => {
-  return ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP[action].some((i) => i === role);
+  return ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP[action].some(
+    (i) => i === role
+  );
 };
 
 /**
@@ -43,18 +51,22 @@ export const canExecuteOrganisationAction = (
  */
 export const isOrganisationRoleWithinUserHierarchy = (
   currentUserRole: keyof typeof ORGANISATION_MEMBER_ROLE_MAP,
-  roleToCheck: keyof typeof ORGANISATION_MEMBER_ROLE_MAP,
+  roleToCheck: keyof typeof ORGANISATION_MEMBER_ROLE_MAP
 ) => {
-  return ORGANISATION_MEMBER_ROLE_HIERARCHY[currentUserRole].some((i) => i === roleToCheck);
+  return ORGANISATION_MEMBER_ROLE_HIERARCHY[currentUserRole].some(
+    (i) => i === roleToCheck
+  );
 };
 
 export const getHighestOrganisationRoleInGroup = (
-  groups: Pick<OrganisationGroup, 'type' | 'organisationRole'>[],
+  groups: Pick<OrganisationGroup, "type" | "organisationRole">[]
 ): OrganisationMemberRole => {
-  let highestOrganisationRole: OrganisationMemberRole = LOWEST_ORGANISATION_ROLE;
+  let highestOrganisationRole: OrganisationMemberRole =
+    LOWEST_ORGANISATION_ROLE;
 
   groups.forEach((group) => {
-    const currentRolePriority = ORGANISATION_MEMBER_ROLE_HIERARCHY[group.organisationRole].length;
+    const currentRolePriority =
+      ORGANISATION_MEMBER_ROLE_HIERARCHY[group.organisationRole].length;
     const highestOrganisationRolePriority =
       ORGANISATION_MEMBER_ROLE_HIERARCHY[highestOrganisationRole].length;
 
@@ -110,11 +122,11 @@ export const buildOrganisationWhereQuery = ({
 
 export const generateDefaultOrganisationSettings = (): Omit<
   OrganisationGlobalSettings,
-  'id' | 'organisation'
+  "id" | "organisation"
 > => {
   return {
     documentVisibility: DocumentVisibility.EVERYONE,
-    documentLanguage: 'en',
+    documentLanguage: "en",
     documentTimezone: null, // Null means local timezone.
     documentDateFormat: DEFAULT_DOCUMENT_DATE_FORMAT,
 
@@ -127,9 +139,9 @@ export const generateDefaultOrganisationSettings = (): Omit<
     drawSignatureEnabled: true,
 
     brandingEnabled: false,
-    brandingLogo: '',
-    brandingUrl: '',
-    brandingCompanyDetails: '',
+    brandingLogo: "",
+    brandingUrl: "",
+    brandingCompanyDetails: "",
 
     emailId: null,
     emailReplyTo: null,
