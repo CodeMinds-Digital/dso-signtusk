@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "build/client",
+  "installCommand": "cd ../.. && npm ci",
+  "framework": null,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ../../",
+  "functions": {
+    "build/server/main.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/build/(.*)",
+      "dest": "/build/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/build/server/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "SKIP_ENV_VALIDATION": "true",
+      "TURBO_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "turbo": false
+}
