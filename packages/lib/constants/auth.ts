@@ -68,7 +68,13 @@ export const formatSecureCookieName = (name: string) =>
   `${getSecureCookiePrefix()}${name}`;
 
 export const getCookieDomain = () => {
-  // In production on Vercel, don't set a specific domain to allow cookies to work
+  // Allow explicit cookie domain configuration
+  const cookieDomain = env("COOKIE_DOMAIN");
+  if (cookieDomain) {
+    return cookieDomain;
+  }
+
+  // On Vercel, don't set a specific domain to allow cookies to work
   // on both production and preview deployments
   if (env("VERCEL") === "1") {
     return undefined; // Let the browser use the current domain

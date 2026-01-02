@@ -5,6 +5,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
 import { extractRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { env } from "@signtusk/lib/utils/env";
 
 import { setCsrfCookie } from "./lib/session/session-cookies";
 import { accountRoute } from "./routes/account";
@@ -18,34 +19,70 @@ import { ssoRoute } from "./routes/sso";
 import { twoFactorRoute } from "./routes/two-factor";
 import type { HonoAuthContext } from "./types/context";
 
+/**
+ * Check if an origin is allowed based on ALLOWED_ORIGINS env var.
+ * Supports wildcard patterns like "https://*.vercel.app"
+ */
+function isAllowedOrigin(origin: string | null, host: string | null): boolean {
+  if (!origin) return true; // No origin header = same-origin request
+
+  const webUrl = NEXT_PUBLIC_WEBAPP_URL();
+  const allowedOriginsEnv = env("ALLOWED_ORIGINS");
+
+  // Build list of allowed origins
+  const allowedOrigins: string[] = [webUrl];
+
+  if (allowedOriginsEnv) {
+    allowedOrigins.push(...allowedOriginsEnv.split(",").map((o) => o.trim()));
+  }
+
+  // Check each allowed origin
+  for (const allowed of allowedOrigins) {
+    if (allowed.includes("*")) {
+      // Wildcard pattern: https://*.vercel.app
+      const pattern = allowed.replace("*", "");
+      if (
+        origin.endsWith(pattern) ||
+        origin.includes(pattern.replace("https://", ""))
+      ) {
+        return true;
+      }
+    } else if (origin === allowed) {
+      return true;
+    }
+  }
+
+  // Also allow if origin host matches request host (same-origin on dynamic hosts)
+  if (host) {
+    try {
+      const originUrl = new URL(origin);
+      if (originUrl.host === host) {
+        return true;
+      }
+    } catch {
+      // Invalid origin URL
+    }
+  }
+
+  return false;
+}
+
 // Note: You must chain routes for Hono RPC client to work.
 export const auth = new Hono<HonoAuthContext>()
   .use(async (c, next) => {
     c.set("requestMetadata", extractRequestMetadata(c.req.raw));
 
-    // On Vercel, allow requests from the same host (handles preview deployments)
-    const headerOrigin = c.req.header("Origin");
-    const headerHost = c.req.header("Host");
+    const headerOrigin = c.req.header("Origin") ?? null;
+    const headerHost = c.req.header("Host") ?? null;
 
-    if (headerOrigin) {
-      const originUrl = new URL(headerOrigin);
-      const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
-
-      // Allow if origin matches configured URL OR if origin host matches request host
-      // This handles Vercel preview deployments where the host varies
-      const isValidOrigin =
-        headerOrigin === validOrigin ||
-        (headerHost && originUrl.host === headerHost);
-
-      if (!isValidOrigin) {
-        return c.json(
-          {
-            message: "Forbidden",
-            statusCode: 403,
-          },
-          403
-        );
-      }
+    if (!isAllowedOrigin(headerOrigin, headerHost)) {
+      return c.json(
+        {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+        403
+      );
     }
 
     await next();

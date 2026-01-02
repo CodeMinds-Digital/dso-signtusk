@@ -29,7 +29,8 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "VERCEL": "1"
+    "VERCEL": "1",
+    "ALLOWED_ORIGINS": "https://dso-signtusk.vercel.app,https://*.vercel.app"
   },
   "build": {
     "env": {
