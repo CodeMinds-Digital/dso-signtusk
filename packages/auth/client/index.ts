@@ -6,9 +6,6 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 import { AppError } from "@signtusk/lib/errors/app-error";
 
 import type { AuthAppType } from "../server";
-import type { SessionValidationResult } from "../server/lib/session/session";
-import type { PartialAccount } from "../server/lib/utils/get-accounts";
-import type { ActiveSession } from "../server/lib/utils/get-session";
 import { handleSignInRedirect } from "../server/lib/utils/redirect";
 import type {
   TDisableTwoFactorRequestSchema,
@@ -23,6 +20,11 @@ import type {
   TUpdatePasswordSchema,
   TVerifyEmailSchema,
 } from "../server/types/email-password";
+import type {
+  ActiveSession,
+  PartialAccount,
+  SessionValidationResult,
+} from "../types";
 
 type AuthClientType = ReturnType<typeof hc<AuthAppType>>;
 

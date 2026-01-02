@@ -1,37 +1,19 @@
-import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
-import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
+import { sha256 } from "@oslojs/crypto/sha2";
+import {
+  encodeBase32LowerCaseNoPadding,
+  encodeHexLowerCase,
+} from "@oslojs/encoding";
+import { UserSecurityAuditLogType, type Session } from "@prisma/client";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { RequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { RequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { prisma } from "@signtusk/prisma";
 
-import { AUTH_SESSION_LIFETIME } from '../../config';
+import type { SessionValidationResult } from "../../../types";
+import { AUTH_SESSION_LIFETIME } from "../../config";
 
-/**
- * The user object to pass around the app.
- *
- * Do not put anything sensitive in here since it will be public.
- */
-export type SessionUser = Pick<
-  User,
-  | 'id'
-  | 'name'
-  | 'email'
-  | 'emailVerified'
-  | 'avatarImageId'
-  | 'twoFactorEnabled'
-  | 'roles'
-  | 'signature'
->;
-
-export type SessionValidationResult =
-  | {
-      session: Session;
-      user: SessionUser;
-      isAuthenticated: true;
-    }
-  | { session: null; user: null; isAuthenticated: false };
+// Re-export types from shared types file for backwards compatibility
+export type { SessionUser, SessionValidationResult } from "../../../types";
 
 export const generateSessionToken = (): string => {
   const bytes = new Uint8Array(20);
@@ -46,9 +28,11 @@ export const generateSessionToken = (): string => {
 export const createSession = async (
   token: string,
   userId: number,
-  metadata: RequestMetadata,
+  metadata: RequestMetadata
 ): Promise<Session> => {
-  const hashedSessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+  const hashedSessionId = encodeHexLowerCase(
+    sha256(new TextEncoder().encode(token))
+  );
 
   const session: Session = {
     id: hashedSessionId,
@@ -77,7 +61,9 @@ export const createSession = async (
   return session;
 };
 
-export const validateSessionToken = async (token: string): Promise<SessionValidationResult> => {
+export const validateSessionToken = async (
+  token: string
+): Promise<SessionValidationResult> => {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   const result = await prisma.session.findUnique({
@@ -157,7 +143,7 @@ export const invalidateSessions = async ({
 
     if (count !== sessionIds.length) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'One or more sessions are not valid.',
+        message: "One or more sessions are not valid.",
       });
     }
 

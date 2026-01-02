@@ -1,30 +1,35 @@
-import type { Session } from '@prisma/client';
-import type { Context } from 'hono';
+import type { Context } from "hono";
 
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { AuthenticationErrorCode } from '../errors/error-codes';
-import type { SessionValidationResult } from '../session/session';
-import { validateSessionToken } from '../session/session';
-import { getSessionCookie } from '../session/session-cookies';
+import type { ActiveSession } from "../../../types";
+import { AuthenticationErrorCode } from "../errors/error-codes";
+import type { SessionValidationResult } from "../session/session";
+import { validateSessionToken } from "../session/session";
+import { getSessionCookie } from "../session/session-cookies";
+
+// Re-export ActiveSession from shared types for backwards compatibility
+export type { ActiveSession } from "../../../types";
 
 export const getSession = async (c: Context | Request) => {
-  const { session, user } = await getOptionalSession(mapRequestToContextForCookie(c));
+  const { session, user } = await getOptionalSession(
+    mapRequestToContextForCookie(c)
+  );
 
   if (session && user) {
     return { session, user };
   }
 
   if (c instanceof Request) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   throw new AppError(AuthenticationErrorCode.Unauthorized);
 };
 
 export const getOptionalSession = async (
-  c: Context | Request,
+  c: Context | Request
 ): Promise<SessionValidationResult> => {
   const sessionId = await getSessionCookie(mapRequestToContextForCookie(c));
 
@@ -39,9 +44,9 @@ export const getOptionalSession = async (
   return await validateSessionToken(sessionId);
 };
 
-export type ActiveSession = Omit<Session, 'sessionToken'>;
-
-export const getActiveSessions = async (c: Context | Request): Promise<ActiveSession[]> => {
+export const getActiveSessions = async (
+  c: Context | Request
+): Promise<ActiveSession[]> => {
   const { user } = await getSession(c);
 
   return await prisma.session.findMany({
@@ -52,7 +57,7 @@ export const getActiveSessions = async (c: Context | Request): Promise<ActiveSes
       },
     },
     orderBy: {
-      updatedAt: 'desc',
+      updatedAt: "desc",
     },
     select: {
       id: true,

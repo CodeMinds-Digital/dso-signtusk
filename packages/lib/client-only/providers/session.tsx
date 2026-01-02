@@ -9,7 +9,7 @@ import React, {
 import { useLocation } from "react-router";
 
 import { authClient } from "@signtusk/auth/client";
-import type { SessionUser } from "@signtusk/auth/server/lib/session/session";
+import type { SessionUser } from "@signtusk/auth/types";
 import { trpc } from "@signtusk/trpc/client";
 import type { TGetOrganisationSessionResponse } from "@signtusk/trpc/server/organisation-router/get-organisation-session.types";
 

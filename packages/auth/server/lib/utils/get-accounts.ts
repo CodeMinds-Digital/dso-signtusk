@@ -1,10 +1,14 @@
-import type { Context } from 'hono';
+import type { Context } from "hono";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { getSession } from './get-session';
+import { getSession } from "./get-session";
 
-export type PartialAccount = {
+// Re-export PartialAccount from shared types for backwards compatibility
+export type { PartialAccount } from "../../../types";
+
+// Extended type for server-side use with additional fields
+export type PartialAccountExtended = {
   id: string;
   userId: number;
   type: string;
@@ -13,7 +17,9 @@ export type PartialAccount = {
   createdAt: Date;
 };
 
-export const getAccounts = async (c: Context | Request): Promise<PartialAccount[]> => {
+export const getAccounts = async (
+  c: Context | Request
+): Promise<PartialAccountExtended[]> => {
   const { user } = await getSession(c);
 
   return await prisma.account.findMany({
