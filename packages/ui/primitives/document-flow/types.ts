@@ -1,6 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@signtusk/lib/types/field-meta';

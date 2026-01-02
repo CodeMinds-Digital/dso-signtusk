@@ -1,4 +1,4 @@
-import { DocumentDistributionMethod } from '@prisma/client';
+import { DocumentDistributionMethod } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@signtusk/lib/types/document-email';

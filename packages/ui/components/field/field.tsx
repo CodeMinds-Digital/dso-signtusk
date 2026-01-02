@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { type Field, FieldType } from '@prisma/client';
+import { type Field, FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { createPortal } from 'react-dom';
 
 import { useElementBounds } from '@signtusk/lib/client-only/hooks/use-element-bounds';

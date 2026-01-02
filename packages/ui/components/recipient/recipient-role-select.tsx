@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 

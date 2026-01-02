@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import {
   CalendarDays,
   CheckSquare,

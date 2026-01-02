@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Field, Recipient } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
+import type { DocumentMeta, Field, Recipient } from '@signtusk/lib/constants/prisma-enums';
+import { SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@signtusk/lib/constants/pdf-viewer';

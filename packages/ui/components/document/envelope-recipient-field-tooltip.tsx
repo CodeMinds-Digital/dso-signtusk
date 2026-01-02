@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { SigningStatus } from '@prisma/client';
-import type { Field, Recipient } from '@prisma/client';
+import { SigningStatus } from '@signtusk/lib/constants/prisma-enums';
+import type { Field, Recipient } from '@signtusk/lib/constants/prisma-enums';
 import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
 
 import { getBoundingClientRect } from '@signtusk/lib/client-only/get-bounding-client-rect';

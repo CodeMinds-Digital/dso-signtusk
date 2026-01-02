@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@signtusk/lib/types/document-auth';

@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@signtusk/lib/constants/date-formats';

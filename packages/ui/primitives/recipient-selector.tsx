@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
+import { RecipientRole, SendStatus, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 

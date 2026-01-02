@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
-import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Field, Recipient } from "@signtusk/lib/constants/prisma-enums";
+import {
+  FieldType,
+  RecipientRole,
+  SendStatus,
+} from "@signtusk/lib/constants/prisma-enums";
 import {
   CalendarDays,
   CheckSquare,
@@ -16,48 +20,51 @@ import {
   Mail,
   Type,
   User,
-} from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { useHotkeys } from 'react-hotkeys-hook';
+} from "lucide-react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 
-import { getBoundingClientRect } from '@signtusk/lib/client-only/get-bounding-client-rect';
-import { useAutoSave } from '@signtusk/lib/client-only/hooks/use-autosave';
-import { useDocumentElement } from '@signtusk/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@signtusk/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from "@signtusk/lib/client-only/get-bounding-client-rect";
+import { useAutoSave } from "@signtusk/lib/client-only/hooks/use-autosave";
+import { useDocumentElement } from "@signtusk/lib/client-only/hooks/use-document-element";
+import { PDF_VIEWER_PAGE_SELECTOR } from "@signtusk/lib/constants/pdf-viewer";
 import {
-  type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
-} from '@signtusk/lib/types/field-meta';
-import { nanoid } from '@signtusk/lib/universal/id';
-import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@signtusk/lib/utils/advanced-fields-helpers';
-import { validateFieldsUninserted } from '@signtusk/lib/utils/fields';
-import { parseMessageDescriptor } from '@signtusk/lib/utils/i18n';
+  type TFieldMetaSchema as FieldMeta,
+} from "@signtusk/lib/types/field-meta";
+import { nanoid } from "@signtusk/lib/universal/id";
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from "@signtusk/lib/utils/advanced-fields-helpers";
+import { validateFieldsUninserted } from "@signtusk/lib/utils/fields";
+import { parseMessageDescriptor } from "@signtusk/lib/utils/i18n";
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
-} from '@signtusk/lib/utils/recipients';
+} from "@signtusk/lib/utils/recipients";
 
-import { FieldToolTip } from '../../components/field/field-tooltip';
-import { useRecipientColors } from '../../lib/recipient-colors';
-import { cn } from '../../lib/utils';
-import { Alert, AlertDescription } from '../alert';
-import { Card, CardContent } from '../card';
-import { Form } from '../form/form';
-import { RecipientSelector } from '../recipient-selector';
-import { useStep } from '../stepper';
-import { useToast } from '../use-toast';
-import { type TAddFieldsFormSchema, ZAddFieldsFormSchema } from './add-fields.types';
+import { FieldToolTip } from "../../components/field/field-tooltip";
+import { useRecipientColors } from "../../lib/recipient-colors";
+import { cn } from "../../lib/utils";
+import { Alert, AlertDescription } from "../alert";
+import { Card, CardContent } from "../card";
+import { Form } from "../form/form";
+import { RecipientSelector } from "../recipient-selector";
+import { useStep } from "../stepper";
+import { useToast } from "../use-toast";
+import {
+  ZAddFieldsFormSchema,
+  type TAddFieldsFormSchema,
+} from "./add-fields.types";
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
-} from './document-flow-root';
-import { FieldItem } from './field-item';
-import { FieldAdvancedSettings } from './field-item-advanced-settings';
-import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
-import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+} from "./document-flow-root";
+import { FieldItem } from "./field-item";
+import { FieldAdvancedSettings } from "./field-item-advanced-settings";
+import { MissingSignatureFieldDialog } from "./missing-signature-field-dialog";
+import { FRIENDLY_FIELD_TYPE, type DocumentFlowStep } from "./types";
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -105,12 +112,16 @@ export const AddFieldsFormPartial = ({
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
+  const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] =
+    useState(false);
 
-  const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
+  const { isWithinPageBounds, getFieldPosition, getPage } =
+    useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const canRenderBackButtonAsRemove =
-    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
+    currentStep === 1 &&
+    typeof documentFlow.onBackStep === "function" &&
+    canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
@@ -127,17 +138,22 @@ export const AddFieldsFormPartial = ({
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
         signerEmail:
-          recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+          recipients.find((recipient) => recipient.id === field.recipientId)
+            ?.email ?? "",
         recipientId: field.recipientId,
-        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+        fieldMeta: field.fieldMeta
+          ? ZFieldMetaSchema.parse(field.fieldMeta)
+          : undefined,
       })),
     },
     resolver: zodResolver(ZAddFieldsFormSchema),
   });
 
-  useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
-  useHotkeys(['ctrl+v', 'meta+v'], (evt) => onFieldPaste(evt));
-  useHotkeys(['ctrl+d', 'meta+d'], (evt) => onFieldCopy(evt, { duplicate: true }));
+  useHotkeys(["ctrl+c", "meta+c"], (evt) => onFieldCopy(evt));
+  useHotkeys(["ctrl+v", "meta+v"], (evt) => onFieldPaste(evt));
+  useHotkeys(["ctrl+d", "meta+d"], (evt) =>
+    onFieldCopy(evt, { duplicate: true })
+  );
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
@@ -157,7 +173,7 @@ export const AddFieldsFormPartial = ({
       return field;
     });
 
-    form.setValue('fields', updatedFields);
+    form.setValue("fields", updatedFields);
   };
 
   const {
@@ -167,29 +183,35 @@ export const AddFieldsFormPartial = ({
     fields: localFields,
   } = useFieldArray({
     control: form.control,
-    name: 'fields',
+    name: "fields",
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
-    null,
+  const [lastActiveField, setLastActiveField] = useState<
+    TAddFieldsFormSchema["fields"][0] | null
+  >(null);
+  const [fieldClipboard, setFieldClipboard] = useState<
+    TAddFieldsFormSchema["fields"][0] | null
+  >(null);
+  const selectedSignerIndex = recipients.findIndex(
+    (r) => r.id === selectedSigner?.id
   );
-  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(
-    null,
-  );
-  const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
   const selectedSignerStyles = useRecipientColors(
-    selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
+    selectedSignerIndex === -1 ? 0 : selectedSignerIndex
   );
 
-  const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
+  const [validateUninsertedFields, setValidateUninsertedFields] =
+    useState(false);
 
-  const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
+  const filterFieldsWithEmptyValues = (
+    fields: typeof localFields,
+    fieldType: string
+  ) =>
     fields
       .filter((field) => field.type === fieldType)
       .filter((field) => {
-        if (field.fieldMeta && 'values' in field.fieldMeta) {
+        if (field.fieldMeta && "values" in field.fieldMeta) {
           return field.fieldMeta.values?.length === 0;
         }
 
@@ -199,23 +221,25 @@ export const AddFieldsFormPartial = ({
   const emptyCheckboxFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localFields],
+    [localFields]
   );
 
   const emptyRadioFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localFields],
+    [localFields]
   );
 
   const emptySelectFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localFields],
+    [localFields]
   );
 
   const hasErrors =
-    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
+    emptyCheckboxFields.length > 0 ||
+    emptyRadioFields.length > 0 ||
+    emptySelectFields.length > 0;
 
   const fieldsWithError = useMemo(() => {
     const fields = localFields.filter((field) => {
@@ -224,7 +248,9 @@ export const AddFieldsFormPartial = ({
           field.type === FieldType.RADIO ||
           field.type === FieldType.DROPDOWN) &&
           field.fieldMeta === undefined) ||
-        (field.fieldMeta && 'values' in field.fieldMeta && field?.fieldMeta?.values?.length === 0);
+        (field.fieldMeta &&
+          "values" in field.fieldMeta &&
+          field?.fieldMeta?.values?.length === 0);
 
       return hasError;
     });
@@ -237,11 +263,11 @@ export const AddFieldsFormPartial = ({
       recipientId: 0,
       type: field.type,
       page: field.pageNumber,
-      positionX: new Prisma.Decimal(field.pageX),
-      positionY: new Prisma.Decimal(field.pageY),
-      width: new Prisma.Decimal(field.pageWidth),
-      height: new Prisma.Decimal(field.pageHeight),
-      customText: '',
+      positionX: field.pageX,
+      positionY: field.pageY,
+      width: field.pageWidth,
+      height: field.pageHeight,
+      customText: "",
       inserted: true,
       fieldMeta: field.fieldMeta ?? null,
     }));
@@ -275,8 +301,8 @@ export const AddFieldsFormPartial = ({
           event,
           PDF_VIEWER_PAGE_SELECTOR,
           fieldBounds.current.width,
-          fieldBounds.current.height,
-        ),
+          fieldBounds.current.height
+        )
       );
 
       setCoords({
@@ -284,7 +310,7 @@ export const AddFieldsFormPartial = ({
         y: event.clientY - fieldBounds.current.height / 2,
       });
     },
-    [isWithinPageBounds],
+    [isWithinPageBounds]
   );
 
   const onMouseClick = useCallback(
@@ -301,7 +327,7 @@ export const AddFieldsFormPartial = ({
           event,
           PDF_VIEWER_PAGE_SELECTOR,
           fieldBounds.current.width,
-          fieldBounds.current.height,
+          fieldBounds.current.height
         )
       ) {
         setSelectedField(null);
@@ -310,7 +336,10 @@ export const AddFieldsFormPartial = ({
 
       const { top, left, height, width } = getBoundingClientRect($page);
 
-      const pageNumber = parseInt($page.getAttribute('data-page-number') ?? '1', 10);
+      const pageNumber = parseInt(
+        $page.getAttribute("data-page-number") ?? "1",
+        10
+      );
 
       // Calculate x and y as a percentage of the page width and height
       let pageX = ((event.pageX - left) / width) * 100;
@@ -350,7 +379,7 @@ export const AddFieldsFormPartial = ({
       setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
-    [append, isWithinPageBounds, selectedField, selectedSigner, getPage],
+    [append, isWithinPageBounds, selectedField, selectedSigner, getPage]
   );
 
   const onFieldResize = useCallback(
@@ -358,7 +387,7 @@ export const AddFieldsFormPartial = ({
       const field = localFields[index];
 
       const $page = window.document.querySelector<HTMLElement>(
-        `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
+        `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`
       );
 
       if (!$page) {
@@ -380,7 +409,7 @@ export const AddFieldsFormPartial = ({
         pageHeight,
       });
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update]
   );
 
   const onFieldMove = useCallback(
@@ -388,7 +417,7 @@ export const AddFieldsFormPartial = ({
       const field = localFields[index];
 
       const $page = window.document.querySelector<HTMLElement>(
-        `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
+        `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`
       );
 
       if (!$page) {
@@ -403,18 +432,21 @@ export const AddFieldsFormPartial = ({
         pageY,
       });
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update]
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+    (
+      event?: KeyboardEvent | null,
+      options?: { duplicate?: boolean; duplicateAll?: boolean }
+    ) => {
       const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
         if (duplicate) {
-          const newField: TAddFieldsFormSchema['fields'][0] = {
+          const newField: TAddFieldsFormSchema["fields"][0] = {
             ...structuredClone(lastActiveField),
             nativeId: undefined,
             formId: nanoid(12),
@@ -430,7 +462,9 @@ export const AddFieldsFormPartial = ({
         }
 
         if (duplicateAll) {
-          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const pages = Array.from(
+            document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR)
+          );
 
           pages.forEach((_, index) => {
             const pageNumber = index + 1;
@@ -439,7 +473,7 @@ export const AddFieldsFormPartial = ({
               return;
             }
 
-            const newField: TAddFieldsFormSchema['fields'][0] = {
+            const newField: TAddFieldsFormSchema["fields"][0] = {
               ...structuredClone(lastActiveField),
               nativeId: undefined,
               formId: nanoid(12),
@@ -462,7 +496,7 @@ export const AddFieldsFormPartial = ({
         });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast]
   );
 
   const onFieldPaste = useCallback(
@@ -483,18 +517,18 @@ export const AddFieldsFormPartial = ({
         });
       }
     },
-    [append, fieldClipboard, selectedSigner?.email],
+    [append, fieldClipboard, selectedSigner?.email]
   );
 
   useEffect(() => {
     if (selectedField) {
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseClick);
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseClick);
     }
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseClick);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseClick);
     };
   }, [onMouseClick, onMouseMove, selectedField]);
 
@@ -525,12 +559,13 @@ export const AddFieldsFormPartial = ({
   useEffect(() => {
     const recipientsByRoleToDisplay = recipients.filter(
       (recipient) =>
-        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+        recipient.role !== RecipientRole.CC &&
+        recipient.role !== RecipientRole.ASSISTANT
     );
 
     setSelectedSigner(
       recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
-        recipientsByRoleToDisplay[0],
+        recipientsByRoleToDisplay[0]
     );
   }, [recipients]);
 
@@ -558,9 +593,10 @@ export const AddFieldsFormPartial = ({
     const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
       localFields.some(
         (field) =>
-          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
-      ),
+          (field.type === FieldType.SIGNATURE ||
+            field.type === FieldType.FREE_SIGNATURE) &&
+          field.signerEmail === signer.email
+      )
     );
 
     if (!everySignerHasSignature) {
@@ -599,7 +635,7 @@ export const AddFieldsFormPartial = ({
           title={msg`Advanced settings`}
           description={msg`Configure the ${parseMessageDescriptor(
             _,
-            FRIENDLY_FIELD_TYPE[currentField.type],
+            FRIENDLY_FIELD_TYPE[currentField.type]
           )} field`}
           field={currentField}
           fields={localFields}
@@ -626,12 +662,13 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    "text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]",
                     selectedSignerStyles?.base,
                     {
-                      '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
-                      'dark:text-black/60': isFieldWithinBounds,
-                    },
+                      "-rotate-6 scale-90 opacity-50 dark:bg-black/20":
+                        !isFieldWithinBounds,
+                      "dark:text-black/60": isFieldWithinBounds,
+                    }
                   )}
                   style={{
                     top: coords.y,
@@ -641,23 +678,32 @@ export const AddFieldsFormPartial = ({
                   }}
                 >
                   <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
-                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
+                    {parseMessageDescriptor(
+                      _,
+                      FRIENDLY_FIELD_TYPE[selectedField]
+                    )}
                   </span>
                 </div>
               )}
 
               {isDocumentPdfLoaded &&
                 localFields.map((field, index) => {
-                  const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
+                  const recipientIndex = recipients.findIndex(
+                    (r) => r.id === field.recipientId
+                  );
                   const hasFieldError =
-                    emptyCheckboxFields.find((f) => f.formId === field.formId) ||
+                    emptyCheckboxFields.find(
+                      (f) => f.formId === field.formId
+                    ) ||
                     emptyRadioFields.find((f) => f.formId === field.formId) ||
                     emptySelectFields.find((f) => f.formId === field.formId);
 
                   return (
                     <FieldItem
                       key={index}
-                      recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
+                      recipientIndex={
+                        recipientIndex === -1 ? 0 : recipientIndex
+                      }
                       field={field}
                       disabled={
                         selectedSigner?.email !== field.signerEmail ||
@@ -712,23 +758,28 @@ export const AddFieldsFormPartial = ({
 
               <Form {...form}>
                 <div className="-mx-2 flex-1 overflow-y-auto px-2">
-                  <fieldset disabled={isFieldsDisabled} className="my-2 grid grid-cols-3 gap-4">
+                  <fieldset
+                    disabled={isFieldsDisabled}
+                    className="my-2 grid grid-cols-3 gap-4"
+                  >
                     <button
                       type="button"
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.SIGNATURE)}
                       onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
-                      data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.SIGNATURE ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal"
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -742,17 +793,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.INITIALS)}
                       onMouseDown={() => setSelectedField(FieldType.INITIALS)}
-                      data-selected={selectedField === FieldType.INITIALS ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.INITIALS ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -767,17 +820,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.EMAIL)}
                       onMouseDown={() => setSelectedField(FieldType.EMAIL)}
-                      data-selected={selectedField === FieldType.EMAIL ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.EMAIL ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -792,17 +847,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.NAME)}
                       onMouseDown={() => setSelectedField(FieldType.NAME)}
-                      data-selected={selectedField === FieldType.NAME ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.NAME ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -817,17 +874,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.DATE)}
                       onMouseDown={() => setSelectedField(FieldType.DATE)}
-                      data-selected={selectedField === FieldType.DATE ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.DATE ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -842,17 +901,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.TEXT)}
                       onMouseDown={() => setSelectedField(FieldType.TEXT)}
-                      data-selected={selectedField === FieldType.TEXT ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.TEXT ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -867,17 +928,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.NUMBER)}
                       onMouseDown={() => setSelectedField(FieldType.NUMBER)}
-                      data-selected={selectedField === FieldType.NUMBER ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.NUMBER ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -892,17 +955,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.RADIO)}
                       onMouseDown={() => setSelectedField(FieldType.RADIO)}
-                      data-selected={selectedField === FieldType.RADIO ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.RADIO ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -917,17 +982,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.CHECKBOX)}
                       onMouseDown={() => setSelectedField(FieldType.CHECKBOX)}
-                      data-selected={selectedField === FieldType.CHECKBOX ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.CHECKBOX ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -943,17 +1010,19 @@ export const AddFieldsFormPartial = ({
                       className="group h-full w-full"
                       onClick={() => setSelectedField(FieldType.DROPDOWN)}
                       onMouseDown={() => setSelectedField(FieldType.DROPDOWN)}
-                      data-selected={selectedField === FieldType.DROPDOWN ? true : undefined}
+                      data-selected={
+                        selectedField === FieldType.DROPDOWN ? true : undefined
+                      }
                     >
                       <Card
                         className={cn(
-                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                          "flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50"
                         )}
                       >
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              "text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal"
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />
@@ -973,12 +1042,12 @@ export const AddFieldsFormPartial = ({
               <ul>
                 <li className="text-sm text-red-500">
                   <Trans>
-                    To proceed further, please set at least one value for the{' '}
+                    To proceed further, please set at least one value for the{" "}
                     {emptyCheckboxFields.length > 0
-                      ? 'Checkbox'
+                      ? "Checkbox"
                       : emptyRadioFields.length > 0
-                        ? 'Radio'
-                        : 'Select'}{' '}
+                        ? "Radio"
+                        : "Select"}{" "}
                     field.
                   </Trans>
                 </li>
@@ -986,19 +1055,23 @@ export const AddFieldsFormPartial = ({
             </div>
           )}
 
-          {selectedSigner && !canRecipientFieldsBeModified(selectedSigner, fields) && (
-            <Alert variant="warning">
-              <AlertDescription>
-                <Trans>
-                  This recipient can no longer be modified as they have signed a field, or completed
-                  the document.
-                </Trans>
-              </AlertDescription>
-            </Alert>
-          )}
+          {selectedSigner &&
+            !canRecipientFieldsBeModified(selectedSigner, fields) && (
+              <Alert variant="warning">
+                <AlertDescription>
+                  <Trans>
+                    This recipient can no longer be modified as they have signed
+                    a field, or completed the document.
+                  </Trans>
+                </AlertDescription>
+              </Alert>
+            )}
 
           <DocumentFlowFormContainerFooter>
-            <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
+            <DocumentFlowFormContainerStep
+              step={currentStep}
+              maxStep={totalSteps}
+            />
 
             <DocumentFlowFormContainerActions
               loading={form.formState.isSubmitting}
@@ -1009,7 +1082,9 @@ export const AddFieldsFormPartial = ({
                 remove();
                 documentFlow.onBackStep?.();
               }}
-              goBackLabel={canRenderBackButtonAsRemove ? msg`Remove` : undefined}
+              goBackLabel={
+                canRenderBackButtonAsRemove ? msg`Remove` : undefined
+              }
               onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>
@@ -1021,7 +1096,11 @@ export const AddFieldsFormPartial = ({
         </>
       )}
       {validateUninsertedFields && fieldsWithError[0] && (
-        <FieldToolTip key={fieldsWithError[0].id} field={fieldsWithError[0]} color="warning">
+        <FieldToolTip
+          key={fieldsWithError[0].id}
+          field={fieldsWithError[0]}
+          color="warning"
+        >
           <Trans>Empty field</Trans>
         </FieldToolTip>
       )}

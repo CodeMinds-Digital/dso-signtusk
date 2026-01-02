@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@signtusk/lib/constants/prisma-enums';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';

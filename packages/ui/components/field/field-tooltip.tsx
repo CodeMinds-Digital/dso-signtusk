@@ -1,4 +1,4 @@
-import type { Field } from '@prisma/client';
+import type { Field } from '@signtusk/lib/constants/prisma-enums';
 import { TooltipArrow } from '@radix-ui/react-tooltip';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';

@@ -1,4 +1,4 @@
-import type { RecipientRole } from '@prisma/client';
+import type { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { BadgeCheck, Copy, Eye, PencilLine, User } from 'lucide-react';
 
 export const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
