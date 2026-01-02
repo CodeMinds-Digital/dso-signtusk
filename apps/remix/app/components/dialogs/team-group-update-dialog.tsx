@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { TEAM_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/teams';
-import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { isTeamRoleWithinUserHierarchy } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/teams";
+import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { isTeamRoleWithinUserHierarchy } from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { Alert, AlertDescription } from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -31,24 +31,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
+} from "@signtusk/ui/primitives/form/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export type TeamGroupUpdateDialogProps = {
   trigger?: React.ReactNode;
   teamGroupId: string;
   teamGroupName: string;
   teamGroupRole: TeamMemberRole;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdateTeamGroupFormSchema = z.object({
   role: z.nativeEnum(TeamMemberRole),
@@ -99,9 +99,9 @@ export const TeamGroupUpdateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update this team member. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update this team member. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -138,8 +138,8 @@ export const TeamGroupUpdateDialog = ({
 
           <DialogDescription>
             <Trans>
-              You are currently updating the <span className="font-bold">{teamGroupName}</span> team
-              group.
+              You are currently updating the{" "}
+              <span className="font-bold">{teamGroupName}</span> team group.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -147,7 +147,10 @@ export const TeamGroupUpdateDialog = ({
         {isTeamRoleWithinUserHierarchy(team.currentTeamRole, teamGroupRole) ? (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
-              <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+              <fieldset
+                className="flex h-full flex-col"
+                disabled={form.formState.isSubmitting}
+              >
                 <FormField
                   control={form.control}
                   name="role"
@@ -163,7 +166,9 @@ export const TeamGroupUpdateDialog = ({
                           </SelectTrigger>
 
                           <SelectContent className="w-full" position="popper">
-                            {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map((role) => (
+                            {TEAM_MEMBER_ROLE_HIERARCHY[
+                              team.currentTeamRole
+                            ].map((role) => (
                               <SelectItem key={role} value={role}>
                                 {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
                               </SelectItem>
@@ -177,7 +182,11 @@ export const TeamGroupUpdateDialog = ({
                 />
 
                 <DialogFooter className="mt-4">
-                  <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setOpen(false)}
+                  >
                     <Trans>Cancel</Trans>
                   </Button>
 
@@ -192,12 +201,18 @@ export const TeamGroupUpdateDialog = ({
           <>
             <Alert variant="neutral">
               <AlertDescription className="text-center font-semibold">
-                <Trans>You cannot modify a group which has a higher role than you.</Trans>
+                <Trans>
+                  You cannot modify a group which has a higher role than you.
+                </Trans>
               </AlertDescription>
             </Alert>
 
             <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
                 <Trans>Close</Trans>
               </Button>
             </DialogFooter>

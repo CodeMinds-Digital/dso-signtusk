@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type { Field } from "@signtusk/prisma/enums";
+import type { Field } from "@signtusk/lib/constants/prisma-enums";
 
 import { getBoundingClientRect } from "@signtusk/lib/client-only/get-bounding-client-rect";
 import { PDF_VIEWER_PAGE_SELECTOR } from "@signtusk/lib/constants/pdf-viewer";

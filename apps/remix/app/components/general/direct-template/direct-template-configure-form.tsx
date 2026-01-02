@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import type { Field } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
+import type { Field } from '@signtusk/lib/constants/prisma-enums';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

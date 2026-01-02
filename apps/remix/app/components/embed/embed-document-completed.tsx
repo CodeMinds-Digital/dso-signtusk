@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import type { Signature } from '@prisma/client';
+import type { Signature } from '@signtusk/lib/constants/prisma-enums';
 
 import signingCelebration from '@signtusk/assets/images/signing-celebration.png';
 import { SigningCard3D } from '@signtusk/ui/components/signing-card';

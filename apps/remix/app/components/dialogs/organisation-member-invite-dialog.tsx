@@ -1,28 +1,36 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Download, Mail, MailIcon, PlusCircle, Trash, Upload, UsersIcon } from 'lucide-react';
-import Papa, { type ParseResult } from 'papaparse';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import {
+  Download,
+  Mail,
+  MailIcon,
+  PlusCircle,
+  Trash,
+  Upload,
+  UsersIcon,
+} from "lucide-react";
+import Papa, { type ParseResult } from "papaparse";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { downloadFile } from '@signtusk/lib/client-only/download-file';
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from '@signtusk/lib/constants/app';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/organisations';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { INTERNAL_CLAIM_ID } from '@signtusk/lib/types/subscription';
-import { trpc } from '@signtusk/trpc/react';
-import { ZCreateOrganisationMemberInvitesRequestSchema } from '@signtusk/trpc/server/organisation-router/create-organisation-member-invites.types';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Card, CardContent } from '@signtusk/ui/primitives/card';
+import { downloadFile } from "@signtusk/lib/client-only/download-file";
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from "@signtusk/lib/constants/app";
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/organisations";
+import { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { INTERNAL_CLAIM_ID } from "@signtusk/lib/types/subscription";
+import { trpc } from "@signtusk/trpc/react";
+import { ZCreateOrganisationMemberInvitesRequestSchema } from "@signtusk/trpc/server/organisation-router/create-organisation-member-invites.types";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Alert, AlertDescription } from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Card, CardContent } from "@signtusk/ui/primitives/card";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -39,26 +47,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { SpinnerBox } from '@signtusk/ui/primitives/spinner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@signtusk/ui/primitives/tabs';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { SpinnerBox } from "@signtusk/ui/primitives/spinner";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@signtusk/ui/primitives/tabs";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type OrganisationMemberInviteDialogProps = {
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZInviteOrganisationMembersFormSchema = z
   .object({
-    invitations: ZCreateOrganisationMemberInvitesRequestSchema.shape.invitations,
+    invitations:
+      ZCreateOrganisationMemberInvitesRequestSchema.shape.invitations,
   })
   // Display exactly which rows are duplicates.
   .superRefine((items, ctx) => {
@@ -76,27 +90,29 @@ const ZInviteOrganisationMembersFormSchema = z
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['invitations', index, 'email'],
+        message: "Emails must be unique",
+        path: ["invitations", index, "email"],
       });
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['invitations', firstFoundIndex, 'email'],
+        message: "Emails must be unique",
+        path: ["invitations", firstFoundIndex, "email"],
       });
     }
   });
 
-type TInviteOrganisationMembersFormSchema = z.infer<typeof ZInviteOrganisationMembersFormSchema>;
+type TInviteOrganisationMembersFormSchema = z.infer<
+  typeof ZInviteOrganisationMembersFormSchema
+>;
 
-type TabTypes = 'INDIVIDUAL' | 'BULK';
+type TabTypes = "INDIVIDUAL" | "BULK";
 
 const ZImportOrganisationMemberSchema = z.array(
   z.object({
     email: z.string().email(),
     organisationRole: z.nativeEnum(OrganisationMemberRole),
-  }),
+  })
 );
 
 export const OrganisationMemberInviteDialog = ({
@@ -105,7 +121,7 @@ export const OrganisationMemberInviteDialog = ({
 }: OrganisationMemberInviteDialogProps) => {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [invitationType, setInvitationType] = useState<TabTypes>('INDIVIDUAL');
+  const [invitationType, setInvitationType] = useState<TabTypes>("INDIVIDUAL");
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -117,7 +133,7 @@ export const OrganisationMemberInviteDialog = ({
     defaultValues: {
       invitations: [
         {
-          email: '',
+          email: "",
           organisationRole: OrganisationMemberRole.MEMBER,
         },
       ],
@@ -130,7 +146,7 @@ export const OrganisationMemberInviteDialog = ({
     remove: removeOrganisationMemberInvite,
   } = useFieldArray({
     control: form.control,
-    name: 'invitations',
+    name: "invitations",
   });
 
   const { mutateAsync: createOrganisationMemberInvites } =
@@ -142,12 +158,14 @@ export const OrganisationMemberInviteDialog = ({
 
   const onAddOrganisationMemberInvite = () => {
     appendOrganisationMemberInvite({
-      email: '',
+      email: "",
       organisationRole: OrganisationMemberRole.MEMBER,
     });
   };
 
-  const onFormSubmit = async ({ invitations }: TInviteOrganisationMembersFormSchema) => {
+  const onFormSubmit = async ({
+    invitations,
+  }: TInviteOrganisationMembersFormSchema) => {
     try {
       await createOrganisationMemberInvites({
         organisationId: organisation.id,
@@ -165,42 +183,48 @@ export const OrganisationMemberInviteDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to invite organisation members. Please try again later.`,
+          msg`We encountered an unknown error while attempting to invite organisation members. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
   const dialogState = useMemo(() => {
     if (!fullOrganisation) {
-      return 'loading';
+      return "loading";
     }
 
     if (!IS_BILLING_ENABLED()) {
-      return 'form';
+      return "form";
     }
 
     if (fullOrganisation.organisationClaim.memberCount === 0) {
-      return 'form';
+      return "form";
     }
 
-    if (fullOrganisation.members.length < fullOrganisation.organisationClaim.memberCount) {
-      return 'form';
+    if (
+      fullOrganisation.members.length <
+      fullOrganisation.organisationClaim.memberCount
+    ) {
+      return "form";
     }
 
     // This is probably going to screw us over in the future.
-    if (fullOrganisation.organisationClaim.originalSubscriptionClaimId !== INTERNAL_CLAIM_ID.TEAM) {
-      return 'alert';
+    if (
+      fullOrganisation.organisationClaim.originalSubscriptionClaimId !==
+      INTERNAL_CLAIM_ID.TEAM
+    ) {
+      return "alert";
     }
 
-    return 'form';
+    return "form";
   }, [fullOrganisation]);
 
   useEffect(() => {
     if (!open) {
       form.reset();
-      setInvitationType('INDIVIDUAL');
+      setInvitationType("INDIVIDUAL");
     }
   }, [open, form]);
 
@@ -213,7 +237,7 @@ export const OrganisationMemberInviteDialog = ({
 
     Papa.parse(csvFile, {
       skipEmptyLines: true,
-      comments: 'Work email,Job title',
+      comments: "Work email,Job title",
       complete: (results: ParseResult<string[]>) => {
         const members = results.data.map((row) => {
           const [email, role] = row;
@@ -225,26 +249,30 @@ export const OrganisationMemberInviteDialog = ({
         });
 
         // Remove the first row if it contains the headers.
-        if (members.length > 1 && members[0].organisationRole.toUpperCase() === 'ROLE') {
+        if (
+          members.length > 1 &&
+          members[0].organisationRole.toUpperCase() === "ROLE"
+        ) {
           members.shift();
         }
 
         try {
-          const importedInvitations = ZImportOrganisationMemberSchema.parse(members);
+          const importedInvitations =
+            ZImportOrganisationMemberSchema.parse(members);
 
-          form.setValue('invitations', importedInvitations);
-          form.clearErrors('invitations');
+          form.setValue("invitations", importedInvitations);
+          form.clearErrors("invitations");
 
-          setInvitationType('INDIVIDUAL');
+          setInvitationType("INDIVIDUAL");
         } catch (err) {
           console.error(err);
 
           toast({
             title: _(msg`Something went wrong`),
             description: _(
-              msg`Please check the CSV file and make sure it is according to our format`,
+              msg`Please check the CSV file and make sure it is according to our format`
             ),
-            variant: 'destructive',
+            variant: "destructive",
           });
         }
       },
@@ -253,20 +281,21 @@ export const OrganisationMemberInviteDialog = ({
 
   const downloadTemplate = () => {
     const data = [
-      { email: 'admin@documenso.com', role: 'Admin' },
-      { email: 'manager@documenso.com', role: 'Manager' },
-      { email: 'member@documenso.com', role: 'Member' },
+      { email: "admin@documenso.com", role: "Admin" },
+      { email: "manager@documenso.com", role: "Manager" },
+      { email: "member@documenso.com", role: "Member" },
     ];
 
     const csvContent =
-      'Email address,Role\n' + data.map((row) => `${row.email},${row.role}`).join('\n');
+      "Email address,Role\n" +
+      data.map((row) => `${row.email},${row.role}`).join("\n");
 
     const blob = new Blob([csvContent], {
-      type: 'text/csv',
+      type: "text/csv",
     });
 
     downloadFile({
-      filename: 'documenso-organisation-member-invites-template.csv',
+      filename: "documenso-organisation-member-invites-template.csv",
       data: blob,
     });
   };
@@ -292,13 +321,15 @@ export const OrganisationMemberInviteDialog = ({
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            <Trans>An email containing an invitation will be sent to each member.</Trans>
+            <Trans>
+              An email containing an invitation will be sent to each member.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
-        {dialogState === 'loading' && <SpinnerBox className="py-32" />}
+        {dialogState === "loading" && <SpinnerBox className="py-32" />}
 
-        {dialogState === 'alert' && (
+        {dialogState === "alert" && (
           <>
             <Alert
               className="flex flex-col justify-between p-6 sm:flex-row sm:items-center"
@@ -306,22 +337,27 @@ export const OrganisationMemberInviteDialog = ({
             >
               <AlertDescription>
                 <Trans>
-                  Your plan does not support inviting members. Please upgrade or your plan or
-                  contact sales at <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if you
+                  Your plan does not support inviting members. Please upgrade or
+                  your plan or contact sales at{" "}
+                  <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if you
                   would like to discuss your options.
                 </Trans>
               </AlertDescription>
             </Alert>
 
             <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
                 <Trans>Cancel</Trans>
               </Button>
             </DialogFooter>
           </>
         )}
 
-        {dialogState === 'form' && (
+        {dialogState === "form" && (
           <Tabs
             defaultValue="INDIVIDUAL"
             value={invitationType}
@@ -329,13 +365,20 @@ export const OrganisationMemberInviteDialog = ({
             onValueChange={(value) => setInvitationType(value as TabTypes)}
           >
             <TabsList className="w-full">
-              <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
+              <TabsTrigger
+                value="INDIVIDUAL"
+                className="hover:text-foreground w-full"
+              >
                 <MailIcon size={20} className="mr-2" />
                 <Trans>Invite Members</Trans>
               </TabsTrigger>
 
-              <TabsTrigger value="BULK" className="hover:text-foreground w-full">
-                <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
+              <TabsTrigger
+                value="BULK"
+                className="hover:text-foreground w-full"
+              >
+                <UsersIcon size={20} className="mr-2" />{" "}
+                <Trans>Bulk Import</Trans>
               </TabsTrigger>
             </TabsList>
 
@@ -347,74 +390,86 @@ export const OrganisationMemberInviteDialog = ({
                     disabled={form.formState.isSubmitting}
                   >
                     <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
-                      {organisationMemberInvites.map((organisationMemberInvite, index) => (
-                        <div
-                          className="flex w-full flex-row space-x-4"
-                          key={organisationMemberInvite.id}
-                        >
-                          <FormField
-                            control={form.control}
-                            name={`invitations.${index}.email`}
-                            render={({ field }) => (
-                              <FormItem className="w-full">
-                                {index === 0 && (
-                                  <FormLabel required>
-                                    <Trans>Email address</Trans>
-                                  </FormLabel>
-                                )}
-                                <FormControl>
-                                  <Input className="bg-background" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`invitations.${index}.organisationRole`}
-                            render={({ field }) => (
-                              <FormItem className="w-full">
-                                {index === 0 && (
-                                  <FormLabel required>
-                                    <Trans>Organisation Role</Trans>
-                                  </FormLabel>
-                                )}
-                                <FormControl>
-                                  <Select {...field} onValueChange={field.onChange}>
-                                    <SelectTrigger className="text-muted-foreground max-w-[200px]">
-                                      <SelectValue />
-                                    </SelectTrigger>
-
-                                    <SelectContent position="popper">
-                                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                                        organisation.currentOrganisationRole
-                                      ].map((role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <button
-                            type="button"
-                            className={cn(
-                              'justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                              index === 0 ? 'mt-8' : 'mt-0',
-                            )}
-                            disabled={organisationMemberInvites.length === 1}
-                            onClick={() => removeOrganisationMemberInvite(index)}
+                      {organisationMemberInvites.map(
+                        (organisationMemberInvite, index) => (
+                          <div
+                            className="flex w-full flex-row space-x-4"
+                            key={organisationMemberInvite.id}
                           >
-                            <Trash className="h-5 w-5" />
-                          </button>
-                        </div>
-                      ))}
+                            <FormField
+                              control={form.control}
+                              name={`invitations.${index}.email`}
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  {index === 0 && (
+                                    <FormLabel required>
+                                      <Trans>Email address</Trans>
+                                    </FormLabel>
+                                  )}
+                                  <FormControl>
+                                    <Input
+                                      className="bg-background"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`invitations.${index}.organisationRole`}
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  {index === 0 && (
+                                    <FormLabel required>
+                                      <Trans>Organisation Role</Trans>
+                                    </FormLabel>
+                                  )}
+                                  <FormControl>
+                                    <Select
+                                      {...field}
+                                      onValueChange={field.onChange}
+                                    >
+                                      <SelectTrigger className="text-muted-foreground max-w-[200px]">
+                                        <SelectValue />
+                                      </SelectTrigger>
+
+                                      <SelectContent position="popper">
+                                        {ORGANISATION_MEMBER_ROLE_HIERARCHY[
+                                          organisation.currentOrganisationRole
+                                        ].map((role) => (
+                                          <SelectItem key={role} value={role}>
+                                            {_(
+                                              ORGANISATION_MEMBER_ROLE_MAP[role]
+                                            ) ?? role}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <button
+                              type="button"
+                              className={cn(
+                                "justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50",
+                                index === 0 ? "mt-8" : "mt-0"
+                              )}
+                              disabled={organisationMemberInvites.length === 1}
+                              onClick={() =>
+                                removeOrganisationMemberInvite(index)
+                              }
+                            >
+                              <Trash className="h-5 w-5" />
+                            </button>
+                          </div>
+                        )
+                      )}
                     </div>
 
                     <Button
@@ -429,12 +484,21 @@ export const OrganisationMemberInviteDialog = ({
                     </Button>
 
                     <DialogFooter>
-                      <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => setOpen(false)}
+                      >
                         <Trans>Cancel</Trans>
                       </Button>
 
-                      <Button type="submit" loading={form.formState.isSubmitting}>
-                        {!form.formState.isSubmitting && <Mail className="mr-2 h-4 w-4" />}
+                      <Button
+                        type="submit"
+                        loading={form.formState.isSubmitting}
+                      >
+                        {!form.formState.isSubmitting && (
+                          <Mail className="mr-2 h-4 w-4" />
+                        )}
                         <Trans>Invite</Trans>
                       </Button>
                     </DialogFooter>
@@ -467,7 +531,11 @@ export const OrganisationMemberInviteDialog = ({
                 </Card>
 
                 <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={downloadTemplate}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={downloadTemplate}
+                  >
                     <Download className="mr-2 h-4 w-4" />
                     <Trans>Template</Trans>
                   </Button>

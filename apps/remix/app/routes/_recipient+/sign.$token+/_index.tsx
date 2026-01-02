@@ -1,43 +1,48 @@
-import { Trans } from '@lingui/react/macro';
-import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { Clock8 } from 'lucide-react';
-import { Link, redirect } from 'react-router';
-import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
-import { match } from 'ts-pattern';
+import { Trans } from "@lingui/react/macro";
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  RecipientRole,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { Clock8 } from "lucide-react";
+import { Link, redirect } from "react-router";
+import { getOptionalLoaderContext } from "server/utils/get-loader-session";
+import { match } from "ts-pattern";
 
-import signingCelebration from '@signtusk/assets/images/signing-celebration.png';
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { EnvelopeRenderProvider } from '@signtusk/lib/client-only/providers/envelope-render-provider';
-import { useOptionalSession } from '@signtusk/lib/client-only/providers/session';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getDocumentAndSenderByToken } from '@signtusk/lib/server-only/document/get-document-by-token';
-import { viewedDocument } from '@signtusk/lib/server-only/document/viewed-document';
-import { getEnvelopeForRecipientSigning } from '@signtusk/lib/server-only/envelope/get-envelope-for-recipient-signing';
-import { getEnvelopeRequiredAccessData } from '@signtusk/lib/server-only/envelope/get-envelope-required-access-data';
-import { getCompletedFieldsForToken } from '@signtusk/lib/server-only/field/get-completed-fields-for-token';
-import { getFieldsForToken } from '@signtusk/lib/server-only/field/get-fields-for-token';
-import { getIsRecipientsTurnToSign } from '@signtusk/lib/server-only/recipient/get-is-recipient-turn';
-import { getNextPendingRecipient } from '@signtusk/lib/server-only/recipient/get-next-pending-recipient';
-import { getRecipientByToken } from '@signtusk/lib/server-only/recipient/get-recipient-by-token';
-import { getRecipientSignatures } from '@signtusk/lib/server-only/recipient/get-recipient-signatures';
-import { getRecipientsForAssistant } from '@signtusk/lib/server-only/recipient/get-recipients-for-assistant';
-import { getTeamSettings } from '@signtusk/lib/server-only/team/get-team-settings';
-import { getUserByEmail } from '@signtusk/lib/server-only/user/get-user-by-email';
-import { DocumentAccessAuth } from '@signtusk/lib/types/document-auth';
-import { extractDocumentAuthMethods } from '@signtusk/lib/utils/document-auth';
-import { prisma } from '@signtusk/prisma';
-import { SigningCard3D } from '@signtusk/ui/components/signing-card';
+import signingCelebration from "@signtusk/assets/images/signing-celebration.png";
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { EnvelopeRenderProvider } from "@signtusk/lib/client-only/providers/envelope-render-provider";
+import { useOptionalSession } from "@signtusk/lib/client-only/providers/session";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getDocumentAndSenderByToken } from "@signtusk/lib/server-only/document/get-document-by-token";
+import { viewedDocument } from "@signtusk/lib/server-only/document/viewed-document";
+import { getEnvelopeForRecipientSigning } from "@signtusk/lib/server-only/envelope/get-envelope-for-recipient-signing";
+import { getEnvelopeRequiredAccessData } from "@signtusk/lib/server-only/envelope/get-envelope-required-access-data";
+import { getCompletedFieldsForToken } from "@signtusk/lib/server-only/field/get-completed-fields-for-token";
+import { getFieldsForToken } from "@signtusk/lib/server-only/field/get-fields-for-token";
+import { getIsRecipientsTurnToSign } from "@signtusk/lib/server-only/recipient/get-is-recipient-turn";
+import { getNextPendingRecipient } from "@signtusk/lib/server-only/recipient/get-next-pending-recipient";
+import { getRecipientByToken } from "@signtusk/lib/server-only/recipient/get-recipient-by-token";
+import { getRecipientSignatures } from "@signtusk/lib/server-only/recipient/get-recipient-signatures";
+import { getRecipientsForAssistant } from "@signtusk/lib/server-only/recipient/get-recipients-for-assistant";
+import { getTeamSettings } from "@signtusk/lib/server-only/team/get-team-settings";
+import { getUserByEmail } from "@signtusk/lib/server-only/user/get-user-by-email";
+import { DocumentAccessAuth } from "@signtusk/lib/types/document-auth";
+import { extractDocumentAuthMethods } from "@signtusk/lib/utils/document-auth";
+import { prisma } from "@signtusk/prisma";
+import { SigningCard3D } from "@signtusk/ui/components/signing-card";
 
-import { Header as AuthenticatedHeader } from '~/components/general/app-header';
-import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
-import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
-import { DocumentSigningPageViewV1 } from '~/components/general/document-signing/document-signing-page-view-v1';
-import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
-import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
-import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
-import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
+import { Header as AuthenticatedHeader } from "~/components/general/app-header";
+import { DocumentSigningAuthPageView } from "~/components/general/document-signing/document-signing-auth-page";
+import { DocumentSigningAuthProvider } from "~/components/general/document-signing/document-signing-auth-provider";
+import { DocumentSigningPageViewV1 } from "~/components/general/document-signing/document-signing-page-view-v1";
+import { DocumentSigningPageViewV2 } from "~/components/general/document-signing/document-signing-page-view-v2";
+import { DocumentSigningProvider } from "~/components/general/document-signing/document-signing-provider";
+import { EnvelopeSigningProvider } from "~/components/general/document-signing/envelope-signing-provider";
+import { superLoaderJson, useSuperLoaderData } from "~/utils/super-json-loader";
 
-import type { Route } from './+types/_index';
+import type { Route } from "./+types/_index";
 
 const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
   const { requestMetadata } = getOptionalLoaderContext();
@@ -47,7 +52,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
   const { token } = params;
 
   if (!token) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const [document, recipient, fields, completedFields] = await Promise.all([
@@ -67,7 +72,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     !recipient ||
     document.status === DocumentStatus.DRAFT
   ) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const recipientWithFields = { ...recipient, fields };
@@ -109,9 +114,12 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
-      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(
+        DocumentAccessAuth.ACCOUNT,
+        () => user && user.email === recipient.email
+      )
       .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
-      .exhaustive(),
+      .exhaustive()
   );
 
   let recipientHasAccount: boolean | null = null;
@@ -147,7 +155,9 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     throw redirect(documentMeta?.redirectUrl || `/sign/${token}/complete`);
   }
 
-  const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
+  const [recipientSignature] = await getRecipientSignatures({
+    recipientId: recipient.id,
+  });
 
   const settings = await getTeamSettings({ teamId: document.teamId });
 
@@ -186,7 +196,9 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
       const error = AppError.parseError(e);
 
       if (error.code === AppErrorCode.UNAUTHORIZED) {
-        const requiredAccessData = await getEnvelopeRequiredAccessData({ token });
+        const requiredAccessData = await getEnvelopeRequiredAccessData({
+          token,
+        });
 
         return {
           isDocumentAccessValid: false,
@@ -194,14 +206,15 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
         } as const;
       }
 
-      throw new Response('Not Found', { status: 404 });
+      throw new Response("Not Found", { status: 404 });
     });
 
   if (!envelopeForSigning.isDocumentAccessValid) {
     return envelopeForSigning;
   }
 
-  const { envelope, recipient, isCompleted, isRejected, isRecipientsTurn } = envelopeForSigning;
+  const { envelope, recipient, isCompleted, isRejected, isRecipientsTurn } =
+    envelopeForSigning;
 
   if (!isRecipientsTurn) {
     throw redirect(`/sign/${token}/waiting`);
@@ -214,9 +227,12 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
-      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(
+        DocumentAccessAuth.ACCOUNT,
+        () => user && user.email === recipient.email
+      )
       .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
-      .exhaustive(),
+      .exhaustive()
   );
 
   let recipientHasAccount: boolean | null = null;
@@ -244,7 +260,9 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 
   if (isCompleted) {
-    throw redirect(envelope.documentMeta.redirectUrl || `/sign/${token}/complete`);
+    throw redirect(
+      envelope.documentMeta.redirectUrl || `/sign/${token}/complete`
+    );
   }
 
   return {
@@ -257,7 +275,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const { token } = loaderArgs.params;
 
   if (!token) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   // Not efficient but works for now until we remove v1.
@@ -275,7 +293,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   });
 
   if (!foundRecipient) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   if (foundRecipient.envelope.internalVersion === 2) {
@@ -305,7 +323,11 @@ export default function SigningPage() {
   return <SigningPageV1 data={data.payload} />;
 }
 
-const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loader>> }) => {
+const SigningPageV1 = ({
+  data,
+}: {
+  data: Awaited<ReturnType<typeof handleV1Loader>>;
+}) => {
   const { sessionData } = useOptionalSession();
 
   const user = sessionData?.user;
@@ -360,13 +382,16 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
           </p>
 
           {user ? (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            <Link
+              to="/"
+              className="text-documenso-700 hover:text-documenso-600 mt-36"
+            >
               <Trans>Go Back Home</Trans>
             </Link>
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-                Want to send slick signing links like this one?{' '}
+                Want to send slick signing links like this one?{" "}
                 <Link
                   to="https://documenso.com"
                   className="text-documenso-700 hover:text-documenso-600"
@@ -416,7 +441,11 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
   );
 };
 
-const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loader>> }) => {
+const SigningPageV2 = ({
+  data,
+}: {
+  data: Awaited<ReturnType<typeof handleV2Loader>>;
+}) => {
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
 
@@ -460,13 +489,16 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
           </p>
 
           {user ? (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            <Link
+              to="/"
+              className="text-documenso-700 hover:text-documenso-600 mt-36"
+            >
               <Trans>Go Back Home</Trans>
             </Link>
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-                Want to send slick signing links like this one?{' '}
+                Want to send slick signing links like this one?{" "}
                 <Link
                   to="https://documenso.com"
                   className="text-documenso-700 hover:text-documenso-600"

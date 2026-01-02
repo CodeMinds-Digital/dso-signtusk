@@ -1,16 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import type { Webhook } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { trpc } from '@signtusk/trpc/react';
-import { ZEditWebhookRequestSchema } from '@signtusk/trpc/server/webhook-router/schema';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { ZEditWebhookRequestSchema } from "@signtusk/trpc/server/webhook-router/schema";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogClose,
@@ -20,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -29,13 +28,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { PasswordInput } from '@signtusk/ui/primitives/password-input';
-import { Switch } from '@signtusk/ui/primitives/switch';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { PasswordInput } from "@signtusk/ui/primitives/password-input";
+import { Switch } from "@signtusk/ui/primitives/switch";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
+import { WebhookMultiSelectCombobox } from "../general/webhook-multiselect-combobox";
 
 const ZEditWebhookFormSchema = ZEditWebhookRequestSchema.omit({ id: true });
 
@@ -44,9 +43,13 @@ type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 export type WebhookEditDialogProps = {
   trigger?: React.ReactNode;
   webhook: Webhook;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
-export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDialogProps) => {
+export const WebhookEditDialog = ({
+  trigger,
+  webhook,
+  ...props
+}: WebhookEditDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -57,9 +60,9 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
   const form = useForm<TEditWebhookFormSchema>({
     resolver: zodResolver(ZEditWebhookFormSchema),
     values: {
-      webhookUrl: webhook?.webhookUrl ?? '',
+      webhookUrl: webhook?.webhookUrl ?? "",
       eventTriggers: webhook?.eventTriggers ?? [],
-      secret: webhook?.secret ?? '',
+      secret: webhook?.secret ?? "",
       enabled: webhook?.enabled ?? true,
     },
   });
@@ -80,7 +83,7 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
       toast({
         title: t`Failed to update webhook`,
         description: t`We encountered an error while updating the webhook. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -121,7 +124,9 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
                       </FormControl>
 
                       <FormDescription>
-                        <Trans>The URL for Documenso to send webhook events to.</Trans>
+                        <Trans>
+                          The URL for Documenso to send webhook events to.
+                        </Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -172,7 +177,10 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The events that will trigger a webhook to be sent to your URL.</Trans>
+                      <Trans>
+                        The events that will trigger a webhook to be sent to
+                        your URL.
+                      </Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -190,14 +198,14 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
                       <PasswordInput
                         className="bg-background"
                         {...field}
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
 
                     <FormDescription>
                       <Trans>
-                        A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso.
+                        A secret that will be sent to your URL so you can verify
+                        that the request has been sent by Documenso.
                       </Trans>
                     </FormDescription>
                     <FormMessage />

@@ -1,19 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { useLocation, useSearchParams } from 'react-router';
+import { useLingui } from "@lingui/react/macro";
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { useLocation, useSearchParams } from "react-router";
 
-import { useDebouncedValue } from '@signtusk/lib/client-only/hooks/use-debounced-value';
-import { trpc } from '@signtusk/trpc/react';
-import { AnimateGenericFadeInOut } from '@signtusk/ui/components/animate/animate-generic-fade-in-out';
-import { Input } from '@signtusk/ui/primitives/input';
+import { useDebouncedValue } from "@signtusk/lib/client-only/hooks/use-debounced-value";
+import { trpc } from "@signtusk/trpc/react";
+import { AnimateGenericFadeInOut } from "@signtusk/ui/components/animate/animate-generic-fade-in-out";
+import { Input } from "@signtusk/ui/primitives/input";
 
-import { TeamGroupCreateDialog } from '~/components/dialogs/team-group-create-dialog';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { TeamInheritMemberAlert } from '~/components/general/teams/team-inherit-member-alert';
-import { TeamGroupsTable } from '~/components/tables/team-groups-table';
-import { useCurrentTeam } from '~/providers/team';
+import { TeamGroupCreateDialog } from "~/components/dialogs/team-group-create-dialog";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { TeamInheritMemberAlert } from "~/components/general/teams/team-inherit-member-alert";
+import { TeamGroupsTable } from "~/components/tables/team-groups-table";
+import { useCurrentTeam } from "~/providers/team";
 
 export default function TeamsSettingsGroupsPage() {
   const { t } = useLingui();
@@ -23,7 +26,9 @@ export default function TeamsSettingsGroupsPage() {
   const { pathname } = useLocation();
   const team = useCurrentTeam();
 
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
+  const [searchQuery, setSearchQuery] = useState(
+    () => searchParams?.get("query") ?? ""
+  );
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
@@ -33,10 +38,10 @@ export default function TeamsSettingsGroupsPage() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams?.toString());
 
-    params.set('query', debouncedSearchQuery);
+    params.set("query", debouncedSearchQuery);
 
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
+    if (debouncedSearchQuery === "") {
+      params.delete("query");
     }
 
     // If nothing  to change then do nothing.
@@ -58,7 +63,10 @@ export default function TeamsSettingsGroupsPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Team Groups`} subtitle={t`Manage the groups assigned to this team.`}>
+      <SettingsHeader
+        title={t`Team Groups`}
+        subtitle={t`Manage the groups assigned to this team.`}
+      >
         <TeamGroupCreateDialog />
       </SettingsHeader>
 
@@ -71,9 +79,13 @@ export default function TeamsSettingsGroupsPage() {
 
       <TeamGroupsTable />
 
-      <AnimateGenericFadeInOut key={everyoneGroupQuery.isFetched ? 'true' : 'false'}>
+      <AnimateGenericFadeInOut
+        key={everyoneGroupQuery.isFetched ? "true" : "false"}
+      >
         {everyoneGroupQuery.isFetched && (
-          <TeamInheritMemberAlert memberAccessTeamGroup={memberAccessTeamGroup} />
+          <TeamInheritMemberAlert
+            memberAccessTeamGroup={memberAccessTeamGroup}
+          />
         )}
       </AnimateGenericFadeInOut>
     </div>

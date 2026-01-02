@@ -1,37 +1,43 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  TemplateType,
+  type TemplateDirectLink,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { getSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { getTeamByUrl } from '@signtusk/lib/server-only/team/get-team';
-import { getTeamPublicProfile } from '@signtusk/lib/server-only/team/get-team-public-profile';
-import { trpc } from '@signtusk/trpc/react';
-import type { FindTemplateRow } from '@signtusk/trpc/server/template-router/schema';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Switch } from '@signtusk/ui/primitives/switch';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+import { getSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { getTeamByUrl } from "@signtusk/lib/server-only/team/get-team";
+import { getTeamPublicProfile } from "@signtusk/lib/server-only/team/get-team-public-profile";
+import { trpc } from "@signtusk/trpc/react";
+import type { FindTemplateRow } from "@signtusk/trpc/server/template-router/schema";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Switch } from "@signtusk/ui/primitives/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@signtusk/ui/primitives/tooltip";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
-import type { TPublicProfileFormSchema } from '~/components/forms/public-profile-form';
-import { PublicProfileForm } from '~/components/forms/public-profile-form';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { SettingsPublicProfileTemplatesTable } from '~/components/tables/settings-public-profile-templates-table';
-import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import { ManagePublicTemplateDialog } from "~/components/dialogs/public-profile-template-manage-dialog";
+import type { TPublicProfileFormSchema } from "~/components/forms/public-profile-form";
+import { PublicProfileForm } from "~/components/forms/public-profile-form";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { SettingsPublicProfileTemplatesTable } from "~/components/tables/settings-public-profile-templates-table";
+import { useCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
-import type { Route } from './+types/settings.public-profile';
+import type { Route } from "./+types/settings.public-profile";
 
 type DirectTemplate = FindTemplateRow & {
-  directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
+  directLink: Pick<TemplateDirectLink, "token" | "enabled">;
 };
 
 export function meta() {
-  return appMetaTags('Public Profile');
+  return appMetaTags("Public Profile");
 }
 
 // Todo: This can be optimized.
@@ -53,7 +59,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   };
 }
 
-export default function PublicProfilePage({ loaderData }: Route.ComponentProps) {
+export default function PublicProfilePage({
+  loaderData,
+}: Route.ComponentProps) {
   const { profile } = loaderData;
 
   const { t } = useLingui();
@@ -63,7 +71,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
   const { refreshSession } = useSession();
 
-  const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);
+  const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(
+    profile.enabled
+  );
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const { data } = trpc.template.findTemplates.useQuery({
@@ -83,9 +93,10 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
     () =>
       (data?.data ?? []).filter(
         (template): template is DirectTemplate =>
-          template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
+          template.directLink?.enabled === true &&
+          template.type !== TemplateType.PUBLIC
       ),
-    [data],
+    [data]
   );
 
   const onProfileUpdate = async (data: TPublicProfileFormSchema) => {
@@ -122,7 +133,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
       toast({
         title: t`Something went wrong`,
         description: t`We were unable to set your public profile to public. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
 
       setIsPublicProfileVisible(!isVisible);
@@ -143,11 +154,13 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           <TooltipTrigger asChild>
             <div
               className={cn(
-                'text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs',
+                "text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs",
                 {
-                  '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
-                  '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
-                },
+                  "[&>*:first-child]:text-muted-foreground":
+                    !isPublicProfileVisible,
+                  "[&>*:last-child]:text-muted-foreground":
+                    isPublicProfileVisible,
+                }
               )}
             >
               <span>
@@ -174,7 +187,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 </p>
 
                 <p>
-                  <Trans>Toggle the switch to hide your profile from the public.</Trans>
+                  <Trans>
+                    Toggle the switch to hide your profile from the public.
+                  </Trans>
                 </p>
               </>
             ) : (
@@ -186,7 +201,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 </p>
 
                 <p>
-                  <Trans>Toggle the switch to show your profile to the public.</Trans>
+                  <Trans>
+                    Toggle the switch to show your profile to the public.
+                  </Trans>
                 </p>
               </>
             )}

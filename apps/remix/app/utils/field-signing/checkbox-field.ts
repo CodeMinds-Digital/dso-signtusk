@@ -1,4 +1,4 @@
-import { FieldType } from "@signtusk/prisma/enums";
+import { FieldType } from "@signtusk/lib/constants/prisma-enums";
 
 import { validateCheckboxLength } from "@signtusk/lib/advanced-fields-validation/validate-checkbox";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";

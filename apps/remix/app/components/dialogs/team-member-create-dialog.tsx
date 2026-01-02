@@ -1,19 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { InfoIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router";
+import { match } from "ts-pattern";
+import { z } from "zod";
 
-import { TEAM_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/teams';
-import { TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/teams";
+import { TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -31,39 +31,46 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { MultiSelectCombobox } from '@signtusk/ui/primitives/multi-select-combobox';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { MultiSelectCombobox } from "@signtusk/ui/primitives/multi-select-combobox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@signtusk/ui/primitives/tooltip";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export type TeamMemberCreateDialogProps = {
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZAddTeamMembersFormSchema = z.object({
   members: z.array(
     z.object({
       organisationMemberId: z.string(),
       teamRole: z.nativeEnum(TeamMemberRole),
-    }),
+    })
   ),
 });
 
 type TAddTeamMembersFormSchema = z.infer<typeof ZAddTeamMembersFormSchema>;
 
-export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDialogProps) => {
+export const TeamMemberCreateDialog = ({
+  trigger,
+  ...props
+}: TeamMemberCreateDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<'SELECT' | 'MEMBERS'>('SELECT');
+  const [step, setStep] = useState<"SELECT" | "MEMBERS">("SELECT");
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -77,7 +84,8 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
     },
   });
 
-  const { mutateAsync: createTeamMembers } = trpc.team.member.createMany.useMutation();
+  const { mutateAsync: createTeamMembers } =
+    trpc.team.member.createMany.useMutation();
 
   const organisationMemberQuery = trpc.organisation.member.find.useQuery({
     organisationId: team.organisationId,
@@ -92,7 +100,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
     const teamMembers = teamMemberQuery.data?.data ?? [];
 
     return organisationMembers.filter(
-      (member) => !teamMembers.some((teamMember) => teamMember.id === member.id),
+      (member) => !teamMembers.some((teamMember) => teamMember.id === member.id)
     );
   }, [organisationMemberQuery, teamMemberQuery]);
 
@@ -114,7 +122,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting to add team members. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -122,7 +130,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
   useEffect(() => {
     if (!open) {
       form.reset();
-      setStep('SELECT');
+      setStep("SELECT");
     }
   }, [open, form]);
 
@@ -141,7 +149,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
       <DialogContent hideClose={true} position="center">
         {match(step)
-          .with('SELECT', () => (
+          .with("SELECT", () => (
             <DialogHeader>
               <DialogTitle className="flex flex-row items-center">
                 <Trans>Add members</Trans>
@@ -151,8 +159,9 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   </TooltipTrigger>
                   <TooltipContent className="text-muted-foreground z-[99999] max-w-xs">
                     <Trans>
-                      To be able to add members to a team, you must first add them to the
-                      organisation. For more information, please see the{' '}
+                      To be able to add members to a team, you must first add
+                      them to the organisation. For more information, please see
+                      the{" "}
                       <Link
                         to="https://docs.documenso.com/users/organisations/members"
                         target="_blank"
@@ -168,11 +177,13 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
               </DialogTitle>
 
               <DialogDescription>
-                <Trans>Select members or groups of members to add to the team.</Trans>
+                <Trans>
+                  Select members or groups of members to add to the team.
+                </Trans>
               </DialogDescription>
             </DialogHeader>
           ))
-          .with('MEMBERS', () => (
+          .with("MEMBERS", () => (
             <DialogHeader>
               <DialogTitle>
                 <Trans>Add members roles</Trans>
@@ -188,7 +199,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset disabled={form.formState.isSubmitting}>
-              {step === 'SELECT' && (
+              {step === "SELECT" && (
                 <>
                   <FormField
                     control={form.control}
@@ -201,13 +212,15 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
                         <FormControl>
                           <MultiSelectCombobox
-                            options={avaliableOrganisationMembers.map((member) => ({
-                              label: member.name,
-                              value: member.id,
-                            }))}
+                            options={avaliableOrganisationMembers.map(
+                              (member) => ({
+                                label: member.name,
+                                value: member.id,
+                              })
+                            )}
                             loading={organisationMemberQuery.isLoading}
                             selectedValues={field.value.map(
-                              (member) => member.organisationMemberId,
+                              (member) => member.organisationMemberId
                             )}
                             onChange={(value) => {
                               field.onChange(
@@ -216,9 +229,10 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                   teamRole:
                                     field.value.find(
                                       (member) =>
-                                        member.organisationMemberId === organisationMemberId,
+                                        member.organisationMemberId ===
+                                        organisationMemberId
                                     )?.teamRole || TeamMemberRole.MEMBER,
-                                })),
+                                }))
                               );
                             }}
                             className="bg-background w-full"
@@ -234,15 +248,19 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   />
 
                   <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setOpen(false)}
+                    >
                       <Trans>Cancel</Trans>
                     </Button>
 
                     <Button
                       type="button"
-                      disabled={form.getValues('members').length === 0}
+                      disabled={form.getValues("members").length === 0}
                       onClick={() => {
-                        setStep('MEMBERS');
+                        setStep("MEMBERS");
                       }}
                     >
                       <Trans>Next</Trans>
@@ -251,11 +269,14 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                 </>
               )}
 
-              {step === 'MEMBERS' && (
+              {step === "MEMBERS" && (
                 <>
                   <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
-                    {form.getValues('members').map((member, index) => (
-                      <div className="flex w-full flex-row space-x-4" key={index}>
+                    {form.getValues("members").map((member, index) => (
+                      <div
+                        className="flex w-full flex-row space-x-4"
+                        key={index}
+                      >
                         <div className="w-full space-y-2">
                           {index === 0 && (
                             <FormLabel>
@@ -267,8 +288,8 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                             className="bg-background"
                             value={
                               organisationMemberQuery.data?.data.find(
-                                ({ id }) => id === member.organisationMemberId,
-                              )?.name || ''
+                                ({ id }) => id === member.organisationMemberId
+                              )?.name || ""
                             }
                           />
                         </div>
@@ -284,19 +305,22 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                 </FormLabel>
                               )}
                               <FormControl>
-                                <Select {...field} onValueChange={field.onChange}>
+                                <Select
+                                  {...field}
+                                  onValueChange={field.onChange}
+                                >
                                   <SelectTrigger className="text-muted-foreground">
                                     <SelectValue />
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[
+                                      team.currentTeamRole
+                                    ].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -309,7 +333,11 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   </div>
 
                   <DialogFooter className="mt-4">
-                    <Button type="button" variant="secondary" onClick={() => setStep('SELECT')}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setStep("SELECT")}
+                    >
                       <Trans>Back</Trans>
                     </Button>
 

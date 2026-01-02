@@ -1,17 +1,20 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import {
+  OrganisationGroupType,
+  TeamMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { match } from "ts-pattern";
+import { z } from "zod";
 
-import { TEAM_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/teams';
-import { TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/teams";
+import { TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -29,36 +32,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { MultiSelectCombobox } from '@signtusk/ui/primitives/multi-select-combobox';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { MultiSelectCombobox } from "@signtusk/ui/primitives/multi-select-combobox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
-export type TeamGroupCreateDialogProps = Omit<DialogPrimitive.DialogProps, 'children'>;
+export type TeamGroupCreateDialogProps = Omit<
+  DialogPrimitive.DialogProps,
+  "children"
+>;
 
 const ZAddTeamMembersFormSchema = z.object({
   groups: z.array(
     z.object({
       organisationGroupId: z.string(),
       teamRole: z.nativeEnum(TeamMemberRole),
-    }),
+    })
   ),
 });
 
 type TAddTeamMembersFormSchema = z.infer<typeof ZAddTeamMembersFormSchema>;
 
-export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) => {
+export const TeamGroupCreateDialog = ({
+  ...props
+}: TeamGroupCreateDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<'SELECT' | 'ROLES'>('SELECT');
+  const [step, setStep] = useState<"SELECT" | "ROLES">("SELECT");
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -72,7 +80,8 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
     },
   });
 
-  const { mutateAsync: createTeamGroups } = trpc.team.group.createMany.useMutation();
+  const { mutateAsync: createTeamGroups } =
+    trpc.team.group.createMany.useMutation();
 
   const organisationGroupQuery = trpc.organisation.group.find.useQuery({
     organisationId: team.organisationId,
@@ -90,7 +99,10 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
     const teamGroups = teamGroupQuery.data?.data ?? [];
 
     return organisationGroups.filter(
-      (group) => !teamGroups.some((teamGroup) => teamGroup.organisationGroupId === group.id),
+      (group) =>
+        !teamGroups.some(
+          (teamGroup) => teamGroup.organisationGroupId === group.id
+        )
     );
   }, [organisationGroupQuery, teamGroupQuery]);
 
@@ -112,7 +124,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting to add team members. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -120,7 +132,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
   useEffect(() => {
     if (!open) {
       form.reset();
-      setStep('SELECT');
+      setStep("SELECT");
     }
   }, [open, form]);
 
@@ -139,7 +151,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
 
       <DialogContent hideClose={true} position="center">
         {match(step)
-          .with('SELECT', () => (
+          .with("SELECT", () => (
             <DialogHeader>
               <DialogTitle>
                 <Trans>Add groups</Trans>
@@ -150,7 +162,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
               </DialogDescription>
             </DialogHeader>
           ))
-          .with('ROLES', () => (
+          .with("ROLES", () => (
             <DialogHeader>
               <DialogTitle>
                 <Trans>Add group roles</Trans>
@@ -166,7 +178,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset disabled={form.formState.isSubmitting}>
-              {step === 'SELECT' && (
+              {step === "SELECT" && (
                 <>
                   <FormField
                     control={form.control}
@@ -179,13 +191,18 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
 
                         <FormControl>
                           <MultiSelectCombobox
-                            options={avaliableOrganisationGroups.map((group) => ({
-                              label: group.name ?? group.organisationRole,
-                              value: group.id,
-                            }))}
-                            loading={organisationGroupQuery.isLoading || teamGroupQuery.isLoading}
+                            options={avaliableOrganisationGroups.map(
+                              (group) => ({
+                                label: group.name ?? group.organisationRole,
+                                value: group.id,
+                              })
+                            )}
+                            loading={
+                              organisationGroupQuery.isLoading ||
+                              teamGroupQuery.isLoading
+                            }
                             selectedValues={field.value.map(
-                              ({ organisationGroupId }) => organisationGroupId,
+                              ({ organisationGroupId }) => organisationGroupId
                             )}
                             onChange={(value) => {
                               field.onChange(
@@ -193,9 +210,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                   organisationGroupId,
                                   teamRole:
                                     field.value.find(
-                                      (value) => value.organisationGroupId === organisationGroupId,
+                                      (value) =>
+                                        value.organisationGroupId ===
+                                        organisationGroupId
                                     )?.teamRole || TeamMemberRole.MEMBER,
-                                })),
+                                }))
                               );
                             }}
                             className="bg-background w-full"
@@ -211,15 +230,19 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                   />
 
                   <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setOpen(false)}
+                    >
                       <Trans>Cancel</Trans>
                     </Button>
 
                     <Button
                       type="button"
-                      disabled={form.getValues('groups').length === 0}
+                      disabled={form.getValues("groups").length === 0}
                       onClick={() => {
-                        setStep('ROLES');
+                        setStep("ROLES");
                       }}
                     >
                       <Trans>Next</Trans>
@@ -228,11 +251,14 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                 </>
               )}
 
-              {step === 'ROLES' && (
+              {step === "ROLES" && (
                 <>
                   <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
-                    {form.getValues('groups').map((group, index) => (
-                      <div className="flex w-full flex-row space-x-4" key={index}>
+                    {form.getValues("groups").map((group, index) => (
+                      <div
+                        className="flex w-full flex-row space-x-4"
+                        key={index}
+                      >
                         <div className="w-full space-y-2">
                           {index === 0 && (
                             <FormLabel>
@@ -244,7 +270,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                             className="bg-background"
                             value={
                               avaliableOrganisationGroups.find(
-                                ({ id }) => id === group.organisationGroupId,
+                                ({ id }) => id === group.organisationGroupId
                               )?.name || t`Untitled Group`
                             }
                           />
@@ -261,19 +287,22 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                 </FormLabel>
                               )}
                               <FormControl>
-                                <Select {...field} onValueChange={field.onChange}>
+                                <Select
+                                  {...field}
+                                  onValueChange={field.onChange}
+                                >
                                   <SelectTrigger className="text-muted-foreground">
                                     <SelectValue />
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[
+                                      team.currentTeamRole
+                                    ].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -286,7 +315,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                   </div>
 
                   <DialogFooter className="mt-4">
-                    <Button type="button" variant="secondary" onClick={() => setStep('SELECT')}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setStep("SELECT")}
+                    >
                       <Trans>Back</Trans>
                     </Button>
 

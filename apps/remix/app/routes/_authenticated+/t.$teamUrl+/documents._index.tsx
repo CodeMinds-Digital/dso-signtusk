@@ -1,37 +1,43 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { FolderType, OrganisationType } from '@prisma/client';
-import { useParams, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
-import { z } from 'zod';
+import { Trans } from "@lingui/react/macro";
+import {
+  EnvelopeType,
+  FolderType,
+  OrganisationType,
+} from "@signtusk/lib/constants/prisma-enums";
+import { Link, useParams, useSearchParams } from "react-router";
+import { z } from "zod";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { parseToIntegerArray } from '@signtusk/lib/utils/params';
-import { formatDocumentsPath } from '@signtusk/lib/utils/teams';
-import { ExtendedDocumentStatus } from '@signtusk/prisma/types/extended-document-status';
-import { trpc } from '@signtusk/trpc/react';
-import type { TFindDocumentsInternalResponse } from '@signtusk/trpc/server/document-router/find-documents-internal.types';
-import { ZFindDocumentsInternalRequestSchema } from '@signtusk/trpc/server/document-router/find-documents-internal.types';
-import { Avatar, AvatarFallback, AvatarImage } from '@signtusk/ui/primitives/avatar';
-import { Tabs, TabsList, TabsTrigger } from '@signtusk/ui/primitives/tabs';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import { parseToIntegerArray } from "@signtusk/lib/utils/params";
+import { formatDocumentsPath } from "@signtusk/lib/utils/teams";
+import { ExtendedDocumentStatus } from "@signtusk/prisma/types/extended-document-status";
+import { trpc } from "@signtusk/trpc/react";
+import type { TFindDocumentsInternalResponse } from "@signtusk/trpc/server/document-router/find-documents-internal.types";
+import { ZFindDocumentsInternalRequestSchema } from "@signtusk/trpc/server/document-router/find-documents-internal.types";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@signtusk/ui/primitives/avatar";
+import { Tabs, TabsList, TabsTrigger } from "@signtusk/ui/primitives/tabs";
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
-import { DocumentSearch } from '~/components/general/document/document-search';
-import { DocumentStatus } from '~/components/general/document/document-status';
-import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
-import { FolderGrid } from '~/components/general/folder/folder-grid';
-import { PeriodSelector } from '~/components/general/period-selector';
-import { DocumentsTable } from '~/components/tables/documents-table';
-import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
-import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
-import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import { DocumentMoveToFolderDialog } from "~/components/dialogs/document-move-to-folder-dialog";
+import { DocumentSearch } from "~/components/general/document/document-search";
+import { DocumentStatus } from "~/components/general/document/document-status";
+import { EnvelopeDropZoneWrapper } from "~/components/general/envelope/envelope-drop-zone-wrapper";
+import { FolderGrid } from "~/components/general/folder/folder-grid";
+import { PeriodSelector } from "~/components/general/period-selector";
+import { DocumentsTable } from "~/components/tables/documents-table";
+import { DocumentsTableEmptyState } from "~/components/tables/documents-table-empty-state";
+import { DocumentsTableSenderFilter } from "~/components/tables/documents-table-sender-filter";
+import { useCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
 export function meta() {
-  return appMetaTags('Documents');
+  return appMetaTags("Documents");
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
@@ -54,7 +60,7 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
 
-  const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
+  const [stats, setStats] = useState<TFindDocumentsInternalResponse["stats"]>({
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
@@ -64,30 +70,36 @@ export default function DocumentsPage() {
   });
 
   const findDocumentSearchParams = useMemo(
-    () => ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
-    [searchParams],
+    () =>
+      ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries()))
+        .data || {},
+    [searchParams]
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    ...findDocumentSearchParams,
-    folderId,
-  });
+  const { data, isLoading, isLoadingError } =
+    trpc.document.findDocumentsInternal.useQuery({
+      ...findDocumentSearchParams,
+      folderId,
+    });
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
 
-    params.set('status', value);
+    params.set("status", value);
 
     if (value === ExtendedDocumentStatus.ALL) {
-      params.delete('status');
+      params.delete("status");
     }
 
-    if (value === ExtendedDocumentStatus.INBOX && organisation.type === OrganisationType.PERSONAL) {
-      params.delete('status');
+    if (
+      value === ExtendedDocumentStatus.INBOX &&
+      organisation.type === OrganisationType.PERSONAL
+    ) {
+      params.delete("status");
     }
 
-    if (params.has('page')) {
-      params.delete('page');
+    if (params.has("page")) {
+      params.delete("page");
     }
 
     let path = formatDocumentsPath(team.url);
@@ -117,7 +129,9 @@ export default function DocumentsPage() {
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
             <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+              {team.avatarImageId && (
+                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
+              )}
               <AvatarFallback className="text-muted-foreground text-xs">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
@@ -129,7 +143,10 @@ export default function DocumentsPage() {
           </div>
 
           <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
+            <Tabs
+              value={findDocumentSearchParams.status || "ALL"}
+              className="overflow-x-auto"
+            >
               <TabsList>
                 {[
                   ExtendedDocumentStatus.INBOX,
@@ -156,7 +173,9 @@ export default function DocumentsPage() {
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                          <span className="ml-1 inline-block opacity-50">
+                            {stats[value]}
+                          </span>
                         )}
                       </Link>
                     </TabsTrigger>
@@ -179,7 +198,9 @@ export default function DocumentsPage() {
           <div>
             {data && data.count === 0 ? (
               <DocumentsTableEmptyState
-                status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
+                status={
+                  findDocumentSearchParams.status || ExtendedDocumentStatus.ALL
+                }
               />
             ) : (
               <DocumentsTable

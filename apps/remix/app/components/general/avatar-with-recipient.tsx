@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Recipient } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
+import { DocumentStatus } from '@signtusk/lib/constants/prisma-enums';
 
 import { useCopyToClipboard } from '@signtusk/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@signtusk/lib/client-only/recipient-type';

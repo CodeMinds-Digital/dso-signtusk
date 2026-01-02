@@ -1,22 +1,29 @@
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { Bird } from 'lucide-react';
-import { useParams, useSearchParams } from 'react-router';
+import { Trans } from "@lingui/react/macro";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { Bird } from "lucide-react";
+import { useParams, useSearchParams } from "react-router";
 
-import { FolderType } from '@signtusk/lib/types/folder-type';
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { formatDocumentsPath, formatTemplatesPath } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Avatar, AvatarFallback, AvatarImage } from '@signtusk/ui/primitives/avatar';
+import { FolderType } from "@signtusk/lib/types/folder-type";
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import {
+  formatDocumentsPath,
+  formatTemplatesPath,
+} from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@signtusk/ui/primitives/avatar";
 
-import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
-import { FolderGrid } from '~/components/general/folder/folder-grid';
-import { TemplatesTable } from '~/components/tables/templates-table';
-import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import { EnvelopeDropZoneWrapper } from "~/components/general/envelope/envelope-drop-zone-wrapper";
+import { FolderGrid } from "~/components/general/folder/folder-grid";
+import { TemplatesTable } from "~/components/tables/templates-table";
+import { useCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
 export function meta() {
-  return appMetaTags('Templates');
+  return appMetaTags("Templates");
 }
 
 export default function TemplatesPage() {
@@ -25,17 +32,18 @@ export default function TemplatesPage() {
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const page = Number(searchParams.get('page')) || 1;
-  const perPage = Number(searchParams.get('perPage')) || 10;
+  const page = Number(searchParams.get("page")) || 1;
+  const perPage = Number(searchParams.get("perPage")) || 10;
 
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
 
-  const { data, isLoading, isLoadingError } = trpc.template.findTemplates.useQuery({
-    page: page,
-    perPage: perPage,
-    folderId,
-  });
+  const { data, isLoading, isLoadingError } =
+    trpc.template.findTemplates.useQuery({
+      page: page,
+      perPage: perPage,
+      folderId,
+    });
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>
@@ -45,7 +53,9 @@ export default function TemplatesPage() {
         <div className="mt-8">
           <div className="flex flex-row items-center">
             <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+              {team.avatarImageId && (
+                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
+              )}
               <AvatarFallback className="text-muted-foreground text-xs">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
@@ -68,8 +78,8 @@ export default function TemplatesPage() {
 
                   <p className="mt-2 max-w-[50ch]">
                     <Trans>
-                      You have not yet created any templates. To create a template please upload
-                      one.
+                      You have not yet created any templates. To create a
+                      template please upload one.
                     </Trans>
                   </p>
                 </div>

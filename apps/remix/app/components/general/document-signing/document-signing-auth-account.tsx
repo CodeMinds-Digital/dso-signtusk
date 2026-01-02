@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 
 import { authClient } from '@signtusk/auth/client';
 import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';

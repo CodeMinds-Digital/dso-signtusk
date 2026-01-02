@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
-import { FieldType, RecipientRole } from '@prisma/client';
+import type { Field } from '@signtusk/lib/constants/prisma-enums';
+import { FieldType, RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { P, match } from 'ts-pattern';

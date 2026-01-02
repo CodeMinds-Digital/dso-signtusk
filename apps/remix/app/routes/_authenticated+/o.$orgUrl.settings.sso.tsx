@@ -1,24 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/organisations';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/organisations";
+import { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
 import {
   formatOrganisationCallbackUrl,
   formatOrganisationLoginUrl,
-} from '@signtusk/lib/utils/organisation-authentication-portal';
-import { trpc } from '@signtusk/trpc/react';
-import { domainRegex } from '@signtusk/trpc/server/enterprise-router/create-organisation-email-domain.types';
-import type { TGetOrganisationAuthenticationPortalResponse } from '@signtusk/trpc/server/enterprise-router/get-organisation-authentication-portal.types';
-import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from '@signtusk/trpc/server/enterprise-router/update-organisation-authentication-portal.types';
-import { CopyTextButton } from '@signtusk/ui/components/common/copy-text-button';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+} from "@signtusk/lib/utils/organisation-authentication-portal";
+import { trpc } from "@signtusk/trpc/react";
+import { domainRegex } from "@signtusk/trpc/server/enterprise-router/create-organisation-email-domain.types";
+import type { TGetOrganisationAuthenticationPortalResponse } from "@signtusk/trpc/server/enterprise-router/get-organisation-authentication-portal.types";
+import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from "@signtusk/trpc/server/enterprise-router/update-organisation-authentication-portal.types";
+import { CopyTextButton } from "@signtusk/ui/components/common/copy-text-button";
+import { Alert, AlertDescription } from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Form,
   FormControl,
@@ -26,60 +26,63 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { Label } from '@signtusk/ui/primitives/label';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { Label } from "@signtusk/ui/primitives/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { SpinnerBox } from '@signtusk/ui/primitives/spinner';
-import { Switch } from '@signtusk/ui/primitives/switch';
-import { Textarea } from '@signtusk/ui/primitives/textarea';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { SpinnerBox } from "@signtusk/ui/primitives/spinner";
+import { Switch } from "@signtusk/ui/primitives/switch";
+import { Textarea } from "@signtusk/ui/primitives/textarea";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { SettingsHeader } from '~/components/general/settings-header';
-import { appMetaTags } from '~/utils/meta';
+import { SettingsHeader } from "~/components/general/settings-header";
+import { appMetaTags } from "~/utils/meta";
 
-const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema.shape.data
-  .pick({
-    enabled: true,
-    wellKnownUrl: true,
-    clientId: true,
-    autoProvisionUsers: true,
-    defaultOrganisationRole: true,
-  })
-  .extend({
-    clientSecret: z.string().nullable(),
-    allowedDomains: z.string().refine(
-      (value) => {
-        const domains = value.split(' ').filter(Boolean);
+const ZProviderFormSchema =
+  ZUpdateOrganisationAuthenticationPortalRequestSchema.shape.data
+    .pick({
+      enabled: true,
+      wellKnownUrl: true,
+      clientId: true,
+      autoProvisionUsers: true,
+      defaultOrganisationRole: true,
+    })
+    .extend({
+      clientSecret: z.string().nullable(),
+      allowedDomains: z.string().refine(
+        (value) => {
+          const domains = value.split(" ").filter(Boolean);
 
-        return domains.every((domain) => domainRegex.test(domain));
-      },
-      {
-        message: msg`Invalid domains`.id,
-      },
-    ),
-  });
+          return domains.every((domain) => domainRegex.test(domain));
+        },
+        {
+          message: msg`Invalid domains`.id,
+        }
+      ),
+    });
 
 type TProviderFormSchema = z.infer<typeof ZProviderFormSchema>;
 
 export function meta() {
-  return appMetaTags('Organisation SSO Portal');
+  return appMetaTags("Organisation SSO Portal");
 }
 
 export default function OrganisationSettingSSOLoginPage() {
   const { t } = useLingui();
   const organisation = useCurrentOrganisation();
 
-  const { data: authenticationPortal, isLoading: isLoadingAuthenticationPortal } =
-    trpc.enterprise.organisation.authenticationPortal.get.useQuery({
-      organisationId: organisation.id,
-    });
+  const {
+    data: authenticationPortal,
+    isLoading: isLoadingAuthenticationPortal,
+  } = trpc.enterprise.organisation.authenticationPortal.get.useQuery({
+    organisationId: organisation.id,
+  });
 
   if (isLoadingAuthenticationPortal || !authenticationPortal) {
     return <SpinnerBox className="py-32" />;
@@ -115,11 +118,11 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
     defaultValues: {
       enabled: authenticationPortal.enabled,
       clientId: authenticationPortal.clientId,
-      clientSecret: authenticationPortal.clientSecretProvided ? null : '',
+      clientSecret: authenticationPortal.clientSecretProvided ? null : "",
       wellKnownUrl: authenticationPortal.wellKnownUrl,
       autoProvisionUsers: authenticationPortal.autoProvisionUsers,
       defaultOrganisationRole: authenticationPortal.defaultOrganisationRole,
-      allowedDomains: authenticationPortal.allowedDomains.join(' '),
+      allowedDomains: authenticationPortal.allowedDomains.join(" "),
     },
   });
 
@@ -127,15 +130,15 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
     const { enabled, clientId, clientSecret, wellKnownUrl } = values;
 
     if (enabled && !clientId) {
-      form.setError('clientId', {
+      form.setError("clientId", {
         message: t`Client ID is required`,
       });
 
       return;
     }
 
-    if (enabled && clientSecret === '') {
-      form.setError('clientSecret', {
+    if (enabled && clientSecret === "") {
+      form.setError("clientSecret", {
         message: t`Client secret is required`,
       });
 
@@ -143,7 +146,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
     }
 
     if (enabled && !wellKnownUrl) {
-      form.setError('wellKnownUrl', {
+      form.setError("wellKnownUrl", {
         message: t`Well-known URL is required`,
       });
 
@@ -160,7 +163,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           wellKnownUrl,
           autoProvisionUsers: values.autoProvisionUsers,
           defaultOrganisationRole: values.defaultOrganisationRole,
-          allowedDomains: values.allowedDomains.split(' ').filter(Boolean),
+          allowedDomains: values.allowedDomains.split(" ").filter(Boolean),
         },
       });
 
@@ -175,12 +178,12 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
       toast({
         title: t`An error occurred`,
         description: t`We couldn't update the provider. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
-  const isSsoEnabled = form.watch('enabled');
+  const isSsoEnabled = form.watch("enabled");
 
   return (
     <Form {...form}>
@@ -206,7 +209,10 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </div>
 
             <p className="text-muted-foreground text-xs">
-              <Trans>This is the URL which users will use to sign in to your organisation.</Trans>
+              <Trans>
+                This is the URL which users will use to sign in to your
+                organisation.
+              </Trans>
             </p>
           </div>
 
@@ -230,7 +236,9 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </div>
 
             <p className="text-muted-foreground text-xs">
-              <Trans>Add this URL to your provider's allowed redirect URIs</Trans>
+              <Trans>
+                Add this URL to your provider's allowed redirect URIs
+              </Trans>
             </p>
           </div>
 
@@ -242,7 +250,10 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             <Input className="pr-12" disabled value={`openid profile email`} />
 
             <p className="text-muted-foreground text-xs">
-              <Trans>This is the required scopes you must set in your provider's settings</Trans>
+              <Trans>
+                This is the required scopes you must set in your provider's
+                settings
+              </Trans>
             </p>
           </div>
 
@@ -256,14 +267,18 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={'https://your-provider.com/.well-known/openid-configuration'}
+                    placeholder={
+                      "https://your-provider.com/.well-known/openid-configuration"
+                    }
                     {...field}
                   />
                 </FormControl>
 
                 {!form.formState.errors.wellKnownUrl && (
                   <p className="text-muted-foreground text-xs">
-                    <Trans>The OpenID discovery endpoint URL for your provider</Trans>
+                    <Trans>
+                      The OpenID discovery endpoint URL for your provider
+                    </Trans>
                   </p>
                 )}
                 <FormMessage />
@@ -301,7 +316,11 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                       id="client-secret"
                       type="password"
                       {...field}
-                      value={field.value === null ? '**********************' : field.value}
+                      value={
+                        field.value === null
+                          ? "**********************"
+                          : field.value
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -324,13 +343,13 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                       <SelectValue placeholder={t`Select default role`} />
                     </SelectTrigger>
                     <SelectContent>
-                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[OrganisationMemberRole.MANAGER].map(
-                        (role) => (
-                          <SelectItem key={role} value={role}>
-                            {t(ORGANISATION_MEMBER_ROLE_MAP[role])}
-                          </SelectItem>
-                        ),
-                      )}
+                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[
+                        OrganisationMemberRole.MANAGER
+                      ].map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {t(ORGANISATION_MEMBER_ROLE_MAP[role])}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -358,7 +377,8 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                 {!form.formState.errors.allowedDomains && (
                   <p className="text-muted-foreground text-xs">
                     <Trans>
-                      Space-separated list of domains. Leave empty to allow all domains.
+                      Space-separated list of domains. Leave empty to allow all
+                      domains.
                     </Trans>
                   </p>
                 )}
@@ -400,11 +420,16 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                     <Trans>Enable SSO portal</Trans>
                   </FormLabel>
                   <p className="text-muted-foreground text-sm">
-                    <Trans>Whether to enable the SSO portal for your organisation</Trans>
+                    <Trans>
+                      Whether to enable the SSO portal for your organisation
+                    </Trans>
                   </p>
                 </div>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -414,8 +439,8 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           <Alert variant="warning">
             <AlertDescription>
               <Trans>
-                Please note that anyone who signs in through your portal will be added to your
-                organisation as a member.
+                Please note that anyone who signs in through your portal will be
+                added to your organisation as a member.
               </Trans>
             </AlertDescription>
           </Alert>

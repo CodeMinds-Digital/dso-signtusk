@@ -1,12 +1,12 @@
-import type { EnvelopeItem } from '@prisma/client';
+import type { EnvelopeItem } from "@signtusk/lib/constants/prisma-enums";
 
-import { getEnvelopeItemPdfUrl } from '../utils/envelope-download';
-import { downloadFile } from './download-file';
+import { getEnvelopeItemPdfUrl } from "../utils/envelope-download";
+import { downloadFile } from "./download-file";
 
-type DocumentVersion = 'original' | 'signed';
+type DocumentVersion = "original" | "signed";
 
 type DownloadPDFProps = {
-  envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
+  envelopeItem: Pick<EnvelopeItem, "id" | "envelopeId">;
   token: string | undefined;
 
   fileName?: string;
@@ -22,10 +22,10 @@ export const downloadPDF = async ({
   envelopeItem,
   token,
   fileName,
-  version = 'signed',
+  version = "signed",
 }: DownloadPDFProps) => {
   const downloadUrl = getEnvelopeItemPdfUrl({
-    type: 'download',
+    type: "download",
     envelopeItem: envelopeItem,
     token,
     version,
@@ -33,8 +33,8 @@ export const downloadPDF = async ({
 
   const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
 
-  const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
-  const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
+  const baseTitle = (fileName ?? "document").replace(/\.pdf$/, "");
+  const suffix = version === "signed" ? "_signed.pdf" : ".pdf";
 
   downloadFile({
     filename: `${baseTitle}${suffix}`,

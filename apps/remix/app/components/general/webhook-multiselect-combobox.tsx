@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { WebhookTriggerEvents } from '@prisma/client';
+import { WebhookTriggerEvents } from '@signtusk/lib/constants/prisma-enums';
 
 import { toFriendlyWebhookEventName } from '@signtusk/lib/universal/webhook/to-friendly-webhook-event-name';
 import { MultiSelect, type Option } from '@signtusk/ui/primitives/multiselect';

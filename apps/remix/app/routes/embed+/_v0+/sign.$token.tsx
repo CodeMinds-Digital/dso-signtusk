@@ -1,41 +1,41 @@
-import { RecipientRole } from '@prisma/client';
-import { data } from 'react-router';
-import { match } from 'ts-pattern';
+import { RecipientRole } from "@signtusk/lib/constants/prisma-enums";
+import { data } from "react-router";
+import { match } from "ts-pattern";
 
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { EnvelopeRenderProvider } from '@signtusk/lib/client-only/providers/envelope-render-provider';
-import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getDocumentAndSenderByToken } from '@signtusk/lib/server-only/document/get-document-by-token';
-import { viewedDocument } from '@signtusk/lib/server-only/document/viewed-document';
-import { getEnvelopeForRecipientSigning } from '@signtusk/lib/server-only/envelope/get-envelope-for-recipient-signing';
-import { getEnvelopeRequiredAccessData } from '@signtusk/lib/server-only/envelope/get-envelope-required-access-data';
-import { getCompletedFieldsForToken } from '@signtusk/lib/server-only/field/get-completed-fields-for-token';
-import { getFieldsForToken } from '@signtusk/lib/server-only/field/get-fields-for-token';
-import { getOrganisationClaimByTeamId } from '@signtusk/lib/server-only/organisation/get-organisation-claims';
-import { getIsRecipientsTurnToSign } from '@signtusk/lib/server-only/recipient/get-is-recipient-turn';
-import { getRecipientByToken } from '@signtusk/lib/server-only/recipient/get-recipient-by-token';
-import { getRecipientsForAssistant } from '@signtusk/lib/server-only/recipient/get-recipients-for-assistant';
-import { DocumentAccessAuth } from '@signtusk/lib/types/document-auth';
-import { isDocumentCompleted } from '@signtusk/lib/utils/document';
-import { extractDocumentAuthMethods } from '@signtusk/lib/utils/document-auth';
-import { prisma } from '@signtusk/prisma';
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { EnvelopeRenderProvider } from "@signtusk/lib/client-only/providers/envelope-render-provider";
+import { IS_BILLING_ENABLED } from "@signtusk/lib/constants/app";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getDocumentAndSenderByToken } from "@signtusk/lib/server-only/document/get-document-by-token";
+import { viewedDocument } from "@signtusk/lib/server-only/document/viewed-document";
+import { getEnvelopeForRecipientSigning } from "@signtusk/lib/server-only/envelope/get-envelope-for-recipient-signing";
+import { getEnvelopeRequiredAccessData } from "@signtusk/lib/server-only/envelope/get-envelope-required-access-data";
+import { getCompletedFieldsForToken } from "@signtusk/lib/server-only/field/get-completed-fields-for-token";
+import { getFieldsForToken } from "@signtusk/lib/server-only/field/get-fields-for-token";
+import { getOrganisationClaimByTeamId } from "@signtusk/lib/server-only/organisation/get-organisation-claims";
+import { getIsRecipientsTurnToSign } from "@signtusk/lib/server-only/recipient/get-is-recipient-turn";
+import { getRecipientByToken } from "@signtusk/lib/server-only/recipient/get-recipient-by-token";
+import { getRecipientsForAssistant } from "@signtusk/lib/server-only/recipient/get-recipients-for-assistant";
+import { DocumentAccessAuth } from "@signtusk/lib/types/document-auth";
+import { isDocumentCompleted } from "@signtusk/lib/utils/document";
+import { extractDocumentAuthMethods } from "@signtusk/lib/utils/document-auth";
+import { prisma } from "@signtusk/prisma";
 
-import { EmbedSignDocumentV1ClientPage } from '~/components/embed/embed-document-signing-page-v1';
-import { EmbedSignDocumentV2ClientPage } from '~/components/embed/embed-document-signing-page-v2';
-import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
-import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
-import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
-import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
+import { EmbedSignDocumentV1ClientPage } from "~/components/embed/embed-document-signing-page-v1";
+import { EmbedSignDocumentV2ClientPage } from "~/components/embed/embed-document-signing-page-v2";
+import { DocumentSigningAuthProvider } from "~/components/general/document-signing/document-signing-auth-provider";
+import { DocumentSigningProvider } from "~/components/general/document-signing/document-signing-provider";
+import { EnvelopeSigningProvider } from "~/components/general/document-signing/envelope-signing-provider";
+import { superLoaderJson, useSuperLoaderData } from "~/utils/super-json-loader";
 
-import { getOptionalLoaderContext } from '../../../../server/utils/get-loader-session';
-import type { Route } from './+types/sign.$token';
+import { getOptionalLoaderContext } from "../../../../server/utils/get-loader-session";
+import type { Route } from "./+types/sign.$token";
 
 async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   const { requestMetadata } = getOptionalLoaderContext();
 
   if (!params.token) {
-    throw new Response('Not found', { status: 404 });
+    throw new Response("Not found", { status: 404 });
   }
 
   const token = params.token;
@@ -56,12 +56,15 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   // `document.directLink` is always available but we're doing this to
   // satisfy the type checker.
   if (!document || !recipient) {
-    throw new Response('Not found', { status: 404 });
+    throw new Response("Not found", { status: 404 });
   }
 
-  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: document.teamId });
+  const organisationClaim = await getOrganisationClaimByTeamId({
+    teamId: document.teamId,
+  });
 
-  const allowEmbedSigningWhitelabel = organisationClaim.flags.embedSigningWhiteLabel;
+  const allowEmbedSigningWhitelabel =
+    organisationClaim.flags.embedSigningWhiteLabel;
   const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
 
   // TODO: Make this more robust, we need to ensure the owner is either
@@ -70,11 +73,11 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   if (IS_BILLING_ENABLED() && !organisationClaim.flags.embedSigning) {
     throw data(
       {
-        type: 'embed-paywall',
+        type: "embed-paywall",
       },
       {
         status: 403,
-      },
+      }
     );
   }
 
@@ -84,21 +87,24 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
 
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
-      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(
+        DocumentAccessAuth.ACCOUNT,
+        () => user && user.email === recipient.email
+      )
       .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
-      .exhaustive(),
+      .exhaustive()
   );
 
   if (!isAccessAuthValid) {
     throw data(
       {
-        type: 'embed-authentication-required',
+        type: "embed-authentication-required",
         email: user?.email || recipient.email,
         returnTo: `/embed/sign/${token}`,
       },
       {
         status: 401,
-      },
+      }
     );
   }
 
@@ -107,11 +113,11 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   if (!isRecipientsTurnToSign) {
     throw data(
       {
-        type: 'embed-waiting-for-turn',
+        type: "embed-waiting-for-turn",
       },
       {
         status: 403,
-      },
+      }
     );
   }
 
@@ -145,7 +151,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
   const { requestMetadata } = getOptionalLoaderContext();
 
   if (!params.token) {
-    throw new Response('Not found', { status: 404 });
+    throw new Response("Not found", { status: 404 });
   }
 
   const token = params.token;
@@ -166,7 +172,9 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
       const error = AppError.parseError(e);
 
       if (error.code === AppErrorCode.UNAUTHORIZED) {
-        const requiredAccessData = await getEnvelopeRequiredAccessData({ token });
+        const requiredAccessData = await getEnvelopeRequiredAccessData({
+          token,
+        });
 
         return {
           isDocumentAccessValid: false,
@@ -174,48 +182,51 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
         } as const;
       }
 
-      throw new Response('Not Found', { status: 404 });
+      throw new Response("Not Found", { status: 404 });
     });
 
   if (!envelopeForSigning.isDocumentAccessValid) {
     throw data(
       {
-        type: 'embed-authentication-required',
+        type: "embed-authentication-required",
         email: envelopeForSigning.recipientEmail,
         returnTo: `/embed/sign/${token}`,
       },
       {
         status: 401,
-      },
+      }
     );
   }
 
   const { envelope, recipient, isRecipientsTurn } = envelopeForSigning;
 
-  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
+  const organisationClaim = await getOrganisationClaimByTeamId({
+    teamId: envelope.teamId,
+  });
 
-  const allowEmbedSigningWhitelabel = organisationClaim.flags.embedSigningWhiteLabel;
+  const allowEmbedSigningWhitelabel =
+    organisationClaim.flags.embedSigningWhiteLabel;
   const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
 
   if (IS_BILLING_ENABLED() && !organisationClaim.flags.embedSigning) {
     throw data(
       {
-        type: 'embed-paywall',
+        type: "embed-paywall",
       },
       {
         status: 403,
-      },
+      }
     );
   }
 
   if (!isRecipientsTurn) {
     throw data(
       {
-        type: 'embed-waiting-for-turn',
+        type: "embed-waiting-for-turn",
       },
       {
         status: 403,
-      },
+      }
     );
   }
 
@@ -226,21 +237,24 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
 
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
-      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(
+        DocumentAccessAuth.ACCOUNT,
+        () => user && user.email === recipient.email
+      )
       .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true)
-      .exhaustive(),
+      .exhaustive()
   );
 
   if (!isAccessAuthValid) {
     throw data(
       {
-        type: 'embed-authentication-required',
+        type: "embed-authentication-required",
         email: user?.email || recipient.email,
         returnTo: `/embed/sign/${token}`,
       },
       {
         status: 401,
-      },
+      }
     );
   }
 
@@ -263,7 +277,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const { token } = loaderArgs.params;
 
   if (!token) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   // Not efficient but works for now until we remove v1.
@@ -281,7 +295,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   });
 
   if (!foundRecipient) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   if (foundRecipient.envelope.internalVersion === 2) {
@@ -366,7 +380,13 @@ const EmbedSignDocumentPageV2 = ({
 }: {
   data: Awaited<ReturnType<typeof handleV2Loader>>;
 }) => {
-  const { token, user, envelopeForSigning, hidePoweredBy, allowEmbedSigningWhitelabel } = data;
+  const {
+    token,
+    user,
+    envelopeForSigning,
+    hidePoweredBy,
+    allowEmbedSigningWhitelabel,
+  } = data;
 
   const { envelope, recipient } = envelopeForSigning;
 

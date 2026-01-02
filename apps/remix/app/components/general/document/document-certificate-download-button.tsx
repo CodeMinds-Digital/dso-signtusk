@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentStatus } from '@prisma/client';
+import type { DocumentStatus } from '@signtusk/lib/constants/prisma-enums';
 import { DownloadIcon } from 'lucide-react';
 
 import { isDocumentCompleted } from '@signtusk/lib/utils/document';

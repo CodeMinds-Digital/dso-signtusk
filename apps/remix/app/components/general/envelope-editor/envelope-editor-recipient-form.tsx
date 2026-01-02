@@ -10,7 +10,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
+import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@signtusk/lib/constants/prisma-enums';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { TeamEmail } from '@prisma/client';
+import type { TeamEmail } from '@signtusk/lib/constants/prisma-enums';
 
 import { trpc } from '@signtusk/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@signtusk/ui/primitives/alert';

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Role, Subscription } from '@prisma/client';
+import type { Role, Subscription } from '@signtusk/lib/constants/prisma-enums';
 import { Edit, Loader } from 'lucide-react';
 import { Link } from 'react-router';
 

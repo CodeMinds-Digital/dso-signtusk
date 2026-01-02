@@ -1,20 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/organisations';
-import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { trpc } from '@signtusk/trpc/react';
-import { ZCreateOrganisationGroupRequestSchema } from '@signtusk/trpc/server/organisation-router/create-organisation-group.types';
-import { Button } from '@signtusk/ui/primitives/button';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/organisations";
+import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { trpc } from "@signtusk/trpc/react";
+import { ZCreateOrganisationGroupRequestSchema } from "@signtusk/trpc/server/organisation-router/create-organisation-group.types";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -32,29 +31,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { MultiSelectCombobox } from '@signtusk/ui/primitives/multi-select-combobox';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { MultiSelectCombobox } from "@signtusk/ui/primitives/multi-select-combobox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type OrganisationGroupCreateDialogProps = {
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
-const ZCreateOrganisationGroupFormSchema = ZCreateOrganisationGroupRequestSchema.pick({
-  name: true,
-  memberIds: true,
-  organisationRole: true,
-});
+const ZCreateOrganisationGroupFormSchema =
+  ZCreateOrganisationGroupRequestSchema.pick({
+    name: true,
+    memberIds: true,
+    organisationRole: true,
+  });
 
-type TCreateOrganisationGroupFormSchema = z.infer<typeof ZCreateOrganisationGroupFormSchema>;
+type TCreateOrganisationGroupFormSchema = z.infer<
+  typeof ZCreateOrganisationGroupFormSchema
+>;
 
 export const OrganisationGroupCreateDialog = ({
   trigger,
@@ -69,13 +71,14 @@ export const OrganisationGroupCreateDialog = ({
   const form = useForm({
     resolver: zodResolver(ZCreateOrganisationGroupFormSchema),
     defaultValues: {
-      name: '',
+      name: "",
       organisationRole: OrganisationMemberRole.MEMBER,
       memberIds: [],
     },
   });
 
-  const { mutateAsync: createOrganisationGroup } = trpc.organisation.group.create.useMutation();
+  const { mutateAsync: createOrganisationGroup } =
+    trpc.organisation.group.create.useMutation();
 
   const { data: membersFindResult, isLoading: isLoadingMembers } =
     trpc.organisation.member.find.useQuery({
@@ -112,7 +115,7 @@ export const OrganisationGroupCreateDialog = ({
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting to create a group. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -142,7 +145,9 @@ export const OrganisationGroupCreateDialog = ({
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Organise your members into groups which can be assigned to teams</Trans>
+            <Trans>
+              Organise your members into groups which can be assigned to teams
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -187,7 +192,8 @@ export const OrganisationGroupCreateDialog = ({
                             organisation.currentOrganisationRole
                           ].map((role) => (
                             <SelectItem key={role} value={role}>
-                              {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
+                              {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role]) ??
+                                role}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -230,7 +236,11 @@ export const OrganisationGroupCreateDialog = ({
               />
 
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

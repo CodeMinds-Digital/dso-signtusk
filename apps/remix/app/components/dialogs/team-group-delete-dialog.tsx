@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { TeamMemberRole } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
 
-import { isTeamRoleWithinUserHierarchy } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+import { isTeamRoleWithinUserHierarchy } from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { Alert, AlertDescription } from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export type TeamGroupDeleteDialogProps = {
   trigger?: React.ReactNode;
@@ -42,27 +42,30 @@ export const TeamGroupDeleteDialog = ({
 
   const team = useCurrentTeam();
 
-  const { mutateAsync: deleteGroup, isPending: isDeleting } = trpc.team.group.delete.useMutation({
-    onSuccess: () => {
-      toast({
-        title: _(msg`Success`),
-        description: _(msg`You have successfully removed this group from the team.`),
-        duration: 5000,
-      });
+  const { mutateAsync: deleteGroup, isPending: isDeleting } =
+    trpc.team.group.delete.useMutation({
+      onSuccess: () => {
+        toast({
+          title: _(msg`Success`),
+          description: _(
+            msg`You have successfully removed this group from the team.`
+          ),
+          duration: 5000,
+        });
 
-      setOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to remove this group. Please try again later.`,
-        ),
-        variant: 'destructive',
-        duration: 10000,
-      });
-    },
-  });
+        setOpen(false);
+      },
+      onError: () => {
+        toast({
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to remove this group. Please try again later.`
+          ),
+          variant: "destructive",
+          duration: 10000,
+        });
+      },
+    });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>
@@ -82,7 +85,7 @@ export const TeamGroupDeleteDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove the following group from{' '}
+              You are about to remove the following group from{" "}
               <span className="font-semibold">{team.name}</span>.
             </Trans>
           </DialogDescription>
@@ -98,7 +101,11 @@ export const TeamGroupDeleteDialog = ({
 
             <fieldset disabled={isDeleting}>
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 
@@ -122,12 +129,18 @@ export const TeamGroupDeleteDialog = ({
           <>
             <Alert variant="neutral">
               <AlertDescription className="text-center font-semibold">
-                <Trans>You cannot delete a group which has a higher role than you.</Trans>
+                <Trans>
+                  You cannot delete a group which has a higher role than you.
+                </Trans>
               </AlertDescription>
             </Alert>
 
             <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
                 <Trans>Close</Trans>
               </Button>
             </DialogFooter>

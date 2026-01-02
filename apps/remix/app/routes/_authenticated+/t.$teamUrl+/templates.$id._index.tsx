@@ -1,42 +1,49 @@
-import { lazy } from 'react';
+import { lazy } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
-import { ChevronLeft, LucideEdit } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  DocumentSigningOrder,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { ChevronLeft, LucideEdit } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 
-import { EnvelopeRenderProvider } from '@signtusk/lib/client-only/providers/envelope-render-provider';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { mapSecondaryIdToTemplateId } from '@signtusk/lib/utils/envelope';
-import { formatDocumentsPath, formatTemplatesPath } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { DocumentReadOnlyFields } from '@signtusk/ui/components/document/document-read-only-fields';
-import PDFViewerKonvaLazy from '@signtusk/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Card, CardContent } from '@signtusk/ui/primitives/card';
-import { PDFViewerLazy } from '@signtusk/ui/primitives/pdf-viewer/lazy';
-import { Spinner } from '@signtusk/ui/primitives/spinner';
+import { EnvelopeRenderProvider } from "@signtusk/lib/client-only/providers/envelope-render-provider";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { mapSecondaryIdToTemplateId } from "@signtusk/lib/utils/envelope";
+import {
+  formatDocumentsPath,
+  formatTemplatesPath,
+} from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { DocumentReadOnlyFields } from "@signtusk/ui/components/document/document-read-only-fields";
+import PDFViewerKonvaLazy from "@signtusk/ui/components/pdf-viewer/pdf-viewer-konva-lazy";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Card, CardContent } from "@signtusk/ui/primitives/card";
+import { PDFViewerLazy } from "@signtusk/ui/primitives/pdf-viewer/lazy";
+import { Spinner } from "@signtusk/ui/primitives/spinner";
 
-import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
-import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
-import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
-import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
-import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
-import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
-import { TemplatePageViewRecentActivity } from '~/components/general/template/template-page-view-recent-activity';
-import { TemplatePageViewRecipients } from '~/components/general/template/template-page-view-recipients';
-import { TemplateType } from '~/components/general/template/template-type';
-import { TemplatesTableActionDropdown } from '~/components/tables/templates-table-action-dropdown';
-import { useCurrentTeam } from '~/providers/team';
+import { TemplateBulkSendDialog } from "~/components/dialogs/template-bulk-send-dialog";
+import { TemplateDirectLinkDialog } from "~/components/dialogs/template-direct-link-dialog";
+import { TemplateUseDialog } from "~/components/dialogs/template-use-dialog";
+import { EnvelopeRendererFileSelector } from "~/components/general/envelope-editor/envelope-file-selector";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { TemplateDirectLinkBadge } from "~/components/general/template/template-direct-link-badge";
+import { TemplatePageViewDocumentsTable } from "~/components/general/template/template-page-view-documents-table";
+import { TemplatePageViewInformation } from "~/components/general/template/template-page-view-information";
+import { TemplatePageViewRecentActivity } from "~/components/general/template/template-page-view-recent-activity";
+import { TemplatePageViewRecipients } from "~/components/general/template/template-page-view-recipients";
+import { TemplateType } from "~/components/general/template/template-type";
+import { TemplatesTableActionDropdown } from "~/components/tables/templates-table-action-dropdown";
+import { useCurrentTeam } from "~/providers/team";
 
-import type { Route } from './+types/templates.$id._index';
+import type { Route } from "./+types/templates.$id._index";
 
 const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+  async () =>
+    import("~/components/general/envelope-editor/envelope-generic-page-renderer")
 );
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
@@ -91,10 +98,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = envelope.fields.map((field) => {
     const recipient = envelope.recipients.find(
-      (recipient) => recipient.id === field.recipientId,
+      (recipient) => recipient.id === field.recipientId
     ) || {
-      name: '',
-      email: '',
+      name: "",
+      email: "",
       signingStatus: SigningStatus.NOT_SIGNED,
     };
 
@@ -108,16 +115,21 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
   const mockedDocumentMeta = envelope.documentMeta
     ? {
         ...envelope.documentMeta,
-        signingOrder: envelope.documentMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
+        signingOrder:
+          envelope.documentMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
         documentId: 0,
       }
     : undefined;
 
-  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
+  const isMultiEnvelopeItem =
+    envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={templateRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link
+        to={templateRootPath}
+        className="flex items-center text-[#7AC455] hover:opacity-80"
+      >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Templates</Trans>
       </Link>
@@ -182,7 +194,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               }}
             >
               {isMultiEnvelopeItem && (
-                <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+                <EnvelopeRendererFileSelector
+                  fields={envelope.fields}
+                  className="mb-4 p-0"
+                />
               )}
 
               <Card className="rounded-xl before:rounded-xl" gradient>
@@ -206,7 +221,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 showFieldStatus={false}
                 showRecipientTooltip={true}
                 showRecipientColors={true}
-                recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+                recipientIds={envelope.recipients.map(
+                  (recipient) => recipient.id
+                )}
                 documentMeta={mockedDocumentMeta}
               />
 
@@ -221,7 +238,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         )}
 
         <div
-          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
+          className={cn(
+            "col-span-12 lg:col-span-6 xl:col-span-5",
+            isMultiEnvelopeItem && "mt-20"
+          )}
         >
           <div className="space-y-6">
             <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">

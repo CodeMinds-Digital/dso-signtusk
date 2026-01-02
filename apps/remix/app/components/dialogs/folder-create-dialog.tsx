@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { FolderType } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderPlusIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import type { FolderType } from "@signtusk/lib/constants/prisma-enums";
+import { FolderPlusIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router";
+import { z } from "zod";
 
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -27,12 +27,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 const ZCreateFolderFormSchema = z.object({
-  name: z.string().min(1, { message: 'Folder name is required' }),
+  name: z.string().min(1, { message: "Folder name is required" }),
 });
 
 type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
@@ -40,9 +40,13 @@ type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
 export type FolderCreateDialogProps = {
   type: FolderType;
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
-export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDialogProps) => {
+export const FolderCreateDialog = ({
+  type,
+  trigger,
+  ...props
+}: FolderCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const { folderId } = useParams();
@@ -54,7 +58,7 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
   const form = useForm<TCreateFolderFormSchema>({
     resolver: zodResolver(ZCreateFolderFormSchema),
     defaultValues: {
-      name: '',
+      name: "",
     },
   });
 
@@ -75,7 +79,7 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
       toast({
         title: t`Failed to create folder`,
         description: t`An unknown error occurred while creating the folder.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -87,7 +91,11 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
   }, [isCreateFolderOpen, form]);
 
   return (
-    <Dialog {...props} open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+    <Dialog
+      {...props}
+      open={isCreateFolderOpen}
+      onOpenChange={setIsCreateFolderOpen}
+    >
       <DialogTrigger asChild>
         {trigger ?? (
           <Button
@@ -107,13 +115,19 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
             <Trans>Create New Folder</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>Enter a name for your new folder. Folders help you organise your items.</Trans>
+            <Trans>
+              Enter a name for your new folder. Folders help you organise your
+              items.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+            <fieldset
+              disabled={form.formState.isSubmitting}
+              className="space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="name"

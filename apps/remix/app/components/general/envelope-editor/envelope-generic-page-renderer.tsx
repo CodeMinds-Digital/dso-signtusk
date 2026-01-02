@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
+import { DocumentStatus, type Recipient, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import type Konva from 'konva';
 
 import { usePageRenderer } from '@signtusk/lib/client-only/hooks/use-page-renderer';

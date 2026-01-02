@@ -1,24 +1,27 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Plural, Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { CheckCircle2Icon, CircleIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { P, match } from 'ts-pattern';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Plural, Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import {
+  TemplateType,
+  type TemplateDirectLink,
+} from "@signtusk/lib/constants/prisma-enums";
+import { CheckCircle2Icon, CircleIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { P, match } from "ts-pattern";
+import { z } from "zod";
 
-import { type Template } from '@signtusk/prisma/types/template-legacy-schema';
-import { trpc } from '@signtusk/trpc/react';
+import { type Template } from "@signtusk/prisma/types/template-legacy-schema";
+import { trpc } from "@signtusk/trpc/react";
 import {
   MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH,
   MAX_TEMPLATE_PUBLIC_TITLE_LENGTH,
-} from '@signtusk/trpc/server/template-router/schema';
-import { AnimateGenericFadeInOut } from '@signtusk/ui/components/animate/animate-generic-fade-in-out';
-import { Button } from '@signtusk/ui/primitives/button';
+} from "@signtusk/trpc/server/template-router/schema";
+import { AnimateGenericFadeInOut } from "@signtusk/ui/components/animate/animate-generic-fade-in-out";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogClose,
@@ -28,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -36,8 +39,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
 import {
   Table,
   TableBody,
@@ -45,47 +48,49 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@signtusk/ui/primitives/table';
-import { Textarea } from '@signtusk/ui/primitives/textarea';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/table";
+import { Textarea } from "@signtusk/ui/primitives/textarea";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export type ManagePublicTemplateDialogProps = {
-  directTemplates: (Omit<Template, 'templateDocumentDataId'> & {
-    directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
+  directTemplates: (Omit<Template, "templateDocumentDataId"> & {
+    directLink: Pick<TemplateDirectLink, "token" | "enabled">;
   })[];
   initialTemplateId?: number | null;
   initialStep?: ProfileTemplateStep;
   trigger?: React.ReactNode;
   isOpen?: boolean;
   onIsOpenChange?: (value: boolean) => unknown;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdatePublicTemplateFormSchema = z.object({
   publicTitle: z
     .string()
-    .min(1, { message: 'Title is required' })
+    .min(1, { message: "Title is required" })
     .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH, {
       message: `Title cannot be longer than ${MAX_TEMPLATE_PUBLIC_TITLE_LENGTH} characters`,
     }),
   publicDescription: z
     .string()
-    .min(1, { message: 'Description is required' })
+    .min(1, { message: "Description is required" })
     .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH, {
       message: `Description cannot be longer than ${MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH} characters`,
     }),
 });
 
-type TUpdatePublicTemplateFormSchema = z.infer<typeof ZUpdatePublicTemplateFormSchema>;
+type TUpdatePublicTemplateFormSchema = z.infer<
+  typeof ZUpdatePublicTemplateFormSchema
+>;
 
-type ProfileTemplateStep = 'SELECT_TEMPLATE' | 'MANAGE' | 'CONFIRM_DISABLE';
+type ProfileTemplateStep = "SELECT_TEMPLATE" | "MANAGE" | "CONFIRM_DISABLE";
 
 export const ManagePublicTemplateDialog = ({
   directTemplates,
   trigger,
   initialTemplateId = null,
-  initialStep = 'SELECT_TEMPLATE',
+  initialStep = "SELECT_TEMPLATE",
   isOpen = false,
   onIsOpenChange,
   ...props
@@ -97,26 +102,30 @@ export const ManagePublicTemplateDialog = ({
 
   const team = useCurrentTeam();
 
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(initialTemplateId);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(
+    initialTemplateId
+  );
 
   const [currentStep, setCurrentStep] = useState<ProfileTemplateStep>(() => {
     if (initialStep) {
       return initialStep;
     }
 
-    return selectedTemplateId ? 'MANAGE' : 'SELECT_TEMPLATE';
+    return selectedTemplateId ? "MANAGE" : "SELECT_TEMPLATE";
   });
 
   const form = useForm({
     resolver: zodResolver(ZUpdatePublicTemplateFormSchema),
     defaultValues: {
-      publicTitle: '',
-      publicDescription: '',
+      publicTitle: "",
+      publicDescription: "",
     },
   });
 
-  const { mutateAsync: updateTemplateSettings, isPending: isUpdatingTemplateSettings } =
-    trpc.template.updateTemplate.useMutation();
+  const {
+    mutateAsync: updateTemplateSettings,
+    isPending: isUpdatingTemplateSettings,
+  } = trpc.template.updateTemplate.useMutation();
 
   const setTemplateToPrivate = async (templateId: number) => {
     try {
@@ -129,7 +138,9 @@ export const ManagePublicTemplateDialog = ({
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`Template has been removed from your public profile.`),
+        description: _(
+          msg`Template has been removed from your public profile.`
+        ),
         duration: 5000,
       });
 
@@ -138,9 +149,9 @@ export const ManagePublicTemplateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to remove this template from your profile. Please try again later.`,
+          msg`We encountered an unknown error while attempting to remove this template from your profile. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -174,16 +185,17 @@ export const ManagePublicTemplateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update the template. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update the template. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
   const selectedTemplate = useMemo(
-    () => directTemplates.find((template) => template.id === selectedTemplateId),
-    [directTemplates, selectedTemplateId],
+    () =>
+      directTemplates.find((template) => template.id === selectedTemplateId),
+    [directTemplates, selectedTemplateId]
   );
 
   const onManageStep = () => {
@@ -196,13 +208,15 @@ export const ManagePublicTemplateDialog = ({
       publicDescription: selectedTemplate.publicDescription,
     });
 
-    setCurrentStep('MANAGE');
+    setCurrentStep("MANAGE");
   };
 
   const isLoading = isUpdatingTemplateSettings || form.formState.isSubmitting;
 
   useEffect(() => {
-    const initialTemplate = directTemplates.find((template) => template.id === initialTemplateId);
+    const initialTemplate = directTemplates.find(
+      (template) => template.id === initialTemplateId
+    );
 
     if (initialTemplate) {
       setSelectedTemplateId(initialTemplate.id);
@@ -215,7 +229,8 @@ export const ManagePublicTemplateDialog = ({
       setSelectedTemplateId(null);
     }
 
-    const step = initialStep || (selectedTemplateId ? 'MANAGE' : 'SELECT_TEMPLATE');
+    const step =
+      initialStep || (selectedTemplateId ? "MANAGE" : "SELECT_TEMPLATE");
 
     setCurrentStep(step);
 
@@ -223,7 +238,7 @@ export const ManagePublicTemplateDialog = ({
   }, [initialTemplateId, initialStep, open, isOpen]);
 
   const handleOnOpenChange = (value: boolean) => {
-    if (isLoading || typeof value !== 'boolean') {
+    if (isLoading || typeof value !== "boolean") {
       return;
     }
 
@@ -238,7 +253,7 @@ export const ManagePublicTemplateDialog = ({
 
         <AnimateGenericFadeInOut motionKey={currentStep}>
           {match({ templateId: selectedTemplateId, currentStep })
-            .with({ currentStep: 'SELECT_TEMPLATE' }, () => (
+            .with({ currentStep: "SELECT_TEMPLATE" }, () => (
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
@@ -252,10 +267,14 @@ export const ManagePublicTemplateDialog = ({
                   <DialogDescription>
                     {team ? (
                       <Trans>
-                        Select a template you'd like to display on your team's public profile
+                        Select a template you'd like to display on your team's
+                        public profile
                       </Trans>
                     ) : (
-                      <Trans>Select a template you'd like to display on your public profile</Trans>
+                      <Trans>
+                        Select a template you'd like to display on your public
+                        profile
+                      </Trans>
                     )}
                   </DialogDescription>
                 </DialogHeader>
@@ -327,7 +346,7 @@ export const ManagePublicTemplateDialog = ({
                 </DialogFooter>
               </DialogContent>
             ))
-            .with({ templateId: P.number, currentStep: 'MANAGE' }, () => (
+            .with({ templateId: P.number, currentStep: "MANAGE" }, () => (
               <DialogContent className="relative">
                 <DialogHeader>
                   <DialogTitle>
@@ -352,7 +371,9 @@ export const ManagePublicTemplateDialog = ({
                           <FormLabel required>Title</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={_(msg`The public name for your template`)}
+                              placeholder={_(
+                                msg`The public name for your template`
+                              )}
                               {...field}
                             />
                           </FormControl>
@@ -366,7 +387,8 @@ export const ManagePublicTemplateDialog = ({
                       name="publicDescription"
                       render={({ field }) => {
                         const remaningLength =
-                          MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH - (field.value || '').length;
+                          MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH -
+                          (field.value || "").length;
 
                         return (
                           <FormItem>
@@ -374,7 +396,7 @@ export const ManagePublicTemplateDialog = ({
                             <FormControl>
                               <Textarea
                                 placeholder={_(
-                                  msg`The public description that will be displayed with this template`,
+                                  msg`The public description that will be displayed with this template`
                                 )}
                                 {...field}
                               />
@@ -386,13 +408,19 @@ export const ManagePublicTemplateDialog = ({
                                   <Plural
                                     value={remaningLength}
                                     one={<Trans># character remaining</Trans>}
-                                    other={<Trans># characters remaining</Trans>}
+                                    other={
+                                      <Trans># characters remaining</Trans>
+                                    }
                                   />
                                 ) : (
                                   <Plural
                                     value={Math.abs(remaningLength)}
-                                    one={<Trans># character over the limit</Trans>}
-                                    other={<Trans># characters over the limit</Trans>}
+                                    one={
+                                      <Trans># character over the limit</Trans>
+                                    }
+                                    other={
+                                      <Trans># characters over the limit</Trans>
+                                    }
                                   />
                                 )}
                               </p>
@@ -409,7 +437,7 @@ export const ManagePublicTemplateDialog = ({
                         <Button
                           variant="destructive"
                           className="mr-auto w-full sm:w-auto"
-                          onClick={() => setCurrentStep('CONFIRM_DISABLE')}
+                          onClick={() => setCurrentStep("CONFIRM_DISABLE")}
                         >
                           <Trans>Disable</Trans>
                         </Button>
@@ -421,7 +449,10 @@ export const ManagePublicTemplateDialog = ({
                         </Button>
                       </DialogClose>
 
-                      <Button type="submit" loading={isUpdatingTemplateSettings}>
+                      <Button
+                        type="submit"
+                        loading={isUpdatingTemplateSettings}
+                      >
                         <Trans>Update</Trans>
                       </Button>
                     </DialogFooter>
@@ -429,36 +460,41 @@ export const ManagePublicTemplateDialog = ({
                 </Form>
               </DialogContent>
             ))
-            .with({ templateId: P.number, currentStep: 'CONFIRM_DISABLE' }, ({ templateId }) => (
-              <DialogContent className="relative">
-                <DialogHeader>
-                  <DialogTitle>
-                    <Trans>Are you sure?</Trans>
-                  </DialogTitle>
+            .with(
+              { templateId: P.number, currentStep: "CONFIRM_DISABLE" },
+              ({ templateId }) => (
+                <DialogContent className="relative">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <Trans>Are you sure?</Trans>
+                    </DialogTitle>
 
-                  <DialogDescription>
-                    <Trans>The template will be removed from your profile</Trans>
-                  </DialogDescription>
-                </DialogHeader>
+                    <DialogDescription>
+                      <Trans>
+                        The template will be removed from your profile
+                      </Trans>
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="secondary">
-                      <Trans>Cancel</Trans>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="secondary">
+                        <Trans>Cancel</Trans>
+                      </Button>
+                    </DialogClose>
+
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      loading={isUpdatingTemplateSettings}
+                      onClick={() => void setTemplateToPrivate(templateId)}
+                    >
+                      <Trans>Confirm</Trans>
                     </Button>
-                  </DialogClose>
-
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    loading={isUpdatingTemplateSettings}
-                    onClick={() => void setTemplateToPrivate(templateId)}
-                  >
-                    <Trans>Confirm</Trans>
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            ))
+                  </DialogFooter>
+                </DialogContent>
+              )
+            )
             .otherwise(() => null)}
         </AnimateGenericFadeInOut>
       </fieldset>

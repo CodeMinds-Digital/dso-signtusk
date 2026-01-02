@@ -1,5 +1,5 @@
 import { Plural, Trans } from '@lingui/react/macro';
-import { FolderType } from '@prisma/client';
+import { FolderType } from '@signtusk/lib/constants/prisma-enums';
 import {
   ArrowRightIcon,
   FolderIcon,

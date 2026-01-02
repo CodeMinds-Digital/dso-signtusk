@@ -1,59 +1,64 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { EnvelopeType } from '@prisma/client';
-import { DateTime } from 'luxon';
-import { redirect } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { DateTime } from "luxon";
+import { redirect } from "react-router";
 
-import { DOCUMENT_STATUS } from '@signtusk/lib/constants/document';
-import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@signtusk/lib/constants/i18n';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';
-import { unsafeGetEntireEnvelope } from '@signtusk/lib/server-only/admin/get-entire-document';
-import { decryptSecondaryData } from '@signtusk/lib/server-only/crypto/decrypt';
-import { findDocumentAuditLogs } from '@signtusk/lib/server-only/document/find-document-audit-logs';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
-import { getTranslations } from '@signtusk/lib/utils/i18n';
-import { Card, CardContent } from '@signtusk/ui/primitives/card';
+import { DOCUMENT_STATUS } from "@signtusk/lib/constants/document";
+import {
+  APP_I18N_OPTIONS,
+  ZSupportedLanguageCodeSchema,
+} from "@signtusk/lib/constants/i18n";
+import { RECIPIENT_ROLES_DESCRIPTION } from "@signtusk/lib/constants/recipient-roles";
+import { unsafeGetEntireEnvelope } from "@signtusk/lib/server-only/admin/get-entire-document";
+import { decryptSecondaryData } from "@signtusk/lib/server-only/crypto/decrypt";
+import { findDocumentAuditLogs } from "@signtusk/lib/server-only/document/find-document-audit-logs";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
+import { getTranslations } from "@signtusk/lib/utils/i18n";
+import { Card, CardContent } from "@signtusk/ui/primitives/card";
 
-import appStylesheet from '~/app.css?url';
-import { BrandingLogo } from '~/components/general/branding-logo';
-import { InternalAuditLogTable } from '~/components/tables/internal-audit-log-table';
+import appStylesheet from "~/app.css?url";
+import { BrandingLogo } from "~/components/general/branding-logo";
+import { InternalAuditLogTable } from "~/components/tables/internal-audit-log-table";
 
-import type { Route } from './+types/audit-log';
-import auditLogStylesheet from './audit-log.print.css?url';
+import type { Route } from "./+types/audit-log";
+import auditLogStylesheet from "./audit-log.print.css?url";
 
 export const links: Route.LinksFunction = () => [
-  { rel: 'stylesheet', href: appStylesheet },
-  { rel: 'stylesheet', href: auditLogStylesheet },
+  { rel: "stylesheet", href: appStylesheet },
+  { rel: "stylesheet", href: auditLogStylesheet },
 ];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const d = new URL(request.url).searchParams.get('d');
+  const d = new URL(request.url).searchParams.get("d");
 
-  if (typeof d !== 'string' || !d) {
-    throw redirect('/');
+  if (typeof d !== "string" || !d) {
+    throw redirect("/");
   }
 
   const rawDocumentId = decryptSecondaryData(d);
 
   if (!rawDocumentId || isNaN(Number(rawDocumentId))) {
-    throw redirect('/');
+    throw redirect("/");
   }
 
   const documentId = Number(rawDocumentId);
 
   const envelope = await unsafeGetEntireEnvelope({
     id: {
-      type: 'documentId',
+      type: "documentId",
       id: documentId,
     },
     type: EnvelopeType.DOCUMENT,
   }).catch(() => null);
 
   if (!envelope) {
-    throw redirect('/');
+    throw redirect("/");
   }
 
-  const documentLanguage = ZSupportedLanguageCodeSchema.parse(envelope.documentMeta?.language);
+  const documentLanguage = ZSupportedLanguageCodeSchema.parse(
+    envelope.documentMeta?.language
+  );
 
   const { data: auditLogs } = await findDocumentAuditLogs({
     documentId: documentId,
@@ -112,7 +117,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           <p>
             <span className="font-medium">{_(msg`Envelope ID`)}</span>
 
-            <span className="mt-1 block break-words">{document.envelopeId}</span>
+            <span className="mt-1 block break-words">
+              {document.envelopeId}
+            </span>
           </p>
 
           <p>
@@ -126,7 +133,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
             <span className="mt-1 block">
               {_(
-                document.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[document.status].description,
+                document.deletedAt
+                  ? msg`Deleted`
+                  : DOCUMENT_STATUS[document.status].description
               ).toUpperCase()}
             </span>
           </p>
@@ -145,7 +154,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.createdAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat("yyyy-mm-dd hh:mm:ss a (ZZZZ)")}
             </span>
           </p>
 
@@ -155,7 +164,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.updatedAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat("yyyy-mm-dd hh:mm:ss a (ZZZZ)")}
             </span>
           </p>
 
@@ -163,7 +172,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="font-medium">{_(msg`Time Zone`)}</span>
 
             <span className="mt-1 block break-words">
-              {document.documentMeta?.timezone ?? 'N/A'}
+              {document.documentMeta?.timezone ?? "N/A"}
             </span>
           </p>
 
@@ -175,7 +184,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
                 <li key={recipient.id}>
                   <span className="text-muted-foreground">
                     [{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}]
-                  </span>{' '}
+                  </span>{" "}
                   {recipient.name} ({recipient.email})
                 </li>
               ))}

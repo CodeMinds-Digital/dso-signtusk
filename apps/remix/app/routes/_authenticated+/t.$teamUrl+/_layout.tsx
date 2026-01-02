@@ -1,21 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
-import { Link, Outlet } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { SubscriptionStatus } from "@signtusk/lib/constants/prisma-enums";
+import { Link, Outlet } from "react-router";
 
 import {
   DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
   PAID_PLAN_LIMITS,
-} from '@signtusk/ee/server-only/limits/constants';
-import { LimitsProvider } from '@signtusk/ee/server-only/limits/provider/client';
-import { useOptionalCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { TrpcProvider } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+} from "@signtusk/ee/server-only/limits/constants";
+import { LimitsProvider } from "@signtusk/ee/server-only/limits/provider/client";
+import { useOptionalCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { TrpcProvider } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { useOptionalCurrentTeam } from "~/providers/team";
 
 export default function Layout() {
   const team = useOptionalCurrentTeam();
@@ -75,7 +75,7 @@ export default function Layout() {
   }
 
   const trpcHeaders = {
-    'x-team-Id': team.id.toString(),
+    "x-team-Id": team.id.toString(),
   };
 
   // Note: We use a key to force a re-render if the team context changes.

@@ -7,7 +7,7 @@ import {
   type Recipient,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from '@signtusk/lib/constants/prisma-enums';
 import { prop, sortBy } from 'remeda';
 
 import { isBase64Image } from '@signtusk/lib/constants/signatures';

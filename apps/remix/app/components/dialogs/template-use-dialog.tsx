@@ -1,32 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
-import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import * as z from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Recipient } from "@signtusk/lib/constants/prisma-enums";
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+} from "@signtusk/lib/constants/prisma-enums";
+import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from "lucide-react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import * as z from "zod";
 
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@signtusk/lib/constants/app';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from "@signtusk/lib/constants/app";
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
-} from '@signtusk/lib/constants/template';
+} from "@signtusk/lib/constants/template";
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
-} from '@signtusk/lib/constants/trpc';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { ZRecipientEmailSchema } from '@signtusk/lib/types/recipient';
-import { putPdfFile } from '@signtusk/lib/universal/upload/put-file';
-import { trpc } from '@signtusk/trpc/react';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Checkbox } from '@signtusk/ui/primitives/checkbox';
+} from "@signtusk/lib/constants/trpc";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { ZRecipientEmailSchema } from "@signtusk/lib/types/recipient";
+import { putPdfFile } from "@signtusk/lib/universal/upload/put-file";
+import { trpc } from "@signtusk/trpc/react";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Checkbox } from "@signtusk/ui/primitives/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -36,7 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -44,12 +47,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { SpinnerBox } from '@signtusk/ui/primitives/spinner';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
-import type { Toast } from '@signtusk/ui/primitives/use-toast';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { SpinnerBox } from "@signtusk/ui/primitives/spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@signtusk/ui/primitives/tooltip";
+import type { Toast } from "@signtusk/ui/primitives/use-toast";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 const ZAddRecipientsForNewDocumentSchema = z.object({
   distributeDocument: z.boolean(),
@@ -60,7 +67,7 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
         title: z.string(),
         data: z.instanceof(File).optional(),
         envelopeItemId: z.string(),
-      }),
+      })
     )
     .optional(),
   recipients: z.array(
@@ -69,11 +76,13 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
       email: ZRecipientEmailSchema,
       name: z.string(),
       signingOrder: z.number().optional(),
-    }),
+    })
   ),
 });
 
-type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
+type TAddRecipientsForNewDocumentSchema = z.infer<
+  typeof ZAddRecipientsForNewDocumentSchema
+>;
 
 export type TemplateUseDialogProps = {
   envelopeId: string;
@@ -101,17 +110,18 @@ export function TemplateUseDialog({
 
   const [open, setOpen] = useState(false);
 
-  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
-    {
-      envelopeId,
-    },
-    {
-      placeholderData: (previousData) => previousData,
-      ...SKIP_QUERY_BATCH_META,
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      enabled: open,
-    },
-  );
+  const { data: response, isLoading: isLoadingEnvelopeItems } =
+    trpc.envelope.item.getMany.useQuery(
+      {
+        envelopeId,
+      },
+      {
+        placeholderData: (previousData) => previousData,
+        ...SKIP_QUERY_BATCH_META,
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+        enabled: open,
+      }
+    );
 
   const envelopeItems = response?.data ?? [];
 
@@ -128,17 +138,17 @@ export function TemplateUseDialog({
         .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
         .map((recipient) => {
           const isRecipientEmailPlaceholder = recipient.email.match(
-            TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
+            TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX
           );
 
           const isRecipientNamePlaceholder = recipient.name.match(
-            TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+            TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX
           );
 
           return {
             id: recipient.id,
-            name: !isRecipientNamePlaceholder ? recipient.name : '',
-            email: !isRecipientEmailPlaceholder ? recipient.email : '',
+            name: !isRecipientNamePlaceholder ? recipient.name : "",
+            email: !isRecipientEmailPlaceholder ? recipient.email : "",
             signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
@@ -152,7 +162,7 @@ export function TemplateUseDialog({
 
   const { replace, fields: localCustomDocumentData } = useFieldArray({
     control: form.control,
-    name: 'customDocumentData',
+    name: "customDocumentData",
   });
 
   const { mutateAsync: createDocumentFromTemplate } =
@@ -162,7 +172,9 @@ export function TemplateUseDialog({
     try {
       const customFilesToUpload = (data.customDocumentData || []).filter(
         (item): item is { data: File; envelopeItemId: string; title: string } =>
-          item.data !== undefined && item.envelopeItemId !== undefined && item.title !== undefined,
+          item.data !== undefined &&
+          item.envelopeItemId !== undefined &&
+          item.title !== undefined
       );
 
       const customDocumentData = await Promise.all(
@@ -173,7 +185,7 @@ export function TemplateUseDialog({
             documentDataId: customDocumentData.id,
             envelopeItemId: item.envelopeItemId,
           };
-        }),
+        })
       );
 
       const { envelopeId } = await createDocumentFromTemplate({
@@ -185,7 +197,9 @@ export function TemplateUseDialog({
 
       toast({
         title: _(msg`Document created`),
-        description: _(msg`Your document has been created from the template successfully.`),
+        description: _(
+          msg`Your document has been created from the template successfully.`
+        ),
         duration: 5000,
       });
 
@@ -195,7 +209,7 @@ export function TemplateUseDialog({
         data.distributeDocument &&
         documentDistributionMethod === DocumentDistributionMethod.NONE
       ) {
-        documentPath += '?action=view-signing-links';
+        documentPath += "?action=view-signing-links";
       }
 
       await navigate(documentPath);
@@ -204,13 +218,15 @@ export function TemplateUseDialog({
 
       const toastPayload: Toast = {
         title: _(msg`Error`),
-        description: _(msg`An error occurred while creating document from template.`),
-        variant: 'destructive',
+        description: _(
+          msg`An error occurred while creating document from template.`
+        ),
+        variant: "destructive",
       };
 
-      if (error.code === 'DOCUMENT_SEND_FAILED') {
+      if (error.code === "DOCUMENT_SEND_FAILED") {
         toastPayload.description = _(
-          msg`The document was created but could not be sent to recipients.`,
+          msg`The document was created but could not be sent to recipients.`
         );
       }
 
@@ -220,7 +236,7 @@ export function TemplateUseDialog({
 
   const { fields: formRecipients } = useFieldArray({
     control: form.control,
-    name: 'recipients',
+    name: "recipients",
   });
 
   useEffect(() => {
@@ -236,13 +252,16 @@ export function TemplateUseDialog({
           title: item.title,
           data: undefined,
           envelopeItemId: item.id,
-        })),
+        }))
       );
     }
   }, [envelopeItems, form, open]);
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
+    >
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" className="bg-background">
@@ -267,18 +286,25 @@ export function TemplateUseDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+            <fieldset
+              className="flex h-full flex-col"
+              disabled={form.formState.isSubmitting}
+            >
               <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
                 {formRecipients.map((recipient, index) => (
-                  <div className="flex w-full flex-row space-x-4" key={recipient.id}>
-                    {templateSigningOrder === DocumentSigningOrder.SEQUENTIAL && (
+                  <div
+                    className="flex w-full flex-row space-x-4"
+                    key={recipient.id}
+                  >
+                    {templateSigningOrder ===
+                      DocumentSigningOrder.SEQUENTIAL && (
                       <FormField
                         control={form.control}
                         name={`recipients.${index}.signingOrder`}
                         render={({ field }) => (
                           <FormItem
-                            className={cn('w-20', {
-                              'mt-8': index === 0,
+                            className={cn("w-20", {
+                              "mt-8": index === 0,
                             })}
                           >
                             <FormControl>
@@ -310,7 +336,11 @@ export function TemplateUseDialog({
                           )}
 
                           <FormControl>
-                            <Input {...field} aria-label="Email" placeholder={_(msg`Email`)} />
+                            <Input
+                              {...field}
+                              aria-label="Email"
+                              placeholder={_(msg`Email`)}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -332,7 +362,10 @@ export function TemplateUseDialog({
                             <Input
                               {...field}
                               aria-label="Name"
-                              placeholder={recipients[index].name || _(msg`Recipient ${index + 1}`)}
+                              placeholder={
+                                recipients[index].name ||
+                                _(msg`Recipient ${index + 1}`)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -357,7 +390,8 @@ export function TemplateUseDialog({
                               onCheckedChange={field.onChange}
                             />
 
-                            {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
+                            {documentDistributionMethod ===
+                              DocumentDistributionMethod.EMAIL && (
                               <label
                                 className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
@@ -371,14 +405,15 @@ export function TemplateUseDialog({
                                   <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
-                                        The document will be immediately sent to recipients if this
-                                        is checked.
+                                        The document will be immediately sent to
+                                        recipients if this is checked.
                                       </Trans>
                                     </p>
 
                                     <p>
                                       <Trans>
-                                        Otherwise, the document will be created as a draft.
+                                        Otherwise, the document will be created
+                                        as a draft.
                                       </Trans>
                                     </p>
                                   </TooltipContent>
@@ -386,7 +421,8 @@ export function TemplateUseDialog({
                               </label>
                             )}
 
-                            {documentDistributionMethod === DocumentDistributionMethod.NONE && (
+                            {documentDistributionMethod ===
+                              DocumentDistributionMethod.NONE && (
                               <label
                                 className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
@@ -399,18 +435,23 @@ export function TemplateUseDialog({
                                   <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
-                                        Create the document as pending and ready to sign.
+                                        Create the document as pending and ready
+                                        to sign.
                                       </Trans>
                                     </p>
 
                                     <p>
-                                      <Trans>We won't send anything to notify recipients.</Trans>
+                                      <Trans>
+                                        We won't send anything to notify
+                                        recipients.
+                                      </Trans>
                                     </p>
 
                                     <p className="mt-2">
                                       <Trans>
-                                        We will generate signing links for you, which you can send
-                                        to the recipients through your method of choice.
+                                        We will generate signing links for you,
+                                        which you can send to the recipients
+                                        through your method of choice.
                                       </Trans>
                                     </p>
                                   </TooltipContent>
@@ -437,7 +478,7 @@ export function TemplateUseDialog({
                           onCheckedChange={(checked) => {
                             field.onChange(checked);
                             if (!checked) {
-                              form.setValue('customDocumentData', undefined);
+                              form.setValue("customDocumentData", undefined);
                             }
                           }}
                         />
@@ -453,8 +494,8 @@ export function TemplateUseDialog({
                             <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                               <p>
                                 <Trans>
-                                  Upload a custom document to use instead of the template's default
-                                  document
+                                  Upload a custom document to use instead of the
+                                  template's default document
                                 </Trans>
                               </p>
                             </TooltipContent>
@@ -465,7 +506,7 @@ export function TemplateUseDialog({
                   )}
                 />
 
-                {form.watch('useCustomDocument') && (
+                {form.watch("useCustomDocument") && (
                   <div className="my-4 space-y-2">
                     {isLoadingEnvelopeItems ? (
                       <SpinnerBox className="py-16" />
@@ -496,7 +537,11 @@ export function TemplateUseDialog({
                                       {field.value ? (
                                         <div>
                                           <Trans>
-                                            Custom {(field.value.size / (1024 * 1024)).toFixed(2)}{' '}
+                                            Custom{" "}
+                                            {(
+                                              field.value.size /
+                                              (1024 * 1024)
+                                            ).toFixed(2)}{" "}
                                             MB file
                                           </Trans>
                                         </div>
@@ -530,11 +575,15 @@ export function TemplateUseDialog({
                                         size="sm"
                                         className="text-xs"
                                         onClick={() => {
-                                          const fileInput = document.getElementById(
-                                            `template-use-dialog-file-input-${item.envelopeItemId}`,
-                                          );
+                                          const fileInput =
+                                            document.getElementById(
+                                              `template-use-dialog-file-input-${item.envelopeItemId}`
+                                            );
 
-                                          if (fileInput instanceof HTMLInputElement) {
+                                          if (
+                                            fileInput instanceof
+                                            HTMLInputElement
+                                          ) {
                                             fileInput.click();
                                           }
                                         }}
@@ -558,10 +607,12 @@ export function TemplateUseDialog({
                                           return;
                                         }
 
-                                        if (file.type !== 'application/pdf') {
-                                          form.setError('customDocumentData', {
-                                            type: 'manual',
-                                            message: _(msg`Please select a PDF file`),
+                                        if (file.type !== "application/pdf") {
+                                          form.setError("customDocumentData", {
+                                            type: "manual",
+                                            message: _(
+                                              msg`Please select a PDF file`
+                                            ),
                                           });
 
                                           return;
@@ -569,12 +620,14 @@ export function TemplateUseDialog({
 
                                         if (
                                           file.size >
-                                          APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024
+                                          APP_DOCUMENT_UPLOAD_SIZE_LIMIT *
+                                            1024 *
+                                            1024
                                         ) {
-                                          form.setError('customDocumentData', {
-                                            type: 'manual',
+                                          form.setError("customDocumentData", {
+                                            type: "manual",
                                             message: _(
-                                              msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
+                                              msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`
                                             ),
                                           });
 
@@ -605,9 +658,10 @@ export function TemplateUseDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {!form.getValues('distributeDocument') ? (
+                  {!form.getValues("distributeDocument") ? (
                     <Trans>Create as draft</Trans>
-                  ) : documentDistributionMethod === DocumentDistributionMethod.EMAIL ? (
+                  ) : documentDistributionMethod ===
+                    DocumentDistributionMethod.EMAIL ? (
                     <Trans>Create and send</Trans>
                   ) : (
                     <Trans>Create signing links</Trans>

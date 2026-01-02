@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { TEAM_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/teams';
-import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { isTeamRoleWithinUserHierarchy } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/teams";
+import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { isTeamRoleWithinUserHierarchy } from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -30,15 +30,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
+} from "@signtusk/ui/primitives/form/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type TeamMemberUpdateDialogProps = {
   currentUserTeamRole: TeamMemberRole;
@@ -47,7 +47,7 @@ export type TeamMemberUpdateDialogProps = {
   memberId: string;
   memberName: string;
   memberTeamRole: TeamMemberRole;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdateTeamMemberFormSchema = z.object({
   role: z.nativeEnum(TeamMemberRole),
@@ -76,7 +76,8 @@ export const TeamMemberUpdateDialog = ({
     },
   });
 
-  const { mutateAsync: updateTeamMember } = trpc.team.member.update.useMutation();
+  const { mutateAsync: updateTeamMember } =
+    trpc.team.member.update.useMutation();
 
   const onFormSubmit = async ({ role }: ZUpdateTeamMemberSchema) => {
     try {
@@ -99,9 +100,9 @@ export const TeamMemberUpdateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update this team member. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update this team member. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -117,8 +118,10 @@ export const TeamMemberUpdateDialog = ({
       setOpen(false);
 
       toast({
-        title: _(msg`You cannot modify a team member who has a higher role than you.`),
-        variant: 'destructive',
+        title: _(
+          msg`You cannot modify a team member who has a higher role than you.`
+        ),
+        variant: "destructive",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,14 +149,18 @@ export const TeamMemberUpdateDialog = ({
 
           <DialogDescription>
             <Trans>
-              You are currently updating <span className="font-bold">{memberName}</span>.
+              You are currently updating{" "}
+              <span className="font-bold">{memberName}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+            <fieldset
+              className="flex h-full flex-col"
+              disabled={form.formState.isSubmitting}
+            >
               <FormField
                 control={form.control}
                 name="role"
@@ -169,11 +176,13 @@ export const TeamMemberUpdateDialog = ({
                         </SelectTrigger>
 
                         <SelectContent className="w-full" position="popper">
-                          {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
-                            <SelectItem key={role} value={role}>
-                              {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                            </SelectItem>
-                          ))}
+                          {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map(
+                            (role) => (
+                              <SelectItem key={role} value={role}>
+                                {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                              </SelectItem>
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -183,7 +192,11 @@ export const TeamMemberUpdateDialog = ({
               />
 
               <DialogFooter className="mt-4">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

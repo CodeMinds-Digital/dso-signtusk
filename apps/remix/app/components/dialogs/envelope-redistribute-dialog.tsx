@@ -1,20 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, type Recipient, SigningStatus } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  DocumentStatus,
+  EnvelopeType,
+  SigningStatus,
+  type Recipient,
+} from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { getRecipientType } from '@signtusk/lib/client-only/recipient-type';
-import type { TEnvelope } from '@signtusk/lib/types/envelope';
-import { recipientAbbreviation } from '@signtusk/lib/utils/recipient-formatter';
-import { trpc as trpcReact } from '@signtusk/trpc/react';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Checkbox } from '@signtusk/ui/primitives/checkbox';
+import { getRecipientType } from "@signtusk/lib/client-only/recipient-type";
+import type { TEnvelope } from "@signtusk/lib/types/envelope";
+import { recipientAbbreviation } from "@signtusk/lib/utils/recipient-formatter";
+import { trpc as trpcReact } from "@signtusk/trpc/react";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Checkbox } from "@signtusk/ui/primitives/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -24,20 +28,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from '@signtusk/ui/primitives/form/form';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { StackAvatar } from '../general/stack-avatar';
+import { StackAvatar } from "../general/stack-avatar";
 
 export type EnvelopeRedistributeDialogProps = {
-  envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
+  envelope: Pick<
+    TEnvelope,
+    "id" | "userId" | "teamId" | "status" | "type" | "documentMeta"
+  > & {
     recipients: Recipient[];
   };
   trigger?: React.ReactNode;
@@ -49,7 +56,9 @@ export const ZEnvelopeRedistributeFormSchema = z.object({
   }),
 });
 
-export type TEnvelopeRedistributeFormSchema = z.infer<typeof ZEnvelopeRedistributeFormSchema>;
+export type TEnvelopeRedistributeFormSchema = z.infer<
+  typeof ZEnvelopeRedistributeFormSchema
+>;
 
 export const EnvelopeRedistributeDialog = ({
   envelope,
@@ -62,7 +71,8 @@ export const EnvelopeRedistributeDialog = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutateAsync: redistributeEnvelope } = trpcReact.envelope.redistribute.useMutation();
+  const { mutateAsync: redistributeEnvelope } =
+    trpcReact.envelope.redistribute.useMutation();
 
   const form = useForm<TEnvelopeRedistributeFormSchema>({
     defaultValues: {
@@ -76,7 +86,9 @@ export const EnvelopeRedistributeDialog = ({
     formState: { isSubmitting },
   } = form;
 
-  const onFormSubmit = async ({ recipients }: TEnvelopeRedistributeFormSchema) => {
+  const onFormSubmit = async ({
+    recipients,
+  }: TEnvelopeRedistributeFormSchema) => {
     try {
       await redistributeEnvelope({ envelopeId: envelope.id, recipients });
 
@@ -91,7 +103,7 @@ export const EnvelopeRedistributeDialog = ({
       toast({
         title: t`Something went wrong`,
         description: t`This envelope could not be resent at this time. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 7500,
       });
     }
@@ -103,7 +115,10 @@ export const EnvelopeRedistributeDialog = ({
     }
   }, [isOpen]);
 
-  if (envelope.status !== DocumentStatus.PENDING || envelope.type !== EnvelopeType.DOCUMENT) {
+  if (
+    envelope.status !== DocumentStatus.PENDING ||
+    envelope.type !== EnvelopeType.DOCUMENT
+  ) {
     return null;
   }
 
@@ -130,16 +145,22 @@ export const EnvelopeRedistributeDialog = ({
                 render={({ field: { value, onChange } }) => (
                   <>
                     {recipients
-                      .filter((recipient) => recipient.signingStatus === SigningStatus.NOT_SIGNED)
+                      .filter(
+                        (recipient) =>
+                          recipient.signingStatus === SigningStatus.NOT_SIGNED
+                      )
                       .map((recipient) => (
                         <FormItem
                           key={recipient.id}
                           className="flex flex-row items-center justify-between gap-x-3 px-3"
                         >
                           <FormLabel
-                            className={cn('my-2 flex items-center gap-2 font-normal', {
-                              'opacity-50': !value.includes(recipient.id),
-                            })}
+                            className={cn(
+                              "my-2 flex items-center gap-2 font-normal",
+                              {
+                                "opacity-50": !value.includes(recipient.id),
+                              }
+                            )}
                           >
                             <StackAvatar
                               key={recipient.id}
@@ -157,7 +178,9 @@ export const EnvelopeRedistributeDialog = ({
                               onCheckedChange={(checked: boolean) =>
                                 checked
                                   ? onChange([...value, recipient.id])
-                                  : onChange(value.filter((v) => v !== recipient.id))
+                                  : onChange(
+                                      value.filter((v) => v !== recipient.id)
+                                    )
                               }
                             />
                           </FormControl>
@@ -169,7 +192,11 @@ export const EnvelopeRedistributeDialog = ({
 
               <DialogFooter className="mt-4">
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary" disabled={isSubmitting}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isSubmitting}
+                  >
                     <Trans>Cancel</Trans>
                   </Button>
                 </DialogClose>

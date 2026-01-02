@@ -1,25 +1,30 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Loader } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { Loader } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router";
+import { z } from "zod";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/organisations';
-import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { TEAM_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/teams-translations';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { trpc } from '@signtusk/trpc/react';
-import type { TFindOrganisationGroupsResponse } from '@signtusk/trpc/server/organisation-router/find-organisation-groups.types';
-import type { TFindOrganisationMembersResponse } from '@signtusk/trpc/server/organisation-router/find-organisation-members.types';
-import { Button } from '@signtusk/ui/primitives/button';
-import { DataTable, type DataTableColumnDef } from '@signtusk/ui/primitives/data-table';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/organisations";
+import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { TEAM_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/teams-translations";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { trpc } from "@signtusk/trpc/react";
+import type { TFindOrganisationGroupsResponse } from "@signtusk/trpc/server/organisation-router/find-organisation-groups.types";
+import type { TFindOrganisationMembersResponse } from "@signtusk/trpc/server/organisation-router/find-organisation-members.types";
+import { Button } from "@signtusk/ui/primitives/button";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@signtusk/ui/primitives/data-table";
 import {
   Form,
   FormControl,
@@ -28,47 +33,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { MultiSelectCombobox } from '@signtusk/ui/primitives/multi-select-combobox';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { MultiSelectCombobox } from "@signtusk/ui/primitives/multi-select-combobox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation-group-delete-dialog';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { SettingsHeader } from '~/components/general/settings-header';
+import { OrganisationGroupDeleteDialog } from "~/components/dialogs/organisation-group-delete-dialog";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { SettingsHeader } from "~/components/general/settings-header";
 
-import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
+import type { Route } from "./+types/o.$orgUrl.settings.groups.$id";
 
-export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
+export default function OrganisationGroupSettingsPage({
+  params,
+}: Route.ComponentProps) {
   const { t } = useLingui();
 
   const organisation = useCurrentOrganisation();
 
   const groupId = params.id;
 
-  const { data: members, isLoading: isLoadingMembers } = trpc.organisation.member.find.useQuery({
-    organisationId: organisation.id,
-  });
-
-  const { data: groupData, isLoading: isLoadingGroup } = trpc.organisation.group.find.useQuery(
-    {
+  const { data: members, isLoading: isLoadingMembers } =
+    trpc.organisation.member.find.useQuery({
       organisationId: organisation.id,
-      organisationGroupId: groupId,
-      page: 1,
-      perPage: 1,
-      types: [OrganisationGroupType.CUSTOM],
-    },
-    {
-      enabled: !!organisation.id && !!groupId,
-    },
-  );
+    });
+
+  const { data: groupData, isLoading: isLoadingGroup } =
+    trpc.organisation.group.find.useQuery(
+      {
+        organisationId: organisation.id,
+        organisationGroupId: groupId,
+        page: 1,
+        perPage: 1,
+        types: [OrganisationGroupType.CUSTOM],
+      },
+      {
+        enabled: !!organisation.id && !!groupId,
+      }
+    );
 
   const group = groupData?.data.find((g) => g.id === groupId);
 
@@ -112,7 +121,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       >
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
-          organisationGroupName={group.name || ''}
+          organisationGroupName={group.name || ""}
           trigger={
             <Button variant="destructive" title={t`Remove organisation group`}>
               <Trans>Delete</Trans>
@@ -121,7 +130,10 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         />
       </SettingsHeader>
 
-      <OrganisationGroupForm group={group} organisationMembers={members?.data || []} />
+      <OrganisationGroupForm
+        group={group}
+        organisationMembers={members?.data || []}
+      />
     </div>
   );
 }
@@ -132,25 +144,31 @@ const ZUpdateOrganisationGroupFormSchema = z.object({
   memberIds: z.array(z.string()),
 });
 
-type TUpdateOrganisationGroupFormSchema = z.infer<typeof ZUpdateOrganisationGroupFormSchema>;
+type TUpdateOrganisationGroupFormSchema = z.infer<
+  typeof ZUpdateOrganisationGroupFormSchema
+>;
 
 type OrganisationGroupFormOptions = {
-  group: TFindOrganisationGroupsResponse['data'][number];
-  organisationMembers: TFindOrganisationMembersResponse['data'];
+  group: TFindOrganisationGroupsResponse["data"][number];
+  organisationMembers: TFindOrganisationMembersResponse["data"];
 };
 
-const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroupFormOptions) => {
+const OrganisationGroupForm = ({
+  group,
+  organisationMembers,
+}: OrganisationGroupFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
   const organisation = useCurrentOrganisation();
 
-  const { mutateAsync: updateOrganisationGroup } = trpc.organisation.group.update.useMutation();
+  const { mutateAsync: updateOrganisationGroup } =
+    trpc.organisation.group.update.useMutation();
 
   const form = useForm<TUpdateOrganisationGroupFormSchema>({
     resolver: zodResolver(ZUpdateOrganisationGroupFormSchema),
     defaultValues: {
-      name: group.name || '',
+      name: group.name || "",
       organisationRole: group.organisationRole,
       memberIds: group.members.map((member) => member.id),
     },
@@ -177,7 +195,7 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
       toast({
         title: t`An error occurred`,
         description: t`We couldn't update the group. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -186,13 +204,15 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
     return [
       {
         header: t`Team`,
-        accessorKey: 'name',
+        accessorKey: "name",
       },
       {
         header: t`Team Role`,
         cell: ({ row }) => t(TEAM_MEMBER_ROLE_MAP[row.original.teamRole]),
       },
-    ] satisfies DataTableColumnDef<OrganisationGroupFormOptions['group']['teams'][number]>[];
+    ] satisfies DataTableColumnDef<
+      OrganisationGroupFormOptions["group"]["teams"][number]
+    >[];
   }, []);
 
   return (
@@ -229,20 +249,21 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
                   </SelectTrigger>
 
                   <SelectContent position="popper">
-                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map(
-                      (role) => (
-                        <SelectItem key={role} value={role}>
-                          {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
-                        </SelectItem>
-                      ),
-                    )}
+                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[
+                      organisation.currentOrganisationRole
+                    ].map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
               <FormMessage />
               <FormDescription>
                 <Trans>
-                  The organisation role that will be applied to all members in this group.
+                  The organisation role that will be applied to all members in
+                  this group.
                 </Trans>
               </FormDescription>
             </FormItem>
@@ -286,7 +307,9 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
           </div>
 
           <FormDescription>
-            <Trans>Teams that this organisation group is currently assigned to</Trans>
+            <Trans>
+              Teams that this organisation group is currently assigned to
+            </Trans>
           </FormDescription>
         </div>
 

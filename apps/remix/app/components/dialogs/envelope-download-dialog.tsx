@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, type EnvelopeItem } from '@prisma/client';
-import { DownloadIcon, FileTextIcon } from 'lucide-react';
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  DocumentStatus,
+  type EnvelopeItem,
+} from "@signtusk/lib/constants/prisma-enums";
+import { DownloadIcon, FileTextIcon } from "lucide-react";
 
-import { downloadPDF } from '@signtusk/lib/client-only/download-pdf';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { downloadPDF } from "@signtusk/lib/client-only/download-pdf";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -15,11 +17,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { Skeleton } from '@signtusk/ui/primitives/skeleton';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { Skeleton } from "@signtusk/ui/primitives/skeleton";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' | 'order'>;
+type EnvelopeItemToDownload = Pick<
+  EnvelopeItem,
+  "id" | "envelopeId" | "title" | "order"
+>;
 
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
@@ -51,26 +56,30 @@ export const EnvelopeDownloadDialog = ({
     [envelopeItemIdAndVersion: string]: boolean;
   }>({});
 
-  const generateDownloadKey = (envelopeItemId: string, version: 'original' | 'signed') =>
-    `${envelopeItemId}-${version}`;
+  const generateDownloadKey = (
+    envelopeItemId: string,
+    version: "original" | "signed"
+  ) => `${envelopeItemId}-${version}`;
 
   const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
     trpc.envelope.item.getManyByToken.useQuery(
       {
         envelopeId,
-        access: token ? { type: 'recipient', token } : { type: 'user' },
+        access: token ? { type: "recipient", token } : { type: "user" },
       },
       {
-        initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
+        initialData: initialEnvelopeItems
+          ? { data: initialEnvelopeItems }
+          : undefined,
         enabled: open,
-      },
+      }
     );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
   const onDownload = async (
     envelopeItem: EnvelopeItemToDownload,
-    version: 'original' | 'signed',
+    version: "original" | "signed"
   ) => {
     const { id: envelopeItemId } = envelopeItem;
 
@@ -106,7 +115,7 @@ export const EnvelopeDownloadDialog = ({
       toast({
         title: t`Something went wrong`,
         description: t`This document could not be downloaded at this time. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 7500,
       });
     }
@@ -159,7 +168,10 @@ export const EnvelopeDownloadDialog = ({
 
                 <div className="min-w-0 flex-1">
                   {/* Todo: Envelopes - Fix overflow */}
-                  <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
+                  <h4
+                    className="text-foreground truncate text-sm font-medium"
+                    title={item.title}
+                  >
                     {item.title}
                   </h4>
                   <p className="text-muted-foreground mt-0.5 text-xs">
@@ -172,13 +184,19 @@ export const EnvelopeDownloadDialog = ({
                     variant="outline"
                     size="sm"
                     className="text-xs"
-                    onClick={async () => onDownload(item, 'original')}
-                    loading={isDownloadingState[generateDownloadKey(item.id, 'original')]}
+                    onClick={async () => onDownload(item, "original")}
+                    loading={
+                      isDownloadingState[
+                        generateDownloadKey(item.id, "original")
+                      ]
+                    }
                   >
-                    {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
-                      <DownloadIcon className="mr-2 h-4 w-4" />
-                    )}
-                    <Trans context="Original document (adjective)">Original</Trans>
+                    {!isDownloadingState[
+                      generateDownloadKey(item.id, "original")
+                    ] && <DownloadIcon className="mr-2 h-4 w-4" />}
+                    <Trans context="Original document (adjective)">
+                      Original
+                    </Trans>
                   </Button>
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
@@ -186,13 +204,19 @@ export const EnvelopeDownloadDialog = ({
                       variant="default"
                       size="sm"
                       className="text-xs"
-                      onClick={async () => onDownload(item, 'signed')}
-                      loading={isDownloadingState[generateDownloadKey(item.id, 'signed')]}
+                      onClick={async () => onDownload(item, "signed")}
+                      loading={
+                        isDownloadingState[
+                          generateDownloadKey(item.id, "signed")
+                        ]
+                      }
                     >
-                      {!isDownloadingState[generateDownloadKey(item.id, 'signed')] && (
-                        <DownloadIcon className="mr-2 h-4 w-4" />
-                      )}
-                      <Trans context="Signed document (adjective)">Signed</Trans>
+                      {!isDownloadingState[
+                        generateDownloadKey(item.id, "signed")
+                      ] && <DownloadIcon className="mr-2 h-4 w-4" />}
+                      <Trans context="Signed document (adjective)">
+                        Signed
+                      </Trans>
                     </Button>
                   )}
                 </div>

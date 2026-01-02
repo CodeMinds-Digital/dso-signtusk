@@ -3,8 +3,8 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, EnvelopeItem } from '@prisma/client';
-import { type Field, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import type { DocumentMeta, EnvelopeItem } from '@signtusk/lib/constants/prisma-enums';
+import { type Field, FieldType, RecipientRole, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@signtusk/lib/client-only/hooks/use-throttle-fn';

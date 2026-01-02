@@ -1,35 +1,38 @@
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType, type Recipient } from '@prisma/client';
-import { ChevronLeft } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link } from 'react-router';
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import {
+  EnvelopeType,
+  type Recipient,
+} from "@signtusk/lib/constants/prisma-enums";
+import { ChevronLeft } from "lucide-react";
+import { DateTime } from "luxon";
+import { Link } from "react-router";
 
-import { getSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { getTeamByUrl } from '@signtusk/lib/server-only/team/get-team';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
-import { logDocumentAccess } from '@signtusk/lib/utils/logger';
-import { formatDocumentsPath } from '@signtusk/lib/utils/teams';
-import { Card } from '@signtusk/ui/primitives/card';
+import { getSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { getTeamByUrl } from "@signtusk/lib/server-only/team/get-team";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
+import { logDocumentAccess } from "@signtusk/lib/utils/logger";
+import { formatDocumentsPath } from "@signtusk/lib/utils/teams";
+import { Card } from "@signtusk/ui/primitives/card";
 
-import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
-import { DocumentCertificateDownloadButton } from '~/components/general/document/document-certificate-download-button';
+import { DocumentAuditLogDownloadButton } from "~/components/general/document/document-audit-log-download-button";
+import { DocumentCertificateDownloadButton } from "~/components/general/document/document-certificate-download-button";
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
-} from '~/components/general/document/document-status';
-import { DocumentLogsTable } from '~/components/tables/document-logs-table';
+} from "~/components/general/document/document-status";
+import { DocumentLogsTable } from "~/components/tables/document-logs-table";
 
-import type { Route } from './+types/documents.$id.logs';
+import type { Route } from "./+types/documents.$id.logs";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { id, teamUrl } = params;
 
   if (!id || !teamUrl) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const { user } = await getSession(request);
@@ -40,7 +43,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const envelope = await getEnvelopeById({
     id: {
-      type: 'envelopeId',
+      type: "envelopeId",
       id,
     },
     type: EnvelopeType.DOCUMENT,
@@ -49,7 +52,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!envelope) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   logDocumentAccess({
@@ -78,12 +81,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   };
 }
 
-export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
+export default function DocumentsLogsPage({
+  loaderData,
+}: Route.ComponentProps) {
   const { document, recipients, documentRootPath } = loaderData;
 
   const { _, i18n } = useLingui();
 
-  const documentInformation: { description: MessageDescriptor; value: string }[] = [
+  const documentInformation: {
+    description: MessageDescriptor;
+    value: string;
+  }[] = [
     {
       description: msg`Document title`,
       value: document.title,
@@ -116,7 +124,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
     {
       description: msg`Time zone`,
-      value: document.documentMeta?.timezone ?? 'N/A',
+      value: document.documentMeta?.timezone ?? "N/A",
     },
   ];
 
@@ -169,7 +177,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       </div>
 
       <section className="mt-6">
-        <Card className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2" degrees={45} gradient>
+        <Card
+          className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2"
+          degrees={45}
+          gradient
+        >
           {documentInformation.map((info, i) => (
             <div className="text-foreground text-sm" key={i}>
               <h3 className="font-semibold">{_(info.description)}</h3>

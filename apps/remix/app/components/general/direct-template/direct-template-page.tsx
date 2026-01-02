@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Field } from '@prisma/client';
-import { type Recipient } from '@prisma/client';
+import type { Field } from '@signtusk/lib/constants/prisma-enums';
+import { type Recipient } from '@signtusk/lib/constants/prisma-enums';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Field, Recipient } from "@signtusk/prisma/enums";
-import { FieldType } from "@signtusk/prisma/enums";
+import type { Field, Recipient } from "@signtusk/lib/constants/prisma-enums";
+import { FieldType } from "@signtusk/lib/constants/prisma-enums";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 

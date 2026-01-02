@@ -1,18 +1,18 @@
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { ChevronLeftIcon } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse, redirect } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { ChevronLeftIcon } from "lucide-react";
+import { Link, Outlet, isRouteErrorResponse, redirect } from "react-router";
 
-import { getSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { getTeamByUrl } from '@signtusk/lib/server-only/team/get-team';
-import { Button } from '@signtusk/ui/primitives/button';
+import { getSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { getTeamByUrl } from "@signtusk/lib/server-only/team/get-team";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
 
-import type { Route } from './+types/settings._layout';
+import type { Route } from "./+types/settings._layout";
 
 /**
  * This file is very similar for templates as well. Any changes here should also be adjusted there as well.
@@ -35,7 +35,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const envelope = await getEnvelopeById({
       id: {
-        type: 'documentId',
+        type: "documentId",
         id: documentId,
       },
       type: EnvelopeType.DOCUMENT,
@@ -45,7 +45,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       const error = AppError.parseError(err);
 
       if (error.code === AppErrorCode.NOT_FOUND) {
-        throw new Response('Not Found', { status: 404 });
+        throw new Response("Not Found", { status: 404 });
       }
 
       throw err;
@@ -53,7 +53,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const url = new URL(request.url);
 
-    throw redirect(url.pathname.replace(`/documents/${id}`, `/documents/${envelope.id}`));
+    throw redirect(
+      url.pathname.replace(`/documents/${id}`, `/documents/${envelope.id}`)
+    );
   }
 }
 

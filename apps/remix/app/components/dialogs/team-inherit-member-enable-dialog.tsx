@@ -1,9 +1,13 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+  TeamMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogClose,
@@ -13,10 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export const TeamMemberInheritEnableDialog = () => {
   const organisation = useCurrentOrganisation();
@@ -25,22 +29,23 @@ export const TeamMemberInheritEnableDialog = () => {
   const { toast } = useToast();
   const { t } = useLingui();
 
-  const { mutateAsync: createTeamGroups, isPending } = trpc.team.group.createMany.useMutation({
-    onSuccess: () => {
-      toast({
-        title: t`Access enabled`,
-        duration: 5000,
-      });
-    },
-    onError: () => {
-      toast({
-        title: t`Something went wrong`,
-        description: t`We encountered an unknown error while attempting to enable access.`,
-        variant: 'destructive',
-        duration: 5000,
-      });
-    },
-  });
+  const { mutateAsync: createTeamGroups, isPending } =
+    trpc.team.group.createMany.useMutation({
+      onSuccess: () => {
+        toast({
+          title: t`Access enabled`,
+          duration: 5000,
+        });
+      },
+      onError: () => {
+        toast({
+          title: t`Something went wrong`,
+          description: t`We encountered an unknown error while attempting to enable access.`,
+          variant: "destructive",
+          duration: 5000,
+        });
+      },
+    });
 
   const organisationGroupQuery = trpc.organisation.group.find.useQuery({
     organisationId: organisation.id,
@@ -81,8 +86,8 @@ export const TeamMemberInheritEnableDialog = () => {
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to give all organisation members access to this team under their
-              organisation role.
+              You are about to give all organisation members access to this team
+              under their organisation role.
             </Trans>
           </DialogDescription>
         </DialogHeader>

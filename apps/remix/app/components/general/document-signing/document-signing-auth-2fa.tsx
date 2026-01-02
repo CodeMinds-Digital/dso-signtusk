@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType } from '@prisma/client';
+import type { TeamGlobalSettings } from '@signtusk/lib/constants/prisma-enums';
+import { DocumentVisibility, OrganisationType } from '@signtusk/lib/constants/prisma-enums';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

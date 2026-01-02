@@ -1,30 +1,29 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DocumentDistributionMethod,
   DocumentStatus,
   EnvelopeType,
   FieldType,
   RecipientRole,
-} from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import * as z from 'zod';
+} from "@signtusk/lib/constants/prisma-enums";
+import { AnimatePresence, motion } from "framer-motion";
+import { InfoIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { match } from "ts-pattern";
+import * as z from "zod";
 
-import { useCurrentEnvelopeEditor } from '@signtusk/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { extractDocumentAuthMethods } from '@signtusk/lib/utils/document-auth';
-import { trpc, trpc as trpcReact } from '@signtusk/trpc/react';
-import { DocumentSendEmailMessageHelper } from '@signtusk/ui/components/document/document-send-email-message-helper';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+import { useCurrentEnvelopeEditor } from "@signtusk/lib/client-only/providers/envelope-editor-provider";
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { extractDocumentAuthMethods } from "@signtusk/lib/utils/document-auth";
+import { trpc, trpc as trpcReact } from "@signtusk/trpc/react";
+import { DocumentSendEmailMessageHelper } from "@signtusk/ui/components/document/document-send-email-message-helper";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Alert, AlertDescription } from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogClose,
@@ -34,7 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -42,20 +41,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { SpinnerBox } from '@signtusk/ui/primitives/spinner';
-import { Tabs, TabsList, TabsTrigger } from '@signtusk/ui/primitives/tabs';
-import { Textarea } from '@signtusk/ui/primitives/textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { SpinnerBox } from "@signtusk/ui/primitives/spinner";
+import { Tabs, TabsList, TabsTrigger } from "@signtusk/ui/primitives/tabs";
+import { Textarea } from "@signtusk/ui/primitives/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@signtusk/ui/primitives/tooltip";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type EnvelopeDistributeDialogProps = {
   onDistribute?: () => Promise<void>;
@@ -67,8 +70,8 @@ export const ZEnvelopeDistributeFormSchema = z.object({
   meta: z.object({
     emailId: z.string().nullable(),
     emailReplyTo: z.preprocess(
-      (val) => (val === '' ? undefined : val),
-      z.string().email().optional(),
+      (val) => (val === "" ? undefined : val),
+      z.string().email().optional()
     ),
     subject: z.string(),
     message: z.string(),
@@ -79,7 +82,9 @@ export const ZEnvelopeDistributeFormSchema = z.object({
   }),
 });
 
-export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFormSchema>;
+export type TEnvelopeDistributeFormSchema = z.infer<
+  typeof ZEnvelopeDistributeFormSchema
+>;
 
 export const EnvelopeDistributeDialog = ({
   trigger,
@@ -88,7 +93,8 @@ export const EnvelopeDistributeDialog = ({
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
-  const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
+  const { envelope, syncEnvelope, isAutosaving, autosaveError } =
+    useCurrentEnvelopeEditor();
 
   const { toast } = useToast();
   const { t } = useLingui();
@@ -97,17 +103,19 @@ export const EnvelopeDistributeDialog = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const { mutateAsync: distributeEnvelope } = trpcReact.envelope.distribute.useMutation();
+  const { mutateAsync: distributeEnvelope } =
+    trpcReact.envelope.distribute.useMutation();
 
   const form = useForm<TEnvelopeDistributeFormSchema>({
     defaultValues: {
       meta: {
         emailId: envelope.documentMeta?.emailId ?? null,
         emailReplyTo: envelope.documentMeta?.emailReplyTo || undefined,
-        subject: envelope.documentMeta?.subject ?? '',
-        message: envelope.documentMeta?.message ?? '',
+        subject: envelope.documentMeta?.subject ?? "",
+        message: envelope.documentMeta?.message ?? "",
         distributionMethod:
-          envelope.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
+          envelope.documentMeta?.distributionMethod ||
+          DocumentDistributionMethod.EMAIL,
       },
     },
     resolver: zodResolver(ZEnvelopeDistributeFormSchema),
@@ -128,7 +136,7 @@ export const EnvelopeDistributeDialog = ({
 
   const emails = emailData?.data || [];
 
-  const distributionMethod = watch('meta.distributionMethod');
+  const distributionMethod = watch("meta.distributionMethod");
 
   const recipientsWithIndex = useMemo(
     () =>
@@ -136,7 +144,7 @@ export const EnvelopeDistributeDialog = ({
         ...recipient,
         index,
       })),
-    [envelope.recipients],
+    [envelope.recipients]
   );
 
   const recipientsMissingSignatureFields = useMemo(
@@ -145,10 +153,12 @@ export const EnvelopeDistributeDialog = ({
         (recipient) =>
           recipient.role === RecipientRole.SIGNER &&
           !envelope.fields.some(
-            (field) => field.type === FieldType.SIGNATURE && field.recipientId === recipient.id,
-          ),
+            (field) =>
+              field.type === FieldType.SIGNATURE &&
+              field.recipientId === recipient.id
+          )
       ),
-    [recipientsWithIndex, envelope.fields],
+    [recipientsWithIndex, envelope.fields]
   );
 
   /**
@@ -162,26 +172,32 @@ export const EnvelopeDistributeDialog = ({
       });
 
       return (
-        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) && !recipient.email
+        (auth.recipientAccessAuthRequired ||
+          auth.recipientActionAuthRequired) &&
+        !recipient.email
       );
     });
   }, [recipientsWithIndex, envelope.authOptions]);
 
   const invalidEnvelopeCode = useMemo(() => {
     if (recipientsMissingSignatureFields.length > 0) {
-      return 'MISSING_SIGNATURES';
+      return "MISSING_SIGNATURES";
     }
 
     if (envelope.recipients.length === 0) {
-      return 'MISSING_RECIPIENTS';
+      return "MISSING_RECIPIENTS";
     }
 
     if (recipientsMissingRequiredEmail.length > 0) {
-      return 'MISSING_REQUIRED_EMAIL';
+      return "MISSING_REQUIRED_EMAIL";
     }
 
     return null;
-  }, [envelope.recipients, recipientsMissingRequiredEmail, recipientsMissingSignatureFields]);
+  }, [
+    envelope.recipients,
+    recipientsMissingRequiredEmail,
+    recipientsMissingSignatureFields,
+  ]);
 
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
     try {
@@ -192,7 +208,7 @@ export const EnvelopeDistributeDialog = ({
       let redirectPath = `${documentRootPath}/${envelope.id}`;
 
       if (meta.distributionMethod === DocumentDistributionMethod.NONE) {
-        redirectPath += '?action=copy-links';
+        redirectPath += "?action=copy-links";
       }
 
       await navigate(redirectPath);
@@ -208,7 +224,7 @@ export const EnvelopeDistributeDialog = ({
       toast({
         title: t`Something went wrong`,
         description: t`This envelope could not be distributed at this time. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 7500,
       });
     }
@@ -237,7 +253,10 @@ export const EnvelopeDistributeDialog = ({
     }
   }, [isOpen]);
 
-  if (envelope.status !== DocumentStatus.DRAFT || envelope.type !== EnvelopeType.DOCUMENT) {
+  if (
+    envelope.status !== DocumentStatus.DRAFT ||
+    envelope.type !== EnvelopeType.DOCUMENT
+  ) {
     return null;
   }
 
@@ -252,7 +271,9 @@ export const EnvelopeDistributeDialog = ({
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Recipients will be able to sign the document once sent</Trans>
+            <Trans>
+              Recipients will be able to sign the document once sent
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -263,41 +284,63 @@ export const EnvelopeDistributeDialog = ({
                 <Tabs
                   onValueChange={(value) =>
                     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    setValue('meta.distributionMethod', value as DocumentDistributionMethod)
+                    setValue(
+                      "meta.distributionMethod",
+                      value as DocumentDistributionMethod
+                    )
                   }
                   value={distributionMethod}
                   className="mb-2"
                 >
                   <TabsList className="w-full">
-                    <TabsTrigger className="w-full" value={DocumentDistributionMethod.EMAIL}>
+                    <TabsTrigger
+                      className="w-full"
+                      value={DocumentDistributionMethod.EMAIL}
+                    >
                       Email
                     </TabsTrigger>
-                    <TabsTrigger className="w-full" value={DocumentDistributionMethod.NONE}>
+                    <TabsTrigger
+                      className="w-full"
+                      value={DocumentDistributionMethod.NONE}
+                    >
                       None
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
 
                 <div
-                  className={cn('min-h-72', {
-                    'min-h-[23rem]': organisation.organisationClaim.flags.emailDomains,
+                  className={cn("min-h-72", {
+                    "min-h-[23rem]":
+                      organisation.organisationClaim.flags.emailDomains,
                   })}
                 >
                   <AnimatePresence initial={false} mode="wait">
                     {isSyncing ? (
                       <motion.div
-                        key={'Flushing'}
+                        key={"Flushing"}
                         initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          transition: { duration: 0.3 },
+                        }}
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                       >
-                        <SpinnerBox spinnerProps={{ size: 'sm' }} className="h-72" />
+                        <SpinnerBox
+                          spinnerProps={{ size: "sm" }}
+                          className="h-72"
+                        />
                       </motion.div>
-                    ) : distributionMethod === DocumentDistributionMethod.EMAIL ? (
+                    ) : distributionMethod ===
+                      DocumentDistributionMethod.EMAIL ? (
                       <motion.div
-                        key={'Emails'}
+                        key={"Emails"}
                         initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          transition: { duration: 0.3 },
+                        }}
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                       >
                         <Form {...form}>
@@ -305,7 +348,8 @@ export const EnvelopeDistributeDialog = ({
                             className="mt-2 flex flex-col gap-y-4 rounded-lg"
                             disabled={form.formState.isSubmitting}
                           >
-                            {organisation.organisationClaim.flags.emailDomains && (
+                            {organisation.organisationClaim.flags
+                              .emailDomains && (
                               <FormField
                                 control={form.control}
                                 name="meta.emailId"
@@ -317,9 +361,15 @@ export const EnvelopeDistributeDialog = ({
                                     <FormControl>
                                       <Select
                                         {...field}
-                                        value={field.value === null ? '-1' : field.value}
+                                        value={
+                                          field.value === null
+                                            ? "-1"
+                                            : field.value
+                                        }
                                         onValueChange={(value) =>
-                                          field.onChange(value === '-1' ? null : value)
+                                          field.onChange(
+                                            value === "-1" ? null : value
+                                          )
                                         }
                                       >
                                         <SelectTrigger
@@ -331,12 +381,17 @@ export const EnvelopeDistributeDialog = ({
 
                                         <SelectContent>
                                           {emails.map((email) => (
-                                            <SelectItem key={email.id} value={email.id}>
+                                            <SelectItem
+                                              key={email.id}
+                                              value={email.id}
+                                            >
                                               {email.email}
                                             </SelectItem>
                                           ))}
 
-                                          <SelectItem value={'-1'}>Documenso</SelectItem>
+                                          <SelectItem value={"-1"}>
+                                            Documenso
+                                          </SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </FormControl>
@@ -354,8 +409,10 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel>
                                     <Trans>
-                                      Reply To Email{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Reply To Email{" "}
+                                      <span className="text-muted-foreground">
+                                        (Optional)
+                                      </span>
                                     </Trans>
                                   </FormLabel>
 
@@ -375,8 +432,10 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel>
                                     <Trans>
-                                      Subject{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Subject{" "}
+                                      <span className="text-muted-foreground">
+                                        (Optional)
+                                      </span>
                                     </Trans>
                                   </FormLabel>
 
@@ -395,8 +454,10 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel className="flex flex-row items-center">
                                     <Trans>
-                                      Message{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Message{" "}
+                                      <span className="text-muted-foreground">
+                                        (Optional)
+                                      </span>
                                     </Trans>
                                     <Tooltip>
                                       <TooltipTrigger type="button">
@@ -422,23 +483,31 @@ export const EnvelopeDistributeDialog = ({
                           </fieldset>
                         </Form>
                       </motion.div>
-                    ) : distributionMethod === DocumentDistributionMethod.NONE ? (
+                    ) : distributionMethod ===
+                      DocumentDistributionMethod.NONE ? (
                       <motion.div
-                        key={'Links'}
+                        key={"Links"}
                         initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          transition: { duration: 0.3 },
+                        }}
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                         className="min-h-60 rounded-lg border"
                       >
                         <div className="py-24 text-center text-sm text-muted-foreground">
                           <p>
-                            <Trans>We won't send anything to notify recipients.</Trans>
+                            <Trans>
+                              We won't send anything to notify recipients.
+                            </Trans>
                           </p>
 
                           <p className="mt-2">
                             <Trans>
-                              We will generate signing links for you, which you can send to the
-                              recipients through your method of choice.
+                              We will generate signing links for you, which you
+                              can send to the recipients through your method of
+                              choice.
                             </Trans>
                           </p>
                         </div>
@@ -449,12 +518,20 @@ export const EnvelopeDistributeDialog = ({
 
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button type="button" variant="secondary" disabled={isSubmitting}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={isSubmitting}
+                    >
                       <Trans>Cancel</Trans>
                     </Button>
                   </DialogClose>
 
-                  <Button loading={isSubmitting} disabled={isSyncing} type="submit">
+                  <Button
+                    loading={isSubmitting}
+                    disabled={isSyncing}
+                    type="submit"
+                  >
                     {distributionMethod === DocumentDistributionMethod.EMAIL ? (
                       <Trans>Send</Trans>
                     ) : (
@@ -469,32 +546,42 @@ export const EnvelopeDistributeDialog = ({
           <>
             <Alert variant="warning">
               {match(invalidEnvelopeCode)
-                .with('MISSING_RECIPIENTS', () => (
+                .with("MISSING_RECIPIENTS", () => (
                   <AlertDescription>
-                    <Trans>You need at least one recipient to send a document</Trans>
+                    <Trans>
+                      You need at least one recipient to send a document
+                    </Trans>
                   </AlertDescription>
                 ))
-                .with('MISSING_SIGNATURES', () => (
+                .with("MISSING_SIGNATURES", () => (
                   <AlertDescription>
-                    <Trans>The following signers are missing signature fields:</Trans>
+                    <Trans>
+                      The following signers are missing signature fields:
+                    </Trans>
 
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingSignatureFields.map((recipient) => (
                         <li key={recipient.id}>
-                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
+                          {recipient.email ||
+                            recipient.name ||
+                            t`Recipient ${recipient.index + 1}`}
                         </li>
                       ))}
                     </ul>
                   </AlertDescription>
                 ))
-                .with('MISSING_REQUIRED_EMAIL', () => (
+                .with("MISSING_REQUIRED_EMAIL", () => (
                   <AlertDescription>
-                    <Trans>The following recipients require an email address:</Trans>
+                    <Trans>
+                      The following recipients require an email address:
+                    </Trans>
 
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingRequiredEmail.map((recipient) => (
                         <li key={recipient.id}>
-                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
+                          {recipient.email ||
+                            recipient.name ||
+                            t`Recipient ${recipient.index + 1}`}
                         </li>
                       ))}
                     </ul>

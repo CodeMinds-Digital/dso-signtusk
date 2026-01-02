@@ -1,48 +1,49 @@
-import { lazy } from 'react';
+import { lazy } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
-import { ChevronLeft, Users2 } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
+import { msg } from "@lingui/core/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { DocumentStatus } from "@signtusk/lib/constants/prisma-enums";
+import { ChevronLeft, Users2 } from "lucide-react";
+import { Link } from "react-router";
+import { match } from "ts-pattern";
 
-import { EnvelopeRenderProvider } from '@signtusk/lib/client-only/providers/envelope-render-provider';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
-import { formatDocumentsPath } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
+import { EnvelopeRenderProvider } from "@signtusk/lib/client-only/providers/envelope-render-provider";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
+import { formatDocumentsPath } from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
 import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
-} from '@signtusk/ui/components/document/document-read-only-fields';
-import PDFViewerKonvaLazy from '@signtusk/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Badge } from '@signtusk/ui/primitives/badge';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Card, CardContent } from '@signtusk/ui/primitives/card';
-import { PDFViewerLazy } from '@signtusk/ui/primitives/pdf-viewer/lazy';
-import { Spinner } from '@signtusk/ui/primitives/spinner';
+} from "@signtusk/ui/components/document/document-read-only-fields";
+import PDFViewerKonvaLazy from "@signtusk/ui/components/pdf-viewer/pdf-viewer-konva-lazy";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Badge } from "@signtusk/ui/primitives/badge";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Card, CardContent } from "@signtusk/ui/primitives/card";
+import { PDFViewerLazy } from "@signtusk/ui/primitives/pdf-viewer/lazy";
+import { Spinner } from "@signtusk/ui/primitives/spinner";
 
-import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
-import { DocumentPageViewDropdown } from '~/components/general/document/document-page-view-dropdown';
-import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
-import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
-import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
-import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
+import { DocumentPageViewButton } from "~/components/general/document/document-page-view-button";
+import { DocumentPageViewDropdown } from "~/components/general/document/document-page-view-dropdown";
+import { DocumentPageViewInformation } from "~/components/general/document/document-page-view-information";
+import { DocumentPageViewRecentActivity } from "~/components/general/document/document-page-view-recent-activity";
+import { DocumentPageViewRecipients } from "~/components/general/document/document-page-view-recipients";
+import { DocumentRecipientLinkCopyDialog } from "~/components/general/document/document-recipient-link-copy-dialog";
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
-} from '~/components/general/document/document-status';
-import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
-import { useCurrentTeam } from '~/providers/team';
+} from "~/components/general/document/document-status";
+import { EnvelopeRendererFileSelector } from "~/components/general/envelope-editor/envelope-file-selector";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { StackAvatarsWithTooltip } from "~/components/general/stack-avatars-with-tooltip";
+import { useCurrentTeam } from "~/providers/team";
 
-import type { Route } from './+types/documents.$id._index';
+import type { Route } from "./+types/documents.$id._index";
 
 const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+  async () =>
+    import("~/components/general/envelope-editor/envelope-generic-page-renderer")
 );
 
 export default function DocumentPage({ params }: Route.ComponentProps) {
@@ -92,7 +93,8 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
   const documentRootPath = formatDocumentsPath(team.url);
 
-  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
+  const isMultiEnvelopeItem =
+    envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
@@ -100,7 +102,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
         <DocumentRecipientLinkCopyDialog recipients={envelope.recipients} />
       )}
 
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link
+        to={documentRootPath}
+        className="flex items-center text-[#7AC455] hover:opacity-80"
+      >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>
@@ -164,7 +169,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               }}
             >
               {isMultiEnvelopeItem && (
-                <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+                <EnvelopeRendererFileSelector
+                  fields={envelope.fields}
+                  className="mb-4 p-0"
+                />
               )}
 
               <Card className="rounded-xl before:rounded-xl" gradient>
@@ -185,11 +193,16 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             <CardContent className="p-2">
               {envelope.status !== DocumentStatus.COMPLETED && (
                 <DocumentReadOnlyFields
-                  fields={mapFieldsWithRecipients(envelope.fields, envelope.recipients)}
+                  fields={mapFieldsWithRecipients(
+                    envelope.fields,
+                    envelope.recipients
+                  )}
                   documentMeta={envelope.documentMeta || undefined}
                   showRecipientTooltip={true}
                   showRecipientColors={true}
-                  recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+                  recipientIds={envelope.recipients.map(
+                    (recipient) => recipient.id
+                  )}
                 />
               )}
 
@@ -204,7 +217,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
         )}
 
         <div
-          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
+          className={cn(
+            "col-span-12 lg:col-span-6 xl:col-span-5",
+            isMultiEnvelopeItem && "mt-20"
+          )}
         >
           <div className="space-y-6">
             <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">
@@ -219,17 +235,23 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               <p className="mt-2 px-4 text-sm text-muted-foreground">
                 {match(envelope.status)
                   .with(DocumentStatus.COMPLETED, () => (
-                    <Trans>This document has been signed by all recipients</Trans>
+                    <Trans>
+                      This document has been signed by all recipients
+                    </Trans>
                   ))
                   .with(DocumentStatus.REJECTED, () => (
-                    <Trans>This document has been rejected by a recipient</Trans>
+                    <Trans>
+                      This document has been rejected by a recipient
+                    </Trans>
                   ))
                   .with(DocumentStatus.DRAFT, () => (
-                    <Trans>This document is currently a draft and has not been sent</Trans>
+                    <Trans>
+                      This document is currently a draft and has not been sent
+                    </Trans>
                   ))
                   .with(DocumentStatus.PENDING, () => {
                     const pendingRecipients = envelope.recipients.filter(
-                      (recipient) => recipient.signingStatus === 'NOT_SIGNED',
+                      (recipient) => recipient.signingStatus === "NOT_SIGNED"
                     );
 
                     return (
@@ -252,7 +274,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             <DocumentPageViewInformation envelope={envelope} userId={user.id} />
 
             {/* Recipients section. */}
-            <DocumentPageViewRecipients envelope={envelope} documentRootPath={documentRootPath} />
+            <DocumentPageViewRecipients
+              envelope={envelope}
+              documentRootPath={documentRootPath}
+            />
 
             {/* Recent activity section. */}
             <DocumentPageViewRecentActivity

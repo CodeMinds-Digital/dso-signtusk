@@ -1,11 +1,11 @@
-import type { Recipient } from "@signtusk/prisma/enums";
+import type { Recipient } from "@signtusk/lib/constants/prisma-enums";
 import {
   DocumentDistributionMethod,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from "@signtusk/prisma/enums";
+} from "@signtusk/lib/constants/prisma-enums";
 
 export enum RecipientStatusType {
   COMPLETED = "completed",

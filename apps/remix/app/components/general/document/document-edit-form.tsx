@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus } from '@signtusk/lib/constants/prisma-enums';
 import { useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useAnalytics } from '@signtusk/lib/client-only/hooks/use-analytics';

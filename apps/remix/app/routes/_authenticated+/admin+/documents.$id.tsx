@@ -1,45 +1,49 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
-import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import {
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { DateTime } from "luxon";
+import { Link, redirect } from "react-router";
 
-import { unsafeGetEntireEnvelope } from '@signtusk/lib/server-only/admin/get-entire-document';
-import { trpc } from '@signtusk/trpc/react';
+import { unsafeGetEntireEnvelope } from "@signtusk/lib/server-only/admin/get-entire-document";
+import { trpc } from "@signtusk/trpc/react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@signtusk/ui/primitives/accordion';
-import { Badge } from '@signtusk/ui/primitives/badge';
-import { Button } from '@signtusk/ui/primitives/button';
+} from "@signtusk/ui/primitives/accordion";
+import { Badge } from "@signtusk/ui/primitives/badge";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@signtusk/ui/primitives/tooltip';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/tooltip";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
-import { DocumentStatus } from '~/components/general/document/document-status';
-import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
-import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
+import { AdminDocumentDeleteDialog } from "~/components/dialogs/admin-document-delete-dialog";
+import { DocumentStatus } from "~/components/general/document/document-status";
+import { AdminDocumentJobsTable } from "~/components/tables/admin-document-jobs-table";
+import { AdminDocumentRecipientItemTable } from "~/components/tables/admin-document-recipient-item-table";
 
-import type { Route } from './+types/documents.$id';
+import type { Route } from "./+types/documents.$id";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const id = params.id;
 
-  if (!id || !id.startsWith('envelope_')) {
-    throw redirect('/admin/documents');
+  if (!id || !id.startsWith("envelope_")) {
+    throw redirect("/admin/documents");
   }
 
   const envelope = await unsafeGetEntireEnvelope({
     id: {
-      type: 'envelopeId',
+      type: "envelopeId",
       id,
     },
     type: EnvelopeType.DOCUMENT,
@@ -48,7 +52,9 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { envelope };
 }
 
-export default function AdminDocumentDetailsPage({ loaderData }: Route.ComponentProps) {
+export default function AdminDocumentDetailsPage({
+  loaderData,
+}: Route.ComponentProps) {
   const { envelope } = loaderData;
 
   const { _, i18n } = useLingui();
@@ -66,7 +72,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
         toast({
           title: _(msg`Error`),
           description: _(msg`Failed to reseal document`),
-          variant: 'destructive',
+          variant: "destructive",
         });
       },
     });
@@ -88,11 +94,13 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
       <div className="mt-4 text-sm text-muted-foreground">
         <div>
-          <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
+          <Trans>Created on</Trans>:{" "}
+          {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
         </div>
 
         <div>
-          <Trans>Last updated at</Trans>: {i18n.date(envelope.updatedAt, DateTime.DATETIME_MED)}
+          <Trans>Last updated at</Trans>:{" "}
+          {i18n.date(envelope.updatedAt, DateTime.DATETIME_MED)}
         </div>
       </div>
 
@@ -113,7 +121,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
                   (recipient) =>
                     recipient.signingStatus !== SigningStatus.SIGNED &&
                     recipient.signingStatus !== SigningStatus.REJECTED &&
-                    recipient.role !== RecipientRole.CC,
+                    recipient.role !== RecipientRole.CC
                 )}
                 onClick={() => resealDocument({ id: envelope.id })}
               >
@@ -123,8 +131,8 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
             <TooltipContent className="max-w-[40ch]">
               <Trans>
-                Attempts sealing the document again, useful for after a code change has occurred to
-                resolve an erroneous document.
+                Attempts sealing the document again, useful for after a code
+                change has occurred to resolve an erroneous document.
               </Trans>
             </TooltipContent>
           </Tooltip>

@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { ReadStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { ReadStatus, RecipientRole, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
 import { ArrowRight, EyeIcon, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
 

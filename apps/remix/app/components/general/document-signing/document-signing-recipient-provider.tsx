@@ -1,6 +1,6 @@
 import { type PropsWithChildren, createContext, useContext } from 'react';
 
-import type { Recipient } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
 
 import type { RecipientWithFields } from '@signtusk/prisma/types/recipient-with-fields';
 

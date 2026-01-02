@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { SubscriptionClaim } from '@prisma/client';
+import type { SubscriptionClaim } from '@signtusk/lib/constants/prisma-enums';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 

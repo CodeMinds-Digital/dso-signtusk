@@ -1,21 +1,24 @@
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import { DateTime } from 'luxon';
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { DateTime } from "luxon";
 
-import { trpc } from '@signtusk/trpc/react';
-import { Alert, AlertDescription } from '@signtusk/ui/primitives/alert';
-import { AlertTitle } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import TokenDeleteDialog from '~/components/dialogs/token-delete-dialog';
-import { ApiTokenForm } from '~/components/forms/token';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { useOptionalCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import TokenDeleteDialog from "~/components/dialogs/token-delete-dialog";
+import { ApiTokenForm } from "~/components/forms/token";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { useOptionalCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
 export function meta() {
-  return appMetaTags('API Tokens');
+  return appMetaTags("API Tokens");
 }
 
 export default function ApiTokensPage() {
@@ -31,14 +34,14 @@ export default function ApiTokensPage() {
         title={<Trans>API Tokens</Trans>}
         subtitle={
           <Trans>
-            On this page, you can create and manage API tokens. See our{' '}
+            On this page, you can create and manage API tokens. See our{" "}
             <a
               className="text-primary underline"
-              href={'https://docs.documenso.com/developers/public-api'}
+              href={"https://docs.documenso.com/developers/public-api"}
               target="_blank"
             >
               Documentation
-            </a>{' '}
+            </a>{" "}
             for more information.
           </Trans>
         }
@@ -71,7 +74,9 @@ export default function ApiTokensPage() {
           {tokens && tokens.length === 0 && (
             <div className="mb-4">
               <p className="text-muted-foreground mt-2 text-sm italic">
-                <Trans>Your tokens will be shown here once you create them.</Trans>
+                <Trans>
+                  Your tokens will be shown here once you create them.
+                </Trans>
               </p>
             </div>
           )}
@@ -79,20 +84,25 @@ export default function ApiTokensPage() {
           {tokens && tokens.length > 0 && (
             <div className="mt-4 flex max-w-xl flex-col gap-y-4">
               {tokens.map((token) => (
-                <div key={token.id} className="border-border rounded-lg border p-4">
+                <div
+                  key={token.id}
+                  className="border-border rounded-lg border p-4"
+                >
                   <div className="flex items-center justify-between gap-x-4">
                     <div>
                       <h5 className="text-base">{token.name}</h5>
 
                       <p className="text-muted-foreground mt-2 text-xs">
                         <Trans>
-                          Created on {i18n.date(token.createdAt, DateTime.DATETIME_FULL)}
+                          Created on{" "}
+                          {i18n.date(token.createdAt, DateTime.DATETIME_FULL)}
                         </Trans>
                       </p>
                       {token.expires ? (
                         <p className="text-muted-foreground mt-1 text-xs">
                           <Trans>
-                            Expires on {i18n.date(token.expires, DateTime.DATETIME_FULL)}
+                            Expires on{" "}
+                            {i18n.date(token.expires, DateTime.DATETIME_FULL)}
                           </Trans>
                         </p>
                       ) : (

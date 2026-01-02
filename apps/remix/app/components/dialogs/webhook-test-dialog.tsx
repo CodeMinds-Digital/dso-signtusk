@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type { Webhook } from "@signtusk/lib/constants/prisma-enums";
+import { WebhookTriggerEvents } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { toFriendlyWebhookEventName } from '@signtusk/lib/universal/webhook/to-friendly-webhook-event-name';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { toFriendlyWebhookEventName } from "@signtusk/lib/universal/webhook/to-friendly-webhook-event-name";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -26,18 +26,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
+} from "@signtusk/ui/primitives/form/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type WebhookTestDialogProps = {
-  webhook: Pick<Webhook, 'id' | 'webhookUrl' | 'eventTriggers'>;
+  webhook: Pick<Webhook, "id" | "webhookUrl" | "eventTriggers">;
   children: React.ReactNode;
 };
 
@@ -47,7 +47,10 @@ const ZTestWebhookFormSchema = z.object({
 
 type TTestWebhookFormSchema = z.infer<typeof ZTestWebhookFormSchema>;
 
-export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps) => {
+export const WebhookTestDialog = ({
+  webhook,
+  children,
+}: WebhookTestDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -80,14 +83,17 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
       toast({
         title: t`Test webhook failed`,
         description: t`We encountered an error while sending the test webhook. Please check your endpoint and try again.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 5000,
       });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
+    >
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent>
@@ -98,7 +104,8 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
 
           <DialogDescription>
             <Trans>
-              Send a test webhook with sample data to verify your integration is working correctly.
+              Send a test webhook with sample data to verify your integration is
+              working correctly.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -140,11 +147,17 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
                 <h4 className="mb-2 text-sm font-medium">
                   <Trans>Webhook URL</Trans>
                 </h4>
-                <p className="text-muted-foreground break-all text-sm">{webhook.webhookUrl}</p>
+                <p className="text-muted-foreground break-all text-sm">
+                  {webhook.webhookUrl}
+                </p>
               </div>
 
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Close</Trans>
                 </Button>
 

@@ -1,5 +1,5 @@
-import type { DocumentMeta } from '@prisma/client';
-import { type Field, FieldType } from '@prisma/client';
+import type { DocumentMeta } from '@signtusk/lib/constants/prisma-enums';
+import { type Field, FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@signtusk/lib/constants/date-formats';

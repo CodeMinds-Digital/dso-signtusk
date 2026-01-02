@@ -1,8 +1,8 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamGroup } from '@prisma/client';
+import { Trans, useLingui } from "@lingui/react/macro";
+import type { TeamGroup } from "@signtusk/lib/constants/prisma-enums";
 
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogClose,
@@ -12,16 +12,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 type TeamMemberInheritDisableDialogProps = {
   group: TeamGroup;
 };
 
-export const TeamMemberInheritDisableDialog = ({ group }: TeamMemberInheritDisableDialogProps) => {
+export const TeamMemberInheritDisableDialog = ({
+  group,
+}: TeamMemberInheritDisableDialogProps) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
@@ -38,7 +40,7 @@ export const TeamMemberInheritDisableDialog = ({ group }: TeamMemberInheritDisab
       toast({
         title: t`Something went wrong`,
         description: t`We encountered an unknown error while attempting to disable access.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 5000,
       });
     },
@@ -60,8 +62,9 @@ export const TeamMemberInheritDisableDialog = ({ group }: TeamMemberInheritDisab
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove default access to this team for all organisation members. Any
-              members not explicitly added to this team will no longer have access.
+              You are about to remove default access to this team for all
+              organisation members. Any members not explicitly added to this
+              team will no longer have access.
             </Trans>
           </DialogDescription>
         </DialogHeader>

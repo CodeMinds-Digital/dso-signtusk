@@ -1,31 +1,31 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from "react";
 
-import { SigningStatus } from '@prisma/client';
-import { useRevalidator } from 'react-router';
+import { SigningStatus } from "@signtusk/lib/constants/prisma-enums";
+import { useRevalidator } from "react-router";
 
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { getDocumentAndSenderByToken } from '@signtusk/lib/server-only/document/get-document-by-token';
-import { getOrganisationClaimByTeamId } from '@signtusk/lib/server-only/organisation/get-organisation-claims';
-import { getRecipientByToken } from '@signtusk/lib/server-only/recipient/get-recipient-by-token';
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { getDocumentAndSenderByToken } from "@signtusk/lib/server-only/document/get-document-by-token";
+import { getOrganisationClaimByTeamId } from "@signtusk/lib/server-only/organisation/get-organisation-claims";
+import { getRecipientByToken } from "@signtusk/lib/server-only/recipient/get-recipient-by-token";
 
-import { BrandingLogo } from '~/components/general/branding-logo';
-import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
-import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
-import { DocumentSigningRecipientProvider } from '~/components/general/document-signing/document-signing-recipient-provider';
-import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
-import { injectCss } from '~/utils/css-vars';
-import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
+import { BrandingLogo } from "~/components/general/branding-logo";
+import { DocumentSigningAuthProvider } from "~/components/general/document-signing/document-signing-auth-provider";
+import { DocumentSigningProvider } from "~/components/general/document-signing/document-signing-provider";
+import { DocumentSigningRecipientProvider } from "~/components/general/document-signing/document-signing-recipient-provider";
+import { ZSignDocumentEmbedDataSchema } from "~/types/embed-document-sign-schema";
+import { injectCss } from "~/utils/css-vars";
+import { superLoaderJson, useSuperLoaderData } from "~/utils/super-json-loader";
 
-import { MultiSignDocumentList } from '../../../../components/embed/multisign/multi-sign-document-list';
-import { MultiSignDocumentSigningView } from '../../../../components/embed/multisign/multi-sign-document-signing-view';
-import type { Route } from './+types/_index';
+import { MultiSignDocumentList } from "../../../../components/embed/multisign/multi-sign-document-list";
+import { MultiSignDocumentSigningView } from "../../../../components/embed/multisign/multi-sign-document-signing-view";
+import type { Route } from "./+types/_index";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getOptionalSession(request);
 
   const url = new URL(request.url);
 
-  const tokens = url.searchParams.getAll('token');
+  const tokens = url.searchParams.getAll("token");
 
   const envelopes = await Promise.all(
     tokens.map(async (token) => {
@@ -36,7 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       const recipient = await getRecipientByToken({ token });
 
       return { document, recipient };
-    }),
+    })
   );
 
   // Check the first envelope for whitelabelling settings (assuming all docs are from same team)
@@ -51,7 +51,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
-  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: firstDocument.teamId });
+  const organisationClaim = await getOrganisationClaimByTeamId({
+    teamId: firstDocument.teamId,
+  });
 
   const allowWhitelabelling = organisationClaim.flags.embedSigningWhiteLabel;
   const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
@@ -71,27 +73,31 @@ export default function MultisignPage() {
   const revalidator = useRevalidator();
 
   const [selectedDocument, setSelectedDocument] = useState<
-    (typeof envelopes)[number]['document'] | null
+    (typeof envelopes)[number]["document"] | null
   >(null);
 
   // Additional state for embed functionality
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
-  const [showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
-    useState(false);
-  const [embedFullName, setEmbedFullName] = useState('');
+  const [
+    showOtherRecipientsCompletedFields,
+    setShowOtherRecipientsCompletedFields,
+  ] = useState(false);
+  const [embedFullName, setEmbedFullName] = useState("");
 
   // Check if all documents are completed
   const isCompleted = envelopes.every(
-    (envelope) => envelope.recipient.signingStatus === SigningStatus.SIGNED,
+    (envelope) => envelope.recipient.signingStatus === SigningStatus.SIGNED
   );
 
   const selectedRecipient = selectedDocument
     ? envelopes.find((e) => e.document.id === selectedDocument.id)?.recipient
     : null;
 
-  const onSelectDocument = (document: (typeof envelopes)[number]['document']) => {
+  const onSelectDocument = (
+    document: (typeof envelopes)[number]["document"]
+  ) => {
     setSelectedDocument(document);
   };
 
@@ -110,14 +116,14 @@ export default function MultisignPage() {
     if (window.parent) {
       window.parent.postMessage(
         {
-          action: 'document-completed',
+          action: "document-completed",
           data: {
             token: data.token,
             documentId: data.documentId,
             recipientId: data.recipientId,
           },
         },
-        '*',
+        "*"
       );
     }
   };
@@ -132,7 +138,7 @@ export default function MultisignPage() {
     if (window.parent) {
       window.parent.postMessage(
         {
-          action: 'document-rejected',
+          action: "document-rejected",
           data: {
             token: data.token,
             documentId: data.documentId,
@@ -140,7 +146,7 @@ export default function MultisignPage() {
             reason: data.reason,
           },
         },
-        '*',
+        "*"
       );
     }
   };
@@ -150,10 +156,10 @@ export default function MultisignPage() {
     if (window.parent) {
       window.parent.postMessage(
         {
-          action: 'document-error',
+          action: "document-error",
           data: null,
         },
-        '*',
+        "*"
       );
     }
   };
@@ -163,10 +169,10 @@ export default function MultisignPage() {
     if (window.parent) {
       window.parent.postMessage(
         {
-          action: 'document-ready',
+          action: "document-ready",
           data: null,
         },
-        '*',
+        "*"
       );
     }
   };
@@ -176,7 +182,7 @@ export default function MultisignPage() {
     if (window.parent) {
       window.parent.postMessage(
         {
-          action: 'all-documents-completed',
+          action: "all-documents-completed",
           data: {
             documents: envelopes.map((envelope) => ({
               token: envelope.recipient.token,
@@ -184,8 +190,8 @@ export default function MultisignPage() {
               recipientId: envelope.recipient.id,
               action:
                 envelope.recipient.signingStatus === SigningStatus.SIGNED
-                  ? 'document-completed'
-                  : 'document-rejected',
+                  ? "document-completed"
+                  : "document-rejected",
               reason:
                 envelope.recipient.signingStatus === SigningStatus.REJECTED
                   ? envelope.recipient.rejectionReason
@@ -193,14 +199,17 @@ export default function MultisignPage() {
             })),
           },
         },
-        '*',
+        "*"
       );
     }
   };
 
   useEffect(() => {
     if (
-      envelopes.every((envelope) => envelope.recipient.signingStatus !== SigningStatus.NOT_SIGNED)
+      envelopes.every(
+        (envelope) =>
+          envelope.recipient.signingStatus !== SigningStatus.NOT_SIGNED
+      )
     ) {
       onAllDocumentsCompleted();
     }
@@ -210,7 +219,9 @@ export default function MultisignPage() {
     const hash = window.location.hash.slice(1);
 
     try {
-      const data = ZSignDocumentEmbedDataSchema.parse(JSON.parse(decodeURIComponent(atob(hash))));
+      const data = ZSignDocumentEmbedDataSchema.parse(
+        JSON.parse(decodeURIComponent(atob(hash)))
+      );
 
       if (!isCompleted && data.name) {
         setEmbedFullName(data.name);
@@ -220,10 +231,12 @@ export default function MultisignPage() {
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
       setAllowDocumentRejection(!!data.allowDocumentRejection);
-      setShowOtherRecipientsCompletedFields(!!data.showOtherRecipientsCompletedFields);
+      setShowOtherRecipientsCompletedFields(
+        !!data.showOtherRecipientsCompletedFields
+      );
 
       if (data.darkModeDisabled) {
-        document.documentElement.classList.add('dark-mode-disabled');
+        document.documentElement.classList.add("dark-mode-disabled");
       }
 
       if (allowWhitelabelling) {
@@ -248,25 +261,40 @@ export default function MultisignPage() {
     // Determine the full name to use - prioritize embed data, then user name, then recipient name
     const fullNameToUse =
       embedFullName ||
-      (user?.email === selectedRecipient.email ? user?.name : selectedRecipient.name) ||
-      '';
+      (user?.email === selectedRecipient.email
+        ? user?.name
+        : selectedRecipient.name) ||
+      "";
 
     return (
       <div className="p-4">
         <DocumentSigningProvider
           email={selectedRecipient.email}
           fullName={fullNameToUse}
-          signature={user?.email === selectedRecipient.email ? user?.signature : undefined}
-          typedSignatureEnabled={selectedDocument.documentMeta?.typedSignatureEnabled}
-          uploadSignatureEnabled={selectedDocument.documentMeta?.uploadSignatureEnabled}
-          drawSignatureEnabled={selectedDocument.documentMeta?.drawSignatureEnabled}
+          signature={
+            user?.email === selectedRecipient.email
+              ? user?.signature
+              : undefined
+          }
+          typedSignatureEnabled={
+            selectedDocument.documentMeta?.typedSignatureEnabled
+          }
+          uploadSignatureEnabled={
+            selectedDocument.documentMeta?.uploadSignatureEnabled
+          }
+          drawSignatureEnabled={
+            selectedDocument.documentMeta?.drawSignatureEnabled
+          }
         >
           <DocumentSigningAuthProvider
             documentAuthOptions={selectedDocument.authOptions}
             recipient={selectedRecipient}
             user={user}
           >
-            <DocumentSigningRecipientProvider recipient={selectedRecipient} targetSigner={null}>
+            <DocumentSigningRecipientProvider
+              recipient={selectedRecipient}
+              targetSigner={null}
+            >
               <MultiSignDocumentSigningView
                 token={selectedRecipient.token}
                 recipientId={selectedRecipient.id}
@@ -294,7 +322,10 @@ export default function MultisignPage() {
   // Otherwise, show the document list
   return (
     <div className="p-4">
-      <MultiSignDocumentList envelopes={envelopes} onDocumentSelect={onSelectDocument} />
+      <MultiSignDocumentList
+        envelopes={envelopes}
+        onDocumentSelect={onSelectDocument}
+      />
 
       {!hidePoweredBy && (
         <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">

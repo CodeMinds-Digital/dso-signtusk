@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { WebhookCallStatus } from '@prisma/client';
+import { WebhookCallStatus } from '@signtusk/lib/constants/prisma-enums';
 import { RotateCwIcon } from 'lucide-react';
 import { createCallable } from 'react-call';
 

@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { match } from "ts-pattern";
+import { z } from "zod";
 
-import { getHighestOrganisationRoleInGroup } from '@signtusk/lib/utils/organisations';
-import { trpc } from '@signtusk/trpc/react';
-import type { TGetAdminOrganisationResponse } from '@signtusk/trpc/server/admin-router/get-admin-organisation.types';
-import { Button } from '@signtusk/ui/primitives/button';
+import { getHighestOrganisationRoleInGroup } from "@signtusk/lib/utils/organisations";
+import { trpc } from "@signtusk/trpc/react";
+import type { TGetAdminOrganisationResponse } from "@signtusk/trpc/server/admin-router/get-admin-organisation.types";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -30,28 +29,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
+} from "@signtusk/ui/primitives/form/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type AdminOrganisationMemberUpdateDialogProps = {
   trigger?: React.ReactNode;
   organisationId: string;
-  organisationMember: TGetAdminOrganisationResponse['members'][number];
+  organisationMember: TGetAdminOrganisationResponse["members"][number];
   isOwner: boolean;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdateOrganisationMemberFormSchema = z.object({
-  role: z.enum(['OWNER', 'ADMIN', 'MANAGER', 'MEMBER']),
+  role: z.enum(["OWNER", "ADMIN", "MANAGER", "MEMBER"]),
 });
 
-type ZUpdateOrganisationMemberSchema = z.infer<typeof ZUpdateOrganisationMemberFormSchema>;
+type ZUpdateOrganisationMemberSchema = z.infer<
+  typeof ZUpdateOrganisationMemberFormSchema
+>;
 
 export const AdminOrganisationMemberUpdateDialog = ({
   trigger,
@@ -68,11 +69,12 @@ export const AdminOrganisationMemberUpdateDialog = ({
 
   // Determine the current role value for the form
   const currentRoleValue = isOwner
-    ? 'OWNER'
+    ? "OWNER"
     : getHighestOrganisationRoleInGroup(
-        organisationMember.organisationGroupMembers.map((ogm) => ogm.group),
+        organisationMember.organisationGroupMembers.map((ogm) => ogm.group)
       );
-  const organisationMemberName = organisationMember.user.name ?? organisationMember.user.email;
+  const organisationMemberName =
+    organisationMember.user.name ?? organisationMember.user.email;
 
   const form = useForm<ZUpdateOrganisationMemberSchema>({
     resolver: zodResolver(ZUpdateOrganisationMemberFormSchema),
@@ -93,7 +95,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
       });
 
       const roleLabel = match(role)
-        .with('OWNER', () => t`Owner`)
+        .with("OWNER", () => t`Owner`)
         .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
         .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
         .with(OrganisationMemberRole.MEMBER, () => t`Member`)
@@ -102,7 +104,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
       toast({
         title: t`Success`,
         description:
-          role === 'OWNER'
+          role === "OWNER"
             ? t`Ownership transferred to ${organisationMemberName}.`
             : t`Updated ${organisationMemberName} to ${roleLabel}.`,
         duration: 5000,
@@ -118,7 +120,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting to update this organisation member. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -156,15 +158,18 @@ export const AdminOrganisationMemberUpdateDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are currently updating <span className="font-bold">{organisationMemberName}</span>
-              .
+              You are currently updating{" "}
+              <span className="font-bold">{organisationMemberName}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+            <fieldset
+              className="flex h-full flex-col"
+              disabled={form.formState.isSubmitting}
+            >
               <FormField
                 control={form.control}
                 name="role"
@@ -201,7 +206,11 @@ export const AdminOrganisationMemberUpdateDialog = ({
               />
 
               <DialogFooter className="mt-4">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

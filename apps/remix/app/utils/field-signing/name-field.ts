@@ -1,4 +1,4 @@
-import { FieldType } from "@signtusk/prisma/enums";
+import { FieldType } from "@signtusk/lib/constants/prisma-enums";
 
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
 import type { TFieldName } from "@signtusk/lib/types/field";

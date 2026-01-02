@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import { RecipientRole } from '@prisma/client';
+import type { Recipient } from '@signtusk/lib/constants/prisma-enums';
+import { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { useSearchParams } from 'react-router';
 
 import { useCopyToClipboard } from '@signtusk/lib/client-only/hooks/use-copy-to-clipboard';

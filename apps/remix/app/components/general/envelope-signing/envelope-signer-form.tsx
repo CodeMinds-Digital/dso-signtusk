@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
-import { FieldType, RecipientRole } from '@prisma/client';
+import { FieldType, RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 
 import { Input } from '@signtusk/ui/primitives/input';
 import { Label } from '@signtusk/ui/primitives/label';

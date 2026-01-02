@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
+import type { User } from '@signtusk/lib/constants/prisma-enums';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@signtusk/lib/client-only/hooks/use-is-mounted';

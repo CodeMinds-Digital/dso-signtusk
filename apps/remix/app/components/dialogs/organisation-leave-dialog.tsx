@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { OrganisationMemberRole } from '@prisma/client';
+import { Trans, useLingui } from "@lingui/react/macro";
+import type { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
 
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { trpc } from '@signtusk/trpc/react';
-import { Alert } from '@signtusk/ui/primitives/alert';
-import { AvatarWithText } from '@signtusk/ui/primitives/avatar';
-import { Button } from '@signtusk/ui/primitives/button';
+import { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import { trpc } from "@signtusk/trpc/react";
+import { Alert } from "@signtusk/ui/primitives/alert";
+import { AvatarWithText } from "@signtusk/ui/primitives/avatar";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type OrganisationLeaveDialogProps = {
   organisationId: string;
@@ -56,14 +55,17 @@ export const OrganisationLeaveDialog = ({
         toast({
           title: t`An unknown error occurred`,
           description: t`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
-          variant: 'destructive',
+          variant: "destructive",
           duration: 10000,
         });
       },
     });
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLeavingOrganisation && setOpen(value)}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => !isLeavingOrganisation && setOpen(value)}
+    >
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="destructive">
@@ -95,7 +97,11 @@ export const OrganisationLeaveDialog = ({
 
         <fieldset disabled={isLeavingOrganisation}>
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setOpen(false)}
+            >
               <Trans>Cancel</Trans>
             </Button>
 

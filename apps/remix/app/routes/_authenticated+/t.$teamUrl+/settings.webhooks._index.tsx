@@ -1,47 +1,42 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Plural, useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import type { Webhook } from "@signtusk/lib/constants/prisma-enums";
 import {
-  CheckCircle2Icon,
   EditIcon,
   Loader,
   MoreHorizontalIcon,
   ScrollTextIcon,
   Trash2Icon,
-  XCircleIcon,
-} from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link } from 'react-router';
+} from "lucide-react";
+import { Link } from "react-router";
 
-import { toFriendlyWebhookEventName } from '@signtusk/lib/universal/webhook/to-friendly-webhook-event-name';
-import { trpc } from '@signtusk/trpc/react';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Badge } from '@signtusk/ui/primitives/badge';
-import { Button } from '@signtusk/ui/primitives/button';
-import { DataTable, type DataTableColumnDef } from '@signtusk/ui/primitives/data-table';
-import { DataTablePagination } from '@signtusk/ui/primitives/data-table-pagination';
+import { toFriendlyWebhookEventName } from "@signtusk/lib/universal/webhook/to-friendly-webhook-event-name";
+import { trpc } from "@signtusk/trpc/react";
+import { Badge } from "@signtusk/ui/primitives/badge";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@signtusk/ui/primitives/data-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@signtusk/ui/primitives/dropdown-menu';
-import { Skeleton } from '@signtusk/ui/primitives/skeleton';
-import { TableCell } from '@signtusk/ui/primitives/table';
+} from "@signtusk/ui/primitives/dropdown-menu";
+import { Skeleton } from "@signtusk/ui/primitives/skeleton";
+import { TableCell } from "@signtusk/ui/primitives/table";
 
-import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
-import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
-import { WebhookEditDialog } from '~/components/dialogs/webhook-edit-dialog';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import { WebhookCreateDialog } from "~/components/dialogs/webhook-create-dialog";
+import { WebhookDeleteDialog } from "~/components/dialogs/webhook-delete-dialog";
+import { WebhookEditDialog } from "~/components/dialogs/webhook-edit-dialog";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { useCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags("Webhooks");
 }
 
 export default function WebhookPage() {
@@ -77,8 +72,15 @@ export default function WebhookPage() {
       {
         header: t`Status`,
         cell: ({ row }) => (
-          <Badge variant={row.original.enabled ? 'default' : 'neutral'} size="small">
-            {row.original.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
+          <Badge
+            variant={row.original.enabled ? "default" : "neutral"}
+            size="small"
+          >
+            {row.original.enabled ? (
+              <Trans>Enabled</Trans>
+            ) : (
+              <Trans>Disabled</Trans>
+            )}
           </Badge>
         ),
       },
@@ -89,9 +91,13 @@ export default function WebhookPage() {
             className="text-foreground"
             title={row.original.eventTriggers
               .map((event) => toFriendlyWebhookEventName(event))
-              .join(', ')}
+              .join(", ")}
           >
-            <Plural value={row.original.eventTriggers.length} one="# Event" other="# Events" />
+            <Plural
+              value={row.original.eventTriggers.length}
+              one="# Event"
+              other="# Events"
+            />
           </p>
         ),
       },
@@ -101,9 +107,11 @@ export default function WebhookPage() {
       },
       {
         header: t`Actions`,
-        cell: ({ row }) => <WebhookTableActionDropdown webhook={row.original} />,
+        cell: ({ row }) => (
+          <WebhookTableActionDropdown webhook={row.original} />
+        ),
       },
-    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+    ] satisfies DataTableColumnDef<(typeof results)["data"][number]>[];
   }, []);
 
   return (
@@ -133,7 +141,8 @@ export default function WebhookPage() {
           <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
             <p>
               <Trans>
-                You have no webhooks yet. Your webhooks will be shown here once you create them.
+                You have no webhooks yet. Your webhooks will be shown here once
+                you create them.
               </Trans>
             </p>
           </div>

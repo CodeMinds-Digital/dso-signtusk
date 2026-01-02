@@ -1,22 +1,27 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { type Recipient, SigningStatus, type Team, type User } from '@prisma/client';
-import { History } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
-import * as z from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import {
+  SigningStatus,
+  type Recipient,
+  type Team,
+  type User,
+} from "@signtusk/lib/constants/prisma-enums";
+import { History } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
+import * as z from "zod";
 
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { getRecipientType } from '@signtusk/lib/client-only/recipient-type';
-import { recipientAbbreviation } from '@signtusk/lib/utils/recipient-formatter';
-import type { Document } from '@signtusk/prisma/types/document-legacy-schema';
-import { trpc as trpcReact } from '@signtusk/trpc/react';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Checkbox } from '@signtusk/ui/primitives/checkbox';
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { getRecipientType } from "@signtusk/lib/client-only/recipient-type";
+import { recipientAbbreviation } from "@signtusk/lib/utils/recipient-formatter";
+import type { Document } from "@signtusk/prisma/types/document-legacy-schema";
+import { trpc as trpcReact } from "@signtusk/trpc/react";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Checkbox } from "@signtusk/ui/primitives/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -25,41 +30,46 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { DropdownMenuItem } from '@signtusk/ui/primitives/dropdown-menu';
+} from "@signtusk/ui/primitives/dialog";
+import { DropdownMenuItem } from "@signtusk/ui/primitives/dropdown-menu";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from '@signtusk/ui/primitives/form/form';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
-import { StackAvatar } from '../general/stack-avatar';
+import { StackAvatar } from "../general/stack-avatar";
 
-const FORM_ID = 'resend-email';
+const FORM_ID = "resend-email";
 
 export type DocumentResendDialogProps = {
-  document: Pick<Document, 'id' | 'userId' | 'teamId' | 'status'> & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
+  document: Pick<Document, "id" | "userId" | "teamId" | "status"> & {
+    user: Pick<User, "id" | "name" | "email">;
     recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
+    team: Pick<Team, "id" | "url"> | null;
   };
   recipients: Recipient[];
 };
 
 export const ZResendDocumentFormSchema = z.object({
   recipients: z.array(z.number()).min(1, {
-    message: 'You must select at least one item.',
+    message: "You must select at least one item.",
   }),
 });
 
-export type TResendDocumentFormSchema = z.infer<typeof ZResendDocumentFormSchema>;
+export type TResendDocumentFormSchema = z.infer<
+  typeof ZResendDocumentFormSchema
+>;
 
-export const DocumentResendDialog = ({ document, recipients }: DocumentResendDialogProps) => {
+export const DocumentResendDialog = ({
+  document,
+  recipients,
+}: DocumentResendDialogProps) => {
   const { user } = useSession();
   const team = useCurrentTeam();
 
@@ -72,10 +82,11 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
 
   const isDisabled =
     (!isOwner && !isCurrentTeamDocument) ||
-    document.status !== 'PENDING' ||
+    document.status !== "PENDING" ||
     !recipients.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED);
 
-  const { mutateAsync: resendDocument } = trpcReact.document.redistribute.useMutation();
+  const { mutateAsync: resendDocument } =
+    trpcReact.document.redistribute.useMutation();
 
   const form = useForm<TResendDocumentFormSchema>({
     resolver: zodResolver(ZResendDocumentFormSchema),
@@ -91,7 +102,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
 
   const selectedRecipients = useWatch({
     control: form.control,
-    name: 'recipients',
+    name: "recipients",
   });
 
   const onFormSubmit = async ({ recipients }: TResendDocumentFormSchema) => {
@@ -108,8 +119,10 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
-        description: _(msg`This document could not be re-sent at this time. Please try again.`),
-        variant: 'destructive',
+        description: _(
+          msg`This document could not be re-sent at this time. Please try again.`
+        ),
+        variant: "destructive",
         duration: 7500,
       });
     }
@@ -118,7 +131,10 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <DropdownMenuItem disabled={isDisabled} onSelect={(e) => e.preventDefault()}>
+        <DropdownMenuItem
+          disabled={isDisabled}
+          onSelect={(e) => e.preventDefault()}
+        >
           <History className="mr-2 h-4 w-4" />
           <Trans>Resend</Trans>
         </DropdownMenuItem>
@@ -134,7 +150,11 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
         </DialogHeader>
 
         <Form {...form}>
-          <form id={FORM_ID} onSubmit={handleSubmit(onFormSubmit)} className="px-3">
+          <form
+            id={FORM_ID}
+            onSubmit={handleSubmit(onFormSubmit)}
+            className="px-3"
+          >
             <FormField
               control={form.control}
               name="recipients"
@@ -146,9 +166,12 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
                       className="flex flex-row items-center justify-between gap-x-3"
                     >
                       <FormLabel
-                        className={cn('my-2 flex items-center gap-2 font-normal', {
-                          'opacity-50': !value.includes(recipient.id),
-                        })}
+                        className={cn(
+                          "my-2 flex items-center gap-2 font-normal",
+                          {
+                            "opacity-50": !value.includes(recipient.id),
+                          }
+                        )}
                       >
                         <StackAvatar
                           key={recipient.id}
@@ -166,7 +189,9 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
                           onCheckedChange={(checked: boolean) =>
                             checked
                               ? onChange([...value, recipient.id])
-                              : onChange(value.filter((v) => v !== recipient.id))
+                              : onChange(
+                                  value.filter((v) => v !== recipient.id)
+                                )
                           }
                         />
                       </FormControl>

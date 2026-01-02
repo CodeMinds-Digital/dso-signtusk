@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { OrganisationMemberRole } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@signtusk/lib/constants/organisations';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@signtusk/lib/constants/organisations-translations';
-import { isOrganisationRoleWithinUserHierarchy } from '@signtusk/lib/utils/organisations';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from "@signtusk/lib/constants/organisations";
+import { ORGANISATION_MEMBER_ROLE_MAP } from "@signtusk/lib/constants/organisations-translations";
+import { isOrganisationRoleWithinUserHierarchy } from "@signtusk/lib/utils/organisations";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -30,15 +30,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
+} from "@signtusk/ui/primitives/form/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@signtusk/ui/primitives/select';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/select";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type OrganisationMemberUpdateDialogProps = {
   currentUserOrganisationRole: OrganisationMemberRole;
@@ -47,13 +47,15 @@ export type OrganisationMemberUpdateDialogProps = {
   organisationMemberId: string;
   organisationMemberName: string;
   organisationMemberRole: OrganisationMemberRole;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdateOrganisationMemberFormSchema = z.object({
   role: z.nativeEnum(OrganisationMemberRole),
 });
 
-type ZUpdateOrganisationMemberSchema = z.infer<typeof ZUpdateOrganisationMemberFormSchema>;
+type ZUpdateOrganisationMemberSchema = z.infer<
+  typeof ZUpdateOrganisationMemberFormSchema
+>;
 
 export const OrganisationMemberUpdateDialog = ({
   currentUserOrganisationRole,
@@ -76,7 +78,8 @@ export const OrganisationMemberUpdateDialog = ({
     },
   });
 
-  const { mutateAsync: updateOrganisationMember } = trpc.organisation.member.update.useMutation();
+  const { mutateAsync: updateOrganisationMember } =
+    trpc.organisation.member.update.useMutation();
 
   const onFormSubmit = async ({ role }: ZUpdateOrganisationMemberSchema) => {
     try {
@@ -99,9 +102,9 @@ export const OrganisationMemberUpdateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update this organisation member. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update this organisation member. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -114,13 +117,18 @@ export const OrganisationMemberUpdateDialog = ({
     form.reset();
 
     if (
-      !isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, organisationMemberRole)
+      !isOrganisationRoleWithinUserHierarchy(
+        currentUserOrganisationRole,
+        organisationMemberRole
+      )
     ) {
       setOpen(false);
 
       toast({
-        title: _(msg`You cannot modify a organisation member who has a higher role than you.`),
-        variant: 'destructive',
+        title: _(
+          msg`You cannot modify a organisation member who has a higher role than you.`
+        ),
+        variant: "destructive",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,15 +156,18 @@ export const OrganisationMemberUpdateDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are currently updating <span className="font-bold">{organisationMemberName}</span>
-              .
+              You are currently updating{" "}
+              <span className="font-bold">{organisationMemberName}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+            <fieldset
+              className="flex h-full flex-col"
+              disabled={form.formState.isSubmitting}
+            >
               <FormField
                 control={form.control}
                 name="role"
@@ -172,13 +183,13 @@ export const OrganisationMemberUpdateDialog = ({
                         </SelectTrigger>
 
                         <SelectContent className="w-full" position="popper">
-                          {ORGANISATION_MEMBER_ROLE_HIERARCHY[currentUserOrganisationRole].map(
-                            (role) => (
-                              <SelectItem key={role} value={role}>
-                                {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
-                              </SelectItem>
-                            ),
-                          )}
+                          {ORGANISATION_MEMBER_ROLE_HIERARCHY[
+                            currentUserOrganisationRole
+                          ].map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -188,7 +199,11 @@ export const OrganisationMemberUpdateDialog = ({
               />
 
               <DialogFooter className="mt-4">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

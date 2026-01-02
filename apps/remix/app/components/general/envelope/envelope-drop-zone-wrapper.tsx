@@ -3,7 +3,7 @@ import { type ReactNode, useState } from 'react';
 import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@signtusk/lib/constants/prisma-enums';
 import { Loader } from 'lucide-react';
 import {
   ErrorCode as DropzoneErrorCode,

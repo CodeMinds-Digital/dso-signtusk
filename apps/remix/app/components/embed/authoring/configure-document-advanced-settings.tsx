@@ -1,5 +1,5 @@
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentDistributionMethod } from '@prisma/client';
+import { DocumentDistributionMethod } from '@signtusk/lib/constants/prisma-enums';
 import { InfoIcon } from 'lucide-react';
 import type { Control } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';

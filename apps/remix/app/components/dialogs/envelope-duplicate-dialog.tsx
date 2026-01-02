@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { useNavigate } from 'react-router';
+import { Trans, useLingui } from "@lingui/react/macro";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { useNavigate } from "react-router";
 
-import { formatDocumentsPath, formatTemplatesPath } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import {
+  formatDocumentsPath,
+  formatTemplatesPath,
+} from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -16,10 +18,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 type EnvelopeDuplicateDialogProps = {
   envelopeId: string;
@@ -67,14 +69,17 @@ export const EnvelopeDuplicateDialog = ({
       toast({
         title: t`Something went wrong`,
         description: t`This document could not be duplicated at this time. Please try again.`,
-        variant: 'destructive',
+        variant: "destructive",
         duration: 7500,
       });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isDuplicating && setOpen(value)}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => !isDuplicating && setOpen(value)}
+    >
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>

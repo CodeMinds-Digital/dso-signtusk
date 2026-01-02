@@ -1,22 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { Link, useNavigate } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { Link, useNavigate } from "react-router";
 
-import { EnvelopeEditorProvider } from '@signtusk/lib/client-only/providers/envelope-editor-provider';
-import { EnvelopeRenderProvider } from '@signtusk/lib/client-only/providers/envelope-render-provider';
-import { formatDocumentsPath, formatTemplatesPath } from '@signtusk/lib/utils/teams';
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Spinner } from '@signtusk/ui/primitives/spinner';
+import { EnvelopeEditorProvider } from "@signtusk/lib/client-only/providers/envelope-editor-provider";
+import { EnvelopeRenderProvider } from "@signtusk/lib/client-only/providers/envelope-render-provider";
+import {
+  formatDocumentsPath,
+  formatTemplatesPath,
+} from "@signtusk/lib/utils/teams";
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Spinner } from "@signtusk/ui/primitives/spinner";
 
-import EnvelopeEditor from '~/components/general/envelope-editor/envelope-editor';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { useCurrentTeam } from '~/providers/team';
+import EnvelopeEditor from "~/components/general/envelope-editor/envelope-editor";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { useCurrentTeam } from "~/providers/team";
 
-import type { Route } from './+types/documents.$id.edit';
+import type { Route } from "./+types/documents.$id.edit";
 
 export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
@@ -32,7 +35,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
     },
     {
       retry: false,
-    },
+    }
   );
 
   /**
@@ -52,11 +55,16 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
     if (envelope.teamId !== team.id) {
       void navigate(pathPrefix, { replace: true });
     } else if (envelope.internalVersion !== 2) {
-      void navigate(`${pathPrefix}/${envelope.id}/legacy_editor`, { replace: true });
+      void navigate(`${pathPrefix}/${envelope.id}/legacy_editor`, {
+        replace: true,
+      });
     }
   }, [envelope, team, navigate]);
 
-  if (envelope && (envelope.teamId !== team.id || envelope.internalVersion !== 2)) {
+  if (
+    envelope &&
+    (envelope.teamId !== team.id || envelope.internalVersion !== 2)
+  ) {
     return (
       <div className="text-foreground flex h-screen w-screen flex-col items-center justify-center gap-2">
         <Spinner />

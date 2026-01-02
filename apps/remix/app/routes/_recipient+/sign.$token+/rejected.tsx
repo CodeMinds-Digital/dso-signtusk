@@ -1,21 +1,21 @@
-import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
-import { XCircle } from 'lucide-react';
-import { Link } from 'react-router';
+import { Trans } from "@lingui/react/macro";
+import { FieldType } from "@signtusk/lib/constants/prisma-enums";
+import { XCircle } from "lucide-react";
+import { Link } from "react-router";
 
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { useOptionalSession } from '@signtusk/lib/client-only/providers/session';
-import { getDocumentAndSenderByToken } from '@signtusk/lib/server-only/document/get-document-by-token';
-import { isRecipientAuthorized } from '@signtusk/lib/server-only/document/is-recipient-authorized';
-import { getFieldsForToken } from '@signtusk/lib/server-only/field/get-fields-for-token';
-import { getRecipientByToken } from '@signtusk/lib/server-only/recipient/get-recipient-by-token';
-import { Badge } from '@signtusk/ui/primitives/badge';
-import { Button } from '@signtusk/ui/primitives/button';
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { useOptionalSession } from "@signtusk/lib/client-only/providers/session";
+import { getDocumentAndSenderByToken } from "@signtusk/lib/server-only/document/get-document-by-token";
+import { isRecipientAuthorized } from "@signtusk/lib/server-only/document/is-recipient-authorized";
+import { getFieldsForToken } from "@signtusk/lib/server-only/field/get-fields-for-token";
+import { getRecipientByToken } from "@signtusk/lib/server-only/recipient/get-recipient-by-token";
+import { Badge } from "@signtusk/ui/primitives/badge";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
-import { truncateTitle } from '~/utils/truncate-title';
+import { DocumentSigningAuthPageView } from "~/components/general/document-signing/document-signing-auth-page";
+import { truncateTitle } from "~/utils/truncate-title";
 
-import type { Route } from './+types/rejected';
+import type { Route } from "./+types/rejected";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getOptionalSession(request);
@@ -23,7 +23,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const { token } = params;
 
   if (!token) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const document = await getDocumentAndSenderByToken({
@@ -32,7 +32,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!document) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const truncatedTitle = truncateTitle(document.title);
@@ -43,11 +43,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   ]);
 
   if (!recipient) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   const isDocumentAccessValid = await isRecipientAuthorized({
-    type: 'ACCESS',
+    type: "ACCESS",
     documentAuthOptions: document.authOptions,
     recipient,
     userId: user?.id,
@@ -73,11 +73,14 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   };
 }
 
-export default function RejectedSigningPage({ loaderData }: Route.ComponentProps) {
+export default function RejectedSigningPage({
+  loaderData,
+}: Route.ComponentProps) {
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
 
-  const { isDocumentAccessValid, recipientReference, truncatedTitle } = loaderData;
+  const { isDocumentAccessValid, recipientReference, truncatedTitle } =
+    loaderData;
 
   if (!isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={recipientReference} />;
@@ -85,7 +88,11 @@ export default function RejectedSigningPage({ loaderData }: Route.ComponentProps
 
   return (
     <div className="flex flex-col items-center pt-24 lg:pt-36 xl:pt-44">
-      <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
+      <Badge
+        variant="neutral"
+        size="default"
+        className="mb-6 rounded-xl border bg-transparent"
+      >
         {truncatedTitle}
       </Badge>
 
@@ -104,8 +111,8 @@ export default function RejectedSigningPage({ loaderData }: Route.ComponentProps
 
         <p className="text-muted-foreground mt-6 max-w-[60ch] text-center text-sm">
           <Trans>
-            The document owner has been notified of your decision. They may contact you with further
-            instructions if necessary.
+            The document owner has been notified of your decision. They may
+            contact you with further instructions if necessary.
           </Trans>
         </p>
 

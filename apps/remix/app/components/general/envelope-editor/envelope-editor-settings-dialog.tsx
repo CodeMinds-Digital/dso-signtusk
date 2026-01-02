@@ -8,7 +8,7 @@ import {
   DocumentVisibility,
   EnvelopeType,
   SendStatus,
-} from '@prisma/client';
+} from '@signtusk/lib/constants/prisma-enums';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';

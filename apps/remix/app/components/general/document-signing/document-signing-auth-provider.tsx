@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { type Envelope, FieldType, type Passkey, type Recipient } from '@prisma/client';
+import { type Envelope, FieldType, type Passkey, type Recipient } from '@signtusk/lib/constants/prisma-enums';
 
 import type { SessionUser } from '@signtusk/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@signtusk/lib/constants/auth';

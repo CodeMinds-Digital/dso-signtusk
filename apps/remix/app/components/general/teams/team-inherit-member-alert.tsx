@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import type { TeamGroup } from '@prisma/client';
+import type { TeamGroup } from '@signtusk/lib/constants/prisma-enums';
 
 import { Alert, AlertDescription, AlertTitle } from '@signtusk/ui/primitives/alert';
 

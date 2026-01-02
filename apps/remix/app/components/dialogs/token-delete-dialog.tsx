@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { ApiToken } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { ApiToken } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -26,19 +26,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
 export type TokenDeleteDialogProps = {
-  token: Pick<ApiToken, 'id' | 'name'>;
+  token: Pick<ApiToken, "id" | "name">;
   onDelete?: () => void;
   children?: React.ReactNode;
 };
 
-export default function TokenDeleteDialog({ token, onDelete, children }: TokenDeleteDialogProps) {
+export default function TokenDeleteDialog({
+  token,
+  onDelete,
+  children,
+}: TokenDeleteDialogProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -50,22 +54,28 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
 
   const ZTokenDeleteDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {
-      errorMap: () => ({ message: _(msg`You must enter '${deleteMessage}' to proceed`) }),
+      errorMap: () => ({
+        message: _(msg`You must enter '${deleteMessage}' to proceed`),
+      }),
     }),
   });
 
-  type TDeleteTokenByIdMutationSchema = z.infer<typeof ZTokenDeleteDialogSchema>;
+  type TDeleteTokenByIdMutationSchema = z.infer<
+    typeof ZTokenDeleteDialogSchema
+  >;
 
-  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.delete.useMutation({
-    onSuccess() {
-      onDelete?.();
-    },
-  });
+  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.delete.useMutation(
+    {
+      onSuccess() {
+        onDelete?.();
+      },
+    }
+  );
 
   const form = useForm<TDeleteTokenByIdMutationSchema>({
     resolver: zodResolver(ZTokenDeleteDialogSchema),
     values: {
-      tokenName: '',
+      tokenName: "",
     },
   });
 
@@ -87,9 +97,9 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to delete this token. Please try again later.`,
+          msg`We encountered an unknown error while attempting to delete this token. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
         duration: 5000,
       });
     }
@@ -122,8 +132,8 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
 
           <DialogDescription>
             <Trans>
-              Please note that this action is irreversible. Once confirmed, your token will be
-              permanently deleted.
+              Please note that this action is irreversible. Once confirmed, your
+              token will be permanently deleted.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -141,7 +151,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
                   <FormItem>
                     <FormLabel>
                       <Trans>
-                        Confirm by typing:{' '}
+                        Confirm by typing:{" "}
                         <span className="font-sm text-destructive font-semibold">
                           {deleteMessage}
                         </span>

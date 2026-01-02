@@ -1,61 +1,61 @@
-import { useMemo, useState } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  WebhookCallStatus,
+  WebhookTriggerEvents,
+} from "@signtusk/lib/constants/prisma-enums";
 import {
   CheckCircle2Icon,
   ChevronRightIcon,
   PencilIcon,
   TerminalIcon,
   XCircleIcon,
-} from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { useLocation, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
-import { z } from 'zod';
+} from "lucide-react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
+import { z } from "zod";
 
-import { useDebouncedValue } from '@signtusk/lib/client-only/hooks/use-debounced-value';
-import { useIsMounted } from '@signtusk/lib/client-only/hooks/use-is-mounted';
-import { useUpdateSearchParams } from '@signtusk/lib/client-only/hooks/use-update-search-params';
-import { ZUrlSearchParamsSchema } from '@signtusk/lib/types/search-params';
-import { toFriendlyWebhookEventName } from '@signtusk/lib/universal/webhook/to-friendly-webhook-event-name';
-import { trpc } from '@signtusk/trpc/react';
-import { Badge } from '@signtusk/ui/primitives/badge';
-import { Button } from '@signtusk/ui/primitives/button';
-import type { DataTableColumnDef } from '@signtusk/ui/primitives/data-table';
-import { DataTable } from '@signtusk/ui/primitives/data-table';
-import { DataTablePagination } from '@signtusk/ui/primitives/data-table-pagination';
-import { Input } from '@signtusk/ui/primitives/input';
-import { MultiSelectCombobox } from '@signtusk/ui/primitives/multi-select-combobox';
-import { Skeleton } from '@signtusk/ui/primitives/skeleton';
-import { SpinnerBox } from '@signtusk/ui/primitives/spinner';
-import { TableCell } from '@signtusk/ui/primitives/table';
-import { Tabs, TabsList, TabsTrigger } from '@signtusk/ui/primitives/tabs';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+import { useDebouncedValue } from "@signtusk/lib/client-only/hooks/use-debounced-value";
+import { useIsMounted } from "@signtusk/lib/client-only/hooks/use-is-mounted";
+import { useUpdateSearchParams } from "@signtusk/lib/client-only/hooks/use-update-search-params";
+import { ZUrlSearchParamsSchema } from "@signtusk/lib/types/search-params";
+import { toFriendlyWebhookEventName } from "@signtusk/lib/universal/webhook/to-friendly-webhook-event-name";
+import { trpc } from "@signtusk/trpc/react";
+import { Badge } from "@signtusk/ui/primitives/badge";
+import { Button } from "@signtusk/ui/primitives/button";
+import type { DataTableColumnDef } from "@signtusk/ui/primitives/data-table";
+import { DataTable } from "@signtusk/ui/primitives/data-table";
+import { DataTablePagination } from "@signtusk/ui/primitives/data-table-pagination";
+import { Input } from "@signtusk/ui/primitives/input";
+import { MultiSelectCombobox } from "@signtusk/ui/primitives/multi-select-combobox";
+import { Skeleton } from "@signtusk/ui/primitives/skeleton";
+import { SpinnerBox } from "@signtusk/ui/primitives/spinner";
+import { TableCell } from "@signtusk/ui/primitives/table";
+import { Tabs, TabsList, TabsTrigger } from "@signtusk/ui/primitives/tabs";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { WebhookEditDialog } from '~/components/dialogs/webhook-edit-dialog';
-import { WebhookTestDialog } from '~/components/dialogs/webhook-test-dialog';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { WebhookLogsSheet } from '~/components/general/webhook-logs-sheet';
-import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
+import { WebhookEditDialog } from "~/components/dialogs/webhook-edit-dialog";
+import { WebhookTestDialog } from "~/components/dialogs/webhook-test-dialog";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { WebhookLogsSheet } from "~/components/general/webhook-logs-sheet";
+import { useCurrentTeam } from "~/providers/team";
+import { appMetaTags } from "~/utils/meta";
 
-import type { Route } from './+types/settings.webhooks.$id._index';
+import type { Route } from "./+types/settings.webhooks.$id._index";
 
 const WebhookSearchParamsSchema = ZUrlSearchParamsSchema.extend({
   status: z.nativeEnum(WebhookCallStatus).optional(),
   events: z.preprocess(
-    (value) => (typeof value === 'string' && value.length > 0 ? value.split(',') : []),
-    z.array(z.nativeEnum(WebhookTriggerEvents)).optional(),
+    (value) =>
+      typeof value === "string" && value.length > 0 ? value.split(",") : [],
+    z.array(z.nativeEnum(WebhookTriggerEvents)).optional()
   ),
 });
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags("Webhooks");
 }
 
 export default function WebhookPage({ params }: Route.ComponentProps) {
@@ -67,19 +67,21 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
   const updateSearchParams = useUpdateSearchParams();
   const team = useCurrentTeam();
 
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
+  const [searchQuery, setSearchQuery] = useState(
+    () => searchParams?.get("query") ?? ""
+  );
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
   const parsedSearchParams = WebhookSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
+    Object.fromEntries(searchParams ?? [])
   );
 
   const { data: webhook, isLoading } = trpc.webhook.getWebhookById.useQuery(
     {
       id: params.id,
     },
-    { enabled: !!params.id, retry: false },
+    { enabled: !!params.id, retry: false }
   );
 
   const {
@@ -101,10 +103,10 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
   useEffect(() => {
     const params = new URLSearchParams(searchParams?.toString());
 
-    params.set('query', debouncedSearchQuery);
+    params.set("query", debouncedSearchQuery);
 
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
+    if (debouncedSearchQuery === "") {
+      params.delete("query");
     }
 
     // If nothing  to change then do nothing.
@@ -133,11 +135,15 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
     return [
       {
         header: t`Status`,
-        accessorKey: 'status',
+        accessorKey: "status",
 
         cell: ({ row }) => (
-          <Badge variant={row.original.status === 'SUCCESS' ? 'default' : 'destructive'}>
-            {row.original.status === 'SUCCESS' ? (
+          <Badge
+            variant={
+              row.original.status === "SUCCESS" ? "default" : "destructive"
+            }
+          >
+            {row.original.status === "SUCCESS" ? (
               <CheckCircle2Icon className="mr-2 h-4 w-4" />
             ) : (
               <XCircleIcon className="mr-2 h-4 w-4" />
@@ -148,7 +154,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
       },
       {
         header: t`Event`,
-        accessorKey: 'event',
+        accessorKey: "event",
         cell: ({ row }) => (
           <div>
             <p className="text-foreground text-sm font-semibold">
@@ -160,13 +166,13 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
       },
       {
         header: t`Sent`,
-        accessorKey: 'createdAt',
+        accessorKey: "createdAt",
         cell: ({ row }) => (
           <div className="flex items-center justify-between gap-2">
             <p>
               {i18n.date(row.original.createdAt, {
-                timeStyle: 'short',
-                dateStyle: 'short',
+                timeStyle: "short",
+                dateStyle: "short",
               })}
             </p>
 
@@ -176,20 +182,20 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
           </div>
         ),
       },
-    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+    ] satisfies DataTableColumnDef<(typeof results)["data"][number]>[];
   }, []);
 
   const getTabHref = (value: string) => {
     const params = new URLSearchParams(searchParams);
 
-    params.set('status', value);
+    params.set("status", value);
 
-    if (value === '') {
-      params.delete('status');
+    if (value === "") {
+      params.delete("status");
     }
 
-    if (params.has('page')) {
-      params.delete('page');
+    if (params.has("page")) {
+      params.delete("page");
     }
 
     let path = pathname;
@@ -237,8 +243,12 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
             <p>
               <Trans>Webhook</Trans>
             </p>
-            <Badge variant={webhook.enabled ? 'default' : 'secondary'}>
-              {webhook.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
+            <Badge variant={webhook.enabled ? "default" : "secondary"}>
+              {webhook.enabled ? (
+                <Trans>Enabled</Trans>
+              ) : (
+                <Trans>Disabled</Trans>
+              )}
             </Badge>
           </div>
         }
@@ -274,19 +284,34 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
 
           <WebhookEventCombobox />
 
-          <Tabs value={parsedSearchParams.status || ''} className="flex-shrink-0">
+          <Tabs
+            value={parsedSearchParams.status || ""}
+            className="flex-shrink-0"
+          >
             <TabsList>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="" asChild>
-                <Link to={getTabHref('')}>
+              <TabsTrigger
+                className="hover:text-foreground min-w-[60px]"
+                value=""
+                asChild
+              >
+                <Link to={getTabHref("")}>
                   <Trans>All</Trans>
                 </Link>
               </TabsTrigger>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="SUCCESS" asChild>
+              <TabsTrigger
+                className="hover:text-foreground min-w-[60px]"
+                value="SUCCESS"
+                asChild
+              >
                 <Link to={getTabHref(WebhookCallStatus.SUCCESS)}>
                   <Trans>Success</Trans>
                 </Link>
               </TabsTrigger>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="FAILED" asChild>
+              <TabsTrigger
+                className="hover:text-foreground min-w-[60px]"
+                value="FAILED"
+                asChild
+              >
                 <Link to={getTabHref(WebhookCallStatus.FAILED)}>
                   <Trans>Failed</Trans>
                 </Link>
@@ -331,7 +356,10 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
         >
           {(table) =>
             results.totalPages > 1 && (
-              <DataTablePagination additionalInformation="VisibleCount" table={table} />
+              <DataTablePagination
+                additionalInformation="VisibleCount"
+                table={table}
+              />
             )
           }
         </DataTable>
@@ -349,7 +377,9 @@ const WebhookEventCombobox = () => {
 
   const isMounted = useIsMounted();
 
-  const events = (searchParams?.get('events') ?? '').split(',').filter((value) => value !== '');
+  const events = (searchParams?.get("events") ?? "")
+    .split(",")
+    .filter((value) => value !== "");
 
   const comboBoxOptions = Object.values(WebhookTriggerEvents).map((event) => ({
     label: toFriendlyWebhookEventName(event),
@@ -363,13 +393,15 @@ const WebhookEventCombobox = () => {
 
     const params = new URLSearchParams(searchParams?.toString());
 
-    params.set('events', newEvents.join(','));
+    params.set("events", newEvents.join(","));
 
     if (newEvents.length === 0) {
-      params.delete('events');
+      params.delete("events");
     }
 
-    void navigate(`${pathname}?${params.toString()}`, { preventScrollReset: true });
+    void navigate(`${pathname}?${params.toString()}`, {
+      preventScrollReset: true,
+    });
   };
 
   return (

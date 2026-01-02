@@ -1,36 +1,40 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@prisma/client';
-import { redirect, useLoaderData } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { redirect, useLoaderData } from "react-router";
 
 import {
   DEFAULT_DOCUMENT_DATE_FORMAT,
   isValidDateFormat,
-} from '@signtusk/lib/constants/date-formats';
-import { DocumentSignatureType } from '@signtusk/lib/constants/document';
-import { isValidLanguageCode } from '@signtusk/lib/constants/i18n';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@signtusk/lib/constants/time-zones';
-import { verifyEmbeddingPresignToken } from '@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { getTemplateById } from '@signtusk/lib/server-only/template/get-template-by-id';
-import { ZDocumentEmailSettingsSchema } from '@signtusk/lib/types/document-email';
-import { nanoid } from '@signtusk/lib/universal/id';
-import { trpc } from '@signtusk/trpc/react';
-import { Stepper } from '@signtusk/ui/primitives/stepper';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/lib/constants/date-formats";
+import { DocumentSignatureType } from "@signtusk/lib/constants/document";
+import { isValidLanguageCode } from "@signtusk/lib/constants/i18n";
+import { DEFAULT_DOCUMENT_TIME_ZONE } from "@signtusk/lib/constants/time-zones";
+import { verifyEmbeddingPresignToken } from "@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token";
+import { getTemplateById } from "@signtusk/lib/server-only/template/get-template-by-id";
+import { ZDocumentEmailSettingsSchema } from "@signtusk/lib/types/document-email";
+import { nanoid } from "@signtusk/lib/universal/id";
+import { trpc } from "@signtusk/trpc/react";
+import { Stepper } from "@signtusk/ui/primitives/stepper";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
-import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';
-import type { TConfigureEmbedFormSchema } from '~/components/embed/authoring/configure-document-view.types';
-import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fields-view';
-import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
+import { ConfigureDocumentProvider } from "~/components/embed/authoring/configure-document-context";
+import { ConfigureDocumentView } from "~/components/embed/authoring/configure-document-view";
+import type { TConfigureEmbedFormSchema } from "~/components/embed/authoring/configure-document-view.types";
+import { ConfigureFieldsView } from "~/components/embed/authoring/configure-fields-view";
+import type { TConfigureFieldsFormSchema } from "~/components/embed/authoring/configure-fields-view.types";
 import {
-  type TBaseEmbedAuthoringSchema,
   ZBaseEmbedAuthoringEditSchema,
-} from '~/types/embed-authoring-base-schema';
+  type TBaseEmbedAuthoringSchema,
+} from "~/types/embed-authoring-base-schema";
 
-import type { Route } from './+types/document.edit.$id';
+import type { Route } from "./+types/document.edit.$id";
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { id } = params;
@@ -38,15 +42,16 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const url = new URL(request.url);
 
   // We know that the token is present because we're checking it in the parent _layout route
-  const token = url.searchParams.get('token') || '';
+  const token = url.searchParams.get("token") || "";
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token, scope: `templateId:${id}` }).catch(
-    () => null,
-  );
+  const result = await verifyEmbeddingPresignToken({
+    token,
+    scope: `templateId:${id}`,
+  }).catch(() => null);
 
   if (!result) {
-    throw new Error('Invalid token');
+    throw new Error("Invalid token");
   }
 
   const templateId = Number(id);
@@ -57,7 +62,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
 
   const template = await getTemplateById({
     id: {
-      type: 'templateId',
+      type: "templateId",
       id: templateId,
     },
     userId: result?.userId,
@@ -65,7 +70,9 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }).catch(() => null);
 
   if (!template) {
-    throw redirect(`/embed/v1/authoring/error/not-found?templateId=${templateId}`);
+    throw redirect(
+      `/embed/v1/authoring/error/not-found?templateId=${templateId}`
+    );
   }
 
   const fields = template.fields.map((field) => ({
@@ -111,57 +118,69 @@ export default function EmbeddingAuthoringTemplateEditPage() {
     return types;
   }, [template.templateMeta]);
 
-  const [configuration, setConfiguration] = useState<TConfigureEmbedFormSchema | null>(() => ({
-    title: template.title,
-    documentData: undefined,
-    meta: {
-      subject: template.templateMeta?.subject ?? undefined,
-      message: template.templateMeta?.message ?? undefined,
-      distributionMethod:
-        template.templateMeta?.distributionMethod ?? DocumentDistributionMethod.EMAIL,
-      emailSettings: template.templateMeta?.emailSettings ?? ZDocumentEmailSettingsSchema.parse({}),
-      timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-      signingOrder: template.templateMeta?.signingOrder ?? DocumentSigningOrder.PARALLEL,
-      allowDictateNextSigner: template.templateMeta?.allowDictateNextSigner ?? false,
-      language: isValidLanguageCode(template.templateMeta?.language)
-        ? template.templateMeta.language
-        : undefined,
-      signatureTypes: signatureTypes,
-      dateFormat: isValidDateFormat(template.templateMeta?.dateFormat)
-        ? template.templateMeta?.dateFormat
-        : DEFAULT_DOCUMENT_DATE_FORMAT,
-      redirectUrl: template.templateMeta?.redirectUrl ?? undefined,
-    },
-    signers: template.recipients.map((recipient) => ({
-      nativeId: recipient.id,
-      formId: nanoid(8),
-      name: recipient.name,
-      email: recipient.email,
-      role: recipient.role,
-      signingOrder: recipient.signingOrder ?? undefined,
-      disabled: recipient.signingStatus !== SigningStatus.NOT_SIGNED,
-    })),
-  }));
+  const [configuration, setConfiguration] =
+    useState<TConfigureEmbedFormSchema | null>(() => ({
+      title: template.title,
+      documentData: undefined,
+      meta: {
+        subject: template.templateMeta?.subject ?? undefined,
+        message: template.templateMeta?.message ?? undefined,
+        distributionMethod:
+          template.templateMeta?.distributionMethod ??
+          DocumentDistributionMethod.EMAIL,
+        emailSettings:
+          template.templateMeta?.emailSettings ??
+          ZDocumentEmailSettingsSchema.parse({}),
+        timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+        signingOrder:
+          template.templateMeta?.signingOrder ?? DocumentSigningOrder.PARALLEL,
+        allowDictateNextSigner:
+          template.templateMeta?.allowDictateNextSigner ?? false,
+        language: isValidLanguageCode(template.templateMeta?.language)
+          ? template.templateMeta.language
+          : undefined,
+        signatureTypes: signatureTypes,
+        dateFormat: isValidDateFormat(template.templateMeta?.dateFormat)
+          ? template.templateMeta?.dateFormat
+          : DEFAULT_DOCUMENT_DATE_FORMAT,
+        redirectUrl: template.templateMeta?.redirectUrl ?? undefined,
+      },
+      signers: template.recipients.map((recipient) => ({
+        nativeId: recipient.id,
+        formId: nanoid(8),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder ?? undefined,
+        disabled: recipient.signingStatus !== SigningStatus.NOT_SIGNED,
+      })),
+    }));
 
-  const [fields, setFields] = useState<TConfigureFieldsFormSchema | null>(() => ({
-    fields: template.fields.map((field) => ({
-      nativeId: field.id,
-      formId: nanoid(8),
-      type: field.type,
-      signerEmail:
-        template.recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-      inserted: field.inserted,
-      recipientId: field.recipientId,
-      pageNumber: field.page,
-      pageX: field.positionX,
-      pageY: field.positionY,
-      pageWidth: field.width,
-      pageHeight: field.height,
-      fieldMeta: field.fieldMeta ?? undefined,
-    })),
-  }));
+  const [fields, setFields] = useState<TConfigureFieldsFormSchema | null>(
+    () => ({
+      fields: template.fields.map((field) => ({
+        nativeId: field.id,
+        formId: nanoid(8),
+        type: field.type,
+        signerEmail:
+          template.recipients.find(
+            (recipient) => recipient.id === field.recipientId
+          )?.email ?? "",
+        inserted: field.inserted,
+        recipientId: field.recipientId,
+        pageNumber: field.page,
+        pageX: field.positionX,
+        pageY: field.positionY,
+        pageWidth: field.width,
+        pageHeight: field.height,
+        fieldMeta: field.fieldMeta ?? undefined,
+      })),
+    })
+  );
 
-  const [features, setFeatures] = useState<TBaseEmbedAuthoringSchema['features'] | null>(null);
+  const [features, setFeatures] = useState<
+    TBaseEmbedAuthoringSchema["features"] | null
+  >(null);
   const [externalId, setExternalId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [canGoBack, setCanGoBack] = useState(true);
@@ -180,7 +199,9 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       const signerEmails = data.signers.map((signer) => signer.email);
 
       return {
-        fields: fieldData.fields.filter((field) => signerEmails.includes(field.signerEmail)),
+        fields: fieldData.fields.filter((field) =>
+          signerEmails.includes(field.signerEmail)
+        ),
       };
     });
     setCurrentStep(2);
@@ -192,11 +213,13 @@ export default function EmbeddingAuthoringTemplateEditPage() {
     setCurrentStep(1);
   };
 
-  const handleConfigureFieldsSubmit = async (data: TConfigureFieldsFormSchema) => {
+  const handleConfigureFieldsSubmit = async (
+    data: TConfigureFieldsFormSchema
+  ) => {
     try {
       if (!configuration) {
         toast({
-          variant: 'destructive',
+          variant: "destructive",
           title: _(msg`Error`),
           description: _(msg`Please configure the document first`),
         });
@@ -217,15 +240,21 @@ export default function EmbeddingAuthoringTemplateEditPage() {
           ...configuration.meta,
           drawSignatureEnabled: configuration.meta.signatureTypes
             ? configuration.meta.signatureTypes.length === 0 ||
-              configuration.meta.signatureTypes.includes(DocumentSignatureType.DRAW)
+              configuration.meta.signatureTypes.includes(
+                DocumentSignatureType.DRAW
+              )
             : undefined,
           typedSignatureEnabled: configuration.meta.signatureTypes
             ? configuration.meta.signatureTypes.length === 0 ||
-              configuration.meta.signatureTypes.includes(DocumentSignatureType.TYPE)
+              configuration.meta.signatureTypes.includes(
+                DocumentSignatureType.TYPE
+              )
             : undefined,
           uploadSignatureEnabled: configuration.meta.signatureTypes
             ? configuration.meta.signatureTypes.length === 0 ||
-              configuration.meta.signatureTypes.includes(DocumentSignatureType.UPLOAD)
+              configuration.meta.signatureTypes.includes(
+                DocumentSignatureType.UPLOAD
+              )
             : undefined,
         },
         recipients: configuration.signers.map((signer) => ({
@@ -259,18 +288,18 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       if (window.parent !== window) {
         window.parent.postMessage(
           {
-            type: 'template-updated',
+            type: "template-updated",
             templateId: updateResult.templateId,
             externalId: templateExternalId,
           },
-          '*',
+          "*"
         );
       }
     } catch (err) {
-      console.error('Error updating template:', err);
+      console.error("Error updating template:", err);
 
       toast({
-        variant: 'destructive',
+        variant: "destructive",
         title: _(msg`Error`),
         description: _(msg`Failed to update template`),
       });
@@ -282,7 +311,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       const hash = window.location.hash.slice(1);
 
       const result = ZBaseEmbedAuthoringEditSchema.safeParse(
-        JSON.parse(decodeURIComponent(atob(hash))),
+        JSON.parse(decodeURIComponent(atob(hash)))
       );
 
       if (!result.success) {
@@ -303,7 +332,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
 
       setHasFinishedInit(true);
     } catch (err) {
-      console.error('Error parsing embedding params:', err);
+      console.error("Error parsing embedding params:", err);
     }
   }, []);
 

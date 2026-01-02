@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamEmail } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import type { TeamEmail } from "@signtusk/lib/constants/prisma-enums";
+import { useForm } from "react-hook-form";
+import { useRevalidator } from "react-router";
+import { z } from "zod";
 
-import { trpc } from '@signtusk/trpc/react';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -26,17 +26,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type TeamEmailUpdateDialogProps = {
   teamEmail: TeamEmail;
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
 const ZUpdateTeamEmailFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+  name: z.string().trim().min(1, { message: "Please enter a valid name." }),
 });
 
 type TUpdateTeamEmailFormSchema = z.infer<typeof ZUpdateTeamEmailFormSchema>;
@@ -83,7 +83,7 @@ export const TeamEmailUpdateDialog = ({
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting update the team email. Please try again later.`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -115,7 +115,9 @@ export const TeamEmailUpdateDialog = ({
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            <Trans>To change the email you must remove and add a new email address.</Trans>
+            <Trans>
+              To change the email you must remove and add a new email address.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -134,7 +136,11 @@ export const TeamEmailUpdateDialog = ({
                       <Trans>Name</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder={t`eg. Legal`} {...field} />
+                      <Input
+                        className="bg-background"
+                        placeholder={t`eg. Legal`}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -146,12 +152,20 @@ export const TeamEmailUpdateDialog = ({
                   <Trans>Email</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input className="bg-background" value={teamEmail.email} disabled={true} />
+                  <Input
+                    className="bg-background"
+                    value={teamEmail.email}
+                    disabled={true}
+                  />
                 </FormControl>
               </FormItem>
 
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

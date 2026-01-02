@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Prisma } from '@prisma/client';
-import { useRevalidator } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Prisma } from "@signtusk/prisma";
+import { useRevalidator } from "react-router";
 
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { extractInitials } from '@signtusk/lib/utils/recipient-formatter';
-import { trpc } from '@signtusk/trpc/react';
-import { Alert } from '@signtusk/ui/primitives/alert';
-import { AvatarWithText } from '@signtusk/ui/primitives/avatar';
-import { Button } from '@signtusk/ui/primitives/button';
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import { extractInitials } from "@signtusk/lib/utils/recipient-formatter";
+import { trpc } from "@signtusk/trpc/react";
+import { Alert } from "@signtusk/ui/primitives/alert";
+import { AvatarWithText } from "@signtusk/ui/primitives/avatar";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 export type TeamEmailDeleteDialogProps = {
   trigger?: React.ReactNode;
@@ -40,7 +40,11 @@ export type TeamEmailDeleteDialogProps = {
   }>;
 };
 
-export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDeleteDialogProps) => {
+export const TeamEmailDeleteDialog = ({
+  trigger,
+  teamName,
+  team,
+}: TeamEmailDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
@@ -59,31 +63,37 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
       onError: () => {
         toast({
           title: _(msg`Something went wrong`),
-          description: _(msg`Unable to remove team email at this time. Please try again.`),
-          variant: 'destructive',
+          description: _(
+            msg`Unable to remove team email at this time. Please try again.`
+          ),
+          variant: "destructive",
           duration: 10000,
         });
       },
     });
 
-  const { mutateAsync: deleteTeamEmailVerification, isPending: isDeletingTeamEmailVerification } =
-    trpc.team.email.verification.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Email verification has been removed`),
-          duration: 5000,
-        });
-      },
-      onError: () => {
-        toast({
-          title: _(msg`Something went wrong`),
-          description: _(msg`Unable to remove email verification at this time. Please try again.`),
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+  const {
+    mutateAsync: deleteTeamEmailVerification,
+    isPending: isDeletingTeamEmailVerification,
+  } = trpc.team.email.verification.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`Email verification has been removed`),
+        duration: 5000,
+      });
+    },
+    onError: () => {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`Unable to remove email verification at this time. Please try again.`
+        ),
+        variant: "destructive",
+        duration: 10000,
+      });
+    },
+  });
 
   const onRemove = async () => {
     if (team.teamEmail) {
@@ -115,7 +125,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to delete the following team email from{' '}
+              You are about to delete the following team email from{" "}
               <span className="font-semibold">{teamName}</span>.
             </Trans>
           </DialogDescription>
@@ -126,7 +136,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
             avatarClass="h-12 w-12"
             avatarSrc={formatAvatarUrl(team.avatarImageId)}
             avatarFallback={extractInitials(
-              (team.teamEmail?.name || team.emailVerification?.name) ?? '',
+              (team.teamEmail?.name || team.emailVerification?.name) ?? ""
             )}
             primaryText={
               <span className="text-foreground/80 text-sm font-semibold">
@@ -141,9 +151,15 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
           />
         </Alert>
 
-        <fieldset disabled={isDeletingTeamEmail || isDeletingTeamEmailVerification}>
+        <fieldset
+          disabled={isDeletingTeamEmail || isDeletingTeamEmailVerification}
+        >
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setOpen(false)}
+            >
               <Trans>Cancel</Trans>
             </Button>
 
