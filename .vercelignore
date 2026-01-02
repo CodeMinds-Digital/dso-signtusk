@@ -111,6 +111,10 @@ scripts/
 tools/
 monitoring/
 
+# Keep essential build scripts
+!apps/remix/.bin/
+!apps/remix/scripts/
+
 # Docker
 Dockerfile*
 docker-compose*.yml

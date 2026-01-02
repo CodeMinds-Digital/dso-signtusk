@@ -88,4 +88,3 @@ public/static/og-share-frame2.png
 !../../packages/prisma/generated/
 # Additional optimizations
 example/
-.bin/
