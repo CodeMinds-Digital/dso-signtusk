@@ -1,14 +1,24 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { RecipientRole } from "@signtusk/lib/constants/prisma-enums";
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from "@signtusk/lib/constants/recipient-roles";
 
-import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
-import TemplateDocumentImage from '../template-components/template-document-image';
-import { TemplateFooter } from '../template-components/template-footer';
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Html,
+  Img,
+  Preview,
+  Section,
+  Text,
+} from "../components";
+import { useBranding } from "../providers/branding";
+import TemplateDocumentImage from "../template-components/template-document-image";
+import { TemplateFooter } from "../template-components/template-footer";
 
 export type DocumentCompletedEmailTemplateProps = {
   recipientName?: string;
@@ -19,16 +29,18 @@ export type DocumentCompletedEmailTemplateProps = {
 };
 
 export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
-  recipientName = 'John Doe',
+  recipientName = "John Doe",
   recipientRole = RecipientRole.SIGNER,
-  documentLink = 'http://localhost:3000',
-  documentName = 'Open Source Pledge.pdf',
-  assetBaseUrl = 'http://localhost:3002',
+  documentLink = "http://localhost:3000",
+  documentName = "Open Source Pledge.pdf",
+  assetBaseUrl = "http://localhost:3002",
 }: DocumentCompletedEmailTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const action = _(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase();
+  const action = _(
+    RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned
+  ).toLowerCase();
 
   const previewText = msg`Document created from direct template`;
 
@@ -46,21 +58,29 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
             <Section className="p-2">
               {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+                <Img
+                  src={branding.brandingLogo}
+                  alt="Branding Logo"
+                  className="mb-4 h-6"
+                />
               ) : (
                 <Img
-                  src={getAssetUrl('/static/logo.png')}
+                  src={getAssetUrl("/static/logo.png")}
                   alt="Documenso Logo"
                   className="mb-4 h-6"
                 />
               )}
 
-              <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
+              <TemplateDocumentImage
+                className="mt-6"
+                assetBaseUrl={assetBaseUrl}
+              />
 
               <Section>
                 <Text className="text-primary mb-0 text-center text-lg font-semibold">
                   <Trans>
-                    {recipientName} {action} a document by using one of your direct links
+                    {recipientName} {action} a document by using one of your
+                    direct links
                   </Trans>
                 </Text>
 

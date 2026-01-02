@@ -1,15 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import React from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-import type { Session } from '@prisma/client';
-import { useLocation } from 'react-router';
+import { useLocation } from "react-router";
 
-import { authClient } from '@signtusk/auth/client';
-import type { SessionUser } from '@signtusk/auth/server/lib/session/session';
-import { trpc } from '@signtusk/trpc/client';
-import type { TGetOrganisationSessionResponse } from '@signtusk/trpc/server/organisation-router/get-organisation-session.types';
+import { authClient } from "@signtusk/auth/client";
+import type { SessionUser } from "@signtusk/auth/server/lib/session/session";
+import { trpc } from "@signtusk/trpc/client";
+import type { TGetOrganisationSessionResponse } from "@signtusk/trpc/server/organisation-router/get-organisation-session.types";
 
-import { SKIP_QUERY_BATCH_META } from '../../constants/trpc';
+import type { Session } from "../../constants/prisma-enums";
+import { SKIP_QUERY_BATCH_META } from "../../constants/trpc";
 
 export type AppSession = {
   session: Session;
@@ -33,11 +38,11 @@ export const useSession = () => {
   const context = useContext(SessionContext);
 
   if (!context) {
-    throw new Error('useSession must be used within a SessionProvider');
+    throw new Error("useSession must be used within a SessionProvider");
   }
 
   if (!context.sessionData) {
-    throw new Error('Session not found');
+    throw new Error("Session not found");
   }
 
   return {
@@ -50,13 +55,16 @@ export const useOptionalSession = () => {
   const context = useContext(SessionContext);
 
   if (!context) {
-    throw new Error('useOptionalSession must be used within a SessionProvider');
+    throw new Error("useOptionalSession must be used within a SessionProvider");
   }
 
   return context;
 };
 
-export const SessionProvider = ({ children, initialSession }: SessionProviderProps) => {
+export const SessionProvider = ({
+  children,
+  initialSession,
+}: SessionProviderProps) => {
   const [session, setSession] = useState<AppSession | null>(initialSession);
 
   const location = useLocation();
@@ -69,12 +77,13 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       return;
     }
 
-    const organisations = await trpc.organisation.internal.getOrganisationSession
-      .query(undefined, SKIP_QUERY_BATCH_META.trpc)
-      .catch(() => {
-        // Todo: (RR7) Log
-        return [];
-      });
+    const organisations =
+      await trpc.organisation.internal.getOrganisationSession
+        .query(undefined, SKIP_QUERY_BATCH_META.trpc)
+        .catch(() => {
+          // Todo: (RR7) Log
+          return [];
+        });
 
     setSession({
       session: newSession.session,
@@ -88,10 +97,10 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       void refreshSession();
     };
 
-    window.addEventListener('focus', onFocus);
+    window.addEventListener("focus", onFocus);
 
     return () => {
-      window.removeEventListener('focus', onFocus);
+      window.removeEventListener("focus", onFocus);
     };
   }, [refreshSession]);
 

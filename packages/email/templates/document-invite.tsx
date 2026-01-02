@@ -1,38 +1,50 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { RecipientRole } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { RecipientRole } from "@signtusk/lib/constants/prisma-enums";
+import { OrganisationType } from "@signtusk/lib/constants/prisma-enums";
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@signtusk/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from "@signtusk/lib/constants/recipient-roles";
 
-import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
-import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
-import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
-import { TemplateDocumentInvite } from '../template-components/template-document-invite';
-import { TemplateFooter } from '../template-components/template-footer';
+import {
+  Body,
+  Container,
+  Head,
+  Hr,
+  Html,
+  Img,
+  Link,
+  Preview,
+  Section,
+  Text,
+} from "../components";
+import { useBranding } from "../providers/branding";
+import { TemplateCustomMessageBody } from "../template-components/template-custom-message-body";
+import type { TemplateDocumentInviteProps } from "../template-components/template-document-invite";
+import { TemplateDocumentInvite } from "../template-components/template-document-invite";
+import { TemplateFooter } from "../template-components/template-footer";
 
-export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
-  customBody?: string;
-  role: RecipientRole;
-  selfSigner?: boolean;
-  teamName?: string;
-  teamEmail?: string;
-  includeSenderDetails?: boolean;
-  organisationType?: OrganisationType;
-};
+export type DocumentInviteEmailTemplateProps =
+  Partial<TemplateDocumentInviteProps> & {
+    customBody?: string;
+    role: RecipientRole;
+    selfSigner?: boolean;
+    teamName?: string;
+    teamEmail?: string;
+    includeSenderDetails?: boolean;
+    organisationType?: OrganisationType;
+  };
 
 export const DocumentInviteEmailTemplate = ({
-  inviterName = 'Lucas Smith',
-  inviterEmail = 'lucas@documenso.com',
-  documentName = 'Open Source Pledge.pdf',
-  signDocumentLink = 'https://documenso.com',
-  assetBaseUrl = 'http://localhost:3002',
+  inviterName = "Lucas Smith",
+  inviterEmail = "lucas@documenso.com",
+  documentName = "Open Source Pledge.pdf",
+  signDocumentLink = "https://documenso.com",
+  assetBaseUrl = "http://localhost:3002",
   customBody,
   role,
   selfSigner = false,
-  teamName = '',
+  teamName = "",
   includeSenderDetails,
   organisationType,
 }: DocumentInviteEmailTemplateProps) => {
@@ -67,10 +79,14 @@ export const DocumentInviteEmailTemplate = ({
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
               {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+                <Img
+                  src={branding.brandingLogo}
+                  alt="Branding Logo"
+                  className="mb-4 h-6"
+                />
               ) : (
                 <Img
-                  src={getAssetUrl('/static/logo.png')}
+                  src={getAssetUrl("/static/logo.png")}
                   alt="Documenso Logo"
                   className="mb-4 h-6"
                 />
@@ -96,8 +112,11 @@ export const DocumentInviteEmailTemplate = ({
               {organisationType === OrganisationType.PERSONAL && (
                 <Text className="my-4 text-base font-semibold">
                   <Trans>
-                    {inviterName}{' '}
-                    <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
+                    {inviterName}{" "}
+                    <Link
+                      className="font-normal text-slate-400"
+                      href="mailto:{inviterEmail}"
+                    >
                       ({inviterEmail})
                     </Link>
                   </Trans>
@@ -109,7 +128,8 @@ export const DocumentInviteEmailTemplate = ({
                   <TemplateCustomMessageBody text={customBody} />
                 ) : (
                   <Trans>
-                    {inviterName} has invited you to {action} the document "{documentName}".
+                    {inviterName} has invited you to {action} the document "
+                    {documentName}".
                   </Trans>
                 )}
               </Text>

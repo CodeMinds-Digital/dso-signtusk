@@ -515,3 +515,14 @@ export interface SubscriptionClaim {
   envelopeItemCount: number;
   flags: AnyJson;
 }
+
+export interface Session {
+  id: string;
+  sessionToken: string;
+  userId: number;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  ipAddress: string | null;
+  userAgent: string | null;
+}
