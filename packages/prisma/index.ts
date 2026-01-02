@@ -80,7 +80,10 @@ export const prismaWithLogging = prisma;
 // Export sql function
 export { sql };
 
-// Export types for compatibility
-export * from "@prisma/client";
+// Export Prisma types for server-side code only
+// Note: Do NOT use "export * from '@prisma/client'" as it causes browser bundling issues
 export type { PrismaClient } from "@prisma/client";
 export type { DB } from "./generated/types.js";
+
+// Re-export specific items needed by server code
+export { Prisma } from "@prisma/client";

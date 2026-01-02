@@ -1,4 +1,4 @@
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { PROTECTED_TEAM_URLS } from '@signtusk/lib/constants/teams';

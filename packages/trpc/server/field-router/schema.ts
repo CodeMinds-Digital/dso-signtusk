@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@signtusk/lib/types/document-auth';

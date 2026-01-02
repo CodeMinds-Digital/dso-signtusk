@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 export const ZUpdateUserRequestSchema = z.object({

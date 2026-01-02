@@ -1,4 +1,4 @@
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 // export const createOrganisationMemberInvitesMeta: TrpcOpenApiMeta = {

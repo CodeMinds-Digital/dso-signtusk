@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { isTemplateRecipientEmailPlaceholder } from '@signtusk/lib/constants/template';

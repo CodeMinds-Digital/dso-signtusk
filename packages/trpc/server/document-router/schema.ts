@@ -1,4 +1,4 @@
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 export const ZDocumentTitleSchema = z

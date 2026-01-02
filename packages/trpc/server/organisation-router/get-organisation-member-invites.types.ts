@@ -1,4 +1,4 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import { OrganisationMemberInviteSchema } from '@signtusk/prisma/generated/zod/modelSchema/OrganisationMemberInviteSchema';

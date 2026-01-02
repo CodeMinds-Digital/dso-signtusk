@@ -1,5 +1,5 @@
 // import type { OpenApiMeta } from 'trpc-to-openapi';
-import { ReadStatus } from '@prisma/client';
+import { ReadStatus } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 export const ZGetInboxCountRequestSchema = z

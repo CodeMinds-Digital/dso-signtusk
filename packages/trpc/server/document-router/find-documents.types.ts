@@ -1,37 +1,52 @@
-import { DocumentSource, DocumentStatus } from '@prisma/client';
-import { z } from 'zod';
+import {
+  DocumentSource,
+  DocumentStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { ZDocumentManySchema } from '@signtusk/lib/types/document';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@signtusk/lib/types/search-params';
+import { ZDocumentManySchema } from "@signtusk/lib/types/document";
+import {
+  ZFindResultResponse,
+  ZFindSearchParamsSchema,
+} from "@signtusk/lib/types/search-params";
 
-import type { TrpcRouteMeta } from '../trpc';
+import type { TrpcRouteMeta } from "../trpc";
 
 export const ZFindDocumentsMeta: TrpcRouteMeta = {
   openapi: {
-    method: 'GET',
-    path: '/document',
-    summary: 'Find documents',
-    description: 'Find documents based on a search criteria',
-    tags: ['Document'],
+    method: "GET",
+    path: "/document",
+    summary: "Find documents",
+    description: "Find documents based on a search criteria",
+    tags: ["Document"],
   },
 };
 
 export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   templateId: z
     .number()
-    .describe('Filter documents by the template ID used to create it.')
+    .describe("Filter documents by the template ID used to create it.")
     .optional(),
   source: z
-    .nativeEnum(DocumentSource)
-    .describe('Filter documents by how it was created.')
+    .enum([
+      DocumentSource.DOCUMENT,
+      DocumentSource.TEMPLATE,
+      DocumentSource.TEMPLATE_DIRECT_LINK,
+    ])
+    .describe("Filter documents by how it was created.")
     .optional(),
   status: z
-    .nativeEnum(DocumentStatus)
-    .describe('Filter documents by the current status')
+    .enum([
+      DocumentStatus.DRAFT,
+      DocumentStatus.PENDING,
+      DocumentStatus.COMPLETED,
+      DocumentStatus.REJECTED,
+    ])
+    .describe("Filter documents by the current status")
     .optional(),
-  folderId: z.string().describe('Filter documents by folder ID').optional(),
-  orderByColumn: z.enum(['createdAt']).optional(),
-  orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
+  folderId: z.string().describe("Filter documents by folder ID").optional(),
+  orderByColumn: z.enum(["createdAt"]).optional(),
+  orderByDirection: z.enum(["asc", "desc"]).describe("").default("desc"),
 });
 
 export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
@@ -39,4 +54,6 @@ export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
 });
 
 export type TFindDocumentsRequest = z.infer<typeof ZFindDocumentsRequestSchema>;
-export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
+export type TFindDocumentsResponse = z.infer<
+  typeof ZFindDocumentsResponseSchema
+>;

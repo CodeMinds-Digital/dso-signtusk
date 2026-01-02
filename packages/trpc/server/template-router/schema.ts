@@ -1,14 +1,17 @@
-import pkg from '@prisma/client';
-const { DocumentSigningOrder, DocumentVisibility, TemplateType } = pkg;
-import { z } from 'zod';
-import { zfd } from 'zod-form-data';
+import {
+  DocumentSigningOrder,
+  DocumentVisibility,
+  TemplateType,
+} from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 
-import { ZDocumentSchema } from '@signtusk/lib/types/document';
+import { ZDocumentSchema } from "@signtusk/lib/types/document";
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@signtusk/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@signtusk/lib/types/document-email';
+} from "@signtusk/lib/types/document-auth";
+import { ZDocumentEmailSettingsSchema } from "@signtusk/lib/types/document-email";
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -20,21 +23,24 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '@signtusk/lib/types/document-meta';
-import { ZEnvelopeAttachmentTypeSchema } from '@signtusk/lib/types/envelope-attachment';
-import { ZFieldMetaPrefillFieldsSchema } from '@signtusk/lib/types/field-meta';
-import { ZRecipientEmailSchema } from '@signtusk/lib/types/recipient';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@signtusk/lib/types/search-params';
+} from "@signtusk/lib/types/document-meta";
+import { ZEnvelopeAttachmentTypeSchema } from "@signtusk/lib/types/envelope-attachment";
+import { ZFieldMetaPrefillFieldsSchema } from "@signtusk/lib/types/field-meta";
+import { ZRecipientEmailSchema } from "@signtusk/lib/types/recipient";
+import {
+  ZFindResultResponse,
+  ZFindSearchParamsSchema,
+} from "@signtusk/lib/types/search-params";
 import {
   ZTemplateLiteSchema,
   ZTemplateManySchema,
   ZTemplateSchema,
-} from '@signtusk/lib/types/template';
-import { LegacyTemplateDirectLinkSchema } from '@signtusk/prisma/types/template-legacy-schema';
-import { ZDocumentExternalIdSchema } from '@signtusk/trpc/server/document-router/schema';
+} from "@signtusk/lib/types/template";
+import { LegacyTemplateDirectLinkSchema } from "@signtusk/prisma/types/template-legacy-schema";
+import { ZDocumentExternalIdSchema } from "@signtusk/trpc/server/document-router/schema";
 
-import { zodFormData } from '../../utils/zod-form-data';
-import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
+import { zodFormData } from "../../utils/zod-form-data";
+import { ZSignFieldWithTokenMutationSchema } from "../field-router/schema";
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
 export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
@@ -44,7 +50,7 @@ export const ZTemplateTitleSchema = z
   .trim()
   .min(1)
   .max(255)
-  .describe('The title of the document.');
+  .describe("The title of the document.");
 
 export const ZTemplatePublicTitleSchema = z
   .string()
@@ -52,7 +58,7 @@ export const ZTemplatePublicTitleSchema = z
   .min(1)
   .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH)
   .describe(
-    'The title of the template that will be displayed to the public. Only applicable for public templates.',
+    "The title of the template that will be displayed to the public. Only applicable for public templates."
   );
 
 export const ZTemplatePublicDescriptionSchema = z
@@ -61,7 +67,7 @@ export const ZTemplatePublicDescriptionSchema = z
   .min(1)
   .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
   .describe(
-    'The description of the template that will be displayed to the public. Only applicable for public templates.',
+    "The description of the template that will be displayed to the public. Only applicable for public templates."
   );
 
 export const ZTemplateMetaUpsertSchema = z.object({
@@ -103,20 +109,22 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   recipients: z
     .array(
       z.object({
-        id: z.number().describe('The ID of the recipient in the template.'),
+        id: z.number().describe("The ID of the recipient in the template."),
         email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
-      }),
+      })
     )
-    .describe('The information of the recipients to create the document with.'),
+    .describe("The information of the recipients to create the document with."),
   distributeDocument: z
     .boolean()
-    .describe('Whether to create the document as pending and distribute it to recipients.')
+    .describe(
+      "Whether to create the document as pending and distribute it to recipients."
+    )
     .optional(),
   customDocumentDataId: z
     .string()
     .describe(
-      '[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      "[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used."
     )
     .optional(),
   customDocumentData: z
@@ -124,24 +132,24 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       z.object({
         documentDataId: z.string(),
         envelopeItemId: z.string(),
-      }),
+      })
     )
     .describe(
-      'The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      "The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used."
     )
     .optional(),
 
   folderId: z
     .string()
     .describe(
-      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+      "The ID of the folder to create the document in. If not provided, the document will be created in the root folder."
     )
     .optional(),
 
   prefillFields: z
     .array(ZFieldMetaPrefillFieldsSchema)
     .describe(
-      'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
+      "The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values."
     )
     .optional(),
 
@@ -156,21 +164,23 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
-      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
-      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      typedSignatureEnabled:
+        ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled:
+        ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
     })
-    .describe('Override values from the template for the created document.')
+    .describe("Override values from the template for the created document.")
     .optional(),
 
   attachments: z
     .array(
       z.object({
-        label: z.string().min(1, 'Label is required'),
-        data: z.string().url('Must be a valid URL'),
-        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
-      }),
+        label: z.string().min(1, "Label is required"),
+        data: z.string().url("Must be a valid URL"),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default("link"),
+      })
     )
     .optional(),
 });
@@ -188,7 +198,7 @@ export const ZCreateTemplateDirectLinkRequestSchema = z.object({
   directRecipientId: z
     .number()
     .describe(
-      'The of the recipient in the current template to transform into the primary recipient when the template is used.',
+      "The of the recipient in the current template to transform into the primary recipient when the template is used."
     )
     .optional(),
 });
@@ -203,7 +213,8 @@ const GenericDirectLinkResponseSchema = LegacyTemplateDirectLinkSchema.pick({
   templateId: true,
 });
 
-export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
+export const ZCreateTemplateDirectLinkResponseSchema =
+  GenericDirectLinkResponseSchema;
 
 export const ZDeleteTemplateDirectLinkRequestSchema = z.object({
   templateId: z.number(),
@@ -214,7 +225,8 @@ export const ZToggleTemplateDirectLinkRequestSchema = z.object({
   enabled: z.boolean(),
 });
 
-export const ZToggleTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
+export const ZToggleTemplateDirectLinkResponseSchema =
+  GenericDirectLinkResponseSchema;
 
 export const ZDeleteTemplateMutationSchema = z.object({
   templateId: z.number(),
@@ -228,8 +240,14 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   folderId: z.string().optional(),
   externalId: z.string().nullish(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
-  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
-  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
+  globalAccessAuth: z
+    .array(ZDocumentAccessAuthTypesSchema)
+    .optional()
+    .default([]),
+  globalActionAuth: z
+    .array(ZDocumentActionAuthTypesSchema)
+    .optional()
+    .default([]),
   publicTitle: ZTemplatePublicTitleSchema.optional(),
   publicDescription: ZTemplatePublicDescriptionSchema.optional(),
   type: z.nativeEnum(TemplateType).optional(),
@@ -237,10 +255,10 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   attachments: z
     .array(
       z.object({
-        label: z.string().min(1, 'Label is required'),
-        data: z.string().url('Must be a valid URL'),
-        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
-      }),
+        label: z.string().min(1, "Label is required"),
+        data: z.string().url("Must be a valid URL"),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default("link"),
+      })
     )
     .optional(),
 });
@@ -272,8 +290,14 @@ export const ZUpdateTemplateRequestSchema = z.object({
       title: ZTemplateTitleSchema.optional(),
       externalId: z.string().nullish(),
       visibility: z.nativeEnum(DocumentVisibility).optional(),
-      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
-      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
+      globalAccessAuth: z
+        .array(ZDocumentAccessAuthTypesSchema)
+        .optional()
+        .default([]),
+      globalActionAuth: z
+        .array(ZDocumentActionAuthTypesSchema)
+        .optional()
+        .default([]),
       publicTitle: ZTemplatePublicTitleSchema.optional(),
       publicDescription: ZTemplatePublicDescriptionSchema.optional(),
       type: z.nativeEnum(TemplateType).optional(),
@@ -287,16 +311,24 @@ export const ZUpdateTemplateRequestSchema = z.object({
 export const ZUpdateTemplateResponseSchema = ZTemplateLiteSchema;
 
 export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
-  type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
-  folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
+  type: z
+    .nativeEnum(TemplateType)
+    .describe("Filter templates by type.")
+    .optional(),
+  folderId: z
+    .string()
+    .describe("The ID of the folder to filter templates by.")
+    .optional(),
 });
 
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
   data: ZTemplateManySchema.array(),
 });
 
-export type TFindTemplatesResponse = z.infer<typeof ZFindTemplatesResponseSchema>;
-export type FindTemplateRow = TFindTemplatesResponse['data'][number];
+export type TFindTemplatesResponse = z.infer<
+  typeof ZFindTemplatesResponseSchema
+>;
+export type FindTemplateRow = TFindTemplatesResponse["data"][number];
 
 export const ZGetTemplateByIdRequestSchema = z.object({
   templateId: z.number(),
@@ -311,8 +343,18 @@ export const ZBulkSendTemplateMutationSchema = z.object({
   sendImmediately: z.boolean(),
 });
 
-export type TCreateTemplatePayloadSchema = z.input<typeof ZCreateTemplatePayloadSchema>;
-export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
-export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
-export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
-export type TBulkSendTemplateMutationSchema = z.infer<typeof ZBulkSendTemplateMutationSchema>;
+export type TCreateTemplatePayloadSchema = z.input<
+  typeof ZCreateTemplatePayloadSchema
+>;
+export type TCreateTemplateMutationSchema = z.infer<
+  typeof ZCreateTemplateMutationSchema
+>;
+export type TDuplicateTemplateMutationSchema = z.infer<
+  typeof ZDuplicateTemplateMutationSchema
+>;
+export type TDeleteTemplateMutationSchema = z.infer<
+  typeof ZDeleteTemplateMutationSchema
+>;
+export type TBulkSendTemplateMutationSchema = z.infer<
+  typeof ZBulkSendTemplateMutationSchema
+>;

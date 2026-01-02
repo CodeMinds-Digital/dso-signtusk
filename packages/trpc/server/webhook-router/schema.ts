@@ -1,4 +1,4 @@
-import { WebhookTriggerEvents } from '@prisma/client';
+import { WebhookTriggerEvents } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 export const ZCreateWebhookRequestSchema = z.object({

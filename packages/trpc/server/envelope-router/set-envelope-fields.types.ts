@@ -1,4 +1,4 @@
-import { EnvelopeType, FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import {

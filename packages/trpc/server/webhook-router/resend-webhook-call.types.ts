@@ -1,4 +1,4 @@
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@signtusk/lib/constants/prisma-enums';
 import { z } from 'zod';
 
 import WebhookCallSchema from '@signtusk/prisma/generated/zod/modelSchema/WebhookCallSchema';
