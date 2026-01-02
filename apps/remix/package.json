@@ -74,14 +74,16 @@
     "@signtusk/tailwind-config": "*",
     "@signtusk/trpc": "*",
     "@signtusk/ui": "*",
-    "@react-router/dev": "^7.9.6"
+    "@react-router/dev": "^7.9.6",
+    "@lingui/vite-plugin": "^5.6.0",
+    "cross-env": "^10.1.0",
+    "typescript": "5.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
     "@lingui/babel-plugin-lingui-macro": "^5.6.0",
-    "@lingui/vite-plugin": "^5.6.0",
     "@react-router/remix-routes-option-adapter": "^7.9.6",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
@@ -97,12 +99,10 @@
     "@types/react": "18.3.27",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "cross-env": "^10.1.0",
     "esbuild": "^0.27.0",
     "remix-flat-routes": "^0.8.5",
     "rollup": "^4.53.3",
     "tsx": "^4.20.6",
-    "typescript": "5.6.2",
     "vite": "^7.2.4",
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
