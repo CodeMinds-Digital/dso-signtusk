@@ -256,26 +256,254 @@ export const EmailDomainStatus = {
   ACTIVE: "ACTIVE",
 } as const;
 
-// Re-export interface types from @prisma/client for backwards compatibility
-// These are the actual Prisma-generated types, not simplified browser-safe versions
-export type {
-  ApiToken,
-  DocumentData,
-  DocumentMeta,
-  Envelope,
-  EnvelopeItem,
-  Field,
-  Passkey,
-  Recipient,
-  Signature,
-  Subscription,
-  SubscriptionClaim,
-  Team,
-  TeamEmail,
-  TeamGlobalSettings,
-  TeamGroup,
-  TeamProfile,
-  TemplateDirectLink,
-  User,
-  Webhook,
-} from "@prisma/client";
+// ============================================================================
+// Browser-safe interface types
+// These are simplified versions of Prisma types for use in client-side code.
+// They don't include all Prisma-specific features but provide the basic shape.
+// For server-side code that needs full Prisma types, import from @prisma/client.
+// ============================================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyDecimal = any; // Represents Prisma Decimal - compatible with number/string
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyJson = any; // Represents Prisma Json fields
+
+export interface Field {
+  id: number;
+  secondaryId: string;
+  envelopeId: string;
+  envelopeItemId: string;
+  recipientId: number;
+  type: FieldType;
+  page: number;
+  positionX: AnyDecimal;
+  positionY: AnyDecimal;
+  width: AnyDecimal;
+  height: AnyDecimal;
+  customText: string;
+  inserted: boolean;
+  fieldMeta: AnyJson;
+}
+
+export interface Recipient {
+  id: number;
+  envelopeId: string;
+  email: string;
+  name: string;
+  token: string;
+  documentDeletedAt: Date | null;
+  expired: Date | null;
+  signedAt: Date | null;
+  authOptions: AnyJson;
+  signingOrder: number | null;
+  rejectionReason: string | null;
+  role: RecipientRole;
+  readStatus: ReadStatus;
+  signingStatus: SigningStatus;
+  sendStatus: SendStatus;
+}
+
+export interface Signature {
+  id: number;
+  created: Date;
+  recipientId: number;
+  fieldId: number;
+  signatureImageAsBase64: string | null;
+  typedSignature: string | null;
+}
+
+export interface Envelope {
+  id: string;
+  secondaryId: string;
+  externalId: string | null;
+  type: EnvelopeType;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt: Date | null;
+  deletedAt: Date | null;
+  title: string;
+  status: DocumentStatus;
+  source: DocumentSource;
+  qrToken: string | null;
+  internalVersion: number;
+  useLegacyFieldInsertion: boolean;
+  authOptions: AnyJson;
+  formValues: AnyJson;
+  visibility: DocumentVisibility;
+  templateType: TemplateType;
+  publicTitle: string;
+  publicDescription: string;
+  templateId: number | null;
+  userId: number;
+  teamId: number;
+  folderId: string | null;
+  documentMetaId: string;
+}
+
+export interface EnvelopeItem {
+  id: string;
+  title: string;
+  order: number;
+  documentDataId: string;
+  envelopeId: string;
+}
+
+export interface DocumentData {
+  id: string;
+  type: DocumentDataType;
+  data: string;
+  initialData: string;
+}
+
+export interface DocumentMeta {
+  id: string;
+  subject: string | null;
+  message: string | null;
+  timezone: string | null;
+  dateFormat: string | null;
+  redirectUrl: string | null;
+  signingOrder: DocumentSigningOrder;
+  allowDictateNextSigner: boolean;
+  typedSignatureEnabled: boolean;
+  uploadSignatureEnabled: boolean;
+  drawSignatureEnabled: boolean;
+  language: string;
+  distributionMethod: DocumentDistributionMethod;
+  emailSettings: AnyJson;
+  emailReplyTo: string | null;
+  emailId: string | null;
+}
+
+export interface Webhook {
+  id: string;
+  webhookUrl: string;
+  eventTriggers: WebhookTriggerEvents[];
+  secret: string | null;
+  enabled: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  teamId: number;
+}
+
+export interface ApiToken {
+  id: number;
+  name: string;
+  token: string;
+  algorithm: "SHA512";
+  expires: Date | null;
+  createdAt: Date;
+  userId: number | null;
+  teamId: number;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  url: string;
+  createdAt: Date;
+  avatarImageId: string | null;
+  organisationId: string;
+  teamGlobalSettingsId: string;
+}
+
+export interface TeamEmail {
+  teamId: number;
+  createdAt: Date;
+  name: string;
+  email: string;
+}
+
+export interface TeamGroup {
+  id: string;
+  organisationGroupId: string;
+  teamRole: TeamMemberRole;
+  teamId: number;
+}
+
+export interface TeamProfile {
+  id: string;
+  enabled: boolean;
+  teamId: number;
+  bio: string | null;
+}
+
+export interface TeamGlobalSettings {
+  id: string;
+  documentVisibility: DocumentVisibility | null;
+  documentLanguage: string | null;
+  documentTimezone: string | null;
+  documentDateFormat: string | null;
+  includeSenderDetails: boolean | null;
+  includeSigningCertificate: boolean | null;
+  includeAuditLog: boolean | null;
+  typedSignatureEnabled: boolean | null;
+  uploadSignatureEnabled: boolean | null;
+  drawSignatureEnabled: boolean | null;
+  emailId: string | null;
+  emailReplyTo: string | null;
+  emailDocumentSettings: AnyJson;
+  brandingEnabled: boolean | null;
+  brandingLogo: string | null;
+  brandingUrl: string | null;
+  brandingCompanyDetails: string | null;
+  aiFeaturesEnabled: boolean | null;
+}
+
+export interface TemplateDirectLink {
+  id: string;
+  envelopeId: string;
+  token: string;
+  createdAt: Date;
+  enabled: boolean;
+  directTemplateRecipientId: number;
+}
+
+export interface User {
+  id: number;
+  name: string | null;
+  email: string;
+  emailVerified: Date | null;
+  signature: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  lastSignedIn: Date;
+  roles: Role[];
+  avatarImageId: string | null;
+  disabled: boolean;
+  twoFactorEnabled: boolean;
+}
+
+export interface Passkey {
+  id: string;
+  userId: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  lastUsedAt: Date | null;
+}
+
+export interface Subscription {
+  id: number;
+  status: SubscriptionStatus;
+  planId: string;
+  priceId: string;
+  periodEnd: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  cancelAtPeriodEnd: boolean;
+  customerId: string;
+  organisationId: string;
+}
+
+export interface SubscriptionClaim {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  locked: boolean;
+  teamCount: number;
+  memberCount: number;
+  envelopeItemCount: number;
+  flags: AnyJson;
+}
