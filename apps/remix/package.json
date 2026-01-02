@@ -76,6 +76,8 @@
     "@signtusk/ui": "*",
     "@react-router/dev": "^7.9.6",
     "@lingui/vite-plugin": "^5.6.0",
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vite-tsconfig-paths": "^5.1.4",
     "cross-env": "^10.1.0",
     "typescript": "5.6.2"
   },
@@ -103,9 +105,7 @@
     "remix-flat-routes": "^0.8.5",
     "rollup": "^4.53.3",
     "tsx": "^4.20.6",
-    "vite": "^7.2.4",
-    "vite-plugin-babel-macros": "^1.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^7.2.4"
   },
   "version": "2.2.6",
   "license": "Private - Part of Signtusk Platform"
