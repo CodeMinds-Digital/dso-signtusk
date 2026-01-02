@@ -2,7 +2,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Kysely, PostgresDialect, sql } from "kysely";
 import { Pool } from "pg";
-import type { DB } from "./generated/types";
+import type { DB } from "./generated/types.js";
 
 // Simple database URL helper (inline to avoid import issues)
 const getDatabaseUrl = () => {
@@ -83,4 +83,4 @@ export { sql };
 // Export types for compatibility
 export * from "@prisma/client";
 export type { PrismaClient } from "@prisma/client";
-export type { DB } from "./generated/types";
+export type { DB } from "./generated/types.js";

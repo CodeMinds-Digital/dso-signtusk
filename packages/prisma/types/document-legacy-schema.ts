@@ -2,14 +2,14 @@
  * Legacy Document schema to confirm backwards API compatibility since
  * we migrated Documents to Envelopes.
  */
-import { DocumentSource } from '@prisma/client';
-import { z } from 'zod';
+import { DocumentSource } from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { ZDocumentAuthOptionsSchema } from '@signtusk/lib/types/document-auth';
-import { ZDocumentFormValuesSchema } from '@signtusk/lib/types/document-form-values';
+import { ZDocumentAuthOptionsSchema } from "@signtusk/lib/types/document-auth";
+import { ZDocumentFormValuesSchema } from "@signtusk/lib/types/document-form-values";
 
-import DocumentStatusSchema from '../generated/zod/inputTypeSchemas/DocumentStatusSchema';
-import DocumentVisibilitySchema from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
+import DocumentStatusSchema from "../generated/zod/inputTypeSchemas/DocumentStatusSchema";
+import DocumentVisibilitySchema from "../generated/zod/inputTypeSchemas/DocumentVisibilitySchema";
 
 /////////////////////////////////////////
 // DOCUMENT SCHEMA
@@ -18,17 +18,23 @@ import DocumentVisibilitySchema from '../generated/zod/inputTypeSchemas/Document
 export const LegacyDocumentSchema = z.object({
   visibility: DocumentVisibilitySchema,
   status: DocumentStatusSchema,
-  source: z.nativeEnum(DocumentSource),
+  source: z.enum([
+    DocumentSource.DOCUMENT,
+    DocumentSource.TEMPLATE,
+    DocumentSource.TEMPLATE_DIRECT_LINK,
+  ]),
   id: z.number(),
   qrToken: z
     .string()
-    .describe('The token for viewing the document using the QR code on the certificate.')
+    .describe(
+      "The token for viewing the document using the QR code on the certificate."
+    )
     .nullable(),
   externalId: z
     .string()
-    .describe('A custom external ID you can use to identify the document.')
+    .describe("A custom external ID you can use to identify the document.")
     .nullable(),
-  userId: z.number().describe('The ID of the user that created this document.'),
+  userId: z.number().describe("The ID of the user that created this document."),
   teamId: z.number(),
   /**
    * [DocumentAuthOptions]

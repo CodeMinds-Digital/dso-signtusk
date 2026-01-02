@@ -2,15 +2,18 @@
  * Legacy Template schema to confirm backwards API compatibility since
  * we removed the "Template" prisma schema model.
  */
-import { TemplateType } from '@prisma/client';
-import { z } from 'zod';
+import { TemplateType } from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { ZDocumentAuthOptionsSchema } from '@signtusk/lib/types/document-auth';
+import { ZDocumentAuthOptionsSchema } from "@signtusk/lib/types/document-auth";
 
-import { DocumentVisibilitySchema } from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
-import TemplateDirectLinkSchema from '../generated/zod/modelSchema/TemplateDirectLinkSchema';
+import { DocumentVisibilitySchema } from "../generated/zod/inputTypeSchemas/DocumentVisibilitySchema";
+import TemplateDirectLinkSchema from "../generated/zod/modelSchema/TemplateDirectLinkSchema";
 
-export const TemplateTypeSchema = z.nativeEnum(TemplateType);
+export const TemplateTypeSchema = z.enum([
+  TemplateType.PUBLIC,
+  TemplateType.PRIVATE,
+]);
 
 export const TemplateSchema = z.object({
   type: TemplateTypeSchema,

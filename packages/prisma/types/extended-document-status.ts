@@ -1,9 +1,9 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from "@signtusk/lib/constants/prisma-enums";
 
 export const ExtendedDocumentStatus = {
   ...DocumentStatus,
-  INBOX: 'INBOX',
-  ALL: 'ALL',
+  INBOX: "INBOX",
+  ALL: "ALL",
 } as const;
 
 export type ExtendedDocumentStatus =

@@ -1,42 +1,47 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { ZDocumentEmailSettingsSchema } from '@signtusk/lib/types/document-email';
+import { DocumentDistributionMethod } from "@signtusk/lib/constants/prisma-enums";
+import { ZDocumentEmailSettingsSchema } from "@signtusk/lib/types/document-email";
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaLanguageSchema,
-} from '@signtusk/lib/types/document-meta';
-import { ZRecipientEmailSchema } from '@signtusk/lib/types/recipient';
-import { DocumentDistributionMethod } from '@signtusk/prisma/generated/types';
+} from "@signtusk/lib/types/document-meta";
+import { ZRecipientEmailSchema } from "@signtusk/lib/types/recipient";
 
 // Define the schema for configuration
-export type TConfigureEmbedFormSchema = z.infer<typeof ZConfigureEmbedFormSchema>;
+export type TConfigureEmbedFormSchema = z.infer<
+  typeof ZConfigureEmbedFormSchema
+>;
 
 export const ZConfigureEmbedFormSchema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
+  title: z.string().min(1, { message: "Title is required" }),
   signers: z
     .array(
       z.object({
         nativeId: z.number().optional(),
         formId: z.string(),
         name: z.string(),
-        email: z.string().email('Invalid email address'),
-        role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
+        email: z.string().email("Invalid email address"),
+        role: z.enum(["SIGNER", "CC", "APPROVER", "VIEWER", "ASSISTANT"]),
         signingOrder: z.number().optional(),
         disabled: z.boolean().optional(),
-      }),
+      })
     )
-    .min(1, { message: 'At least one signer is required' }),
+    .min(1, { message: "At least one signer is required" }),
   meta: z.object({
     subject: z.string().optional(),
     message: z.string().optional(),
-    distributionMethod: z.nativeEnum(DocumentDistributionMethod),
+    distributionMethod: z.enum([
+      DocumentDistributionMethod.EMAIL,
+      DocumentDistributionMethod.NONE,
+    ]),
     emailSettings: ZDocumentEmailSettingsSchema,
     dateFormat: ZDocumentMetaDateFormatSchema.optional(),
-    timezone: z.string().min(1, 'Timezone is required'),
+    timezone: z.string().min(1, "Timezone is required"),
     redirectUrl: z.string().optional(),
     language: ZDocumentMetaLanguageSchema.optional(),
     signatureTypes: z.array(z.string()).default([]),
-    signingOrder: z.enum(['SEQUENTIAL', 'PARALLEL']),
+    signingOrder: z.enum(["SEQUENTIAL", "PARALLEL"]),
     allowDictateNextSigner: z.boolean().default(false).optional(),
     externalId: z.string().optional(),
   }),
@@ -50,16 +55,17 @@ export const ZConfigureEmbedFormSchema = z.object({
     .optional(),
 });
 
-export const ZConfigureTemplateEmbedFormSchema = ZConfigureEmbedFormSchema.extend({
-  signers: z.array(
-    z.object({
-      nativeId: z.number().optional(),
-      formId: z.string(),
-      name: z.string(),
-      email: ZRecipientEmailSchema,
-      role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
-      signingOrder: z.number().optional(),
-      disabled: z.boolean().optional(),
-    }),
-  ),
-});
+export const ZConfigureTemplateEmbedFormSchema =
+  ZConfigureEmbedFormSchema.extend({
+    signers: z.array(
+      z.object({
+        nativeId: z.number().optional(),
+        formId: z.string(),
+        name: z.string(),
+        email: ZRecipientEmailSchema,
+        role: z.enum(["SIGNER", "CC", "APPROVER", "VIEWER", "ASSISTANT"]),
+        signingOrder: z.number().optional(),
+        disabled: z.boolean().optional(),
+      })
+    ),
+  });

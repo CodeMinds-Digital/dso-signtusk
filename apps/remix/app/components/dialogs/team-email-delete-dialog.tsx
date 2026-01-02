@@ -3,7 +3,6 @@ import { useState } from "react";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { Prisma } from "@signtusk/prisma";
 import { useRevalidator } from "react-router";
 
 import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
@@ -23,21 +22,25 @@ import {
 } from "@signtusk/ui/primitives/dialog";
 import { useToast } from "@signtusk/ui/primitives/use-toast";
 
+// Browser-safe type for team with email info
+type TeamWithEmail = {
+  id: number;
+  avatarImageId: string | null;
+  teamEmail: {
+    name: string;
+    email: string;
+  } | null;
+  emailVerification: {
+    expiresAt: Date;
+    name: string;
+    email: string;
+  } | null;
+};
+
 export type TeamEmailDeleteDialogProps = {
   trigger?: React.ReactNode;
   teamName: string;
-  team: Prisma.TeamGetPayload<{
-    include: {
-      teamEmail: true;
-      emailVerification: {
-        select: {
-          expiresAt: true;
-          name: true;
-          email: true;
-        };
-      };
-    };
-  }>;
+  team: TeamWithEmail;
 };
 
 export const TeamEmailDeleteDialog = ({

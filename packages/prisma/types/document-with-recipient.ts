@@ -1,4 +1,8 @@
-import type { DocumentData, Envelope, Recipient } from '@prisma/client';
+import type {
+  DocumentData,
+  Envelope,
+  Recipient,
+} from "@signtusk/lib/constants/prisma-enums";
 
 export type EnvelopeWithRecipients = Envelope & {
   recipients: Recipient[];
