@@ -1,13 +1,13 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from "@signtusk/prisma/enums";
 
-import { validateCheckboxLength } from '@signtusk/lib/advanced-fields-validation/validate-checkbox';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { TFieldCheckbox } from '@signtusk/lib/types/field';
-import { parseCheckboxCustomText } from '@signtusk/lib/utils/fields';
-import type { TSignEnvelopeFieldValue } from '@signtusk/trpc/server/envelope-router/sign-envelope-field.types';
-import { checkboxValidationSigns } from '@signtusk/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { validateCheckboxLength } from "@signtusk/lib/advanced-fields-validation/validate-checkbox";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { TFieldCheckbox } from "@signtusk/lib/types/field";
+import { parseCheckboxCustomText } from "@signtusk/lib/utils/fields";
+import type { TSignEnvelopeFieldValue } from "@signtusk/trpc/server/envelope-router/sign-envelope-field.types";
+import { checkboxValidationSigns } from "@signtusk/ui/primitives/document-flow/field-items-advanced-settings/constants";
 
-import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
+import { SignFieldCheckboxDialog } from "~/components/dialogs/sign-field-checkbox-dialog";
 
 type HandleCheckboxFieldClickOptions = {
   field: TFieldCheckbox;
@@ -15,20 +15,25 @@ type HandleCheckboxFieldClickOptions = {
 };
 
 export const handleCheckboxFieldClick = async (
-  options: HandleCheckboxFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.CHECKBOX }> | null> => {
+  options: HandleCheckboxFieldClickOptions
+): Promise<Extract<
+  TSignEnvelopeFieldValue,
+  { type: typeof FieldType.CHECKBOX }
+> | null> => {
   const { field, clickedCheckboxIndex } = options;
 
   if (field.type !== FieldType.CHECKBOX) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Invalid field type',
+      message: "Invalid field type",
     });
   }
 
   const { values = [], validationRule, validationLength } = field.fieldMeta;
   const { customText } = field;
 
-  const currentCheckedIndices: number[] = customText ? parseCheckboxCustomText(customText) : [];
+  const currentCheckedIndices: number[] = customText
+    ? parseCheckboxCustomText(customText)
+    : [];
 
   const newValues = values.map((_value, i) => {
     let isChecked = currentCheckedIndices.includes(i);
@@ -43,7 +48,9 @@ export const handleCheckboxFieldClick = async (
     };
   });
 
-  let checkedValues: number[] | null = newValues.filter((v) => v.isChecked).map((v) => v.index);
+  let checkedValues: number[] | null = newValues
+    .filter((v) => v.isChecked)
+    .map((v) => v.index);
 
   if (checkedValues.length === 0) {
     return {
@@ -54,19 +61,20 @@ export const handleCheckboxFieldClick = async (
 
   if (validationRule && validationLength) {
     const checkboxValidationRule = checkboxValidationSigns.find(
-      (sign) => sign.label === validationRule,
+      (sign) => sign.label === validationRule
     );
 
     if (!checkboxValidationRule) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Invalid checkbox validation rule',
+        message: "Invalid checkbox validation rule",
       });
     }
 
     // Custom logic to make it flow better.
     // If "at most" OR "exactly" 1 value then just return the new selected value if exists.
     if (
-      (checkboxValidationRule.value === '=' || checkboxValidationRule.value === '<=') &&
+      (checkboxValidationRule.value === "=" ||
+        checkboxValidationRule.value === "<=") &&
       validationLength === 1
     ) {
       return {
@@ -78,7 +86,7 @@ export const handleCheckboxFieldClick = async (
     const isValid = validateCheckboxLength(
       checkedValues.length,
       checkboxValidationRule.value,
-      validationLength,
+      validationLength
     );
 
     // Only render validation dialog if validation is invalid.

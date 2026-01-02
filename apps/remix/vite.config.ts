@@ -76,10 +76,11 @@ export default defineConfig({
       "../../packages/ui/**/*",
       "../../packages/lib/**/*",
     ],
-    include: ["prop-types", "file-selector", "attr-accept", "@prisma/client"],
+    include: ["prop-types", "file-selector", "attr-accept"],
     exclude: [
       "node_modules",
       "@napi-rs/canvas",
+      "@prisma/client",
       "@signtusk/pdf-sign",
       "@signtusk/prisma",
       "prisma",
@@ -109,7 +110,9 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "@napi-rs/canvas",
+        "@prisma/client",
         "@signtusk/pdf-sign",
+        "@signtusk/prisma",
         "@aws-sdk/cloudfront-signer",
         "nodemailer",
         /playwright/,

@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { Field, Recipient } from '@prisma/client';
-import { FieldType } from '@prisma/client';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Field, Recipient } from "@signtusk/prisma/enums";
+import { FieldType } from "@signtusk/prisma/enums";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { ZFieldMetaSchema } from '@signtusk/lib/types/field-meta';
-import { nanoid } from '@signtusk/lib/universal/id';
+import { ZFieldMetaSchema } from "@signtusk/lib/types/field-meta";
+import { nanoid } from "@signtusk/lib/universal/id";
 
-import type { TEnvelope } from '../../types/envelope';
+import type { TEnvelope } from "../../types/envelope";
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -49,12 +49,15 @@ type UseEditorFieldsResponse = {
   setSelectedField: (formId: string | null) => void;
 
   // Field operations
-  addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
+  addField: (field: Omit<TLocalField, "formId">) => TLocalField;
   setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
-  duplicateFieldToAllPages: (field: TLocalField, recipientId?: number) => TLocalField[];
+  duplicateFieldToAllPages: (
+    field: TLocalField,
+    recipientId?: number
+  ) => TLocalField[];
 
   // Field utilities
   getFieldByFormId: (formId: string) => TLocalField | undefined;
@@ -71,8 +74,12 @@ export const useEditorFields = ({
   envelope,
   handleFieldsUpdate,
 }: EditorFieldsProps): UseEditorFieldsResponse => {
-  const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
-  const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
+  const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(
+    null
+  );
+  const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(
+    null
+  );
 
   const generateDefaultValues = (fields?: Field[]) => {
     const formFields = (fields || envelope.fields).map(
@@ -87,8 +94,10 @@ export const useEditorFields = ({
         width: Number(field.width),
         height: Number(field.height),
         recipientId: field.recipientId,
-        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
-      }),
+        fieldMeta: field.fieldMeta
+          ? ZFieldMetaSchema.parse(field.fieldMeta)
+          : undefined,
+      })
     );
 
     return {
@@ -108,8 +117,8 @@ export const useEditorFields = ({
     fields: localFields,
   } = useFieldArray({
     control: form.control,
-    name: 'fields',
-    keyName: 'react-hook-form-id',
+    name: "fields",
+    keyName: "react-hook-form-id",
   });
 
   const triggerFieldsUpdate = () => {
@@ -124,7 +133,7 @@ export const useEditorFields = ({
 
     const foundField = localFields.find((field) => field.formId === formId);
     const recipient = envelope.recipients.find(
-      (recipient) => recipient.id === foundField?.recipientId,
+      (recipient) => recipient.id === foundField?.recipientId
     );
 
     if (recipient) {
@@ -140,7 +149,7 @@ export const useEditorFields = ({
   };
 
   const addField = useCallback(
-    (fieldData: Omit<TLocalField, 'formId'>): TLocalField => {
+    (fieldData: Omit<TLocalField, "formId">): TLocalField => {
       const field: TLocalField = {
         ...fieldData,
         formId: nanoid(12),
@@ -152,13 +161,15 @@ export const useEditorFields = ({
       setSelectedField(field.formId, true);
       return field;
     },
-    [append, triggerFieldsUpdate, setSelectedField],
+    [append, triggerFieldsUpdate, setSelectedField]
   );
 
   const removeFieldsByFormId = useCallback(
     (formIds: string[]) => {
       const indexes = formIds
-        .map((formId) => localFields.findIndex((field) => field.formId === formId))
+        .map((formId) =>
+          localFields.findIndex((field) => field.formId === formId)
+        )
         .filter((index) => index !== -1);
 
       if (indexes.length > 0) {
@@ -166,7 +177,7 @@ export const useEditorFields = ({
         triggerFieldsUpdate();
       }
     },
-    [localFields, remove, triggerFieldsUpdate],
+    [localFields, remove, triggerFieldsUpdate]
   );
 
   const setFieldId = (formId: string, id: number) => {
@@ -199,7 +210,7 @@ export const useEditorFields = ({
         triggerFieldsUpdate();
       }
     },
-    [localFields, update, triggerFieldsUpdate],
+    [localFields, update, triggerFieldsUpdate]
   );
 
   const duplicateField = useCallback(
@@ -217,12 +228,12 @@ export const useEditorFields = ({
       triggerFieldsUpdate();
       return newField;
     },
-    [append, triggerFieldsUpdate],
+    [append, triggerFieldsUpdate]
   );
 
   const duplicateFieldToAllPages = useCallback(
     (field: TLocalField): TLocalField[] => {
-      const pages = Array.from(document.querySelectorAll('[data-page-number]'));
+      const pages = Array.from(document.querySelectorAll("[data-page-number]"));
       const newFields: TLocalField[] = [];
 
       pages.forEach((_, index) => {
@@ -246,25 +257,31 @@ export const useEditorFields = ({
       triggerFieldsUpdate();
       return newFields;
     },
-    [append, triggerFieldsUpdate],
+    [append, triggerFieldsUpdate]
   );
 
   const getFieldByFormId = useCallback(
     (formId: string): TLocalField | undefined => {
-      return localFields.find((field) => field.formId === formId) as TLocalField | undefined;
+      return localFields.find((field) => field.formId === formId) as
+        | TLocalField
+        | undefined;
     },
-    [localFields],
+    [localFields]
   );
 
   const getFieldsByRecipient = useCallback(
     (recipientId: number): TLocalField[] => {
       return localFields.filter((field) => field.recipientId === recipientId);
     },
-    [localFields],
+    [localFields]
   );
 
   const selectedRecipient = useMemo(() => {
-    return envelope.recipients.find((recipient) => recipient.id === selectedRecipientId) || null;
+    return (
+      envelope.recipients.find(
+        (recipient) => recipient.id === selectedRecipientId
+      ) || null
+    );
   }, [selectedRecipientId, envelope.recipients]);
 
   const selectedField = useMemo(() => {
@@ -275,12 +292,16 @@ export const useEditorFields = ({
    * Keep the selected field form ID in sync with the local fields.
    */
   useEffect(() => {
-    const foundField = localFields.find((field) => field.formId === selectedFieldFormId);
+    const foundField = localFields.find(
+      (field) => field.formId === selectedFieldFormId
+    );
     setSelectedFieldFormId(foundField?.formId ?? null);
   }, [selectedFieldFormId, localFields]);
 
   const setSelectedRecipient = (recipientId: number | null) => {
-    const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
+    const foundRecipient = envelope.recipients.find(
+      (recipient) => recipient.id === recipientId
+    );
 
     setSelectedRecipientId(foundRecipient?.id ?? null);
   };
@@ -318,7 +339,7 @@ export const useEditorFields = ({
 };
 
 const restrictFieldPosValues = (
-  field: Pick<TLocalField, 'positionX' | 'positionY' | 'width' | 'height'>,
+  field: Pick<TLocalField, "positionX" | "positionY" | "width" | "height">
 ) => {
   return {
     positionX: Math.max(0, Math.min(100, field.positionX)),

@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-import type { Field } from '@prisma/client';
+import type { Field } from "@signtusk/prisma/enums";
 
-import { getBoundingClientRect } from '@signtusk/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@signtusk/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from "@signtusk/lib/client-only/get-bounding-client-rect";
+import { PDF_VIEWER_PAGE_SELECTOR } from "@signtusk/lib/constants/pdf-viewer";
 
 export const useFieldPageCoords = (
-  field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height' | 'page'>,
+  field: Pick<Field, "positionX" | "positionY" | "width" | "height" | "page">
 ) => {
   const [coords, setCoords] = useState({
     x: 0,
@@ -17,7 +17,7 @@ export const useFieldPageCoords = (
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
+      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`
     );
 
     if (!$page) {
@@ -50,16 +50,16 @@ export const useFieldPageCoords = (
       calculateCoords();
     };
 
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener("resize", onResize);
     };
   }, [calculateCoords]);
 
   useEffect(() => {
     const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
+      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`
     );
 
     if (!$page) {

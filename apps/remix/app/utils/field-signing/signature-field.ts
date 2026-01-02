@@ -1,10 +1,10 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from "@signtusk/prisma/enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { TFieldSignature } from '@signtusk/lib/types/field';
-import type { TSignEnvelopeFieldValue } from '@signtusk/trpc/server/envelope-router/sign-envelope-field.types';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { TFieldSignature } from "@signtusk/lib/types/field";
+import type { TSignEnvelopeFieldValue } from "@signtusk/trpc/server/envelope-router/sign-envelope-field.types";
 
-import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
+import { SignFieldSignatureDialog } from "~/components/dialogs/sign-field-signature-dialog";
 
 type HandleSignatureFieldClickOptions = {
   field: TFieldSignature;
@@ -15,14 +15,22 @@ type HandleSignatureFieldClickOptions = {
 };
 
 export const handleSignatureFieldClick = async (
-  options: HandleSignatureFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.SIGNATURE }> | null> => {
-  const { field, signature, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled } =
-    options;
+  options: HandleSignatureFieldClickOptions
+): Promise<Extract<
+  TSignEnvelopeFieldValue,
+  { type: typeof FieldType.SIGNATURE }
+> | null> => {
+  const {
+    field,
+    signature,
+    typedSignatureEnabled,
+    uploadSignatureEnabled,
+    drawSignatureEnabled,
+  } = options;
 
   if (field.type !== FieldType.SIGNATURE) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Invalid field type',
+      message: "Invalid field type",
     });
   }
 

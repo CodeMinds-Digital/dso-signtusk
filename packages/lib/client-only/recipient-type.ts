@@ -1,25 +1,28 @@
-import type { Recipient } from '@prisma/client';
+import type { Recipient } from "@signtusk/prisma/enums";
 import {
   DocumentDistributionMethod,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@prisma/client';
+} from "@signtusk/prisma/enums";
 
 export enum RecipientStatusType {
-  COMPLETED = 'completed',
-  OPENED = 'opened',
-  WAITING = 'waiting',
-  UNSIGNED = 'unsigned',
-  REJECTED = 'rejected',
+  COMPLETED = "completed",
+  OPENED = "opened",
+  WAITING = "waiting",
+  UNSIGNED = "unsigned",
+  REJECTED = "rejected",
 }
 
 export const getRecipientType = (
   recipient: Recipient,
-  distributionMethod: DocumentDistributionMethod = DocumentDistributionMethod.EMAIL,
+  distributionMethod: DocumentDistributionMethod = DocumentDistributionMethod.EMAIL
 ) => {
-  if (recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED) {
+  if (
+    recipient.role === RecipientRole.CC ||
+    recipient.signingStatus === SigningStatus.SIGNED
+  ) {
     return RecipientStatusType.COMPLETED;
   }
 

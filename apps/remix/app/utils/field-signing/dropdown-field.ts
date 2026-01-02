@@ -1,10 +1,10 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from "@signtusk/prisma/enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { TFieldDropdown } from '@signtusk/lib/types/field';
-import type { TSignEnvelopeFieldValue } from '@signtusk/trpc/server/envelope-router/sign-envelope-field.types';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { TFieldDropdown } from "@signtusk/lib/types/field";
+import type { TSignEnvelopeFieldValue } from "@signtusk/trpc/server/envelope-router/sign-envelope-field.types";
 
-import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
+import { SignFieldDropdownDialog } from "~/components/dialogs/sign-field-dropdown-dialog";
 
 type HandleDropdownFieldClickOptions = {
   field: TFieldDropdown;
@@ -12,13 +12,16 @@ type HandleDropdownFieldClickOptions = {
 };
 
 export const handleDropdownFieldClick = async (
-  options: HandleDropdownFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.DROPDOWN }> | null> => {
+  options: HandleDropdownFieldClickOptions
+): Promise<Extract<
+  TSignEnvelopeFieldValue,
+  { type: typeof FieldType.DROPDOWN }
+> | null> => {
   const { field, text } = options;
 
   if (field.type !== FieldType.DROPDOWN || !field.fieldMeta) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Invalid field type',
+      message: "Invalid field type",
     });
   }
 

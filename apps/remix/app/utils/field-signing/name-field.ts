@@ -1,10 +1,10 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from "@signtusk/prisma/enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { TFieldName } from '@signtusk/lib/types/field';
-import type { TSignEnvelopeFieldValue } from '@signtusk/trpc/server/envelope-router/sign-envelope-field.types';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { TFieldName } from "@signtusk/lib/types/field";
+import type { TSignEnvelopeFieldValue } from "@signtusk/trpc/server/envelope-router/sign-envelope-field.types";
 
-import { SignFieldNameDialog } from '~/components/dialogs/sign-field-name-dialog';
+import { SignFieldNameDialog } from "~/components/dialogs/sign-field-name-dialog";
 
 type HandleNameFieldClickOptions = {
   field: TFieldName;
@@ -12,13 +12,16 @@ type HandleNameFieldClickOptions = {
 };
 
 export const handleNameFieldClick = async (
-  options: HandleNameFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.NAME }> | null> => {
+  options: HandleNameFieldClickOptions
+): Promise<Extract<
+  TSignEnvelopeFieldValue,
+  { type: typeof FieldType.NAME }
+> | null> => {
   const { field, name } = options;
 
   if (field.type !== FieldType.NAME) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Invalid field type',
+      message: "Invalid field type",
     });
   }
 
