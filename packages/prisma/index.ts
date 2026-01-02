@@ -1,8 +1,8 @@
 /// <reference types="@signtusk/prisma/types/types.d.ts" />
-import { PrismaClient } from '@prisma/client';
-import { Kysely, PostgresDialect, sql } from 'kysely';
-import { Pool } from 'pg';
-import type { DB } from './generated/types';
+import { PrismaClient } from "@prisma/client";
+import { Kysely, PostgresDialect, sql } from "kysely";
+import { Pool } from "pg";
+import type { DB } from "./generated/types";
 
 // Simple database URL helper (inline to avoid import issues)
 const getDatabaseUrl = () => {
@@ -21,7 +21,8 @@ const getDatabaseUrl = () => {
   }
 
   if (process.env.DATABASE_URL_UNPOOLED) {
-    process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.DATABASE_URL_UNPOOLED;
+    process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL =
+      process.env.DATABASE_URL_UNPOOLED;
   }
 
   if (process.env.POSTGRES_PRISMA_URL) {
@@ -29,7 +30,8 @@ const getDatabaseUrl = () => {
   }
 
   if (process.env.POSTGRES_URL_NON_POOLING) {
-    process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.POSTGRES_URL_NON_POOLING;
+    process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL =
+      process.env.POSTGRES_URL_NON_POOLING;
   }
 
   return process.env.NEXT_PRIVATE_DATABASE_URL;
@@ -47,21 +49,25 @@ function remember<T>(name: string, getValue: () => T): T {
 }
 
 // Export simple Prisma client
-export const prisma = remember('prisma', () =>
-  new PrismaClient({
-    datasourceUrl: getDatabaseUrl(),
-  })
+export const prisma = remember(
+  "prisma",
+  () =>
+    new PrismaClient({
+      datasourceUrl: getDatabaseUrl(),
+    })
 );
 
 // Create Kysely instance for direct SQL queries
-export const kysely = remember('kysely', () => 
-  new Kysely<DB>({
-    dialect: new PostgresDialect({
-      pool: new Pool({
-        connectionString: getDatabaseUrl(),
+export const kysely = remember(
+  "kysely",
+  () =>
+    new Kysely<DB>({
+      dialect: new PostgresDialect({
+        pool: new Pool({
+          connectionString: getDatabaseUrl(),
+        }),
       }),
-    }),
-  })
+    })
 );
 
 // For compatibility with existing code that expects kyselyPrisma.$kysely
@@ -75,6 +81,6 @@ export const prismaWithLogging = prisma;
 export { sql };
 
 // Export types for compatibility
-    export * from '@prisma/client';
-    export type { PrismaClient } from '@prisma/client';
-    export type { DB } from './generated/types';
+export * from "@prisma/client";
+export type { PrismaClient } from "@prisma/client";
+export type { DB } from "./generated/types";
