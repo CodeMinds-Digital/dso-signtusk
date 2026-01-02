@@ -106,7 +106,6 @@ export enum WebhookTriggerEvents {
 export enum WebhookCallStatus {
   SUCCESS = "SUCCESS",
   FAILED = "FAILED",
-  PENDING = "PENDING",
 }
 
 export enum TemplateType {
@@ -120,8 +119,9 @@ export enum FolderType {
 }
 
 export enum OrganisationGroupType {
-  INTERNAL = "INTERNAL",
-  EXTERNAL = "EXTERNAL",
+  INTERNAL_ORGANISATION = "INTERNAL_ORGANISATION",
+  INTERNAL_TEAM = "INTERNAL_TEAM",
+  CUSTOM = "CUSTOM",
 }
 
 export enum AuthenticationMethod {
@@ -153,6 +153,8 @@ export enum Role {
 
 export interface Field {
   id: number;
+  secondaryId: string;
+  envelopeId: string;
   envelopeItemId: string;
   type: FieldType;
   page: number;
@@ -162,36 +164,46 @@ export interface Field {
   height: number | string;
   recipientId: number;
   fieldMeta?: unknown;
-  customText?: string | null;
-  inserted?: boolean;
+  customText: string;
+  inserted: boolean;
 }
 
 export interface Recipient {
   id: number;
+  envelopeId: string;
   email: string;
   name: string;
+  token: string;
+  documentDeletedAt: Date | null;
+  expired: Date | null;
+  signedAt: Date | null;
+  authOptions: unknown | null;
+  signingOrder: number | null;
+  rejectionReason: string | null;
   role: RecipientRole;
+  readStatus: ReadStatus;
   signingStatus: SigningStatus;
   sendStatus: SendStatus;
-  readStatus: ReadStatus;
-  token?: string;
-  signingOrder?: number | null;
-  authenticationMethod?: AuthenticationMethod | null;
 }
 
 export interface EnvelopeItem {
   id: string;
-  envelopeId: number;
+  title: string;
+  order: number;
+  documentDataId: string;
+  envelopeId: string;
 }
 
 export interface Webhook {
-  id: number;
+  id: string;
   webhookUrl: string;
   eventTriggers: WebhookTriggerEvents[];
   secret: string | null;
   enabled: boolean;
   teamId: number;
+  userId: number;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ApiToken {
@@ -206,23 +218,22 @@ export interface ApiToken {
 }
 
 export interface TeamEmail {
-  id: number;
+  teamId: number;
   email: string;
   name: string;
-  teamId: number;
   createdAt: Date;
 }
 
 export interface TeamGroup {
-  id: number;
+  id: string;
   teamId: number;
-  organisationGroupId: number;
+  organisationGroupId: string;
   teamRole: TeamMemberRole;
 }
 
 export interface TemplateDirectLink {
-  id: number;
-  templateId: number;
+  id: string;
+  envelopeId: string;
   token: string;
   enabled: boolean;
   directTemplateRecipientId: number;
@@ -251,7 +262,7 @@ export interface Signature {
   fieldId: number;
   signatureImageAsBase64: string | null;
   typedSignature: string | null;
-  createdAt: Date;
+  created: Date;
 }
 
 export interface DocumentData {
@@ -274,4 +285,112 @@ export interface DocumentMeta {
   uploadSignatureEnabled: boolean;
   language: string | null;
   distributionMethod: DocumentDistributionMethod;
+}
+
+// Additional enums needed by components
+export enum DocumentSource {
+  DOCUMENT = "DOCUMENT",
+  TEMPLATE = "TEMPLATE",
+  TEMPLATE_DIRECT_LINK = "TEMPLATE_DIRECT_LINK",
+}
+
+export enum EmailDomainStatus {
+  PENDING = "PENDING",
+  ACTIVE = "ACTIVE",
+}
+
+// Additional interfaces needed by components
+export interface TeamGlobalSettings {
+  id: string;
+  documentVisibility: DocumentVisibility | null;
+  documentLanguage: string | null;
+  documentTimezone: string | null;
+  documentDateFormat: string | null;
+  includeSenderDetails: boolean | null;
+  includeSigningCertificate: boolean | null;
+  includeAuditLog: boolean | null;
+  typedSignatureEnabled: boolean | null;
+  uploadSignatureEnabled: boolean | null;
+  drawSignatureEnabled: boolean | null;
+  emailId: string | null;
+  emailReplyTo: string | null;
+  emailDocumentSettings: unknown | null;
+  brandingEnabled: boolean | null;
+  brandingLogo: string | null;
+  brandingUrl: string | null;
+  brandingCompanyDetails: string | null;
+  aiFeaturesEnabled: boolean | null;
+}
+
+export interface TeamProfile {
+  id: string;
+  enabled: boolean;
+  teamId: number;
+  bio: string | null;
+}
+
+export interface SubscriptionClaim {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  locked: boolean;
+  teamCount: number;
+  memberCount: number;
+  envelopeItemCount: number;
+  flags: unknown;
+}
+
+export interface Subscription {
+  id: number;
+  status: SubscriptionStatus;
+  planId: string;
+  priceId: string;
+  periodEnd: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  cancelAtPeriodEnd: boolean;
+  customerId: string;
+  organisationId: string;
+}
+
+export interface Envelope {
+  id: string;
+  secondaryId: string;
+  externalId: string | null;
+  type: EnvelopeType;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt: Date | null;
+  deletedAt: Date | null;
+  title: string;
+  status: DocumentStatus;
+  source: DocumentSource;
+  qrToken: string | null;
+  internalVersion: number;
+  useLegacyFieldInsertion: boolean;
+  visibility: DocumentVisibility;
+  templateType: TemplateType;
+  publicTitle: string;
+  publicDescription: string;
+  templateId: number | null;
+  userId: number;
+  teamId: number;
+  folderId: string | null;
+  documentMetaId: string;
+}
+
+export interface Passkey {
+  id: string;
+  userId: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  lastUsedAt: Date | null;
+  credentialId: Uint8Array;
+  credentialPublicKey: Uint8Array;
+  counter: bigint;
+  credentialDeviceType: string;
+  credentialBackedUp: boolean;
+  transports: string[];
 }

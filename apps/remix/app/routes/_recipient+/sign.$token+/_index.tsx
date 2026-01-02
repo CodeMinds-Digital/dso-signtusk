@@ -523,7 +523,10 @@ const SigningPageV2 = ({
     >
       <DocumentSigningAuthProvider
         documentAuthOptions={envelope.authOptions}
-        recipient={recipient}
+        recipient={{
+          ...recipient,
+          role: recipient.role as RecipientRole,
+        }}
         user={user}
       >
         <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>

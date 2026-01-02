@@ -176,13 +176,13 @@ export const TeamMemberUpdateDialog = ({
                         </SelectTrigger>
 
                         <SelectContent className="w-full" position="popper">
-                          {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map(
-                            (role) => (
-                              <SelectItem key={role} value={role}>
-                                {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                              </SelectItem>
-                            )
-                          )}
+                          {TEAM_MEMBER_ROLE_HIERARCHY[
+                            currentUserTeamRole as unknown as keyof typeof TEAM_MEMBER_ROLE_HIERARCHY
+                          ].map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>

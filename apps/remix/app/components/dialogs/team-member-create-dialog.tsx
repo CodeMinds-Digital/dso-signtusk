@@ -315,7 +315,7 @@ export const TeamMemberCreateDialog = ({
 
                                   <SelectContent position="popper">
                                     {TEAM_MEMBER_ROLE_HIERARCHY[
-                                      team.currentTeamRole
+                                      team.currentTeamRole as unknown as keyof typeof TEAM_MEMBER_ROLE_HIERARCHY
                                     ].map((role) => (
                                       <SelectItem key={role} value={role}>
                                         {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}

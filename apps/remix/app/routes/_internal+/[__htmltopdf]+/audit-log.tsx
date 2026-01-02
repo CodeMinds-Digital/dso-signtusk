@@ -180,14 +180,22 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <p className="font-medium">{_(msg`Recipients`)}</p>
 
             <ul className="mt-1 list-inside list-disc">
-              {document.recipients.map((recipient) => (
-                <li key={recipient.id}>
-                  <span className="text-muted-foreground">
-                    [{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}]
-                  </span>{" "}
-                  {recipient.name} ({recipient.email})
-                </li>
-              ))}
+              {document.recipients.map(
+                (recipient: {
+                  id: number;
+                  role: keyof typeof RECIPIENT_ROLES_DESCRIPTION;
+                  name: string;
+                  email: string;
+                }) => (
+                  <li key={recipient.id}>
+                    <span className="text-muted-foreground">
+                      [{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
+                      ]
+                    </span>{" "}
+                    {recipient.name} ({recipient.email})
+                  </li>
+                )
+              )}
             </ul>
           </div>
         </CardContent>

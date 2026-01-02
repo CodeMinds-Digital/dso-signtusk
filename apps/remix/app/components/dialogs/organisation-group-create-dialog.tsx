@@ -189,7 +189,7 @@ export const OrganisationGroupCreateDialog = ({
 
                         <SelectContent position="popper">
                           {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                            organisation.currentOrganisationRole
+                            organisation.currentOrganisationRole as unknown as keyof typeof ORGANISATION_MEMBER_ROLE_HIERARCHY
                           ].map((role) => (
                             <SelectItem key={role} value={role}>
                               {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role]) ??

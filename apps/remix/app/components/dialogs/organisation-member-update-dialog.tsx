@@ -184,7 +184,7 @@ export const OrganisationMemberUpdateDialog = ({
 
                         <SelectContent className="w-full" position="popper">
                           {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                            currentUserOrganisationRole
+                            currentUserOrganisationRole as unknown as keyof typeof ORGANISATION_MEMBER_ROLE_HIERARCHY
                           ].map((role) => (
                             <SelectItem key={role} value={role}>
                               {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
