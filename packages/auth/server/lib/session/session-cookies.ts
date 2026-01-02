@@ -1,26 +1,26 @@
-import type { Context } from 'hono';
-import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
+import type { Context } from "hono";
+import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 
 import {
   formatSecureCookieName,
   getCookieDomain,
   useSecureCookies,
-} from '@signtusk/lib/constants/auth';
-import { appLog } from '@signtusk/lib/utils/debugger';
-import { env } from '@signtusk/lib/utils/env';
+} from "@signtusk/lib/constants/auth";
+import { appLog } from "@signtusk/lib/utils/debugger";
+import { env } from "@signtusk/lib/utils/env";
 
-import { AUTH_SESSION_LIFETIME } from '../../config';
-import { extractCookieFromHeaders } from '../utils/cookies';
-import { generateSessionToken } from './session';
+import { AUTH_SESSION_LIFETIME } from "../../config";
+import { extractCookieFromHeaders } from "../utils/cookies";
+import { generateSessionToken } from "./session";
 
-export const sessionCookieName = formatSecureCookieName('sessionId');
-export const csrfCookieName = formatSecureCookieName('csrfToken');
+export const sessionCookieName = formatSecureCookieName("sessionId");
+export const csrfCookieName = formatSecureCookieName("csrfToken");
 
 const getAuthSecret = () => {
-  const authSecret = env('NEXTAUTH_SECRET');
+  const authSecret = env("NEXTAUTH_SECRET");
 
   if (!authSecret) {
-    throw new Error('NEXTAUTH_SECRET is not set');
+    throw new Error("NEXTAUTH_SECRET is not set");
   }
 
   return authSecret;
@@ -28,17 +28,24 @@ const getAuthSecret = () => {
 
 /**
  * Generic auth session cookie options.
+ * Returns fresh options each time to ensure dynamic values are current.
  */
-export const sessionCookieOptions = {
-  httpOnly: true,
-  path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax',
-  secure: useSecureCookies,
-  domain: getCookieDomain(),
-  expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
-} as const;
+export const getSessionCookieOptions = () =>
+  ({
+    httpOnly: true,
+    path: "/",
+    sameSite: useSecureCookies ? "none" : "lax",
+    secure: useSecureCookies,
+    domain: getCookieDomain(),
+    expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
+  }) as const;
 
-export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
+// Keep for backward compatibility but use the function internally
+export const sessionCookieOptions = getSessionCookieOptions();
+
+export const extractSessionCookieFromHeaders = (
+  headers: Headers
+): string | null => {
   return extractCookieFromHeaders(sessionCookieName, headers);
 };
 
@@ -49,7 +56,11 @@ export const extractSessionCookieFromHeaders = (headers: Headers): string | null
  * @returns The session ID or null if no session cookie is found.
  */
 export const getSessionCookie = async (c: Context): Promise<string | null> => {
-  const sessionId = await getSignedCookie(c, getAuthSecret(), sessionCookieName);
+  const sessionId = await getSignedCookie(
+    c,
+    getAuthSecret(),
+    sessionCookieName
+  );
 
   return sessionId || null;
 };
@@ -66,9 +77,9 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
     sessionCookieName,
     sessionToken,
     getAuthSecret(),
-    sessionCookieOptions,
+    getSessionCookieOptions()
   ).catch((err) => {
-    appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
+    appLog("SetSessionCookie", `Error setting signed cookie: ${err}`);
 
     throw err;
   });
@@ -81,7 +92,7 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
  * @param sessionToken - The session token to set.
  */
 export const deleteSessionCookie = (c: Context) => {
-  deleteCookie(c, sessionCookieName, sessionCookieOptions);
+  deleteCookie(c, sessionCookieName, getSessionCookieOptions());
 };
 
 export const getCsrfCookie = async (c: Context) => {
@@ -94,7 +105,7 @@ export const setCsrfCookie = async (c: Context) => {
   const csrfToken = generateSessionToken();
 
   await setSignedCookie(c, csrfCookieName, csrfToken, getAuthSecret(), {
-    ...sessionCookieOptions,
+    ...getSessionCookieOptions(),
 
     // Explicity set to undefined for session lived cookie.
     expires: undefined,
