@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "apps/remix/build/client",
-  "installCommand": "npm install",
+  "installCommand": "npm install --force",
   "framework": null,
   "functions": {
     "apps/remix/api/index.js": {
