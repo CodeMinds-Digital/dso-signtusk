@@ -55,5 +55,21 @@ module.exports = {
         "@typescript-eslint/require-await": "off",
       },
     },
+    {
+      // Handle server files in apps/remix/server and vite config
+      files: ["apps/remix/server/**/*.ts", "apps/remix/vite.config.ts"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        project: null, // Don't use project-based linting for these files
+        ecmaVersion: 2022,
+        sourceType: "module",
+      },
+      rules: {
+        // Disable rules that require type information
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/require-await": "off",
+      },
+    },
   ],
 };

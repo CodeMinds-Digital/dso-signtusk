@@ -1,11 +1,11 @@
-import { type DocumentDataType, DocumentStatus } from '@prisma/client';
-import contentDisposition from 'content-disposition';
-import { type Context } from 'hono';
+import { DocumentStatus, type DocumentDataType } from "@prisma/client";
+import contentDisposition from "content-disposition";
+import { type Context } from "hono";
 
-import { sha256 } from '@signtusk/lib/universal/crypto';
-import { getFileServerSide } from '@signtusk/lib/universal/upload/get-file.server';
+import { sha256 } from "@signtusk/lib/universal/crypto";
+import { getFileServerSide } from "@signtusk/lib/universal/upload/get-file.server";
 
-import type { HonoEnv } from '../../router';
+import type { HonoEnv } from "../../router";
 
 type HandleEnvelopeItemFileRequestOptions = {
   title: string;
@@ -15,7 +15,7 @@ type HandleEnvelopeItemFileRequestOptions = {
     data: string;
     initialData: string;
   };
-  version: 'signed' | 'original';
+  version: "signed" | "original";
   isDownload: boolean;
   context: Context<HonoEnv>;
 };
@@ -31,11 +31,12 @@ export const handleEnvelopeItemFileRequest = async ({
   isDownload,
   context: c,
 }: HandleEnvelopeItemFileRequestOptions) => {
-  const documentDataToUse = version === 'signed' ? documentData.data : documentData.initialData;
+  const documentDataToUse =
+    version === "signed" ? documentData.data : documentData.initialData;
 
-  const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
+  const etag = Buffer.from(sha256(documentDataToUse)).toString("hex");
 
-  if (c.req.header('If-None-Match') === etag && !isDownload) {
+  if (c.req.header("If-None-Match") === etag && !isDownload) {
     return c.body(null, 304);
   }
 
@@ -49,33 +50,25 @@ export const handleEnvelopeItemFileRequest = async ({
   });
 
   if (!file) {
-    return c.json({ error: 'File not found' }, 404);
+    return c.json({ error: "File not found" }, 404);
   }
 
-  c.header('Content-Type', 'application/pdf');
-  c.header('ETag', etag);
-
-  if (!isDownload) {
-    if (status === DocumentStatus.COMPLETED) {
-      c.header('Cache-Control', 'public, max-age=31536000, immutable');
-    } else {
-      c.header('Cache-Control', 'public, max-age=0, must-revalidate');
-    }
-  }
-
-  if (isDownload) {
-    // Generate filename following the pattern from envelope-download-dialog.tsx
-    const baseTitle = title.replace(/\.pdf$/, '');
-    const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
-    const filename = `${baseTitle}${suffix}`;
-
-    c.header('Content-Disposition', contentDisposition(filename));
-
-    // For downloads, prevent caching to ensure fresh data
-    c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
-    c.header('Pragma', 'no-cache');
-    c.header('Expires', '0');
-  }
-
-  return c.body(file);
+  return c.body(file as Uint8Array, 200, {
+    "Content-Type": "application/pdf",
+    ETag: etag,
+    ...(isDownload && {
+      "Content-Disposition": contentDisposition(
+        `${title.replace(/\.pdf$/, "")}${version === "signed" ? "_signed.pdf" : ".pdf"}`
+      ),
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    }),
+    ...(!isDownload && {
+      "Cache-Control":
+        status === DocumentStatus.COMPLETED
+          ? "public, max-age=31536000, immutable"
+          : "public, max-age=0, must-revalidate",
+    }),
+  });
 };

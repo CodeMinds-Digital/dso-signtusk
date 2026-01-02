@@ -136,6 +136,8 @@ logs/
 backups/
 
 package-lock.json
+dso-signtusk-working/
+dso-signtusk-working.zip
 /.kiro
 /.kiro/specs
 packages/pdf-sign.zip

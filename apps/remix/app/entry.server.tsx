@@ -1,17 +1,18 @@
-import { i18n } from '@lingui/core';
-import { I18nProvider } from '@lingui/react';
-import { createReadableStreamFromReadable } from '@react-router/node';
-import { isbot } from 'isbot';
-import { PassThrough } from 'node:stream';
-import type { RenderToPipeableStreamOptions } from 'react-dom/server';
-import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from 'react-router';
-import { ServerRouter } from 'react-router';
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { isbot } from "isbot";
+import { PassThrough } from "node:stream";
+import React from "react";
+import type { RenderToPipeableStreamOptions } from "react-dom/server";
+import { renderToPipeableStream } from "react-dom/server";
+import type { AppLoadContext, EntryContext } from "react-router";
+import { ServerRouter } from "react-router";
 
-import { APP_I18N_OPTIONS } from '@signtusk/lib/constants/i18n';
-import { dynamicActivate, extractLocaleData } from '@signtusk/lib/utils/i18n';
+import { APP_I18N_OPTIONS } from "@signtusk/lib/constants/i18n";
+import { dynamicActivate, extractLocaleData } from "@signtusk/lib/utils/i18n";
 
-import { langCookie } from './storage/lang-cookie.server';
+import { langCookie } from "./storage/lang-cookie.server";
 
 export const streamTimeout = 5_000;
 
@@ -20,9 +21,9 @@ export default async function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  _loadContext: AppLoadContext,
+  _loadContext: AppLoadContext
 ) {
-  let language = await langCookie.parse(request.headers.get('cookie') ?? '');
+  let language = await langCookie.parse(request.headers.get("cookie") ?? "");
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(language)) {
     language = extractLocaleData({ headers: request.headers }).lang;
@@ -32,30 +33,37 @@ export default async function handleRequest(
 
   return new Promise((resolve, reject) => {
     let shellRendered = false;
-    const userAgent = request.headers.get('user-agent');
+    const userAgent = request.headers.get("user-agent");
 
     // Ensure requests from bots and SPA Mode renders wait for all content to load before responding
     // https://react.dev/reference/react-dom/server/renderToPipeableStream#waiting-for-all-content-to-load-for-crawlers-and-static-generation
     const readyOption: keyof RenderToPipeableStreamOptions =
-      (userAgent && isbot(userAgent)) || routerContext.isSpaMode ? 'onAllReady' : 'onShellReady';
+      (userAgent && isbot(userAgent)) || routerContext.isSpaMode
+        ? "onAllReady"
+        : "onShellReady";
 
     const { pipe, abort } = renderToPipeableStream(
-      <I18nProvider i18n={i18n}>
-        <ServerRouter context={routerContext} url={request.url} />
-      </I18nProvider>,
+      React.createElement(
+        I18nProvider,
+        { i18n },
+        React.createElement(ServerRouter, {
+          context: routerContext,
+          url: request.url,
+        })
+      ),
       {
         [readyOption]() {
           shellRendered = true;
           const body = new PassThrough();
           const stream = createReadableStreamFromReadable(body);
 
-          responseHeaders.set('Content-Type', 'text/html');
+          responseHeaders.set("Content-Type", "text/html");
 
           resolve(
             new Response(stream, {
               headers: responseHeaders,
               status: responseStatusCode,
-            }),
+            })
           );
 
           pipe(body);
@@ -72,7 +80,7 @@ export default async function handleRequest(
             console.error(error);
           }
         },
-      },
+      }
     );
 
     // Abort the rendering stream after the `streamTimeout` so it has time to

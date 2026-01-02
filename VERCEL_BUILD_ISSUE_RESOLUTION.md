@@ -29,7 +29,8 @@ All Vercel build issues have been successfully resolved. The build now completes
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-plugin-static-copy": "^3.1.4",
     "vite-tsconfig-paths": "^5.1.4",
-    "@react-router/remix-routes-option-adapter": "^7.9.6"
+    "@react-router/remix-routes-option-adapter": "^7.9.6",
+    "remix-flat-routes": "^0.8.5"
   }
 }
 ```
@@ -69,8 +70,21 @@ All Vercel build issues have been successfully resolved. The build now completes
 
 #### 4. Duplicate Dependency Cleanup ✅
 
-**Problem**: `@react-router/remix-routes-option-adapter` appeared in both dependencies and devDependencies
-**Solution**: Removed duplicate entry from devDependencies to avoid conflicts
+**Problem**: Multiple packages appeared in both dependencies and devDependencies causing conflicts
+**Solution**: Cleaned up duplicate entries and moved build-time dependencies to regular dependencies
+
+**Fixed Dependencies:**
+
+- `@react-router/remix-routes-option-adapter` - Removed duplicate from devDependencies
+- `remix-flat-routes` - Moved from devDependencies to dependencies (needed for routes.ts compilation)
+
+**Latest Build Error Resolved (January 1, 2026):**
+
+```
+Error: Cannot find package 'remix-flat-routes' imported from '/vercel/path0/apps/remix/app/routes.ts'
+```
+
+**Root Cause**: `remix-flat-routes` was in devDependencies but needed during build for route configuration compilation.
 
 ## Verification
 
@@ -174,6 +188,7 @@ cd apps/remix && npm run build:vercel
 - `vite-plugin-static-copy` ✅ Added to regular dependencies
 - `vite-tsconfig-paths` ✅ Moved to regular dependency
 - `@react-router/remix-routes-option-adapter` ✅ Duplicate removed, single entry in dependencies
+- `remix-flat-routes` ✅ Moved from devDependencies to dependencies
 
 ### ✅ Configuration Alignment
 
@@ -221,7 +236,7 @@ Ensure these are configured in Vercel dashboard:
 
 - `apps/remix/vercel.json` - Proper Vercel configuration
 - `.vercel/project.json` - Disabled framework auto-detection
-- `apps/remix/package.json` - Moved critical dependencies and removed duplicates
+- `apps/remix/package.json` - Moved critical dependencies and removed duplicates (including remix-flat-routes fix)
 
 ### Ignore Files:
 
