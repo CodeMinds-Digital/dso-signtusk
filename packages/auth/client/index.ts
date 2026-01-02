@@ -1,20 +1,20 @@
-import type { ClientResponse, InferRequestType } from 'hono/client';
-import { hc } from 'hono/client';
-import superjson from 'superjson';
+import type { ClientResponse, InferRequestType } from "hono/client";
+import { hc } from "hono/client";
+import superjson from "superjson";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { AppError } from '@signtusk/lib/errors/app-error';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { AppError } from "@signtusk/lib/errors/app-error";
 
-import type { AuthAppType } from '../server';
-import type { SessionValidationResult } from '../server/lib/session/session';
-import type { PartialAccount } from '../server/lib/utils/get-accounts';
-import type { ActiveSession } from '../server/lib/utils/get-session';
-import { handleSignInRedirect } from '../server/lib/utils/redirect';
+import type { AuthAppType } from "../server";
+import type { SessionValidationResult } from "../server/lib/session/session";
+import type { PartialAccount } from "../server/lib/utils/get-accounts";
+import type { ActiveSession } from "../server/lib/utils/get-session";
+import { handleSignInRedirect } from "../server/lib/utils/redirect";
 import type {
   TDisableTwoFactorRequestSchema,
   TEnableTwoFactorRequestSchema,
   TViewTwoFactorRecoveryCodesRequestSchema,
-} from '../server/routes/two-factor.types';
+} from "../server/routes/two-factor.types";
 import type {
   TForgotPasswordSchema,
   TResendVerifyEmailSchema,
@@ -22,22 +22,24 @@ import type {
   TSignUpSchema,
   TUpdatePasswordSchema,
   TVerifyEmailSchema,
-} from '../server/types/email-password';
+} from "../server/types/email-password";
 
 type AuthClientType = ReturnType<typeof hc<AuthAppType>>;
 
 type TEmailPasswordSignin = InferRequestType<
-  AuthClientType['email-password']['authorize']['$post']
->['json'] & { redirectPath?: string };
+  AuthClientType["email-password"]["authorize"]["$post"]
+>["json"] & { redirectPath?: string };
 
-type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$post']>['json'] & {
+type TPasskeySignin = InferRequestType<
+  AuthClientType["passkey"]["authorize"]["$post"]
+>["json"] & {
   redirectPath?: string;
 };
 
 export class AuthClient {
   public client: AuthClientType;
 
-  private signOutredirectPath: string = '/signin';
+  private signOutredirectPath: string = "/signin";
 
   constructor(options: { baseUrl: string }) {
     this.client = hc<AuthAppType>(options.baseUrl);
@@ -50,7 +52,7 @@ export class AuthClient {
   }
 
   public async signOutAllSessions() {
-    await this.client['signout-all'].$post();
+    await this.client["signout-all"].$post();
   }
 
   public async signOutSession({
@@ -60,7 +62,7 @@ export class AuthClient {
     sessionId: string;
     redirectPath?: string;
   }) {
-    await this.client['signout-session'].$post({
+    await this.client["signout-session"].$post({
       json: { sessionId },
     });
 
@@ -70,7 +72,7 @@ export class AuthClient {
   }
 
   public async getSession() {
-    const response = await this.client['session-json'].$get();
+    const response = await this.client["session-json"].$get();
 
     if (!response.ok) {
       const error = await response.json();
@@ -84,7 +86,7 @@ export class AuthClient {
   }
 
   public async getSessions() {
-    const response = await this.client['sessions'].$get();
+    const response = await this.client["sessions"].$get();
 
     if (!response.ok) {
       const error = await response.json();
@@ -109,7 +111,7 @@ export class AuthClient {
 
   public account = {
     getMany: async () => {
-      const response = await this.client['accounts'].$get();
+      const response = await this.client["accounts"].$get();
 
       if (!response.ok) {
         const error = await response.json();
@@ -122,7 +124,7 @@ export class AuthClient {
       return superjson.deserialize<{ accounts: PartialAccount[] }>(result);
     },
     delete: async (accountId: string) => {
-      const response = await this.client['account'][':accountId'].$delete({
+      const response = await this.client["account"][":accountId"].$delete({
         param: { accountId },
       });
 
@@ -135,14 +137,18 @@ export class AuthClient {
   };
 
   public emailPassword = {
-    signIn: async (data: Omit<TEmailPasswordSignin, 'csrfToken'> & { csrfToken?: string }) => {
+    signIn: async (
+      data: Omit<TEmailPasswordSignin, "csrfToken"> & { csrfToken?: string }
+    ) => {
       let csrfToken = data.csrfToken;
 
       if (!csrfToken) {
-        csrfToken = (await this.client.csrf.$get().then(async (res) => res.json())).csrfToken;
+        csrfToken = (
+          await this.client.csrf.$get().then(async (res) => res.json())
+        ).csrfToken;
       }
 
-      const response = await this.client['email-password'].authorize.$post({
+      const response = await this.client["email-password"].authorize.$post({
         json: {
           ...data,
           csrfToken,
@@ -159,7 +165,9 @@ export class AuthClient {
     },
 
     updatePassword: async (data: TUpdatePasswordSchema) => {
-      const response = await this.client['email-password']['update-password'].$post({ json: data });
+      const response = await this.client["email-password"][
+        "update-password"
+      ].$post({ json: data });
 
       if (!response.ok) {
         const error = await response.json();
@@ -169,7 +177,9 @@ export class AuthClient {
     },
 
     forgotPassword: async (data: TForgotPasswordSchema) => {
-      const response = await this.client['email-password']['forgot-password'].$post({ json: data });
+      const response = await this.client["email-password"][
+        "forgot-password"
+      ].$post({ json: data });
 
       if (!response.ok) {
         const error = await response.json();
@@ -179,7 +189,9 @@ export class AuthClient {
     },
 
     resetPassword: async (data: TResetPasswordSchema) => {
-      const response = await this.client['email-password']['reset-password'].$post({ json: data });
+      const response = await this.client["email-password"][
+        "reset-password"
+      ].$post({ json: data });
 
       if (!response.ok) {
         const error = await response.json();
@@ -189,7 +201,9 @@ export class AuthClient {
     },
 
     signUp: async (data: TSignUpSchema) => {
-      const response = await this.client['email-password']['signup'].$post({ json: data });
+      const response = await this.client["email-password"]["signup"].$post({
+        json: data,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -199,7 +213,9 @@ export class AuthClient {
     },
 
     resendVerifyEmail: async (data: TResendVerifyEmailSchema) => {
-      const response = await this.client['email-password']['resend-verify-email'].$post({
+      const response = await this.client["email-password"][
+        "resend-verify-email"
+      ].$post({
         json: data,
       });
 
@@ -211,7 +227,9 @@ export class AuthClient {
     },
 
     verifyEmail: async (data: TVerifyEmailSchema) => {
-      const response = await this.client['email-password']['verify-email'].$post({ json: data });
+      const response = await this.client["email-password"][
+        "verify-email"
+      ].$post({ json: data });
 
       if (!response.ok) {
         const error = await response.json();
@@ -225,7 +243,7 @@ export class AuthClient {
 
   public twoFactor = {
     setup: async () => {
-      const response = await this.client['two-factor'].setup.$post();
+      const response = await this.client["two-factor"].setup.$post();
 
       if (!response.ok) {
         const error = await response.json();
@@ -236,7 +254,9 @@ export class AuthClient {
       return response.json();
     },
     enable: async (data: TEnableTwoFactorRequestSchema) => {
-      const response = await this.client['two-factor'].enable.$post({ json: data });
+      const response = await this.client["two-factor"].enable.$post({
+        json: data,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -247,7 +267,9 @@ export class AuthClient {
       return response.json();
     },
     disable: async (data: TDisableTwoFactorRequestSchema) => {
-      const response = await this.client['two-factor'].disable.$post({ json: data });
+      const response = await this.client["two-factor"].disable.$post({
+        json: data,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -255,8 +277,12 @@ export class AuthClient {
         throw AppError.parseError(error);
       }
     },
-    viewRecoveryCodes: async (data: TViewTwoFactorRecoveryCodesRequestSchema) => {
-      const response = await this.client['two-factor']['view-recovery-codes'].$post({ json: data });
+    viewRecoveryCodes: async (
+      data: TViewTwoFactorRecoveryCodesRequestSchema
+    ) => {
+      const response = await this.client["two-factor"][
+        "view-recovery-codes"
+      ].$post({ json: data });
 
       if (!response.ok) {
         const error = await response.json();
@@ -270,7 +296,9 @@ export class AuthClient {
 
   public passkey = {
     signIn: async (data: TPasskeySignin) => {
-      const response = await this.client['passkey'].authorize.$post({ json: data });
+      const response = await this.client["passkey"].authorize.$post({
+        json: data,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -284,7 +312,7 @@ export class AuthClient {
 
   public google = {
     signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
-      const response = await this.client['oauth'].authorize.google.$post({
+      const response = await this.client["oauth"].authorize.google.$post({
         json: { redirectPath },
       });
 
@@ -305,7 +333,7 @@ export class AuthClient {
 
   public microsoft = {
     signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
-      const response = await this.client['oauth'].authorize.microsoft.$post({
+      const response = await this.client["oauth"].authorize.microsoft.$post({
         json: { redirectPath },
       });
 
@@ -325,7 +353,9 @@ export class AuthClient {
 
   public oidc = {
     signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
-      const response = await this.client['oauth'].authorize.oidc.$post({ json: { redirectPath } });
+      const response = await this.client["oauth"].authorize.oidc.$post({
+        json: { redirectPath },
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -342,7 +372,9 @@ export class AuthClient {
     },
     org: {
       signIn: async ({ orgUrl }: { orgUrl: string }) => {
-        const response = await this.client['oauth'].authorize.oidc.org[':orgUrl'].$post({
+        const response = await this.client["oauth"].authorize.oidc.org[
+          ":orgUrl"
+        ].$post({
           param: { orgUrl },
         });
 
@@ -364,5 +396,8 @@ export class AuthClient {
 }
 
 export const authClient = new AuthClient({
-  baseUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth`,
+  baseUrl:
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/auth`
+      : `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth`,
 });
