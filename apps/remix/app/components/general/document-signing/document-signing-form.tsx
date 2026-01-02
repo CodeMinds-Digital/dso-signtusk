@@ -1,31 +1,35 @@
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { type Field, FieldType, type Recipient, RecipientRole } from '@signtusk/lib/constants/prisma-enums';
-import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Field, Recipient } from "@prisma/client";
+import { FieldType, RecipientRole } from "@signtusk/lib/constants/prisma-enums";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 
-import type { DocumentAndSender } from '@signtusk/lib/server-only/document/get-document-by-token';
-import type { TRecipientAccessAuth } from '@signtusk/lib/types/document-auth';
-import { isFieldUnsignedAndRequired } from '@signtusk/lib/utils/advanced-fields-helpers';
-import { sortFieldsByPosition } from '@signtusk/lib/utils/fields';
-import type { RecipientWithFields } from '@signtusk/prisma/types/recipient-with-fields';
-import { FieldToolTip } from '@signtusk/ui/components/field/field-tooltip';
-import { Button } from '@signtusk/ui/primitives/button';
-import { Input } from '@signtusk/ui/primitives/input';
-import { Label } from '@signtusk/ui/primitives/label';
-import { RadioGroup, RadioGroupItem } from '@signtusk/ui/primitives/radio-group';
-import { SignaturePadDialog } from '@signtusk/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+import type { DocumentAndSender } from "@signtusk/lib/server-only/document/get-document-by-token";
+import type { TRecipientAccessAuth } from "@signtusk/lib/types/document-auth";
+import { isFieldUnsignedAndRequired } from "@signtusk/lib/utils/advanced-fields-helpers";
+import { sortFieldsByPosition } from "@signtusk/lib/utils/fields";
+import type { RecipientWithFields } from "@signtusk/prisma/types/recipient-with-fields";
+import { FieldToolTip } from "@signtusk/ui/components/field/field-tooltip";
+import { Button } from "@signtusk/ui/primitives/button";
+import { Input } from "@signtusk/ui/primitives/input";
+import { Label } from "@signtusk/ui/primitives/label";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@signtusk/ui/primitives/radio-group";
+import { SignaturePadDialog } from "@signtusk/ui/primitives/signature-pad/signature-pad-dialog";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 import {
   AssistantConfirmationDialog,
   type NextSigner,
-} from '../../dialogs/assistant-confirmation-dialog';
-import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
-import { useRequiredDocumentSigningContext } from './document-signing-provider';
+} from "../../dialogs/assistant-confirmation-dialog";
+import { DocumentSigningCompleteDialog } from "./document-signing-complete-dialog";
+import { useRequiredDocumentSigningContext } from "./document-signing-provider";
 
 export type DocumentSigningFormProps = {
   document: DocumentAndSender;
@@ -61,10 +65,13 @@ export const DocumentSigningForm = ({
 
   const assistantSignersId = useId();
 
-  const { fullName, signature, setFullName, setSignature } = useRequiredDocumentSigningContext();
+  const { fullName, signature, setFullName, setSignature } =
+    useRequiredDocumentSigningContext();
 
-  const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [validateUninsertedFields, setValidateUninsertedFields] =
+    useState(false);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
+    useState(false);
   const [isAssistantSubmitting, setIsAssistantSubmitting] = useState(false);
 
   const assistantForm = useForm<{ selectedSignerId: number | undefined }>({
@@ -75,17 +82,23 @@ export const DocumentSigningForm = ({
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
-    [fields],
+    [fields]
   );
 
-  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = fields.some(
+    (field) => field.type === FieldType.SIGNATURE
+  );
 
   const uninsertedFields = useMemo(() => {
-    return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
+    return sortFieldsByPosition(
+      fieldsRequiringValidation.filter((field) => !field.inserted)
+    );
   }, [fieldsRequiringValidation]);
 
   const uninsertedRecipientFields = useMemo(() => {
-    return fieldsRequiringValidation.filter((field) => field.recipientId === recipient.id);
+    return fieldsRequiringValidation.filter(
+      (field) => field.recipientId === recipient.id
+    );
   }, [fieldsRequiringValidation, recipient]);
 
   const localFieldsValidated = () => {
@@ -101,7 +114,9 @@ export const DocumentSigningForm = ({
     setIsConfirmationDialogOpen(true);
   };
 
-  const handleAssistantConfirmDialogSubmit = async (nextSigner?: NextSigner) => {
+  const handleAssistantConfirmDialogSubmit = async (
+    nextSigner?: NextSigner
+  ) => {
     setIsAssistantSubmitting(true);
 
     try {
@@ -109,8 +124,10 @@ export const DocumentSigningForm = ({
     } catch (err) {
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while completing the document. Please try again.`),
-        variant: 'destructive',
+        description: _(
+          msg`An error occurred while completing the document. Please try again.`
+        ),
+        variant: "destructive",
       });
 
       setIsAssistantSubmitting(false);
@@ -121,7 +138,11 @@ export const DocumentSigningForm = ({
   return (
     <div className="flex h-full flex-col">
       {validateUninsertedFields && uninsertedFields[0] && (
-        <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
+        <FieldToolTip
+          key={uninsertedFields[0].id}
+          field={uninsertedFields[0]}
+          color="warning"
+        >
           <Trans>Click to insert field</Trans>
         </FieldToolTip>
       )}
@@ -138,7 +159,10 @@ export const DocumentSigningForm = ({
                     className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                     variant="secondary"
                     size="lg"
-                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                    disabled={
+                      typeof window !== "undefined" &&
+                      window.history.length <= 1
+                    }
                     onClick={async () => navigate(-1)}
                   >
                     <Trans>Cancel</Trans>
@@ -149,14 +173,20 @@ export const DocumentSigningForm = ({
                     documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={localFieldsValidated}
-                    onSignatureComplete={async (nextSigner, accessAuthOptions) =>
-                      completeDocument({ nextSigner, accessAuthOptions })
-                    }
+                    onSignatureComplete={async (
+                      nextSigner,
+                      accessAuthOptions
+                    ) => completeDocument({ nextSigner, accessAuthOptions })}
                     recipient={recipient}
-                    allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
+                    allowDictateNextSigner={
+                      document.documentMeta?.allowDictateNextSigner
+                    }
                     defaultNextSigner={
                       nextRecipient
-                        ? { name: nextRecipient.name, email: nextRecipient.email }
+                        ? {
+                            name: nextRecipient.name,
+                            email: nextRecipient.email,
+                          }
                         : undefined
                     }
                   />
@@ -165,12 +195,14 @@ export const DocumentSigningForm = ({
             </>
           ) : recipient.role === RecipientRole.ASSISTANT ? (
             <>
-              <form onSubmit={assistantForm.handleSubmit(onAssistantFormSubmit)}>
+              <form
+                onSubmit={assistantForm.handleSubmit(onAssistantFormSubmit)}
+              >
                 <fieldset className="rounded-2xl border border-border bg-white p-3 dark:bg-background">
                   <Controller
                     name="selectedSignerId"
                     control={assistantForm.control}
-                    rules={{ required: 'Please select a signer' }}
+                    rules={{ required: "Please select a signer" }}
                     render={({ field }) => (
                       <RadioGroup
                         className="gap-0 space-y-3 shadow-none"
@@ -208,11 +240,14 @@ export const DocumentSigningForm = ({
                                         </span>
                                       )}
                                     </Label>
-                                    <p className="text-xs text-muted-foreground">{r.email}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {r.email}
+                                    </p>
                                   </div>
                                 </div>
                                 <div className="text-xs leading-[inherit] text-muted-foreground">
-                                  {r.fields.length} {r.fields.length === 1 ? 'field' : 'fields'}
+                                  {r.fields.length}{" "}
+                                  {r.fields.length === 1 ? "field" : "fields"}
                                 </div>
                               </div>
                             </div>
@@ -236,11 +271,14 @@ export const DocumentSigningForm = ({
                 <AssistantConfirmationDialog
                   hasUninsertedFields={uninsertedFields.length > 0}
                   isOpen={isConfirmationDialogOpen}
-                  onClose={() => !isAssistantSubmitting && setIsConfirmationDialogOpen(false)}
+                  onClose={() =>
+                    !isAssistantSubmitting && setIsConfirmationDialogOpen(false)
+                  }
                   onConfirm={handleAssistantConfirmDialogSubmit}
                   isSubmitting={isAssistantSubmitting}
                   allowDictateNextSigner={
-                    nextRecipient && document.documentMeta?.allowDictateNextSigner
+                    nextRecipient &&
+                    document.documentMeta?.allowDictateNextSigner
                   }
                   defaultNextSigner={
                     nextRecipient
@@ -280,11 +318,17 @@ export const DocumentSigningForm = ({
                       <SignaturePadDialog
                         className="mt-2"
                         disabled={isSubmitting}
-                        value={signature ?? ''}
-                        onChange={(v) => setSignature(v ?? '')}
-                        typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
-                        uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
-                        drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
+                        value={signature ?? ""}
+                        onChange={(v) => setSignature(v ?? "")}
+                        typedSignatureEnabled={
+                          document.documentMeta?.typedSignatureEnabled
+                        }
+                        uploadSignatureEnabled={
+                          document.documentMeta?.uploadSignatureEnabled
+                        }
+                        drawSignatureEnabled={
+                          document.documentMeta?.drawSignatureEnabled
+                        }
                       />
                     </div>
                   )}
@@ -297,7 +341,9 @@ export const DocumentSigningForm = ({
                   className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                   variant="secondary"
                   size="lg"
-                  disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                  disabled={
+                    typeof window !== "undefined" && window.history.length <= 1
+                  }
                   onClick={async () => navigate(-1)}
                 >
                   <Trans>Cancel</Trans>
@@ -317,7 +363,8 @@ export const DocumentSigningForm = ({
                   }
                   recipient={recipient}
                   allowDictateNextSigner={
-                    nextRecipient && document.documentMeta?.allowDictateNextSigner
+                    nextRecipient &&
+                    document.documentMeta?.allowDictateNextSigner
                   }
                   defaultNextSigner={
                     nextRecipient

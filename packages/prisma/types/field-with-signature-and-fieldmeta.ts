@@ -1,6 +1,6 @@
-import type { Field, Signature } from '@prisma/client';
+import type { Field, Signature } from "@prisma/client";
 
-import { type TFieldMetaSchema as FieldMeta } from '@signtusk/lib/types/field-meta';
+import { type TFieldMetaSchema as FieldMeta } from "@signtusk/lib/types/field-meta";
 
 export type FieldWithSignatureAndFieldMeta = Field & {
   signature?: Signature | null;

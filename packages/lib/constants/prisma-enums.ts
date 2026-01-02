@@ -2,395 +2,280 @@
  * Browser-safe Prisma enums.
  * These are duplicated from @prisma/client to avoid importing the full Prisma client in browser code.
  * Keep these in sync with the Prisma schema.
+ *
+ * NOTE: We use string literal union types instead of enums to ensure compatibility
+ * with Prisma's generated types. TypeScript treats enum types as nominal (different enums
+ * with same values are incompatible), but string literal unions are structural.
+ *
+ * IMPORTANT: Do NOT define interface types here (like Field, Recipient, etc.) as they
+ * will conflict with the Prisma-generated types. Use the types from @prisma/client instead.
  */
 
-export enum FieldType {
-  SIGNATURE = "SIGNATURE",
-  FREE_SIGNATURE = "FREE_SIGNATURE",
-  INITIALS = "INITIALS",
-  NAME = "NAME",
-  EMAIL = "EMAIL",
-  DATE = "DATE",
-  TEXT = "TEXT",
-  NUMBER = "NUMBER",
-  RADIO = "RADIO",
-  CHECKBOX = "CHECKBOX",
-  DROPDOWN = "DROPDOWN",
-}
+// String literal union types for compatibility with Prisma
+export type FieldType =
+  | "SIGNATURE"
+  | "FREE_SIGNATURE"
+  | "INITIALS"
+  | "NAME"
+  | "EMAIL"
+  | "DATE"
+  | "TEXT"
+  | "NUMBER"
+  | "RADIO"
+  | "CHECKBOX"
+  | "DROPDOWN";
 
-export enum RecipientRole {
-  CC = "CC",
-  SIGNER = "SIGNER",
-  VIEWER = "VIEWER",
-  APPROVER = "APPROVER",
-  ASSISTANT = "ASSISTANT",
-}
+export const FieldType = {
+  SIGNATURE: "SIGNATURE",
+  FREE_SIGNATURE: "FREE_SIGNATURE",
+  INITIALS: "INITIALS",
+  NAME: "NAME",
+  EMAIL: "EMAIL",
+  DATE: "DATE",
+  TEXT: "TEXT",
+  NUMBER: "NUMBER",
+  RADIO: "RADIO",
+  CHECKBOX: "CHECKBOX",
+  DROPDOWN: "DROPDOWN",
+} as const;
 
-export enum SigningStatus {
-  NOT_SIGNED = "NOT_SIGNED",
-  SIGNED = "SIGNED",
-  REJECTED = "REJECTED",
-}
+export type RecipientRole =
+  | "CC"
+  | "SIGNER"
+  | "VIEWER"
+  | "APPROVER"
+  | "ASSISTANT";
 
-export enum SendStatus {
-  NOT_SENT = "NOT_SENT",
-  SENT = "SENT",
-}
+export const RecipientRole = {
+  CC: "CC",
+  SIGNER: "SIGNER",
+  VIEWER: "VIEWER",
+  APPROVER: "APPROVER",
+  ASSISTANT: "ASSISTANT",
+} as const;
 
-export enum ReadStatus {
-  NOT_OPENED = "NOT_OPENED",
-  OPENED = "OPENED",
-}
+export type SigningStatus = "NOT_SIGNED" | "SIGNED" | "REJECTED";
 
-export enum DocumentDistributionMethod {
-  EMAIL = "EMAIL",
-  NONE = "NONE",
-}
+export const SigningStatus = {
+  NOT_SIGNED: "NOT_SIGNED",
+  SIGNED: "SIGNED",
+  REJECTED: "REJECTED",
+} as const;
 
-export enum DocumentStatus {
-  DRAFT = "DRAFT",
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
-  REJECTED = "REJECTED",
-}
+export type SendStatus = "NOT_SENT" | "SENT";
 
-export enum EnvelopeType {
-  DOCUMENT = "DOCUMENT",
-  TEMPLATE = "TEMPLATE",
-}
+export const SendStatus = {
+  NOT_SENT: "NOT_SENT",
+  SENT: "SENT",
+} as const;
 
-export enum DocumentVisibility {
-  EVERYONE = "EVERYONE",
-  ADMIN = "ADMIN",
-  MANAGER_AND_ABOVE = "MANAGER_AND_ABOVE",
-}
+export type ReadStatus = "NOT_OPENED" | "OPENED";
 
-export enum OrganisationType {
-  PERSONAL = "PERSONAL",
-  ORGANISATION = "ORGANISATION",
-}
+export const ReadStatus = {
+  NOT_OPENED: "NOT_OPENED",
+  OPENED: "OPENED",
+} as const;
 
-export enum OrganisationMemberRole {
-  ADMIN = "ADMIN",
-  MANAGER = "MANAGER",
-  MEMBER = "MEMBER",
-}
+export type DocumentDistributionMethod = "EMAIL" | "NONE";
 
-export enum SubscriptionStatus {
-  ACTIVE = "ACTIVE",
-  PAST_DUE = "PAST_DUE",
-  INACTIVE = "INACTIVE",
-}
+export const DocumentDistributionMethod = {
+  EMAIL: "EMAIL",
+  NONE: "NONE",
+} as const;
 
-export enum DocumentSigningOrder {
-  PARALLEL = "PARALLEL",
-  SEQUENTIAL = "SEQUENTIAL",
-}
+export type DocumentStatus = "DRAFT" | "PENDING" | "COMPLETED" | "REJECTED";
 
-export enum TeamMemberRole {
-  ADMIN = "ADMIN",
-  MANAGER = "MANAGER",
-  MEMBER = "MEMBER",
-}
+export const DocumentStatus = {
+  DRAFT: "DRAFT",
+  PENDING: "PENDING",
+  COMPLETED: "COMPLETED",
+  REJECTED: "REJECTED",
+} as const;
 
-export enum WebhookTriggerEvents {
-  DOCUMENT_CREATED = "DOCUMENT_CREATED",
-  DOCUMENT_SENT = "DOCUMENT_SENT",
-  DOCUMENT_OPENED = "DOCUMENT_OPENED",
-  DOCUMENT_SIGNED = "DOCUMENT_SIGNED",
-  DOCUMENT_COMPLETED = "DOCUMENT_COMPLETED",
-  DOCUMENT_REJECTED = "DOCUMENT_REJECTED",
-  DOCUMENT_CANCELLED = "DOCUMENT_CANCELLED",
-}
+export type EnvelopeType = "DOCUMENT" | "TEMPLATE";
 
-export enum WebhookCallStatus {
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
-}
+export const EnvelopeType = {
+  DOCUMENT: "DOCUMENT",
+  TEMPLATE: "TEMPLATE",
+} as const;
 
-export enum TemplateType {
-  PUBLIC = "PUBLIC",
-  PRIVATE = "PRIVATE",
-}
+export type DocumentVisibility = "EVERYONE" | "ADMIN" | "MANAGER_AND_ABOVE";
 
-export enum FolderType {
-  DOCUMENT = "DOCUMENT",
-  TEMPLATE = "TEMPLATE",
-}
+export const DocumentVisibility = {
+  EVERYONE: "EVERYONE",
+  ADMIN: "ADMIN",
+  MANAGER_AND_ABOVE: "MANAGER_AND_ABOVE",
+} as const;
 
-export enum OrganisationGroupType {
-  INTERNAL_ORGANISATION = "INTERNAL_ORGANISATION",
-  INTERNAL_TEAM = "INTERNAL_TEAM",
-  CUSTOM = "CUSTOM",
-}
+export type OrganisationType = "PERSONAL" | "ORGANISATION";
 
-export enum AuthenticationMethod {
-  ACCOUNT = "ACCOUNT",
-  EXPLICIT_NONE = "EXPLICIT_NONE",
-  TWO_FACTOR_AUTH = "TWO_FACTOR_AUTH",
-  PASSKEY = "PASSKEY",
-}
+export const OrganisationType = {
+  PERSONAL: "PERSONAL",
+  ORGANISATION: "ORGANISATION",
+} as const;
 
-export enum DocumentDataType {
-  BYTES = "BYTES",
-  BYTES_64 = "BYTES_64",
-  S3_PATH = "S3_PATH",
-}
+export type OrganisationMemberRole = "ADMIN" | "MANAGER" | "MEMBER";
 
-export enum OrganisationMemberInviteStatus {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  DECLINED = "DECLINED",
-}
+export const OrganisationMemberRole = {
+  ADMIN: "ADMIN",
+  MANAGER: "MANAGER",
+  MEMBER: "MEMBER",
+} as const;
 
-export enum Role {
-  ADMIN = "ADMIN",
-  USER = "USER",
-}
+export type SubscriptionStatus = "ACTIVE" | "PAST_DUE" | "INACTIVE";
 
-// Type definitions for commonly used Prisma types in client code
-// These are simplified versions - only include fields needed client-side
+export const SubscriptionStatus = {
+  ACTIVE: "ACTIVE",
+  PAST_DUE: "PAST_DUE",
+  INACTIVE: "INACTIVE",
+} as const;
 
-export interface Field {
-  id: number;
-  secondaryId: string;
-  envelopeId: string;
-  envelopeItemId: string;
-  type: FieldType;
-  page: number;
-  positionX: number | string;
-  positionY: number | string;
-  width: number | string;
-  height: number | string;
-  recipientId: number;
-  fieldMeta?: unknown;
-  customText: string;
-  inserted: boolean;
-}
+export type DocumentSigningOrder = "PARALLEL" | "SEQUENTIAL";
 
-export interface Recipient {
-  id: number;
-  envelopeId: string;
-  email: string;
-  name: string;
-  token: string;
-  documentDeletedAt: Date | null;
-  expired: Date | null;
-  signedAt: Date | null;
-  authOptions: unknown | null;
-  signingOrder: number | null;
-  rejectionReason: string | null;
-  role: RecipientRole;
-  readStatus: ReadStatus;
-  signingStatus: SigningStatus;
-  sendStatus: SendStatus;
-}
+export const DocumentSigningOrder = {
+  PARALLEL: "PARALLEL",
+  SEQUENTIAL: "SEQUENTIAL",
+} as const;
 
-export interface EnvelopeItem {
-  id: string;
-  title: string;
-  order: number;
-  documentDataId: string;
-  envelopeId: string;
-}
+export type TeamMemberRole = "ADMIN" | "MANAGER" | "MEMBER";
 
-export interface Webhook {
-  id: string;
-  webhookUrl: string;
-  eventTriggers: WebhookTriggerEvents[];
-  secret: string | null;
-  enabled: boolean;
-  teamId: number;
-  userId: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export const TeamMemberRole = {
+  ADMIN: "ADMIN",
+  MANAGER: "MANAGER",
+  MEMBER: "MEMBER",
+} as const;
 
-export interface ApiToken {
-  id: number;
-  name: string;
-  token: string;
-  algorithm: string | null;
-  expires: Date | null;
-  createdAt: Date;
-  teamId: number;
-  userId: number;
-}
+export type WebhookTriggerEvents =
+  | "DOCUMENT_CREATED"
+  | "DOCUMENT_SENT"
+  | "DOCUMENT_OPENED"
+  | "DOCUMENT_SIGNED"
+  | "DOCUMENT_COMPLETED"
+  | "DOCUMENT_REJECTED"
+  | "DOCUMENT_CANCELLED";
 
-export interface TeamEmail {
-  teamId: number;
-  email: string;
-  name: string;
-  createdAt: Date;
-}
+export const WebhookTriggerEvents = {
+  DOCUMENT_CREATED: "DOCUMENT_CREATED",
+  DOCUMENT_SENT: "DOCUMENT_SENT",
+  DOCUMENT_OPENED: "DOCUMENT_OPENED",
+  DOCUMENT_SIGNED: "DOCUMENT_SIGNED",
+  DOCUMENT_COMPLETED: "DOCUMENT_COMPLETED",
+  DOCUMENT_REJECTED: "DOCUMENT_REJECTED",
+  DOCUMENT_CANCELLED: "DOCUMENT_CANCELLED",
+} as const;
 
-export interface TeamGroup {
-  id: string;
-  teamId: number;
-  organisationGroupId: string;
-  teamRole: TeamMemberRole;
-}
+export type WebhookCallStatus = "SUCCESS" | "FAILED";
 
-export interface TemplateDirectLink {
-  id: string;
-  envelopeId: string;
-  token: string;
-  enabled: boolean;
-  directTemplateRecipientId: number;
-  createdAt: Date;
-}
+export const WebhookCallStatus = {
+  SUCCESS: "SUCCESS",
+  FAILED: "FAILED",
+} as const;
 
-export interface User {
-  id: number;
-  name: string | null;
-  email: string;
-  emailVerified: Date | null;
-  avatarImageId: string | null;
-}
+export type TemplateType = "PUBLIC" | "PRIVATE";
 
-export interface Team {
-  id: number;
-  name: string;
-  url: string;
-  createdAt: Date;
-  avatarImageId: string | null;
-}
+export const TemplateType = {
+  PUBLIC: "PUBLIC",
+  PRIVATE: "PRIVATE",
+} as const;
 
-export interface Signature {
-  id: number;
-  recipientId: number;
-  fieldId: number;
-  signatureImageAsBase64: string | null;
-  typedSignature: string | null;
-  created: Date;
-}
+// Alias for backwards compatibility
+export type TemplateTypes = TemplateType;
+export const TemplateTypes = TemplateType;
 
-export interface DocumentData {
-  id: string;
-  type: DocumentDataType;
-  data: string;
-  initialData: string;
-}
+export type FolderType = "DOCUMENT" | "TEMPLATE";
 
-export interface DocumentMeta {
-  id: string;
-  subject: string | null;
-  message: string | null;
-  timezone: string | null;
-  dateFormat: string | null;
-  redirectUrl: string | null;
-  signingOrder: DocumentSigningOrder | null;
-  typedSignatureEnabled: boolean;
-  drawSignatureEnabled: boolean;
-  uploadSignatureEnabled: boolean;
-  language: string | null;
-  distributionMethod: DocumentDistributionMethod;
-}
+export const FolderType = {
+  DOCUMENT: "DOCUMENT",
+  TEMPLATE: "TEMPLATE",
+} as const;
 
-// Additional enums needed by components
-export enum DocumentSource {
-  DOCUMENT = "DOCUMENT",
-  TEMPLATE = "TEMPLATE",
-  TEMPLATE_DIRECT_LINK = "TEMPLATE_DIRECT_LINK",
-}
+export type OrganisationGroupType =
+  | "INTERNAL_ORGANISATION"
+  | "INTERNAL_TEAM"
+  | "CUSTOM";
 
-export enum EmailDomainStatus {
-  PENDING = "PENDING",
-  ACTIVE = "ACTIVE",
-}
+export const OrganisationGroupType = {
+  INTERNAL_ORGANISATION: "INTERNAL_ORGANISATION",
+  INTERNAL_TEAM: "INTERNAL_TEAM",
+  CUSTOM: "CUSTOM",
+} as const;
 
-// Additional interfaces needed by components
-export interface TeamGlobalSettings {
-  id: string;
-  documentVisibility: DocumentVisibility | null;
-  documentLanguage: string | null;
-  documentTimezone: string | null;
-  documentDateFormat: string | null;
-  includeSenderDetails: boolean | null;
-  includeSigningCertificate: boolean | null;
-  includeAuditLog: boolean | null;
-  typedSignatureEnabled: boolean | null;
-  uploadSignatureEnabled: boolean | null;
-  drawSignatureEnabled: boolean | null;
-  emailId: string | null;
-  emailReplyTo: string | null;
-  emailDocumentSettings: unknown | null;
-  brandingEnabled: boolean | null;
-  brandingLogo: string | null;
-  brandingUrl: string | null;
-  brandingCompanyDetails: string | null;
-  aiFeaturesEnabled: boolean | null;
-}
+export type AuthenticationMethod =
+  | "ACCOUNT"
+  | "EXPLICIT_NONE"
+  | "TWO_FACTOR_AUTH"
+  | "PASSKEY"
+  | "PASSWORD";
 
-export interface TeamProfile {
-  id: string;
-  enabled: boolean;
-  teamId: number;
-  bio: string | null;
-}
+export const AuthenticationMethod = {
+  ACCOUNT: "ACCOUNT",
+  EXPLICIT_NONE: "EXPLICIT_NONE",
+  TWO_FACTOR_AUTH: "TWO_FACTOR_AUTH",
+  PASSKEY: "PASSKEY",
+  PASSWORD: "PASSWORD",
+} as const;
 
-export interface SubscriptionClaim {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  locked: boolean;
-  teamCount: number;
-  memberCount: number;
-  envelopeItemCount: number;
-  flags: unknown;
-}
+export type DocumentDataType = "BYTES" | "BYTES_64" | "S3_PATH";
 
-export interface Subscription {
-  id: number;
-  status: SubscriptionStatus;
-  planId: string;
-  priceId: string;
-  periodEnd: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  cancelAtPeriodEnd: boolean;
-  customerId: string;
-  organisationId: string;
-}
+export const DocumentDataType = {
+  BYTES: "BYTES",
+  BYTES_64: "BYTES_64",
+  S3_PATH: "S3_PATH",
+} as const;
 
-export interface Envelope {
-  id: string;
-  secondaryId: string;
-  externalId: string | null;
-  type: EnvelopeType;
-  createdAt: Date;
-  updatedAt: Date;
-  completedAt: Date | null;
-  deletedAt: Date | null;
-  title: string;
-  status: DocumentStatus;
-  source: DocumentSource;
-  qrToken: string | null;
-  internalVersion: number;
-  useLegacyFieldInsertion: boolean;
-  visibility: DocumentVisibility;
-  templateType: TemplateType;
-  publicTitle: string;
-  publicDescription: string;
-  templateId: number | null;
-  userId: number;
-  teamId: number;
-  folderId: string | null;
-  documentMetaId: string;
-}
+export type OrganisationMemberInviteStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "DECLINED";
 
-export interface Passkey {
-  id: string;
-  userId: number;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-  lastUsedAt: Date | null;
-  credentialId: Uint8Array;
-  credentialPublicKey: Uint8Array;
-  counter: bigint;
-  credentialDeviceType: string;
-  credentialBackedUp: boolean;
-  transports: string[];
-}
+export const OrganisationMemberInviteStatus = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
+} as const;
+
+export type Role = "ADMIN" | "USER";
+
+export const Role = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+} as const;
+
+export type DocumentSource = "DOCUMENT" | "TEMPLATE" | "TEMPLATE_DIRECT_LINK";
+
+export const DocumentSource = {
+  DOCUMENT: "DOCUMENT",
+  TEMPLATE: "TEMPLATE",
+  TEMPLATE_DIRECT_LINK: "TEMPLATE_DIRECT_LINK",
+} as const;
+
+export type EmailDomainStatus = "PENDING" | "ACTIVE";
+
+export const EmailDomainStatus = {
+  PENDING: "PENDING",
+  ACTIVE: "ACTIVE",
+} as const;
+
+// Re-export interface types from @prisma/client for backwards compatibility
+// These are the actual Prisma-generated types, not simplified browser-safe versions
+export type {
+  ApiToken,
+  DocumentData,
+  DocumentMeta,
+  Envelope,
+  EnvelopeItem,
+  Field,
+  Passkey,
+  Recipient,
+  Signature,
+  Subscription,
+  SubscriptionClaim,
+  Team,
+  TeamEmail,
+  TeamGlobalSettings,
+  TeamGroup,
+  TeamProfile,
+  TemplateDirectLink,
+  User,
+  Webhook,
+} from "@prisma/client";

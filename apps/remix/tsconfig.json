@@ -3,58 +3,29 @@
     "**/*",
     "**/.server/**/*",
     "**/.client/**/*",
-    ".react-router/types/**/*"
+    ".react-router/types/**/*",
+    "../../packages/prisma/types/types.d.ts"
   ],
   "compilerOptions": {
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ],
-    "types": [
-      "node",
-      "vite/client"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["node", "vite/client"],
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "rootDirs": [
-      ".",
-      "./.react-router/types"
-    ],
+    "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./app/*"
-      ],
-      "@signtusk/api": [
-        "../../packages/api"
-      ],
-      "@signtusk/assets": [
-        "../../packages/assets"
-      ],
-      "@signtusk/auth": [
-        "../../packages/auth"
-      ],
-      "@signtusk/ee": [
-        "../../packages/ee"
-      ],
-      "@signtusk/lib": [
-        "../../packages/lib"
-      ],
-      "@signtusk/prisma": [
-        "../../packages/prisma"
-      ],
-      "@signtusk/trpc": [
-        "../../packages/trpc"
-      ],
-      "@signtusk/ui": [
-        "../../packages/ui"
-      ],
-      "@signtusk/tailwind-config": [
-        "../../packages/tailwind-config"
-      ]
+      "~/*": ["./app/*"],
+      "@signtusk/api": ["../../packages/api"],
+      "@signtusk/assets": ["../../packages/assets"],
+      "@signtusk/auth": ["../../packages/auth"],
+      "@signtusk/ee": ["../../packages/ee"],
+      "@signtusk/lib": ["../../packages/lib"],
+      "@signtusk/prisma": ["../../packages/prisma"],
+      "@signtusk/trpc": ["../../packages/trpc"],
+      "@signtusk/ui": ["../../packages/ui"],
+      "@signtusk/tailwind-config": ["../../packages/tailwind-config"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
