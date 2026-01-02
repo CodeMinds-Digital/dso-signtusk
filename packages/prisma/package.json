@@ -1,7 +1,7 @@
 {
   "name": "@signtusk/prisma",
   "version": "0.0.0",
-  "type": "commonjs",
+  "type": "module",
   "main": "./index.ts",
   "types": "./index.ts",
   "license": "Private - Part of Signtusk Platform",
