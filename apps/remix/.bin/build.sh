@@ -16,6 +16,11 @@ cd "$WEB_APP_DIR"
 
 start_time=$(date +%s)
 
+echo "[Build]: Generating Prisma client with environment variables"
+cd ../../packages/prisma
+NEXT_PRIVATE_DATABASE_URL="$NEXT_PRIVATE_DATABASE_URL" NEXT_PRIVATE_DIRECT_DATABASE_URL="$NEXT_PRIVATE_DIRECT_DATABASE_URL" npx prisma generate
+cd "$WEB_APP_DIR"
+
 echo "[Build]: Extracting and compiling translations"
 npm run translate --prefix ../../
 
