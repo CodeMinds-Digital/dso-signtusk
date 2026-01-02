@@ -2,16 +2,24 @@
   "name": "@signtusk/remix",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "build": "./.bin/build.sh",
-    "build:app": "npm run typecheck && cross-env NODE_ENV=production react-router build",
-    "build:server": "cross-env NODE_ENV=production rollup -c rollup.config.mjs",
-    "dev": "npm run with:env -- react-router dev",
+    "build": "node scripts/vercel-build.js",
+    "build:vercel": "node scripts/vercel-build.js",
+    "build:vercel:fallback": "node scripts/vercel-build-fallback.js",
+    "build:standalone": "echo 'Skipping translations' && npm run build:app && npm run build:server && cp server/main.js build/server/main.js",
+    "build:app": "node scripts/build-with-env.js npx cross-env NODE_ENV=production npx react-router build",
+    "build:server": "node scripts/build-with-env.js npx cross-env NODE_ENV=production npx rollup -c rollup.config.mjs",
+    "dev": "node scripts/build-with-env.js npx react-router dev",
     "dev:billing": "bash .bin/stripe-dev.sh",
-    "start": "npm run with:env -- cross-env NODE_ENV=production node build/server/main.js",
+    "start": "node scripts/build-with-env.js NODE_ENV=production node build/server/main.js",
     "clean": "rimraf .react-router && rimraf node_modules",
-    "typecheck": "react-router typegen && tsc",
-    "with:env": "dotenv -e ../../.env -e ../../.env.local --"
+    "typecheck": "npx react-router typegen && tsc",
+    "with:env": "node scripts/build-with-env.js",
+    "build:simple": "node scripts/build-with-env.js npx cross-env NODE_ENV=production npx react-router build && node scripts/build-with-env.js npx cross-env NODE_ENV=production npx rollup -c rollup.config.mjs && cp server/main.js build/server/main.js",
+    "build:fallback": "node scripts/build-with-env.js npx react-router build && node scripts/build-with-env.js npx rollup -c rollup.config.mjs && cp server/main.js build/server/main.js"
   },
   "dependencies": {
     "@babel/core": "^7.28.5",
@@ -120,6 +128,6 @@
     "tsx": "^4.20.6",
     "vite": "^7.2.4"
   },
-  "version": "2.2.6",
+  "version": "2.2.6-test-1767106062731-test-1767152849895-test-1767152849931-test-1767238798435-test-1767238798444-test-1767281974775",
   "license": "Private - Part of Signtusk Platform"
 }
