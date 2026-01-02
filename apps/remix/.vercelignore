@@ -1,0 +1,91 @@
+# Dependencies
+node_modules/
+../../node_modules/
+
+# Build outputs (exclude all build artifacts - Vercel will rebuild)
+build/
+.next/
+.turbo/
+dist/
+.react-router/
+
+# Development files
+.env.local
+.env.development
+.env.staging
+.env copy.local
+
+# Logs
+logs/
+*.log
+
+# Test files
+*.test.*
+*.spec.*
+__tests__/
+test/
+tests/
+
+# Development scripts (keep only vercel-build.js)
+scripts/build-with-env.js
+scripts/vercel-build-fallback.js
+
+# Source maps
+*.map
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+*.bak
+
+# Documentation
+*.md
+!README.md
+
+# Docker files (not needed for Vercel)
+Dockerfile*
+.dockerignore
+
+# Netlify files (not needed for Vercel)
+netlify.toml
+
+# Large font files (use CDN or separate storage for production)
+public/fonts/noto-sans-chinese.ttf
+public/fonts/noto-sans-korean.ttf
+public/fonts/noto-sans-japanese.ttf
+public/fonts/inter-italic-variablefont_opsz,wght.ttf
+
+# Large unused components
+app/components/general/background.tsx
+
+# Large images (optimize or use CDN for production)
+public/opengraph-image.jpg
+public/static/og-share-frame2.png
+
+# Development configuration
+.nvmrc
+
+# Other apps and packages (exclude everything except what we need)
+../../apps/web/
+../../apps/app/
+../../apps/docs/
+../../apps/mobile/
+../../packages/*/
+!../../packages/prisma/
+
+# Keep only essential prisma files
+!../../packages/prisma/schema.prisma
+!../../packages/prisma/migrations/
+!../../packages/prisma/scripts/vercel-generate.js
+!../../packages/prisma/package.json
+!../../packages/prisma/generated/
+# Additional optimizations
+example/
+.bin/

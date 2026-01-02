@@ -1,0 +1,72 @@
+# Local Development Configuration
+# This file overrides .env.example for local development
+
+# ===== REDIS CONFIGURATION =====
+# Using Upstash Redis (cloud-hosted)
+REDIS_URL="rediss://default:ASkIAAIncDE3NGY2ZWZjMmQ5ODM0MjBjOGI5ZWYzZmE2ODVkNmRmZHAxMTA1MDQ@set-panther-10504.upstash.io:6379"
+
+# ===== DATABASE CONFIGURATION =====
+# Using your existing Prisma database connection
+# (DATABASE_URL should already be configured in your Prisma setup)
+NEXT_PRIVATE_DATABASE_URL="postgresql://neondb_owner:npg_7Zyqa2nNKJcl@ep-round-river-a1cizlzb-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://neondb_owner:npg_7Zyqa2nNKJcl@ep-round-river-a1cizlzb-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# ===== AUTHENTICATION SECRETS =====
+# Generate secure secrets for local development
+NEXTAUTH_SECRET="dev-nextauth-secret-that-is-at-least-32-characters-long-for-security"
+NEXT_PRIVATE_ENCRYPTION_KEY="dev-encryption-key-32-chars-long"
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="dev-secondary-key-32-chars-long"
+
+# Legacy auth secrets (for compatibility)
+JWT_SECRET="dev-jwt-secret-key-that-is-at-least-32-characters-long-for-validation"
+ENCRYPTION_KEY="dev-encryption-key-32-characters"
+SESSION_SECRET="dev-session-secret-key-that-is-at-least-32-characters-long"
+
+# ===== APPLICATION URLS =====
+NEXT_PUBLIC_WEBAPP_URL="http://localhost:3002"
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3002"
+NEXT_PUBLIC_APP_URL="http://localhost:3002"
+NEXT_PUBLIC_API_URL="http://localhost:3002"
+
+# ===== SERVER CONFIGURATION =====
+PORT=3002
+NODE_ENV="development"
+
+# ===== EMAIL CONFIGURATION (Development) =====
+# Using local SMTP for development (optional)
+NEXT_PRIVATE_SMTP_HOST="localhost"
+NEXT_PRIVATE_SMTP_PORT=1025
+NEXT_PRIVATE_SMTP_FROM_NAME="Signtusk Dev"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@localhost"
+NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS=true
+
+# Legacy SMTP
+SMTP_HOST="localhost"
+SMTP_PORT="1025"
+SMTP_FROM="noreply@localhost"
+
+# ===== STORAGE CONFIGURATION =====
+# Using database storage for development
+NEXT_PUBLIC_UPLOAD_TRANSPORT="database"
+STORAGE_PROVIDER="local"
+STORAGE_PATH="./uploads"
+
+# ===== SIGNING CONFIGURATION =====
+NEXT_PRIVATE_SIGNING_TRANSPORT="local"
+
+# ===== FEATURES =====
+# Enable features for development
+NEXT_PUBLIC_FEATURE_BILLING_ENABLED=false
+NEXT_PUBLIC_DISABLE_SIGNUP=false
+PDF_GENERATION_METHOD="server-side"
+
+# ===== BACKGROUND JOBS =====
+NEXT_PRIVATE_JOBS_PROVIDER="local"
+
+# ===== DEVELOPMENT FLAGS =====
+# Disable telemetry for local development
+DOCUMENSO_DISABLE_TELEMETRY=true
+
+# ===== LOGGING =====
+# Enable debug logging
+LOG_LEVEL="debug"

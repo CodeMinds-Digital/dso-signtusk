@@ -118,6 +118,10 @@ playwright/.cache/
 
 # Reference projects
 documenso-main/
+dso-signtusk-working/
+dso-signtusk-working.zip
 package-lock.json
+.vercel/
+logs/
 /.kiro
 /.kiro/specs
