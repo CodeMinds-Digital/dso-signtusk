@@ -1,13 +1,16 @@
-import { compare } from '@node-rs/bcrypt';
+import { compare } from "bcryptjs";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
 type VerifyPasswordOptions = {
   userId: number;
   password: string;
 };
 
-export const verifyPassword = async ({ userId, password }: VerifyPasswordOptions) => {
+export const verifyPassword = async ({
+  userId,
+  password,
+}: VerifyPasswordOptions) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });

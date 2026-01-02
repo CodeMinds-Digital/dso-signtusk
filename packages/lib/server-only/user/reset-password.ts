@@ -1,12 +1,15 @@
-import { compare, hash } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { compare, hash } from "bcryptjs";
 
-import { prisma } from '@signtusk/prisma';
+import {
+  Prisma,
+  UserSecurityAuditLogType,
+  prisma,
+} from "@signtusk/prisma/client";
 
-import { SALT_ROUNDS } from '../../constants/auth';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { jobsClient } from '../../jobs/client';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { SALT_ROUNDS } from "../../constants/auth";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { jobsClient } from "../../jobs/client";
+import type { RequestMetadata } from "../../universal/extract-request-metadata";
 
 export type ResetPasswordOptions = {
   token: string;
@@ -14,9 +17,13 @@ export type ResetPasswordOptions = {
   requestMetadata?: RequestMetadata;
 };
 
-export const resetPassword = async ({ token, password, requestMetadata }: ResetPasswordOptions) => {
+export const resetPassword = async ({
+  token,
+  password,
+  requestMetadata,
+}: ResetPasswordOptions) => {
   if (!token) {
-    throw new AppError('INVALID_TOKEN');
+    throw new AppError("INVALID_TOKEN");
   }
 
   const foundToken = await prisma.passwordResetToken.findFirst({
@@ -36,7 +43,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
   });
 
   if (!foundToken) {
-    throw new AppError('INVALID_TOKEN');
+    throw new AppError("INVALID_TOKEN");
   }
 
   const now = new Date();
@@ -45,15 +52,18 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
     throw new AppError(AppErrorCode.EXPIRED_CODE);
   }
 
-  const isSamePassword = await compare(password, foundToken.user.password || '');
+  const isSamePassword = await compare(
+    password,
+    foundToken.user.password || ""
+  );
 
   if (isSamePassword) {
-    throw new AppError('SAME_PASSWORD');
+    throw new AppError("SAME_PASSWORD");
   }
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.user.update({
       where: {
         id: foundToken.userId,
@@ -79,7 +89,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
     });
 
     await jobsClient.triggerJob({
-      name: 'send.password.reset.success.email',
+      name: "send.password.reset.success.email",
       payload: {
         userId: foundToken.userId,
       },

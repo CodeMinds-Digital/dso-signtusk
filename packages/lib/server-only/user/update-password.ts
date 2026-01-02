@@ -1,11 +1,11 @@
-import { compare, hash } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from "@prisma/client";
+import { compare, hash } from "bcryptjs";
 
-import { SALT_ROUNDS } from '@signtusk/lib/constants/auth';
-import type { RequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { prisma } from '@signtusk/prisma';
+import { SALT_ROUNDS } from "@signtusk/lib/constants/auth";
+import type { RequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { prisma } from "@signtusk/prisma";
 
-import { AppError } from '../../errors/app-error';
+import { AppError } from "../../errors/app-error";
 
 export type UpdatePasswordOptions = {
   userId: number;
@@ -28,18 +28,18 @@ export const updatePassword = async ({
   });
 
   if (!user.password) {
-    throw new AppError('NO_PASSWORD');
+    throw new AppError("NO_PASSWORD");
   }
 
   const isCurrentPasswordValid = await compare(currentPassword, user.password);
   if (!isCurrentPasswordValid) {
-    throw new AppError('INCORRECT_PASSWORD');
+    throw new AppError("INCORRECT_PASSWORD");
   }
 
   // Compare the new password with the old password
   const isSamePassword = await compare(password, user.password);
   if (isSamePassword) {
-    throw new AppError('SAME_PASSWORD');
+    throw new AppError("SAME_PASSWORD");
   }
 
   const hashedNewPassword = await hash(password, SALT_ROUNDS);

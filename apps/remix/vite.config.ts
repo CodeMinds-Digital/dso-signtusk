@@ -56,7 +56,6 @@ export default defineConfig({
     noExternal: ["react-dropzone", "plausible-tracker"],
     external: [
       "@napi-rs/canvas",
-      "@node-rs/bcrypt",
       "@prisma/client",
       "prisma",
       "kysely",
@@ -81,7 +80,6 @@ export default defineConfig({
     exclude: [
       "node_modules",
       "@napi-rs/canvas",
-      "@node-rs/bcrypt",
       "@signtusk/pdf-sign",
       "@signtusk/prisma",
       "prisma",
@@ -111,7 +109,6 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "@napi-rs/canvas",
-        "@node-rs/bcrypt",
         "@signtusk/pdf-sign",
         "@aws-sdk/cloudfront-signer",
         "nodemailer",

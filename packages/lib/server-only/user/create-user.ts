@@ -1,11 +1,11 @@
-import { hash } from '@node-rs/bcrypt';
-import type { User } from '@prisma/client';
+import type { User } from "@prisma/client";
+import { hash } from "bcryptjs";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { SALT_ROUNDS } from '../../constants/auth';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { createPersonalOrganisation } from '../organisation/create-organisation';
+import { SALT_ROUNDS } from "../../constants/auth";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { createPersonalOrganisation } from "../organisation/create-organisation";
 
 export interface CreateUserOptions {
   name: string;
@@ -14,7 +14,12 @@ export interface CreateUserOptions {
   signature?: string | null;
 }
 
-export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+export const createUser = async ({
+  name,
+  email,
+  password,
+  signature,
+}: CreateUserOptions) => {
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({

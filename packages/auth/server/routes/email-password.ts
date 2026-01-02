@@ -1,34 +1,34 @@
-import { sValidator } from '@hono/standard-validator';
-import { compare } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { Hono } from 'hono';
-import { DateTime } from 'luxon';
-import { z } from 'zod';
+import { sValidator } from "@hono/standard-validator";
+import { UserSecurityAuditLogType } from "@prisma/client";
+import { compare } from "bcryptjs";
+import { Hono } from "hono";
+import { DateTime } from "luxon";
+import { z } from "zod";
 
-import { EMAIL_VERIFICATION_STATE } from '@signtusk/lib/constants/email';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { jobsClient } from '@signtusk/lib/jobs/client';
-import { disableTwoFactorAuthentication } from '@signtusk/lib/server-only/2fa/disable-2fa';
-import { enableTwoFactorAuthentication } from '@signtusk/lib/server-only/2fa/enable-2fa';
-import { isTwoFactorAuthenticationEnabled } from '@signtusk/lib/server-only/2fa/is-2fa-availble';
-import { setupTwoFactorAuthentication } from '@signtusk/lib/server-only/2fa/setup-2fa';
-import { validateTwoFactorAuthentication } from '@signtusk/lib/server-only/2fa/validate-2fa';
-import { viewBackupCodes } from '@signtusk/lib/server-only/2fa/view-backup-codes';
-import { createUser } from '@signtusk/lib/server-only/user/create-user';
-import { forgotPassword } from '@signtusk/lib/server-only/user/forgot-password';
-import { getMostRecentEmailVerificationToken } from '@signtusk/lib/server-only/user/get-most-recent-email-verification-token';
-import { resetPassword } from '@signtusk/lib/server-only/user/reset-password';
-import { updatePassword } from '@signtusk/lib/server-only/user/update-password';
-import { verifyEmail } from '@signtusk/lib/server-only/user/verify-email';
-import { env } from '@signtusk/lib/utils/env';
-import { prisma } from '@signtusk/prisma';
+import { EMAIL_VERIFICATION_STATE } from "@signtusk/lib/constants/email";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { jobsClient } from "@signtusk/lib/jobs/client";
+import { disableTwoFactorAuthentication } from "@signtusk/lib/server-only/2fa/disable-2fa";
+import { enableTwoFactorAuthentication } from "@signtusk/lib/server-only/2fa/enable-2fa";
+import { isTwoFactorAuthenticationEnabled } from "@signtusk/lib/server-only/2fa/is-2fa-availble";
+import { setupTwoFactorAuthentication } from "@signtusk/lib/server-only/2fa/setup-2fa";
+import { validateTwoFactorAuthentication } from "@signtusk/lib/server-only/2fa/validate-2fa";
+import { viewBackupCodes } from "@signtusk/lib/server-only/2fa/view-backup-codes";
+import { createUser } from "@signtusk/lib/server-only/user/create-user";
+import { forgotPassword } from "@signtusk/lib/server-only/user/forgot-password";
+import { getMostRecentEmailVerificationToken } from "@signtusk/lib/server-only/user/get-most-recent-email-verification-token";
+import { resetPassword } from "@signtusk/lib/server-only/user/reset-password";
+import { updatePassword } from "@signtusk/lib/server-only/user/update-password";
+import { verifyEmail } from "@signtusk/lib/server-only/user/verify-email";
+import { env } from "@signtusk/lib/utils/env";
+import { prisma } from "@signtusk/prisma";
 
-import { AuthenticationErrorCode } from '../lib/errors/error-codes';
-import { invalidateSessions } from '../lib/session/session';
-import { getCsrfCookie } from '../lib/session/session-cookies';
-import { onAuthorize } from '../lib/utils/authorizer';
-import { getSession } from '../lib/utils/get-session';
-import type { HonoAuthContext } from '../types/context';
+import { AuthenticationErrorCode } from "../lib/errors/error-codes";
+import { invalidateSessions } from "../lib/session/session";
+import { getCsrfCookie } from "../lib/session/session-cookies";
+import { onAuthorize } from "../lib/utils/authorizer";
+import { getSession } from "../lib/utils/get-session";
+import type { HonoAuthContext } from "../types/context";
 import {
   ZForgotPasswordSchema,
   ZResendVerifyEmailSchema,
@@ -37,23 +37,24 @@ import {
   ZSignUpSchema,
   ZUpdatePasswordSchema,
   ZVerifyEmailSchema,
-} from '../types/email-password';
+} from "../types/email-password";
 
 export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
-    const requestMetadata = c.get('requestMetadata');
+  .post("/authorize", sValidator("json", ZSignInSchema), async (c) => {
+    const requestMetadata = c.get("requestMetadata");
 
-    const { email, password, totpCode, backupCode, csrfToken } = c.req.valid('json');
+    const { email, password, totpCode, backupCode, csrfToken } =
+      c.req.valid("json");
 
     const csrfCookieToken = await getCsrfCookie(c);
 
     // Todo: (RR7) Add logging here.
     if (csrfToken !== csrfCookieToken || !csrfCookieToken) {
       throw new AppError(AuthenticationErrorCode.InvalidRequest, {
-        message: 'Invalid CSRF token',
+        message: "Invalid CSRF token",
       });
     }
 
@@ -65,7 +66,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     if (!user || !user.password) {
       throw new AppError(AuthenticationErrorCode.InvalidCredentials, {
-        message: 'Invalid email or password',
+        message: "Invalid email or password",
       });
     }
 
@@ -82,14 +83,18 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
 
       throw new AppError(AuthenticationErrorCode.InvalidCredentials, {
-        message: 'Invalid email or password',
+        message: "Invalid email or password",
       });
     }
 
     const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
 
     if (is2faEnabled) {
-      const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+      const isValid = await validateTwoFactorAuthentication({
+        backupCode,
+        totpCode,
+        user,
+      });
 
       if (!isValid) {
         await prisma.userSecurityAuditLog.create({
@@ -113,103 +118,112 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       if (
         !mostRecentToken ||
         mostRecentToken.expires.valueOf() <= Date.now() ||
-        DateTime.fromJSDate(mostRecentToken.createdAt).diffNow('minutes').minutes > -5
+        DateTime.fromJSDate(mostRecentToken.createdAt).diffNow("minutes")
+          .minutes > -5
       ) {
         await jobsClient.triggerJob({
-          name: 'send.signup.confirmation.email',
+          name: "send.signup.confirmation.email",
           payload: {
             email: user.email,
           },
         });
       }
 
-      throw new AppError('UNVERIFIED_EMAIL', {
-        message: 'Unverified email',
+      throw new AppError("UNVERIFIED_EMAIL", {
+        message: "Unverified email",
       });
     }
 
     if (user.disabled) {
-      throw new AppError('ACCOUNT_DISABLED', {
-        message: 'Account disabled',
+      throw new AppError("ACCOUNT_DISABLED", {
+        message: "Account disabled",
       });
     }
 
     await onAuthorize({ userId: user.id }, c);
 
-    return c.text('', 201);
+    return c.text("", 201);
   })
   /**
    * Signup endpoint.
    */
-  .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
-    if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
-      throw new AppError('SIGNUP_DISABLED', {
-        message: 'Signups are disabled.',
+  .post("/signup", sValidator("json", ZSignUpSchema), async (c) => {
+    if (env("NEXT_PUBLIC_DISABLE_SIGNUP") === "true") {
+      throw new AppError("SIGNUP_DISABLED", {
+        message: "Signups are disabled.",
       });
     }
 
-    const { name, email, password, signature } = c.req.valid('json');
+    const { name, email, password, signature } = c.req.valid("json");
 
-    const user = await createUser({ name, email, password, signature }).catch((err) => {
-      console.error(err);
-      throw err;
-    });
+    const user = await createUser({ name, email, password, signature }).catch(
+      (err) => {
+        console.error(err);
+        throw err;
+      }
+    );
 
     await jobsClient.triggerJob({
-      name: 'send.signup.confirmation.email',
+      name: "send.signup.confirmation.email",
       payload: {
         email: user.email,
       },
     });
 
-    return c.text('OK', 201);
+    return c.text("OK", 201);
   })
   /**
    * Update password endpoint.
    */
-  .post('/update-password', sValidator('json', ZUpdatePasswordSchema), async (c) => {
-    const { password, currentPassword } = c.req.valid('json');
-    const requestMetadata = c.get('requestMetadata');
+  .post(
+    "/update-password",
+    sValidator("json", ZUpdatePasswordSchema),
+    async (c) => {
+      const { password, currentPassword } = c.req.valid("json");
+      const requestMetadata = c.get("requestMetadata");
 
-    const { session, user } = await getSession(c);
+      const { session, user } = await getSession(c);
 
-    await updatePassword({
-      userId: user.id,
-      password,
-      currentPassword,
-      requestMetadata,
-    });
-
-    const userSessionIds = await prisma.session
-      .findMany({
-        where: {
-          userId: user.id satisfies number, // Incase we pass undefined somehow.
-          id: {
-            not: session.id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      })
-      .then((sessions) => sessions.map((s) => s.id));
-
-    if (userSessionIds.length > 0) {
-      await invalidateSessions({
+      await updatePassword({
         userId: user.id,
-        sessionIds: userSessionIds,
-        metadata: requestMetadata,
-        isRevoke: true,
+        password,
+        currentPassword,
+        requestMetadata,
       });
-    }
 
-    return c.text('OK', 201);
-  })
+      const userSessionIds = await prisma.session
+        .findMany({
+          where: {
+            userId: user.id satisfies number, // Incase we pass undefined somehow.
+            id: {
+              not: session.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        })
+        .then((sessions) => sessions.map((s) => s.id));
+
+      if (userSessionIds.length > 0) {
+        await invalidateSessions({
+          userId: user.id,
+          sessionIds: userSessionIds,
+          metadata: requestMetadata,
+          isRevoke: true,
+        });
+      }
+
+      return c.text("OK", 201);
+    }
+  )
   /**
    * Verify email endpoint.
    */
-  .post('/verify-email', sValidator('json', ZVerifyEmailSchema), async (c) => {
-    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
+  .post("/verify-email", sValidator("json", ZVerifyEmailSchema), async (c) => {
+    const { state, userId } = await verifyEmail({
+      token: c.req.valid("json").token,
+    });
 
     // If email is verified, automatically authenticate user.
     if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
@@ -223,71 +237,83 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Resend verification email endpoint.
    */
-  .post('/resend-verify-email', sValidator('json', ZResendVerifyEmailSchema), async (c) => {
-    const { email } = c.req.valid('json');
+  .post(
+    "/resend-verify-email",
+    sValidator("json", ZResendVerifyEmailSchema),
+    async (c) => {
+      const { email } = c.req.valid("json");
 
-    await jobsClient.triggerJob({
-      name: 'send.signup.confirmation.email',
-      payload: {
-        email,
-      },
-    });
+      await jobsClient.triggerJob({
+        name: "send.signup.confirmation.email",
+        payload: {
+          email,
+        },
+      });
 
-    return c.text('OK', 201);
-  })
+      return c.text("OK", 201);
+    }
+  )
   /**
    * Forgot password endpoint.
    */
-  .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
-    const { email } = c.req.valid('json');
+  .post(
+    "/forgot-password",
+    sValidator("json", ZForgotPasswordSchema),
+    async (c) => {
+      const { email } = c.req.valid("json");
 
-    await forgotPassword({
-      email,
-    });
+      await forgotPassword({
+        email,
+      });
 
-    return c.text('OK', 201);
-  })
+      return c.text("OK", 201);
+    }
+  )
   /**
    * Reset password endpoint.
    */
-  .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
-    const { token, password } = c.req.valid('json');
+  .post(
+    "/reset-password",
+    sValidator("json", ZResetPasswordSchema),
+    async (c) => {
+      const { token, password } = c.req.valid("json");
 
-    const requestMetadata = c.get('requestMetadata');
+      const requestMetadata = c.get("requestMetadata");
 
-    const { userId } = await resetPassword({
-      token,
-      password,
-      requestMetadata,
-    });
-
-    // Invalidate all sessions after successful password reset
-    const userSessionIds = await prisma.session
-      .findMany({
-        where: {
-          userId: userId satisfies number, // Incase we pass undefined somehow.
-        },
-        select: {
-          id: true,
-        },
-      })
-      .then((sessions) => sessions.map((session) => session.id));
-
-    if (userSessionIds.length > 0) {
-      await invalidateSessions({
-        userId,
-        sessionIds: userSessionIds,
-        metadata: requestMetadata,
-        isRevoke: true,
+      const { userId } = await resetPassword({
+        token,
+        password,
+        requestMetadata,
       });
-    }
 
-    return c.text('OK', 201);
-  })
+      // Invalidate all sessions after successful password reset
+      const userSessionIds = await prisma.session
+        .findMany({
+          where: {
+            userId: userId satisfies number, // Incase we pass undefined somehow.
+          },
+          select: {
+            id: true,
+          },
+        })
+        .then((sessions) => sessions.map((session) => session.id));
+
+      if (userSessionIds.length > 0) {
+        await invalidateSessions({
+          userId,
+          sessionIds: userSessionIds,
+          metadata: requestMetadata,
+          isRevoke: true,
+        });
+      }
+
+      return c.text("OK", 201);
+    }
+  )
   /**
    * Setup two factor authentication.
    */
-  .post('/2fa/setup', async (c) => {
+  .post("/2fa/setup", async (c) => {
     const { user } = await getSession(c);
 
     const result = await setupTwoFactorAuthentication({
@@ -304,15 +330,15 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Enable two factor authentication.
    */
   .post(
-    '/2fa/enable',
+    "/2fa/enable",
     sValidator(
-      'json',
+      "json",
       z.object({
         code: z.string(),
-      }),
+      })
     ),
     async (c) => {
-      const requestMetadata = c.get('requestMetadata');
+      const requestMetadata = c.get("requestMetadata");
 
       const { user: sessionUser } = await getSession(c);
 
@@ -332,7 +358,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         throw new AppError(AuthenticationErrorCode.InvalidRequest);
       }
 
-      const { code } = c.req.valid('json');
+      const { code } = c.req.valid("json");
 
       const result = await enableTwoFactorAuthentication({
         user,
@@ -344,22 +370,22 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         success: true,
         recoveryCodes: result.recoveryCodes,
       });
-    },
+    }
   )
   /**
    * Disable two factor authentication.
    */
   .post(
-    '/2fa/disable',
+    "/2fa/disable",
     sValidator(
-      'json',
+      "json",
       z.object({
         totpCode: z.string().trim().optional(),
         backupCode: z.string().trim().optional(),
-      }),
+      })
     ),
     async (c) => {
-      const requestMetadata = c.get('requestMetadata');
+      const requestMetadata = c.get("requestMetadata");
 
       const { user: sessionUser } = await getSession(c);
 
@@ -380,7 +406,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         throw new AppError(AuthenticationErrorCode.InvalidRequest);
       }
 
-      const { totpCode, backupCode } = c.req.valid('json');
+      const { totpCode, backupCode } = c.req.valid("json");
 
       await disableTwoFactorAuthentication({
         user,
@@ -389,19 +415,19 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         requestMetadata,
       });
 
-      return c.text('OK', 201);
-    },
+      return c.text("OK", 201);
+    }
   )
   /**
    * View backup codes.
    */
   .post(
-    '/2fa/view-recovery-codes',
+    "/2fa/view-recovery-codes",
     sValidator(
-      'json',
+      "json",
       z.object({
         token: z.string(),
-      }),
+      })
     ),
     async (c) => {
       const { user: sessionUser } = await getSession(c);
@@ -423,7 +449,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         throw new AppError(AuthenticationErrorCode.InvalidRequest);
       }
 
-      const { token } = c.req.valid('json');
+      const { token } = c.req.valid("json");
 
       const backupCodes = await viewBackupCodes({
         user,
@@ -434,5 +460,5 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         success: true,
         backupCodes,
       });
-    },
+    }
   );
