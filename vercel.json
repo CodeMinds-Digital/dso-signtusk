@@ -12,7 +12,7 @@
   },
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/((?!assets/|fonts/|static/|site\\.webmanifest|favicon|apple-touch-icon|android-chrome|robots\\.txt|\\.png|\\.jpg|\\.ico|\\.ttf|\\.woff|\\.woff2).*)",
       "destination": "/apps/remix/api"
     }
   ],
@@ -23,6 +23,41 @@
         {
           "key": "Cache-Control",
           "value": "public, immutable, max-age=31536000"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/site.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(favicon|apple-touch-icon|android-chrome).*\\.(png|ico)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
         }
       ]
     }

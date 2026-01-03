@@ -83,6 +83,10 @@ export default defineConfig({
       versions: {},
       platform: "browser",
     }),
+    // Define Buffer for browser environments
+    "global.Buffer": "globalThis.Buffer",
+    // Additional Node.js globals that might be needed
+    global: "globalThis",
   },
   plugins: [
     prismaClientBrowserStub(),
@@ -126,7 +130,16 @@ export default defineConfig({
       "../../packages/ui/**/*",
       "../../packages/lib/**/*",
     ],
-    include: ["prop-types", "file-selector", "attr-accept"],
+    include: [
+      "prop-types",
+      "file-selector",
+      "attr-accept",
+      "buffer",
+      "process/browser",
+      "util",
+      "stream-browserify",
+      "crypto-browserify",
+    ],
     exclude: [
       "node_modules",
       "@napi-rs/canvas",
@@ -149,6 +162,12 @@ export default defineConfig({
     alias: {
       https: "node:https",
       canvas: path.resolve(__dirname, "./app/types/empty-module.ts"),
+      // Additional Node.js polyfills for browser
+      buffer: "buffer",
+      process: "process/browser",
+      util: "util",
+      stream: "stream-browserify",
+      crypto: "crypto-browserify",
     },
   },
   /**

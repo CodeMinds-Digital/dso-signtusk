@@ -1,33 +1,42 @@
-import { useMemo, useTransition } from 'react';
+import { useMemo, useTransition } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus as DocumentStatusEnum } from '@signtusk/lib/constants/prisma-enums';
-import { RecipientRole, SigningStatus } from '@signtusk/lib/constants/prisma-enums';
-import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, useSearchParams } from 'react-router';
-import { match } from 'ts-pattern';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import {
+  DocumentStatus as DocumentStatusEnum,
+  RecipientRole,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import {
+  CheckCircleIcon,
+  DownloadIcon,
+  EyeIcon,
+  Loader,
+  PencilIcon,
+} from "lucide-react";
+import { DateTime } from "luxon";
+import { Link, useSearchParams } from "react-router";
+import { match } from "ts-pattern";
 
-import { useUpdateSearchParams } from '@signtusk/lib/client-only/hooks/use-update-search-params';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { isDocumentCompleted } from '@signtusk/lib/utils/document';
-import { trpc } from '@signtusk/trpc/react';
-import type { TFindInboxResponse } from '@signtusk/trpc/server/document-router/find-inbox.types';
-import { Button } from '@signtusk/ui/primitives/button';
-import type { DataTableColumnDef } from '@signtusk/ui/primitives/data-table';
-import { DataTable } from '@signtusk/ui/primitives/data-table';
-import { DataTablePagination } from '@signtusk/ui/primitives/data-table-pagination';
-import { Skeleton } from '@signtusk/ui/primitives/skeleton';
-import { TableCell } from '@signtusk/ui/primitives/table';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+import { useUpdateSearchParams } from "@signtusk/lib/client-only/hooks/use-update-search-params";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { isDocumentCompleted } from "@signtusk/lib/utils/document";
+import { trpc } from "@signtusk/trpc/react";
+import type { TFindInboxResponse } from "@signtusk/trpc/server/document-router/find-inbox.types";
+import { Button } from "@signtusk/ui/primitives/button";
+import type { DataTableColumnDef } from "@signtusk/ui/primitives/data-table";
+import { DataTable } from "@signtusk/ui/primitives/data-table";
+import { DataTablePagination } from "@signtusk/ui/primitives/data-table-pagination";
+import { Skeleton } from "@signtusk/ui/primitives/skeleton";
+import { TableCell } from "@signtusk/ui/primitives/table";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { DocumentStatus } from '~/components/general/document/document-status';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { DocumentStatus } from "~/components/general/document/document-status";
+import { useOptionalCurrentTeam } from "~/providers/team";
 
-import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
-import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
+import { EnvelopeDownloadDialog } from "../dialogs/envelope-download-dialog";
+import { StackAvatarsWithTooltip } from "../general/stack-avatars-with-tooltip";
 
 export type DocumentsTableProps = {
   data?: TFindInboxResponse;
@@ -35,7 +44,7 @@ export type DocumentsTableProps = {
   isLoadingError?: boolean;
 };
 
-type DocumentsTableRow = TFindInboxResponse['data'][number];
+type DocumentsTableRow = TFindInboxResponse["data"][number];
 
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
@@ -46,21 +55,30 @@ export const InboxTable = () => {
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
-  const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
+  const page = searchParams?.get?.("page")
+    ? Number(searchParams.get("page"))
+    : undefined;
+  const perPage = searchParams?.get?.("perPage")
+    ? Number(searchParams.get("perPage"))
+    : undefined;
 
-  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
-    page: page || 1,
-    perPage: perPage || 10,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery(
+    {
+      page: page || 1,
+      perPage: perPage || 10,
+    }
+  );
 
   const columns = useMemo(() => {
     return [
       {
         header: _(msg`Created`),
-        accessorKey: 'createdAt',
+        accessorKey: "createdAt",
         cell: ({ row }) =>
-          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+          i18n.date(row.original.createdAt, {
+            ...DateTime.DATETIME_SHORT,
+            hourCycle: "h12",
+          }),
       },
       {
         header: _(msg`Title`),
@@ -71,13 +89,13 @@ export const InboxTable = () => {
         ),
       },
       {
-        id: 'sender',
+        id: "sender",
         header: _(msg`Sender`),
         cell: ({ row }) => row.original.user.name ?? row.original.user.email,
       },
       {
         header: _(msg`Recipient`),
-        accessorKey: 'recipient',
+        accessorKey: "recipient",
         cell: ({ row }) => (
           <StackAvatarsWithTooltip
             recipients={row.original.recipients}
@@ -87,7 +105,7 @@ export const InboxTable = () => {
       },
       {
         header: _(msg`Status`),
-        accessorKey: 'status',
+        accessorKey: "status",
         cell: ({ row }) => <DocumentStatus status={row.original.status} />,
         size: 140,
       },
@@ -132,7 +150,9 @@ export const InboxTable = () => {
         emptyState={
           <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
             <p>
-              <Trans>Documents that require your attention will appear here</Trans>
+              <Trans>
+                Documents that require your attention will appear here
+              </Trans>
             </p>
           </div>
         }
@@ -164,7 +184,10 @@ export const InboxTable = () => {
       >
         {(table) =>
           results.totalPages > 1 && (
-            <DataTablePagination additionalInformation="VisibleCount" table={table} />
+            <DataTablePagination
+              additionalInformation="VisibleCount"
+              table={table}
+            />
           )
         }
       </DataTable>
@@ -179,15 +202,19 @@ export const InboxTable = () => {
 };
 
 export type InboxTableActionButtonProps = {
-  row: TFindInboxResponse['data'][number];
+  row: TFindInboxResponse["data"][number];
 };
 
-export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => {
+export const InboxTableActionButton = ({
+  row,
+}: InboxTableActionButtonProps) => {
   const { user } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = row.recipients.find(
+    (recipient) => recipient.email === user.email
+  );
 
   const isPending = row.status === DocumentStatusEnum.PENDING;
   const isComplete = isDocumentCompleted(row.status);
