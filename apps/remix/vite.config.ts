@@ -87,6 +87,8 @@ export default defineConfig({
     "global.Buffer": "globalThis.Buffer",
     // Additional Node.js globals that might be needed
     global: "globalThis",
+    // Ensure Buffer is available globally
+    Buffer: "globalThis.Buffer",
   },
   plugins: [
     prismaClientBrowserStub(),

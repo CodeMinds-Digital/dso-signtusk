@@ -1,3 +1,6 @@
+// Import polyfills first, before any other imports
+import "./polyfills";
+
 import {
   Links,
   Meta,
@@ -151,92 +154,35 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
 
-        {/* Process and Buffer polyfills for browser - must be loaded before any other scripts */}
+        {/* Ensure polyfills are available - backup inline script */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Backup polyfills in case the module import doesn't work
               if (typeof process === 'undefined') {
-                window.process = {
+                globalThis.process = {
                   env: { NODE_ENV: '${process.env.NODE_ENV || "production"}' },
                   browser: true,
                   version: '',
                   versions: {},
                   platform: 'browser',
                   cwd: function() { return '/'; },
-                  nextTick: function(fn) { setTimeout(fn, 0); },
-                  stdout: { write: function() {} },
-                  stderr: { write: function() {} }
+                  nextTick: function(fn) { setTimeout(fn, 0); }
                 };
-                globalThis.process = window.process;
               }
               
               if (typeof Buffer === 'undefined') {
-                // Comprehensive Buffer polyfill for browser
-                function BufferPolyfill(data, encoding) {
+                // Simple Buffer constructor for basic compatibility
+                globalThis.Buffer = function(data, encoding) {
                   if (typeof data === 'string') {
-                    this.data = data;
-                    this.encoding = encoding || 'utf8';
-                  } else if (data instanceof Uint8Array) {
-                    this.data = new TextDecoder().decode(data);
-                    this.encoding = 'utf8';
-                  } else if (Array.isArray(data)) {
-                    this.data = new TextDecoder().decode(new Uint8Array(data));
-                    this.encoding = 'utf8';
-                  } else {
-                    this.data = String(data || '');
-                    this.encoding = 'utf8';
+                    return { toString: () => data, length: data.length };
                   }
-                }
-                
-                BufferPolyfill.prototype.toString = function(encoding) {
-                  if (encoding === 'base64') {
-                    return btoa(this.data);
-                  }
-                  if (encoding === 'hex') {
-                    return Array.from(new TextEncoder().encode(this.data))
-                      .map(b => b.toString(16).padStart(2, '0')).join('');
-                  }
-                  return this.data;
+                  return { toString: () => String(data), length: 0 };
                 };
-                
-                BufferPolyfill.prototype.length = function() {
-                  return this.data.length;
-                };
-                
-                BufferPolyfill.from = function(data, encoding) {
-                  return new BufferPolyfill(data, encoding);
-                };
-                
-                BufferPolyfill.alloc = function(size, fill) {
-                  const arr = new Uint8Array(size);
-                  if (fill !== undefined) {
-                    arr.fill(typeof fill === 'string' ? fill.charCodeAt(0) : fill);
-                  }
-                  return new BufferPolyfill(arr);
-                };
-                
-                BufferPolyfill.allocUnsafe = function(size) {
-                  return new BufferPolyfill(new Uint8Array(size));
-                };
-                
-                BufferPolyfill.isBuffer = function(obj) {
-                  return obj instanceof BufferPolyfill || obj instanceof Uint8Array;
-                };
-                
-                BufferPolyfill.concat = function(list) {
-                  const totalLength = list.reduce((acc, buf) => acc + (buf.length || buf.data?.length || 0), 0);
-                  const result = new Uint8Array(totalLength);
-                  let offset = 0;
-                  for (const buf of list) {
-                    const data = buf instanceof BufferPolyfill ? new TextEncoder().encode(buf.data) : buf;
-                    result.set(data, offset);
-                    offset += data.length;
-                  }
-                  return new BufferPolyfill(result);
-                };
-                
-                window.Buffer = BufferPolyfill;
-                globalThis.Buffer = BufferPolyfill;
+                globalThis.Buffer.from = (data) => globalThis.Buffer(data);
+                globalThis.Buffer.alloc = (size) => globalThis.Buffer(''.repeat(size));
+                globalThis.Buffer.isBuffer = () => false;
+                globalThis.Buffer.concat = (list) => globalThis.Buffer(list.join(''));
               }
             `,
           }}

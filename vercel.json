@@ -10,9 +10,23 @@
       "maxDuration": 30
     }
   },
+  "routes": [
+    {
+      "src": "/site\\.webmanifest",
+      "dest": "/apps/remix/public/site.webmanifest"
+    },
+    {
+      "src": "/fonts/(.*)",
+      "dest": "/apps/remix/public/fonts/$1"
+    },
+    {
+      "src": "/(favicon|apple-touch-icon|android-chrome).*\\.(png|ico)",
+      "dest": "/apps/remix/public/$1"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/((?!assets/|fonts/|static/|site\\.webmanifest|favicon|apple-touch-icon|android-chrome|robots\\.txt|\\.png|\\.jpg|\\.ico|\\.ttf|\\.woff|\\.woff2).*)",
+      "source": "/((?!api/|assets/|fonts/|static/|site\\.webmanifest|favicon|apple-touch-icon|android-chrome|robots\\.txt|\\.png|\\.jpg|\\.ico|\\.ttf|\\.woff|\\.woff2|\\.svg|\\.webp).*)",
       "destination": "/apps/remix/api"
     }
   ],
@@ -63,7 +77,8 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "ALLOWED_ORIGINS": "https://dso-signtusk.vercel.app,https://dso-signtusk-remix-vpsy-cnv81yn0e-codemindsdigitals-projects.vercel.app,https://dso-signtusk-remix-vpsy-pb01iyucs-codemindsdigitals-projects.vercel.app,https://dso-signtusk-remix-vpsy-769v5j5lr-codemindsdigitals-projects.vercel.app,https://*.vercel.app"
   },
   "build": {
     "env": {

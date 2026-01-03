@@ -114,6 +114,7 @@ app.route("/api/swagger", swaggerRoute);
 app.use(`/api/v1/*`, cors());
 app.route("/api/v1", tsRestHonoApp);
 app.use("/api/jobs/*", jobsClient.getApiHandler());
+app.use("/api/trpc/*", cors());
 app.use("/api/trpc/*", reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.

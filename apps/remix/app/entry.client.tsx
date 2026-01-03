@@ -1,5 +1,5 @@
-// Process polyfill for browser - must be first
-import "./types/process-polyfill";
+// Comprehensive polyfills for browser - must be first
+import "./polyfills";
 
 import { StrictMode, startTransition, useEffect } from "react";
 
