@@ -4,24 +4,25 @@ import {
   httpLink,
   isNonJsonSerializable,
   splitLink,
-} from '@trpc/client';
+} from "@trpc/client";
 
-import { getBaseUrl } from '@signtusk/lib/universal/get-base-url';
+import { getBaseUrl } from "@signtusk/lib/universal/get-base-url";
 
-import type { AppRouter } from '../server/router';
-import { dataTransformer } from '../utils/data-transformer';
+import type { AppRouter } from "../types";
+import { dataTransformer } from "../utils/data-transformer";
 
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     splitLink({
-      condition: (op) => op.context.skipBatch === true || isNonJsonSerializable(op.input),
+      condition: (op) =>
+        op.context.skipBatch === true || isNonJsonSerializable(op.input),
       true: httpLink({
         url: `${getBaseUrl()}/api/trpc`,
         transformer: dataTransformer,
         headers: (opts) => {
-          if (typeof opts.op.context.teamId === 'string') {
+          if (typeof opts.op.context.teamId === "string") {
             return {
-              'x-team-id': opts.op.context.teamId,
+              "x-team-id": opts.op.context.teamId,
             };
           }
 
@@ -33,12 +34,15 @@ export const trpc = createTRPCClient<AppRouter>({
         transformer: dataTransformer,
         headers: (opts) => {
           const operationWithTeamId = opts.opList.find(
-            (op) => op.context.teamId && typeof op.context.teamId === 'string',
+            (op) => op.context.teamId && typeof op.context.teamId === "string"
           );
 
-          if (operationWithTeamId && typeof operationWithTeamId.context.teamId === 'string') {
+          if (
+            operationWithTeamId &&
+            typeof operationWithTeamId.context.teamId === "string"
+          ) {
             return {
-              'x-team-id': operationWithTeamId.context.teamId,
+              "x-team-id": operationWithTeamId.context.teamId,
             };
           }
 

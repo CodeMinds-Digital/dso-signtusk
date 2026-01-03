@@ -1,15 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink, httpLink, isNonJsonSerializable, splitLink } from '@trpc/client';
-import { createTRPCReact } from '@trpc/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  httpBatchLink,
+  httpLink,
+  isNonJsonSerializable,
+  splitLink,
+} from "@trpc/client";
+import { createTRPCReact } from "@trpc/react-query";
 
-import { getBaseUrl } from '@signtusk/lib/universal/get-base-url';
+import { getBaseUrl } from "@signtusk/lib/universal/get-base-url";
 
-import type { AppRouter } from '../server/router';
-import { dataTransformer } from '../utils/data-transformer';
+import type { AppRouter } from "../types";
+import { dataTransformer } from "../utils/data-transformer";
 
-export { getQueryKey } from '@trpc/react-query';
+export { getQueryKey } from "@trpc/react-query";
 
 export const trpc = createTRPCReact<AppRouter>({
   overrides: {
@@ -44,7 +49,8 @@ export function TrpcProvider({ children, headers }: TrpcProviderProps) {
       trpc.createClient({
         links: [
           splitLink({
-            condition: (op) => op.context.skipBatch === true || isNonJsonSerializable(op.input),
+            condition: (op) =>
+              op.context.skipBatch === true || isNonJsonSerializable(op.input),
             true: httpLink({
               url: `${getBaseUrl()}/api/trpc`,
               headers,
@@ -58,7 +64,7 @@ export function TrpcProvider({ children, headers }: TrpcProviderProps) {
           }),
         ],
       }),
-    [headers],
+    [headers]
   );
 
   return (
