@@ -1,16 +1,19 @@
-import { StrictMode, startTransition, useEffect } from 'react';
+// Process polyfill for browser - must be first
+import "./types/process-polyfill";
 
-import { i18n } from '@lingui/core';
-import { detect, fromHtmlTag } from '@lingui/detect-locale';
-import { I18nProvider } from '@lingui/react';
-import posthog from 'posthog-js';
-import { hydrateRoot } from 'react-dom/client';
-import { HydratedRouter } from 'react-router/dom';
+import { StrictMode, startTransition, useEffect } from "react";
 
-import { extractPostHogConfig } from '@signtusk/lib/constants/feature-flags';
-import { dynamicActivate } from '@signtusk/lib/utils/i18n';
+import { i18n } from "@lingui/core";
+import { detect, fromHtmlTag } from "@lingui/detect-locale";
+import { I18nProvider } from "@lingui/react";
+import posthog from "posthog-js";
+import { hydrateRoot } from "react-dom/client";
+import { HydratedRouter } from "react-router/dom";
 
-import './utils/polyfills/promise-with-resolvers';
+import { extractPostHogConfig } from "@signtusk/lib/constants/feature-flags";
+import { dynamicActivate } from "@signtusk/lib/utils/i18n";
+
+import "./utils/polyfills/promise-with-resolvers";
 
 function PosthogInit() {
   const postHogConfig = extractPostHogConfig();
@@ -28,7 +31,7 @@ function PosthogInit() {
 }
 
 async function main() {
-  const locale = detect(fromHtmlTag('lang')) || 'en';
+  const locale = detect(fromHtmlTag("lang")) || "en";
 
   await dynamicActivate(locale);
 
@@ -41,7 +44,7 @@ async function main() {
         </I18nProvider>
 
         <PosthogInit />
-      </StrictMode>,
+      </StrictMode>
     );
   });
 }

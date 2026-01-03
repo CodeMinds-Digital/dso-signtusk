@@ -68,6 +68,13 @@ export default defineConfig({
   define: {
     // Disable Sharp in browser environment
     "process.env.SHARP_IGNORE_GLOBAL_LIBVIPS": '"1"',
+    // Provide process.env for browser compatibility
+    "process.env.NODE_ENV": JSON.stringify(
+      process.env.NODE_ENV || "production"
+    ),
+    // Define process for browser environments
+    "process.browser": "true",
+    "process.version": '""',
   },
   plugins: [
     prismaClientBrowserStub(),
