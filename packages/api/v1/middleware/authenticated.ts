@@ -1,14 +1,14 @@
-import type { Team, User } from '@prisma/client';
-import type { TsRestRequest } from '@ts-rest/serverless';
-import type { Logger } from 'pino';
+import type { Team, User } from "@signtusk/lib/constants/prisma-enums";
+import type { TsRestRequest } from "@ts-rest/serverless";
+import type { Logger } from "pino";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getApiTokenByToken } from '@signtusk/lib/server-only/public-api/get-api-token-by-token';
-import type { BaseApiLog, RootApiLog } from '@signtusk/lib/types/api-logs';
-import type { ApiRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { extractRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { nanoid } from '@signtusk/lib/universal/id';
-import { logger } from '@signtusk/lib/utils/logger';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getApiTokenByToken } from "@signtusk/lib/server-only/public-api/get-api-token-by-token";
+import type { BaseApiLog, RootApiLog } from "@signtusk/lib/types/api-logs";
+import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { extractRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { nanoid } from "@signtusk/lib/universal/id";
+import { logger } from "@signtusk/lib/utils/logger";
 
 type B = {
   // appRoute: any;
@@ -29,10 +29,10 @@ export const authenticatedMiddleware = <
 >(
   handler: (
     args: T & { req: TsRestRequest },
-    user: Pick<User, 'id' | 'email' | 'name' | 'disabled'>,
+    user: Pick<User, "id" | "email" | "name" | "disabled">,
     team: Team,
-    options: { metadata: ApiRequestMetadata; logger: Logger },
-  ) => Promise<R>,
+    options: { metadata: ApiRequestMetadata; logger: Logger }
+  ) => Promise<R>
 ) => {
   return async (args: T, { request }: B) => {
     const requestMetadata = extractRequestMetadata(request);
@@ -44,8 +44,8 @@ export const authenticatedMiddleware = <
     } satisfies RootApiLog);
 
     const infoToLog: BaseApiLog = {
-      auth: 'api',
-      source: 'apiV1',
+      auth: "api",
+      source: "apiV1",
       path: request.url,
     };
 
@@ -53,11 +53,13 @@ export const authenticatedMiddleware = <
       const { authorization } = args.headers;
 
       // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
-      const [token] = (authorization || '').split('Bearer ').filter((s) => s.length > 0);
+      const [token] = (authorization || "")
+        .split("Bearer ")
+        .filter((s) => s.length > 0);
 
       if (!token) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'API token was not provided',
+          message: "API token was not provided",
         });
       }
 
@@ -65,7 +67,7 @@ export const authenticatedMiddleware = <
 
       if (apiToken.user.disabled) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'User is disabled',
+          message: "User is disabled",
         });
       }
 
@@ -77,8 +79,8 @@ export const authenticatedMiddleware = <
 
       const metadata: ApiRequestMetadata = {
         requestMetadata,
-        source: 'apiV1',
-        auth: 'api',
+        source: "apiV1",
+        auth: "api",
         auditUser: {
           id: apiToken.team ? null : apiToken.user.id,
           email: apiToken.team ? null : apiToken.user.email,
@@ -93,14 +95,14 @@ export const authenticatedMiddleware = <
         },
         apiToken.user,
         apiToken.team,
-        { metadata, logger: apiLogger },
+        { metadata, logger: apiLogger }
       );
     } catch (err) {
       console.log({ err });
 
       apiLogger.info(infoToLog);
 
-      let message = 'Unauthorized';
+      let message = "Unauthorized";
 
       if (err instanceof AppError) {
         message = err.message;

@@ -1,37 +1,47 @@
-import { DocumentDataType, EnvelopeType, SigningStatus } from '@prisma/client';
-import { tsr } from '@ts-rest/serverless/fetch';
-import { match } from 'ts-pattern';
+import {
+  DocumentDataType,
+  EnvelopeType,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { tsr } from "@ts-rest/serverless/fetch";
+import { match } from "ts-pattern";
 
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@signtusk/lib/constants/date-formats';
-import '@signtusk/lib/constants/time-zones';
-import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@signtusk/lib/constants/time-zones';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { createDocumentData } from '@signtusk/lib/server-only/document-data/create-document-data';
-import { updateDocumentMeta } from '@signtusk/lib/server-only/document-meta/upsert-document-meta';
-import { deleteDocument } from '@signtusk/lib/server-only/document/delete-document';
-import { findDocuments } from '@signtusk/lib/server-only/document/find-documents';
-import { resendDocument } from '@signtusk/lib/server-only/document/resend-document';
-import { sendDocument } from '@signtusk/lib/server-only/document/send-document';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import {
+  DATE_FORMATS,
+  DEFAULT_DOCUMENT_DATE_FORMAT,
+} from "@signtusk/lib/constants/date-formats";
+import "@signtusk/lib/constants/time-zones";
+import {
+  DEFAULT_DOCUMENT_TIME_ZONE,
+  TIME_ZONES,
+} from "@signtusk/lib/constants/time-zones";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { createDocumentData } from "@signtusk/lib/server-only/document-data/create-document-data";
+import { updateDocumentMeta } from "@signtusk/lib/server-only/document-meta/upsert-document-meta";
+import { deleteDocument } from "@signtusk/lib/server-only/document/delete-document";
+import { findDocuments } from "@signtusk/lib/server-only/document/find-documents";
+import { resendDocument } from "@signtusk/lib/server-only/document/resend-document";
+import { sendDocument } from "@signtusk/lib/server-only/document/send-document";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
 import {
   getEnvelopeById,
   getEnvelopeWhereInput,
-} from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { deleteDocumentField } from '@signtusk/lib/server-only/field/delete-document-field';
-import { updateEnvelopeFields } from '@signtusk/lib/server-only/field/update-envelope-fields';
-import { insertFormValuesInPdf } from '@signtusk/lib/server-only/pdf/insert-form-values-in-pdf';
-import { deleteEnvelopeRecipient } from '@signtusk/lib/server-only/recipient/delete-envelope-recipient';
-import { getRecipientsForDocument } from '@signtusk/lib/server-only/recipient/get-recipients-for-document';
-import { setDocumentRecipients } from '@signtusk/lib/server-only/recipient/set-document-recipients';
-import { updateEnvelopeRecipients } from '@signtusk/lib/server-only/recipient/update-envelope-recipients';
-import { createDocumentFromTemplate } from '@signtusk/lib/server-only/template/create-document-from-template';
-import { deleteTemplate } from '@signtusk/lib/server-only/template/delete-template';
-import { findTemplates } from '@signtusk/lib/server-only/template/find-templates';
-import { getTemplateById } from '@signtusk/lib/server-only/template/get-template-by-id';
-import { ZRecipientAuthOptionsSchema } from '@signtusk/lib/types/document-auth';
-import { extractDerivedDocumentEmailSettings } from '@signtusk/lib/types/document-email';
+} from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { deleteDocumentField } from "@signtusk/lib/server-only/field/delete-document-field";
+import { updateEnvelopeFields } from "@signtusk/lib/server-only/field/update-envelope-fields";
+import { insertFormValuesInPdf } from "@signtusk/lib/server-only/pdf/insert-form-values-in-pdf";
+import { deleteEnvelopeRecipient } from "@signtusk/lib/server-only/recipient/delete-envelope-recipient";
+import { getRecipientsForDocument } from "@signtusk/lib/server-only/recipient/get-recipients-for-document";
+import { setDocumentRecipients } from "@signtusk/lib/server-only/recipient/set-document-recipients";
+import { updateEnvelopeRecipients } from "@signtusk/lib/server-only/recipient/update-envelope-recipients";
+import { createDocumentFromTemplate } from "@signtusk/lib/server-only/template/create-document-from-template";
+import { deleteTemplate } from "@signtusk/lib/server-only/template/delete-template";
+import { findTemplates } from "@signtusk/lib/server-only/template/find-templates";
+import { getTemplateById } from "@signtusk/lib/server-only/template/get-template-by-id";
+import { ZRecipientAuthOptionsSchema } from "@signtusk/lib/types/document-auth";
+import { extractDerivedDocumentEmailSettings } from "@signtusk/lib/types/document-email";
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -39,23 +49,23 @@ import {
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@signtusk/lib/types/field-meta';
-import { getFileServerSide } from '@signtusk/lib/universal/upload/get-file.server';
-import { putPdfFileServerSide } from '@signtusk/lib/universal/upload/put-file.server';
+} from "@signtusk/lib/types/field-meta";
+import { getFileServerSide } from "@signtusk/lib/universal/upload/get-file.server";
+import { putPdfFileServerSide } from "@signtusk/lib/universal/upload/put-file.server";
 import {
   getPresignGetUrl,
   getPresignPostUrl,
-} from '@signtusk/lib/universal/upload/server-actions';
-import { isDocumentCompleted } from '@signtusk/lib/utils/document';
-import { createDocumentAuditLogData } from '@signtusk/lib/utils/document-audit-logs';
+} from "@signtusk/lib/universal/upload/server-actions";
+import { isDocumentCompleted } from "@signtusk/lib/utils/document";
+import { createDocumentAuditLogData } from "@signtusk/lib/utils/document-audit-logs";
 import {
   mapSecondaryIdToDocumentId,
   mapSecondaryIdToTemplateId,
-} from '@signtusk/lib/utils/envelope';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/envelope";
+import { prisma } from "@signtusk/prisma";
 
-import { ApiContractV1 } from './contract';
-import { authenticatedMiddleware } from './middleware/authenticated';
+import { ApiContractV1 } from "./contract";
+import { authenticatedMiddleware } from "./middleware/authenticated";
 
 export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -100,7 +110,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     try {
       const { envelopeWhereInput } = await getEnvelopeWhereInput({
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: Number(documentId),
         },
         type: EnvelopeType.DOCUMENT,
@@ -113,7 +123,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         include: {
           recipients: {
             orderBy: {
-              id: 'asc',
+              id: "asc",
             },
           },
           fields: {
@@ -128,7 +138,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
               },
             },
             orderBy: {
-              id: 'asc',
+              id: "asc",
             },
           },
         },
@@ -143,7 +153,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           const result = ZFieldMetaSchema.safeParse(field.fieldMeta);
 
           if (!result.success) {
-            throw new Error('Field meta parsing failed for field ' + field.id);
+            throw new Error("Field meta parsing failed for field " + field.id);
           }
 
           parsedMetaOrNull = result.data ?? null;
@@ -190,459 +200,501 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: "Document not found",
         },
       };
     }
   }),
 
-  downloadSignedDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
-    const { id: documentId } = args.params;
-    const { downloadOriginalDocument } = args.query;
+  downloadSignedDocument: authenticatedMiddleware(
+    async (args, user, team, { logger }) => {
+      const { id: documentId } = args.params;
+      const { downloadOriginalDocument } = args.query;
 
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
-
-    try {
-      const envelope = await getEnvelopeById({
-        id: {
-          type: 'documentId',
-          id: Number(documentId),
+      logger.info({
+        input: {
+          id: documentId,
         },
-        type: EnvelopeType.DOCUMENT,
-        userId: user.id,
-        teamId: team.id,
-      }).catch(() => null);
-
-      const firstDocumentData = envelope?.envelopeItems[0]?.documentData;
-
-      if (!envelope || !firstDocumentData) {
-        return {
-          status: 404,
-          body: {
-            message: 'Document not found',
-          },
-        };
-      }
-
-      // This error is done AFTER the get envelope so we can test access controls without S3.
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
-        return {
-          status: 500,
-          body: {
-            message: 'Document downloads are only available when S3 storage is configured.',
-          },
-        };
-      }
-
-      if (DocumentDataType.S3_PATH !== firstDocumentData.type) {
-        return {
-          status: 400,
-          body: {
-            message: 'Invalid document data type',
-          },
-        };
-      }
-
-      if (!downloadOriginalDocument && !isDocumentCompleted(envelope.status)) {
-        return {
-          status: 400,
-          body: {
-            message: 'Document is not completed yet.',
-          },
-        };
-      }
-
-      if (envelope.envelopeItems.length !== 1) {
-        return {
-          status: 400,
-          body: {
-            message: 'API V1 does not support items',
-          },
-        };
-      }
-
-      const { url } = await getPresignGetUrl(
-        downloadOriginalDocument ? firstDocumentData.initialData : firstDocumentData.data,
-      );
-
-      return {
-        status: 200,
-        body: { downloadUrl: url },
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'Error downloading the document. Please try again.',
-        },
-      };
-    }
-  }),
-
-  deleteDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId } = args.params;
-
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
-
-    try {
-      const legacyDocumentId = Number(documentId);
-
-      const envelope = await getEnvelopeById({
-        id: {
-          type: 'documentId',
-          id: legacyDocumentId,
-        },
-        type: EnvelopeType.DOCUMENT,
-        userId: user.id,
-        teamId: team.id,
       });
 
-      if (!envelope) {
-        return {
-          status: 404,
-          body: {
-            message: 'Document not found',
+      try {
+        const envelope = await getEnvelopeById({
+          id: {
+            type: "documentId",
+            id: Number(documentId),
           },
-        };
-      }
-
-      const deletedDocument = await deleteDocument({
-        id: {
-          type: 'documentId',
-          id: legacyDocumentId,
-        },
-        userId: user.id,
-        teamId: team.id,
-        requestMetadata: metadata,
-      });
-
-      return {
-        status: 200,
-        body: {
-          id: legacyDocumentId,
-          externalId: deletedDocument.externalId,
-          userId: deletedDocument.userId,
-          teamId: deletedDocument.teamId,
-          title: deletedDocument.title,
-          status: deletedDocument.status,
-          createdAt: deletedDocument.createdAt,
-          updatedAt: deletedDocument.updatedAt,
-          completedAt: deletedDocument.completedAt,
-        },
-      };
-    } catch (err) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-  }),
-
-  createDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body } = args;
-
-    try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
-        return {
-          status: 500,
-          body: {
-            message: 'Create document is not available without S3 transport.',
-          },
-        };
-      }
-
-      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
-
-      if (remaining.documents <= 0) {
-        return {
-          status: 400,
-          body: {
-            message: 'You have reached the maximum number of documents allowed for this month',
-          },
-        };
-      }
-
-      const dateFormat = body.meta.dateFormat
-        ? DATE_FORMATS.find((format) => format.value === body.meta.dateFormat)
-        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
-
-      if (body.meta.dateFormat && !dateFormat) {
-        return {
-          status: 400,
-          body: {
-            message: 'Invalid date format. Please provide a valid date format',
-          },
-        };
-      }
-
-      const timezone = body.meta.timezone
-        ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
-        : DEFAULT_DOCUMENT_TIME_ZONE;
-
-      const isTimeZoneValid = body.meta.timezone ? TIME_ZONES.includes(String(timezone)) : true;
-
-      if (!isTimeZoneValid) {
-        return {
-          status: 400,
-          body: {
-            message: 'Invalid timezone. Please provide a valid timezone',
-          },
-        };
-      }
-
-      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
-
-      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
-
-      const documentData = await createDocumentData({
-        data: key,
-        type: DocumentDataType.S3_PATH,
-      });
-
-      const envelope = await createEnvelope({
-        userId: user.id,
-        teamId: team.id,
-        internalVersion: 1,
-        data: {
-          title: body.title,
           type: EnvelopeType.DOCUMENT,
-          externalId: body.externalId || undefined,
-          formValues: body.formValues,
-          folderId: body.folderId,
-          envelopeItems: [
-            {
-              documentDataId: documentData.id,
+          userId: user.id,
+          teamId: team.id,
+        }).catch(() => null);
+
+        const firstDocumentData = envelope?.envelopeItems[0]?.documentData;
+
+        if (!envelope || !firstDocumentData) {
+          return {
+            status: 404,
+            body: {
+              message: "Document not found",
             },
-          ],
-          globalAccessAuth: body.authOptions?.globalAccessAuth,
-          globalActionAuth: body.authOptions?.globalActionAuth,
-        },
-        attachments: body.attachments,
-        meta: {
-          subject: body.meta.subject,
-          message: body.meta.message,
-          timezone,
-          dateFormat: dateFormat?.value,
-          redirectUrl: body.meta.redirectUrl,
-          signingOrder: body.meta.signingOrder,
-          allowDictateNextSigner: body.meta.allowDictateNextSigner,
-          language: body.meta.language,
-          typedSignatureEnabled: body.meta.typedSignatureEnabled,
-          uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
-          drawSignatureEnabled: body.meta.drawSignatureEnabled,
-          distributionMethod: body.meta.distributionMethod,
-          emailSettings: body.meta.emailSettings,
-        },
-        requestMetadata: metadata,
-      });
+          };
+        }
 
-      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+        // This error is done AFTER the get envelope so we can test access controls without S3.
+        if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== "s3") {
+          return {
+            status: 500,
+            body: {
+              message:
+                "Document downloads are only available when S3 storage is configured.",
+            },
+          };
+        }
 
-      const { recipients } = await setDocumentRecipients({
-        userId: user.id,
-        teamId: team.id,
-        id: {
-          type: 'documentId',
-          id: legacyDocumentId,
-        },
-        recipients: body.recipients,
-        requestMetadata: metadata,
-      });
+        if (DocumentDataType.S3_PATH !== firstDocumentData.type) {
+          return {
+            status: 400,
+            body: {
+              message: "Invalid document data type",
+            },
+          };
+        }
 
-      return {
-        status: 200,
-        body: {
-          uploadUrl: url,
-          documentId: legacyDocumentId,
-          recipients: recipients.map((recipient) => ({
-            recipientId: recipient.id,
-            name: recipient.name,
-            email: recipient.email,
-            token: recipient.token,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-          })),
-        },
-      };
-    } catch (err) {
-      return {
-        status: 404,
-        body: {
-          message: 'An error has occured while uploading the file',
-        },
-      };
-    }
-  }),
+        if (
+          !downloadOriginalDocument &&
+          !isDocumentCompleted(envelope.status)
+        ) {
+          return {
+            status: 400,
+            body: {
+              message: "Document is not completed yet.",
+            },
+          };
+        }
 
-  createTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body } = args;
-    const {
-      title,
-      folderId,
-      externalId,
-      visibility,
-      globalAccessAuth,
-      globalActionAuth,
-      publicTitle,
-      publicDescription,
-      type,
-      meta,
-      attachments,
-    } = body;
+        if (envelope.envelopeItems.length !== 1) {
+          return {
+            status: 400,
+            body: {
+              message: "API V1 does not support items",
+            },
+          };
+        }
 
-    try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        const { url } = await getPresignGetUrl(
+          downloadOriginalDocument
+            ? firstDocumentData.initialData
+            : firstDocumentData.data
+        );
+
+        return {
+          status: 200,
+          body: { downloadUrl: url },
+        };
+      } catch (err) {
         return {
           status: 500,
           body: {
-            message: 'Create template is not available without S3 transport.',
+            message: "Error downloading the document. Please try again.",
           },
         };
       }
+    }
+  ),
 
-      const dateFormat = meta?.dateFormat
-        ? DATE_FORMATS.find((format) => format.value === meta?.dateFormat)
-        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+  deleteDocument: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId } = args.params;
 
-      if (meta?.dateFormat && !dateFormat) {
-        return {
-          status: 400,
-          body: {
-            message: 'Invalid date format. Please provide a valid date format',
-          },
-        };
-      }
-
-      const timezone = meta?.timezone
-        ? TIME_ZONES.find((tz) => tz === meta?.timezone)
-        : DEFAULT_DOCUMENT_TIME_ZONE;
-
-      const isTimeZoneValid = meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
-
-      if (!isTimeZoneValid) {
-        return {
-          status: 400,
-          body: {
-            message: 'Invalid timezone. Please provide a valid timezone',
-          },
-        };
-      }
-
-      const fileName = title?.endsWith('.pdf') ? title : `${title}.pdf`;
-
-      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
-
-      const templateDocumentData = await createDocumentData({
-        data: key,
-        type: DocumentDataType.S3_PATH,
+      logger.info({
+        input: {
+          id: documentId,
+        },
       });
 
-      const createdTemplate = await createEnvelope({
-        userId: user.id,
-        teamId: team.id,
-        internalVersion: 1,
-        data: {
-          type: EnvelopeType.TEMPLATE,
-          envelopeItems: [
-            {
-              documentDataId: templateDocumentData.id,
+      try {
+        const legacyDocumentId = Number(documentId);
+
+        const envelope = await getEnvelopeById({
+          id: {
+            type: "documentId",
+            id: legacyDocumentId,
+          },
+          type: EnvelopeType.DOCUMENT,
+          userId: user.id,
+          teamId: team.id,
+        });
+
+        if (!envelope) {
+          return {
+            status: 404,
+            body: {
+              message: "Document not found",
             },
-          ],
-          templateType: type,
-          title,
-          folderId,
-          externalId: externalId ?? undefined,
-          visibility,
-          globalAccessAuth,
-          globalActionAuth,
-          publicTitle,
-          publicDescription,
-        },
+          };
+        }
+
+        const deletedDocument = await deleteDocument({
+          id: {
+            type: "documentId",
+            id: legacyDocumentId,
+          },
+          userId: user.id,
+          teamId: team.id,
+          requestMetadata: metadata,
+        });
+
+        return {
+          status: 200,
+          body: {
+            id: legacyDocumentId,
+            externalId: deletedDocument.externalId,
+            userId: deletedDocument.userId,
+            teamId: deletedDocument.teamId,
+            title: deletedDocument.title,
+            status: deletedDocument.status,
+            createdAt: deletedDocument.createdAt,
+            updatedAt: deletedDocument.updatedAt,
+            completedAt: deletedDocument.completedAt,
+          },
+        };
+      } catch (err) {
+        return {
+          status: 404,
+          body: {
+            message: "Document not found",
+          },
+        };
+      }
+    }
+  ),
+
+  createDocument: authenticatedMiddleware(
+    async (args, user, team, { metadata }) => {
+      const { body } = args;
+
+      try {
+        if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== "s3") {
+          return {
+            status: 500,
+            body: {
+              message: "Create document is not available without S3 transport.",
+            },
+          };
+        }
+
+        const { remaining } = await getServerLimits({
+          userId: user.id,
+          teamId: team.id,
+        });
+
+        if (remaining.documents <= 0) {
+          return {
+            status: 400,
+            body: {
+              message:
+                "You have reached the maximum number of documents allowed for this month",
+            },
+          };
+        }
+
+        const dateFormat = body.meta.dateFormat
+          ? DATE_FORMATS.find((format) => format.value === body.meta.dateFormat)
+          : DATE_FORMATS.find(
+              (format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT
+            );
+
+        if (body.meta.dateFormat && !dateFormat) {
+          return {
+            status: 400,
+            body: {
+              message:
+                "Invalid date format. Please provide a valid date format",
+            },
+          };
+        }
+
+        const timezone = body.meta.timezone
+          ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
+          : DEFAULT_DOCUMENT_TIME_ZONE;
+
+        const isTimeZoneValid = body.meta.timezone
+          ? TIME_ZONES.includes(String(timezone))
+          : true;
+
+        if (!isTimeZoneValid) {
+          return {
+            status: 400,
+            body: {
+              message: "Invalid timezone. Please provide a valid timezone",
+            },
+          };
+        }
+
+        const fileName = body.title.endsWith(".pdf")
+          ? body.title
+          : `${body.title}.pdf`;
+
+        const { url, key } = await getPresignPostUrl(
+          fileName,
+          "application/pdf"
+        );
+
+        const documentData = await createDocumentData({
+          data: key,
+          type: DocumentDataType.S3_PATH,
+        });
+
+        const envelope = await createEnvelope({
+          userId: user.id,
+          teamId: team.id,
+          internalVersion: 1,
+          data: {
+            title: body.title,
+            type: EnvelopeType.DOCUMENT,
+            externalId: body.externalId || undefined,
+            formValues: body.formValues,
+            folderId: body.folderId,
+            envelopeItems: [
+              {
+                documentDataId: documentData.id,
+              },
+            ],
+            globalAccessAuth: body.authOptions?.globalAccessAuth,
+            globalActionAuth: body.authOptions?.globalActionAuth,
+          },
+          attachments: body.attachments,
+          meta: {
+            subject: body.meta.subject,
+            message: body.meta.message,
+            timezone,
+            dateFormat: dateFormat?.value,
+            redirectUrl: body.meta.redirectUrl,
+            signingOrder: body.meta.signingOrder,
+            allowDictateNextSigner: body.meta.allowDictateNextSigner,
+            language: body.meta.language,
+            typedSignatureEnabled: body.meta.typedSignatureEnabled,
+            uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
+            drawSignatureEnabled: body.meta.drawSignatureEnabled,
+            distributionMethod: body.meta.distributionMethod,
+            emailSettings: body.meta.emailSettings,
+          },
+          requestMetadata: metadata,
+        });
+
+        const legacyDocumentId = mapSecondaryIdToDocumentId(
+          envelope.secondaryId
+        );
+
+        const { recipients } = await setDocumentRecipients({
+          userId: user.id,
+          teamId: team.id,
+          id: {
+            type: "documentId",
+            id: legacyDocumentId,
+          },
+          recipients: body.recipients,
+          requestMetadata: metadata,
+        });
+
+        return {
+          status: 200,
+          body: {
+            uploadUrl: url,
+            documentId: legacyDocumentId,
+            recipients: recipients.map((recipient) => ({
+              recipientId: recipient.id,
+              name: recipient.name,
+              email: recipient.email,
+              token: recipient.token,
+              role: recipient.role,
+              signingOrder: recipient.signingOrder,
+              signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+            })),
+          },
+        };
+      } catch (err) {
+        return {
+          status: 404,
+          body: {
+            message: "An error has occured while uploading the file",
+          },
+        };
+      }
+    }
+  ),
+
+  createTemplate: authenticatedMiddleware(
+    async (args, user, team, { metadata }) => {
+      const { body } = args;
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
         meta,
         attachments,
-        requestMetadata: metadata,
-      });
+      } = body;
 
-      const fullTemplate = await getTemplateById({
-        id: {
-          type: 'envelopeId',
-          id: createdTemplate.id,
-        },
-        userId: user.id,
-        teamId: team.id,
-      });
+      try {
+        if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== "s3") {
+          return {
+            status: 500,
+            body: {
+              message: "Create template is not available without S3 transport.",
+            },
+          };
+        }
 
-      return {
-        status: 200,
-        body: {
-          uploadUrl: url,
-          template: fullTemplate,
-        },
-      };
-    } catch (err) {
-      return {
-        status: 404,
-        body: {
-          message: 'An error has occured while creating the template',
-        },
-      };
+        const dateFormat = meta?.dateFormat
+          ? DATE_FORMATS.find((format) => format.value === meta?.dateFormat)
+          : DATE_FORMATS.find(
+              (format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT
+            );
+
+        if (meta?.dateFormat && !dateFormat) {
+          return {
+            status: 400,
+            body: {
+              message:
+                "Invalid date format. Please provide a valid date format",
+            },
+          };
+        }
+
+        const timezone = meta?.timezone
+          ? TIME_ZONES.find((tz) => tz === meta?.timezone)
+          : DEFAULT_DOCUMENT_TIME_ZONE;
+
+        const isTimeZoneValid = meta?.timezone
+          ? TIME_ZONES.includes(String(timezone))
+          : true;
+
+        if (!isTimeZoneValid) {
+          return {
+            status: 400,
+            body: {
+              message: "Invalid timezone. Please provide a valid timezone",
+            },
+          };
+        }
+
+        const fileName = title?.endsWith(".pdf") ? title : `${title}.pdf`;
+
+        const { url, key } = await getPresignPostUrl(
+          fileName,
+          "application/pdf"
+        );
+
+        const templateDocumentData = await createDocumentData({
+          data: key,
+          type: DocumentDataType.S3_PATH,
+        });
+
+        const createdTemplate = await createEnvelope({
+          userId: user.id,
+          teamId: team.id,
+          internalVersion: 1,
+          data: {
+            type: EnvelopeType.TEMPLATE,
+            envelopeItems: [
+              {
+                documentDataId: templateDocumentData.id,
+              },
+            ],
+            templateType: type,
+            title,
+            folderId,
+            externalId: externalId ?? undefined,
+            visibility,
+            globalAccessAuth,
+            globalActionAuth,
+            publicTitle,
+            publicDescription,
+          },
+          meta,
+          attachments,
+          requestMetadata: metadata,
+        });
+
+        const fullTemplate = await getTemplateById({
+          id: {
+            type: "envelopeId",
+            id: createdTemplate.id,
+          },
+          userId: user.id,
+          teamId: team.id,
+        });
+
+        return {
+          status: 200,
+          body: {
+            uploadUrl: url,
+            template: fullTemplate,
+          },
+        };
+      } catch (err) {
+        return {
+          status: 404,
+          body: {
+            message: "An error has occured while creating the template",
+          },
+        };
+      }
     }
-  }),
+  ),
 
-  deleteTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
-    const { id: templateId } = args.params;
+  deleteTemplate: authenticatedMiddleware(
+    async (args, user, team, { logger }) => {
+      const { id: templateId } = args.params;
 
-    logger.info({
-      input: {
-        id: templateId,
-      },
-    });
-
-    try {
-      const deletedTemplate = await deleteTemplate({
-        id: {
-          type: 'templateId',
-          id: Number(templateId),
+      logger.info({
+        input: {
+          id: templateId,
         },
-        userId: user.id,
-        teamId: team.id,
       });
 
-      const legacyTemplateId = mapSecondaryIdToTemplateId(deletedTemplate.secondaryId);
+      try {
+        const deletedTemplate = await deleteTemplate({
+          id: {
+            type: "templateId",
+            id: Number(templateId),
+          },
+          userId: user.id,
+          teamId: team.id,
+        });
 
-      return {
-        status: 200,
-        body: {
-          id: legacyTemplateId,
-          externalId: deletedTemplate.externalId,
-          type: deletedTemplate.templateType,
-          title: deletedTemplate.title,
-          userId: deletedTemplate.userId,
-          teamId: deletedTemplate.teamId,
-          createdAt: deletedTemplate.createdAt,
-          updatedAt: deletedTemplate.updatedAt,
-        },
-      };
-    } catch (err) {
-      return {
-        status: 404,
-        body: {
-          message: 'Template not found',
-        },
-      };
+        const legacyTemplateId = mapSecondaryIdToTemplateId(
+          deletedTemplate.secondaryId
+        );
+
+        return {
+          status: 200,
+          body: {
+            id: legacyTemplateId,
+            externalId: deletedTemplate.externalId,
+            type: deletedTemplate.templateType,
+            title: deletedTemplate.title,
+            userId: deletedTemplate.userId,
+            teamId: deletedTemplate.teamId,
+            createdAt: deletedTemplate.createdAt,
+            updatedAt: deletedTemplate.updatedAt,
+          },
+        };
+      } catch (err) {
+        return {
+          status: 404,
+          body: {
+            message: "Template not found",
+          },
+        };
+      }
     }
-  }),
+  ),
 
   getTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: templateId } = args.params;
@@ -656,7 +708,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     try {
       const template = await getTemplateById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: Number(templateId),
         },
         userId: user.id,
@@ -669,13 +721,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           ...template,
           templateMeta: template.templateMeta
             ? {
-              ...template.templateMeta,
-              templateId: template.id,
-            }
+                ...template.templateMeta,
+                templateId: template.id,
+              }
             : null,
           Field: template.fields.map((field) => ({
             ...field,
-            fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+            fieldMeta: field.fieldMeta
+              ? ZFieldMetaSchema.parse(field.fieldMeta)
+              : null,
           })),
           Recipient: template.recipients,
         },
@@ -713,7 +767,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             Field: template.fields.map((field) => ({
               ...field,
               templateId: mapSecondaryIdToTemplateId(template.secondaryId),
-              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+              fieldMeta: field.fieldMeta
+                ? ZFieldMetaSchema.parse(field.fieldMeta)
+                : null,
             })),
             Recipient: template.recipients,
           })),
@@ -735,24 +791,30 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       });
 
-      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
+      const { remaining } = await getServerLimits({
+        userId: user.id,
+        teamId: team.id,
+      });
 
       if (remaining.documents <= 0) {
         return {
           status: 400,
           body: {
-            message: 'You have reached the maximum number of documents allowed for this month',
+            message:
+              "You have reached the maximum number of documents allowed for this month",
           },
         };
       }
 
       const templateId = Number(params.templateId);
 
-      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
+      const fileName = body.title.endsWith(".pdf")
+        ? body.title
+        : `${body.title}.pdf`;
 
       const template = await getEnvelopeById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         type: EnvelopeType.TEMPLATE,
@@ -761,7 +823,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       if (template.envelopeItems.length !== 1) {
-        throw new Error('API V1 does not support templates with multiple documents');
+        throw new Error(
+          "API V1 does not support templates with multiple documents"
+        );
       }
 
       // V1 API request schema uses indices for recipients
@@ -770,7 +834,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         const existingRecipient = template.recipients.at(index);
 
         if (!existingRecipient) {
-          throw new Error('Recipient not found.');
+          throw new Error("Recipient not found.");
         }
 
         return {
@@ -784,7 +848,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
       const createdEnvelope = await createDocumentFromTemplate({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         externalId: body.externalId || null,
@@ -811,7 +875,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const firstEnvelopeItemData = envelopeItems[0].documentData;
 
       if (!firstEnvelopeItemData) {
-        throw new Error('Document data not found.');
+        throw new Error("Document data not found.");
       }
 
       if (body.formValues) {
@@ -824,7 +888,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
         const newDocumentData = await putPdfFileServerSide({
           name: fileName,
-          type: 'application/pdf',
+          type: "application/pdf",
           arrayBuffer: async () => Promise.resolve(prefilled),
         });
 
@@ -867,7 +931,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           })),
         },
       };
-    },
+    }
   ),
 
   generateDocumentFromTemplate: authenticatedMiddleware(
@@ -880,25 +944,31 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       });
 
-      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
+      const { remaining } = await getServerLimits({
+        userId: user.id,
+        teamId: team.id,
+      });
 
       if (remaining.documents <= 0) {
         return {
           status: 400,
           body: {
-            message: 'You have reached the maximum number of documents allowed for this month',
+            message:
+              "You have reached the maximum number of documents allowed for this month",
           },
         };
       }
 
       const templateId = Number(params.templateId);
 
-      let envelope: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
+      let envelope: Awaited<
+        ReturnType<typeof createDocumentFromTemplate>
+      > | null = null;
 
       try {
         envelope = await createDocumentFromTemplate({
           id: {
-            type: 'templateId',
+            type: "templateId",
             id: templateId,
           },
           externalId: body.externalId || null,
@@ -918,22 +988,27 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       if (envelope.envelopeItems.length !== 1) {
-        throw new Error('API V1 does not support envelopes');
+        throw new Error("API V1 does not support envelopes");
       }
 
-      const firstEnvelopeDocumentData = await prisma.envelopeItem.findFirstOrThrow({
-        where: {
-          envelopeId: envelope.id,
-        },
-        include: {
-          documentData: true,
-        },
-      });
+      const firstEnvelopeDocumentData =
+        await prisma.envelopeItem.findFirstOrThrow({
+          where: {
+            envelopeId: envelope.id,
+          },
+          include: {
+            documentData: true,
+          },
+        });
 
       if (body.formValues) {
-        const fileName = envelope.title.endsWith('.pdf') ? envelope.title : `${envelope.title}.pdf`;
+        const fileName = envelope.title.endsWith(".pdf")
+          ? envelope.title
+          : `${envelope.title}.pdf`;
 
-        const pdf = await getFileServerSide(firstEnvelopeDocumentData.documentData);
+        const pdf = await getFileServerSide(
+          firstEnvelopeDocumentData.documentData
+        );
 
         const prefilled = await insertFormValuesInPdf({
           pdf: Buffer.from(pdf),
@@ -942,7 +1017,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
         const newDocumentData = await putPdfFileServerSide({
           name: fileName,
-          type: 'application/pdf',
+          type: "application/pdf",
           arrayBuffer: async () => Promise.resolve(prefilled),
         });
 
@@ -994,25 +1069,171 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           })),
         },
       };
-    },
+    }
   ),
 
-  sendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId } = args.params;
-    const { sendEmail, sendCompletionEmails } = args.body;
+  sendDocument: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId } = args.params;
+      const { sendEmail, sendCompletionEmails } = args.body;
 
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
+      logger.info({
+        input: {
+          id: documentId,
+        },
+      });
 
-    try {
+      try {
+        const legacyDocumentId = Number(documentId);
+
+        const envelope = await getEnvelopeById({
+          id: {
+            type: "documentId",
+            id: legacyDocumentId,
+          },
+          type: EnvelopeType.DOCUMENT,
+          userId: user.id,
+          teamId: team.id,
+        });
+
+        if (!envelope) {
+          return {
+            status: 404,
+            body: {
+              message: "Document not found",
+            },
+          };
+        }
+
+        if (isDocumentCompleted(envelope.status)) {
+          return {
+            status: 400,
+            body: {
+              message: "Document is already complete",
+            },
+          };
+        }
+
+        const emailSettings = extractDerivedDocumentEmailSettings(
+          envelope.documentMeta
+        );
+
+        // Update document email settings if sendCompletionEmails is provided
+        if (typeof sendCompletionEmails === "boolean") {
+          await updateDocumentMeta({
+            id: {
+              type: "envelopeId",
+              id: envelope.id,
+            },
+            userId: user.id,
+            teamId: team.id,
+            emailSettings: {
+              ...emailSettings,
+              documentCompleted: sendCompletionEmails,
+              ownerDocumentCompleted: sendCompletionEmails,
+            },
+            requestMetadata: metadata,
+          });
+        }
+
+        const { recipients, ...sentDocument } = await sendDocument({
+          id: {
+            type: "envelopeId",
+            id: envelope.id,
+          },
+          userId: user.id,
+          teamId: team.id,
+          sendEmail,
+          requestMetadata: metadata,
+        });
+
+        return {
+          status: 200,
+          body: {
+            message: "Document sent for signing successfully",
+            id: mapSecondaryIdToDocumentId(sentDocument.secondaryId),
+            externalId: sentDocument.externalId,
+            userId: sentDocument.userId,
+            teamId: sentDocument.teamId,
+            title: sentDocument.title,
+            status: sentDocument.status,
+            createdAt: sentDocument.createdAt,
+            updatedAt: sentDocument.updatedAt,
+            completedAt: sentDocument.completedAt,
+            recipients: recipients.map((recipient) => ({
+              ...recipient,
+              signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+            })),
+          },
+        };
+      } catch (err) {
+        return {
+          status: 500,
+          body: {
+            message:
+              "An error has occured while sending the document for signing",
+          },
+        };
+      }
+    }
+  ),
+
+  resendDocument: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId } = args.params;
+      const { recipients } = args.body;
+
+      logger.info({
+        input: {
+          id: documentId,
+        },
+      });
+
+      try {
+        await resendDocument({
+          userId: user.id,
+          id: {
+            type: "documentId",
+            id: Number(documentId),
+          },
+          recipients,
+          teamId: team.id,
+          requestMetadata: metadata,
+        });
+
+        return {
+          status: 200,
+          body: {
+            message: "Document resend successfully initiated",
+          },
+        };
+      } catch (err) {
+        return {
+          status: 500,
+          body: {
+            message: "An error has occured while resending the document",
+          },
+        };
+      }
+    }
+  ),
+
+  createRecipient: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId } = args.params;
+      const { name, email, role, authOptions, signingOrder } = args.body;
+
+      logger.info({
+        input: {
+          id: documentId,
+        },
+      });
+
       const legacyDocumentId = Number(documentId);
 
       const envelope = await getEnvelopeById({
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: legacyDocumentId,
         },
         type: EnvelopeType.DOCUMENT,
@@ -1024,7 +1245,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         return {
           status: 404,
           body: {
-            message: 'Document not found',
+            message: "Document not found",
           },
         };
       }
@@ -1033,183 +1254,138 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         return {
           status: 400,
           body: {
-            message: 'Document is already complete',
+            message: "Document is already completed",
           },
         };
       }
 
-      const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
+      const recipients = await getRecipientsForDocument({
+        documentId: Number(documentId),
+        userId: user.id,
+        teamId: team.id,
+      });
 
-      // Update document email settings if sendCompletionEmails is provided
-      if (typeof sendCompletionEmails === 'boolean') {
-        await updateDocumentMeta({
+      const recipientAlreadyExists = recipients.some(
+        (recipient) => recipient.email === email
+      );
+
+      if (recipientAlreadyExists) {
+        return {
+          status: 400,
+          body: {
+            message: "Recipient already exists",
+          },
+        };
+      }
+
+      try {
+        const { recipients: newRecipients } = await setDocumentRecipients({
           id: {
-            type: 'envelopeId',
-            id: envelope.id,
+            type: "documentId",
+            id: Number(documentId),
           },
           userId: user.id,
           teamId: team.id,
-          emailSettings: {
-            ...emailSettings,
-            documentCompleted: sendCompletionEmails,
-            ownerDocumentCompleted: sendCompletionEmails,
-          },
+          recipients: [
+            ...recipients.map((recipient) => ({
+              email: recipient.email,
+              name: recipient.name,
+              role: recipient.role,
+              signingOrder: recipient.signingOrder,
+              actionAuth:
+                ZRecipientAuthOptionsSchema.parse(recipient.authOptions)
+                  ?.actionAuth ?? [],
+            })),
+            {
+              email,
+              name,
+              role,
+              signingOrder,
+              actionAuth: authOptions?.actionAuth ?? [],
+            },
+          ],
           requestMetadata: metadata,
         });
+
+        const newRecipient = newRecipients.find(
+          (recipient) => recipient.email === email
+        );
+
+        if (!newRecipient) {
+          throw new Error("Recipient not found");
+        }
+
+        return {
+          status: 200,
+          body: {
+            ...newRecipient,
+            documentId: Number(documentId),
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${newRecipient.token}`,
+          },
+        };
+      } catch (err) {
+        return {
+          status: 500,
+          body: {
+            message: "An error has occured while creating the recipient",
+          },
+        };
+      }
+    }
+  ),
+
+  updateRecipient: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId, recipientId } = args.params;
+      const { name, email, role, authOptions, signingOrder } = args.body;
+
+      logger.info({
+        input: {
+          id: documentId,
+          recipientId,
+        },
+      });
+
+      const legacyDocumentId = Number(documentId);
+
+      const envelope = await getEnvelopeById({
+        id: {
+          type: "documentId",
+          id: legacyDocumentId,
+        },
+        type: EnvelopeType.DOCUMENT,
+        userId: user.id,
+        teamId: team.id,
+      });
+
+      if (!envelope) {
+        return {
+          status: 404,
+          body: {
+            message: "Document not found",
+          },
+        };
       }
 
-      const { recipients, ...sentDocument } = await sendDocument({
+      if (isDocumentCompleted(envelope.status)) {
+        return {
+          status: 400,
+          body: {
+            message: "Document is already completed",
+          },
+        };
+      }
+
+      const updatedRecipient = await updateEnvelopeRecipients({
+        userId: user.id,
+        teamId: team.id,
         id: {
-          type: 'envelopeId',
+          type: "envelopeId",
           id: envelope.id,
         },
-        userId: user.id,
-        teamId: team.id,
-        sendEmail,
-        requestMetadata: metadata,
-      });
-
-      return {
-        status: 200,
-        body: {
-          message: 'Document sent for signing successfully',
-          id: mapSecondaryIdToDocumentId(sentDocument.secondaryId),
-          externalId: sentDocument.externalId,
-          userId: sentDocument.userId,
-          teamId: sentDocument.teamId,
-          title: sentDocument.title,
-          status: sentDocument.status,
-          createdAt: sentDocument.createdAt,
-          updatedAt: sentDocument.updatedAt,
-          completedAt: sentDocument.completedAt,
-          recipients: recipients.map((recipient) => ({
-            ...recipient,
-            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-          })),
-        },
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while sending the document for signing',
-        },
-      };
-    }
-  }),
-
-  resendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId } = args.params;
-    const { recipients } = args.body;
-
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
-
-    try {
-      await resendDocument({
-        userId: user.id,
-        id: {
-          type: 'documentId',
-          id: Number(documentId),
-        },
-        recipients,
-        teamId: team.id,
-        requestMetadata: metadata,
-      });
-
-      return {
-        status: 200,
-        body: {
-          message: 'Document resend successfully initiated',
-        },
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while resending the document',
-        },
-      };
-    }
-  }),
-
-  createRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId } = args.params;
-    const { name, email, role, authOptions, signingOrder } = args.body;
-
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
-
-    const legacyDocumentId = Number(documentId);
-
-    const envelope = await getEnvelopeById({
-      id: {
-        type: 'documentId',
-        id: legacyDocumentId,
-      },
-      type: EnvelopeType.DOCUMENT,
-      userId: user.id,
-      teamId: team.id,
-    });
-
-    if (!envelope) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-
-    if (isDocumentCompleted(envelope.status)) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
-      };
-    }
-
-    const recipients = await getRecipientsForDocument({
-      documentId: Number(documentId),
-      userId: user.id,
-      teamId: team.id,
-    });
-
-    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
-
-    if (recipientAlreadyExists) {
-      return {
-        status: 400,
-        body: {
-          message: 'Recipient already exists',
-        },
-      };
-    }
-
-    try {
-      const { recipients: newRecipients } = await setDocumentRecipients({
-        id: {
-          type: 'documentId',
-          id: Number(documentId),
-        },
-        userId: user.id,
-        teamId: team.id,
         recipients: [
-          ...recipients.map((recipient) => ({
-            email: recipient.email,
-            name: recipient.name,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-            actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? [],
-          })),
           {
+            id: Number(recipientId),
             email,
             name,
             role,
@@ -1218,517 +1394,462 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           },
         ],
         requestMetadata: metadata,
-      });
+      })
+        .then(({ recipients }) => recipients[0])
+        .catch(null);
 
-      const newRecipient = newRecipients.find((recipient) => recipient.email === email);
-
-      if (!newRecipient) {
-        throw new Error('Recipient not found');
+      if (!updatedRecipient) {
+        return {
+          status: 404,
+          body: {
+            message: "Recipient not found",
+          },
+        };
       }
 
       return {
         status: 200,
         body: {
-          ...newRecipient,
+          ...updatedRecipient,
           documentId: Number(documentId),
-          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${newRecipient.token}`,
-        },
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while creating the recipient',
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
         },
       };
     }
-  }),
+  ),
 
-  updateRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId, recipientId } = args.params;
-    const { name, email, role, authOptions, signingOrder } = args.body;
+  deleteRecipient: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId, recipientId } = args.params;
 
-    logger.info({
-      input: {
-        id: documentId,
-        recipientId,
-      },
-    });
-
-    const legacyDocumentId = Number(documentId);
-
-    const envelope = await getEnvelopeById({
-      id: {
-        type: 'documentId',
-        id: legacyDocumentId,
-      },
-      type: EnvelopeType.DOCUMENT,
-      userId: user.id,
-      teamId: team.id,
-    });
-
-    if (!envelope) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
+      logger.info({
+        input: {
+          id: documentId,
+          recipientId,
         },
-      };
-    }
+      });
 
-    if (isDocumentCompleted(envelope.status)) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already completed',
+      const deletedRecipient = await deleteEnvelopeRecipient({
+        userId: user.id,
+        teamId: team.id,
+        recipientId: Number(recipientId),
+        requestMetadata: {
+          requestMetadata: metadata.requestMetadata,
+          source: "apiV1",
+          auth: "api",
+          auditUser: {
+            id: team.id,
+            email: team.name,
+            name: team.name,
+          },
         },
-      };
-    }
-
-    const updatedRecipient = await updateEnvelopeRecipients({
-      userId: user.id,
-      teamId: team.id,
-      id: {
-        type: 'envelopeId',
-        id: envelope.id,
-      },
-      recipients: [
-        {
-          id: Number(recipientId),
-          email,
-          name,
-          role,
-          signingOrder,
-          actionAuth: authOptions?.actionAuth ?? [],
-        },
-      ],
-      requestMetadata: metadata,
-    })
-      .then(({ recipients }) => recipients[0])
-      .catch(null);
-
-    if (!updatedRecipient) {
-      return {
-        status: 404,
-        body: {
-          message: 'Recipient not found',
-        },
-      };
-    }
-
-    return {
-      status: 200,
-      body: {
-        ...updatedRecipient,
-        documentId: Number(documentId),
-        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
-      },
-    };
-  }),
-
-  deleteRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId, recipientId } = args.params;
-
-    logger.info({
-      input: {
-        id: documentId,
-        recipientId,
-      },
-    });
-
-    const deletedRecipient = await deleteEnvelopeRecipient({
-      userId: user.id,
-      teamId: team.id,
-      recipientId: Number(recipientId),
-      requestMetadata: {
-        requestMetadata: metadata.requestMetadata,
-        source: 'apiV1',
-        auth: 'api',
-        auditUser: {
-          id: team.id,
-          email: team.name,
-          name: team.name,
-        },
-      },
-    });
-
-    return {
-      status: 200,
-      body: {
-        ...deletedRecipient,
-        documentId: Number(documentId),
-        signingUrl: '',
-      },
-    };
-  }),
-
-  createField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId } = args.params;
-
-    logger.info({
-      input: {
-        id: documentId,
-      },
-    });
-
-    const fields = Array.isArray(args.body) ? args.body : [args.body];
-
-    const { envelopeWhereInput } = await getEnvelopeWhereInput({
-      id: {
-        type: 'documentId',
-        id: Number(documentId),
-      },
-      type: EnvelopeType.DOCUMENT,
-      teamId: team.id,
-      userId: user.id,
-    });
-
-    const envelope = await prisma.envelope.findFirst({
-      where: envelopeWhereInput,
-      select: {
-        id: true,
-        secondaryId: true,
-        status: true,
-        envelopeItems: {
-          select: { id: true },
-        },
-      },
-    });
-
-    if (!envelope) {
-      return {
-        status: 404,
-        body: { message: 'Document not found' },
-      };
-    }
-
-    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
-
-    if (!firstEnvelopeItemId) {
-      throw new Error('Missing envelope item ID');
-    }
-
-    if (envelope.envelopeItems.length !== 1) {
-      throw new Error('API V1 does not support multiple documents');
-    }
-
-    if (isDocumentCompleted(envelope.status)) {
-      return {
-        status: 400,
-        body: { message: 'Document is already completed' },
-      };
-    }
-
-    try {
-      const createdFields = await prisma.$transaction(async (tx) => {
-        return Promise.all(
-          fields.map(async (fieldData) => {
-            const {
-              recipientId,
-              type,
-              pageNumber,
-              pageWidth,
-              pageHeight,
-              pageX,
-              pageY,
-              fieldMeta,
-            } = fieldData;
-
-            if (pageNumber <= 0) {
-              throw new Error('Invalid page number');
-            }
-
-            const recipient = await prisma.recipient.findFirst({
-              where: {
-                id: Number(recipientId),
-                envelopeId: envelope.id,
-              },
-            });
-
-            if (!recipient) {
-              throw new Error('Recipient not found');
-            }
-
-            if (recipient.signingStatus === SigningStatus.SIGNED) {
-              throw new Error('Recipient has already signed the document');
-            }
-
-            const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(
-              type,
-            );
-
-            if (advancedField && !fieldMeta) {
-              throw new Error(
-                'Field meta is required for this type of field. Please provide the appropriate field meta object.',
-              );
-            }
-
-            if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
-              throw new Error('Field meta type does not match the field type');
-            }
-
-            const result = match(type)
-              .with('RADIO', () => ZRadioFieldMeta.safeParse(fieldMeta))
-              .with('CHECKBOX', () => ZCheckboxFieldMeta.safeParse(fieldMeta))
-              .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
-              .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
-              .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
-              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
-                success: true,
-                data: undefined,
-              }))
-              .with('FREE_SIGNATURE', () => ({
-                success: false,
-                error: 'FREE_SIGNATURE is not supported',
-                data: undefined,
-              }))
-              .exhaustive();
-
-            if (!result.success) {
-              throw new Error('Field meta parsing failed');
-            }
-
-            const field = await tx.field.create({
-              data: {
-                envelopeId: envelope.id,
-                envelopeItemId: firstEnvelopeItemId,
-                recipientId: Number(recipientId),
-                type,
-                page: pageNumber,
-                positionX: pageX,
-                positionY: pageY,
-                width: pageWidth,
-                height: pageHeight,
-                customText: '',
-                inserted: false,
-                fieldMeta: result.data,
-              },
-              include: {
-                recipient: true,
-              },
-            });
-
-            await tx.documentAuditLog.create({
-              data: createDocumentAuditLogData({
-                type: 'FIELD_CREATED',
-                envelopeId: envelope.id,
-                user: {
-                  id: team.id ?? user.id,
-                  email: team?.name ?? user.email,
-                  name: team ? '' : user.name,
-                },
-                data: {
-                  fieldId: field.secondaryId,
-                  fieldRecipientEmail: field.recipient?.email ?? '',
-                  fieldRecipientId: recipientId,
-                  fieldType: field.type,
-                },
-                requestMetadata: metadata.requestMetadata,
-              }),
-            });
-
-            return {
-              id: field.id,
-              documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-              recipientId: field.recipientId ?? -1,
-              type: field.type,
-              pageNumber: field.page,
-              pageX: Number(field.positionX),
-              pageY: Number(field.positionY),
-              pageWidth: Number(field.width),
-              pageHeight: Number(field.height),
-              customText: field.customText,
-              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
-              inserted: field.inserted,
-            };
-          }),
-        );
       });
 
       return {
         status: 200,
         body: {
-          fields: createdFields,
+          ...deletedRecipient,
           documentId: Number(documentId),
+          signingUrl: "",
         },
       };
-    } catch (err) {
-      return AppError.toRestAPIError(err);
     }
-  }),
+  ),
 
-  updateField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId, fieldId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
-      args.body;
+  createField: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId } = args.params;
 
-    logger.info({
-      input: {
-        id: documentId,
-        fieldId,
-      },
-    });
+      logger.info({
+        input: {
+          id: documentId,
+        },
+      });
 
-    const envelope = await getEnvelopeById({
-      id: {
-        type: 'documentId',
-        id: Number(documentId),
-      },
-      type: EnvelopeType.DOCUMENT,
-      userId: user.id,
-      teamId: team.id,
-    });
+      const fields = Array.isArray(args.body) ? args.body : [args.body];
 
-    if (!envelope) {
+      const { envelopeWhereInput } = await getEnvelopeWhereInput({
+        id: {
+          type: "documentId",
+          id: Number(documentId),
+        },
+        type: EnvelopeType.DOCUMENT,
+        teamId: team.id,
+        userId: user.id,
+      });
+
+      const envelope = await prisma.envelope.findFirst({
+        where: envelopeWhereInput,
+        select: {
+          id: true,
+          secondaryId: true,
+          status: true,
+          envelopeItems: {
+            select: { id: true },
+          },
+        },
+      });
+
+      if (!envelope) {
+        return {
+          status: 404,
+          body: { message: "Document not found" },
+        };
+      }
+
+      const firstEnvelopeItemId = envelope.envelopeItems[0].id;
+
+      if (!firstEnvelopeItemId) {
+        throw new Error("Missing envelope item ID");
+      }
+
+      if (envelope.envelopeItems.length !== 1) {
+        throw new Error("API V1 does not support multiple documents");
+      }
+
+      if (isDocumentCompleted(envelope.status)) {
+        return {
+          status: 400,
+          body: { message: "Document is already completed" },
+        };
+      }
+
+      try {
+        const createdFields = await prisma.$transaction(async (tx) => {
+          return Promise.all(
+            fields.map(async (fieldData) => {
+              const {
+                recipientId,
+                type,
+                pageNumber,
+                pageWidth,
+                pageHeight,
+                pageX,
+                pageY,
+                fieldMeta,
+              } = fieldData;
+
+              if (pageNumber <= 0) {
+                throw new Error("Invalid page number");
+              }
+
+              const recipient = await prisma.recipient.findFirst({
+                where: {
+                  id: Number(recipientId),
+                  envelopeId: envelope.id,
+                },
+              });
+
+              if (!recipient) {
+                throw new Error("Recipient not found");
+              }
+
+              if (recipient.signingStatus === SigningStatus.SIGNED) {
+                throw new Error("Recipient has already signed the document");
+              }
+
+              const advancedField = [
+                "NUMBER",
+                "RADIO",
+                "CHECKBOX",
+                "DROPDOWN",
+                "TEXT",
+              ].includes(type);
+
+              if (advancedField && !fieldMeta) {
+                throw new Error(
+                  "Field meta is required for this type of field. Please provide the appropriate field meta object."
+                );
+              }
+
+              if (
+                fieldMeta &&
+                fieldMeta.type.toLowerCase() !== String(type).toLowerCase()
+              ) {
+                throw new Error(
+                  "Field meta type does not match the field type"
+                );
+              }
+
+              const result = match(type)
+                .with("RADIO", () => ZRadioFieldMeta.safeParse(fieldMeta))
+                .with("CHECKBOX", () => ZCheckboxFieldMeta.safeParse(fieldMeta))
+                .with("DROPDOWN", () => ZDropdownFieldMeta.safeParse(fieldMeta))
+                .with("NUMBER", () => ZNumberFieldMeta.safeParse(fieldMeta))
+                .with("TEXT", () => ZTextFieldMeta.safeParse(fieldMeta))
+                .with("SIGNATURE", "INITIALS", "DATE", "EMAIL", "NAME", () => ({
+                  success: true,
+                  data: undefined,
+                }))
+                .with("FREE_SIGNATURE", () => ({
+                  success: false,
+                  error: "FREE_SIGNATURE is not supported",
+                  data: undefined,
+                }))
+                .exhaustive();
+
+              if (!result.success) {
+                throw new Error("Field meta parsing failed");
+              }
+
+              const field = await tx.field.create({
+                data: {
+                  envelopeId: envelope.id,
+                  envelopeItemId: firstEnvelopeItemId,
+                  recipientId: Number(recipientId),
+                  type,
+                  page: pageNumber,
+                  positionX: pageX,
+                  positionY: pageY,
+                  width: pageWidth,
+                  height: pageHeight,
+                  customText: "",
+                  inserted: false,
+                  fieldMeta: result.data,
+                },
+                include: {
+                  recipient: true,
+                },
+              });
+
+              await tx.documentAuditLog.create({
+                data: createDocumentAuditLogData({
+                  type: "FIELD_CREATED",
+                  envelopeId: envelope.id,
+                  user: {
+                    id: team.id ?? user.id,
+                    email: team?.name ?? user.email,
+                    name: team ? "" : user.name,
+                  },
+                  data: {
+                    fieldId: field.secondaryId,
+                    fieldRecipientEmail: field.recipient?.email ?? "",
+                    fieldRecipientId: recipientId,
+                    fieldType: field.type,
+                  },
+                  requestMetadata: metadata.requestMetadata,
+                }),
+              });
+
+              return {
+                id: field.id,
+                documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+                recipientId: field.recipientId ?? -1,
+                type: field.type,
+                pageNumber: field.page,
+                pageX: Number(field.positionX),
+                pageY: Number(field.positionY),
+                pageWidth: Number(field.width),
+                pageHeight: Number(field.height),
+                customText: field.customText,
+                fieldMeta: field.fieldMeta
+                  ? ZFieldMetaSchema.parse(field.fieldMeta)
+                  : undefined,
+                inserted: field.inserted,
+              };
+            })
+          );
+        });
+
+        return {
+          status: 200,
+          body: {
+            fields: createdFields,
+            documentId: Number(documentId),
+          },
+        };
+      } catch (err) {
+        return AppError.toRestAPIError(err);
+      }
+    }
+  ),
+
+  updateField: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { id: documentId, fieldId } = args.params;
+      const {
+        recipientId,
+        type,
+        pageNumber,
+        pageWidth,
+        pageHeight,
+        pageX,
+        pageY,
+        fieldMeta,
+      } = args.body;
+
+      logger.info({
+        input: {
+          id: documentId,
+          fieldId,
+        },
+      });
+
+      const envelope = await getEnvelopeById({
+        id: {
+          type: "documentId",
+          id: Number(documentId),
+        },
+        type: EnvelopeType.DOCUMENT,
+        userId: user.id,
+        teamId: team.id,
+      });
+
+      if (!envelope) {
+        return {
+          status: 404,
+          body: {
+            message: "Document not found",
+          },
+        };
+      }
+
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+      const firstEnvelopeItemId = envelope.envelopeItems[0].id;
+
+      if (!firstEnvelopeItemId) {
+        throw new Error("Missing document data");
+      }
+
+      if (envelope.envelopeItems.length > 1) {
+        throw new Error("API V1 does not support multiple documents");
+      }
+
+      if (isDocumentCompleted(envelope.status)) {
+        return {
+          status: 400,
+          body: {
+            message: "Document is already completed",
+          },
+        };
+      }
+
+      const recipient = await prisma.recipient.findFirst({
+        where: {
+          id: Number(recipientId),
+          envelopeId: envelope.id,
+        },
+      });
+
+      if (!recipient) {
+        return {
+          status: 404,
+          body: {
+            message: "Recipient not found",
+          },
+        };
+      }
+
+      if (recipient.signingStatus === SigningStatus.SIGNED) {
+        return {
+          status: 400,
+          body: {
+            message: "Recipient has already signed the document",
+          },
+        };
+      }
+
+      const { fields } = await updateEnvelopeFields({
+        userId: user.id,
+        teamId: team.id,
+        id: {
+          type: "documentId",
+          id: legacyDocumentId,
+        },
+        fields: [
+          {
+            id: Number(fieldId),
+            type,
+            pageNumber,
+            pageX,
+            pageY,
+            width: pageWidth,
+            height: pageHeight,
+            fieldMeta: fieldMeta
+              ? ZFieldMetaSchema.parse(fieldMeta)
+              : undefined,
+          },
+        ],
+        requestMetadata: {
+          requestMetadata: metadata.requestMetadata,
+          source: "apiV1",
+          auth: "api",
+          auditUser: {
+            id: team.id,
+            email: team.name,
+            name: team.name,
+          },
+        },
+      });
+
+      const updatedField = fields[0];
+
       return {
-        status: 404,
+        status: 200,
         body: {
-          message: 'Document not found',
+          id: updatedField.id,
+          documentId: legacyDocumentId,
+          recipientId: updatedField.recipientId ?? -1,
+          type: updatedField.type,
+          pageNumber: updatedField.page,
+          pageX: Number(updatedField.positionX),
+          pageY: Number(updatedField.positionY),
+          pageWidth: Number(updatedField.width),
+          pageHeight: Number(updatedField.height),
+          customText: updatedField.customText,
+          inserted: updatedField.inserted,
         },
       };
     }
+  ),
 
-    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+  deleteField: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      // Note: documentId isn't actually used anywhere, so we just return it.
+      const { id: unverifiedDocumentId, fieldId } = args.params;
 
-    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
+      logger.info({
+        input: {
+          id: unverifiedDocumentId,
+          fieldId,
+        },
+      });
 
-    if (!firstEnvelopeItemId) {
-      throw new Error('Missing document data');
-    }
+      const deletedField = await deleteDocumentField({
+        fieldId: Number(fieldId),
+        userId: user.id,
+        teamId: team.id,
+        requestMetadata: {
+          requestMetadata: metadata.requestMetadata,
+          source: "apiV1",
+          auth: "api",
+          auditUser: {
+            id: team.id,
+            email: team.name,
+            name: team.name,
+          },
+        },
+      });
 
-    if (envelope.envelopeItems.length > 1) {
-      throw new Error('API V1 does not support multiple documents');
-    }
+      const remappedField = {
+        id: deletedField.id,
+        documentId: Number(unverifiedDocumentId),
+        recipientId: deletedField.recipientId ?? -1,
+        type: deletedField.type,
+        pageNumber: deletedField.page,
+        pageX: Number(deletedField.positionX),
+        pageY: Number(deletedField.positionY),
+        pageWidth: Number(deletedField.width),
+        pageHeight: Number(deletedField.height),
+        customText: deletedField.customText,
+        inserted: deletedField.inserted,
+      };
 
-    if (isDocumentCompleted(envelope.status)) {
       return {
-        status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
+        status: 200,
+        body: remappedField,
       };
     }
-
-    const recipient = await prisma.recipient.findFirst({
-      where: {
-        id: Number(recipientId),
-        envelopeId: envelope.id,
-      },
-    });
-
-    if (!recipient) {
-      return {
-        status: 404,
-        body: {
-          message: 'Recipient not found',
-        },
-      };
-    }
-
-    if (recipient.signingStatus === SigningStatus.SIGNED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Recipient has already signed the document',
-        },
-      };
-    }
-
-    const { fields } = await updateEnvelopeFields({
-      userId: user.id,
-      teamId: team.id,
-      id: {
-        type: 'documentId',
-        id: legacyDocumentId,
-      },
-      fields: [
-        {
-          id: Number(fieldId),
-          type,
-          pageNumber,
-          pageX,
-          pageY,
-          width: pageWidth,
-          height: pageHeight,
-          fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
-        },
-      ],
-      requestMetadata: {
-        requestMetadata: metadata.requestMetadata,
-        source: 'apiV1',
-        auth: 'api',
-        auditUser: {
-          id: team.id,
-          email: team.name,
-          name: team.name,
-        },
-      },
-    });
-
-    const updatedField = fields[0];
-
-    return {
-      status: 200,
-      body: {
-        id: updatedField.id,
-        documentId: legacyDocumentId,
-        recipientId: updatedField.recipientId ?? -1,
-        type: updatedField.type,
-        pageNumber: updatedField.page,
-        pageX: Number(updatedField.positionX),
-        pageY: Number(updatedField.positionY),
-        pageWidth: Number(updatedField.width),
-        pageHeight: Number(updatedField.height),
-        customText: updatedField.customText,
-        inserted: updatedField.inserted,
-      },
-    };
-  }),
-
-  deleteField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    // Note: documentId isn't actually used anywhere, so we just return it.
-    const { id: unverifiedDocumentId, fieldId } = args.params;
-
-    logger.info({
-      input: {
-        id: unverifiedDocumentId,
-        fieldId,
-      },
-    });
-
-    const deletedField = await deleteDocumentField({
-      fieldId: Number(fieldId),
-      userId: user.id,
-      teamId: team.id,
-      requestMetadata: {
-        requestMetadata: metadata.requestMetadata,
-        source: 'apiV1',
-        auth: 'api',
-        auditUser: {
-          id: team.id,
-          email: team.name,
-          name: team.name,
-        },
-      },
-    });
-
-    const remappedField = {
-      id: deletedField.id,
-      documentId: Number(unverifiedDocumentId),
-      recipientId: deletedField.recipientId ?? -1,
-      type: deletedField.type,
-      pageNumber: deletedField.page,
-      pageX: Number(deletedField.positionX),
-      pageY: Number(deletedField.positionY),
-      pageWidth: Number(deletedField.width),
-      pageHeight: Number(deletedField.height),
-      customText: deletedField.customText,
-      inserted: deletedField.inserted,
-    };
-
-    return {
-      status: 200,
-      body: remappedField,
-    };
-  }),
+  ),
 });
