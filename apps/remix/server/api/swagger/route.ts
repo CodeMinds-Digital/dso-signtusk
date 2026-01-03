@@ -1,17 +1,14 @@
 import { Hono } from "hono";
 
-import {
-  API_V2_BETA_URL,
-  API_V2_URL,
-  NEXT_PUBLIC_WEBAPP_URL,
-} from "@signtusk/lib/constants/app";
+import { API_V2_BETA_URL, API_V2_URL } from "@signtusk/lib/constants/app";
 
 const swaggerRoute = new Hono();
 
 /**
  * Swagger UI HTML template
+ * Uses relative URLs to avoid CORS issues with Vercel preview deployments
  */
-const getSwaggerHtml = (specUrl: string, title: string) => `
+const getSwaggerHtml = (specPath: string, title: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,8 +38,10 @@ const getSwaggerHtml = (specUrl: string, title: string) => `
   <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
   <script>
     window.onload = function() {
+      // Use relative URL to avoid CORS issues with preview deployments
+      const specUrl = window.location.origin + "${specPath}";
       const ui = SwaggerUIBundle({
-        url: "${specUrl}",
+        url: specUrl,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -67,18 +66,16 @@ const getSwaggerHtml = (specUrl: string, title: string) => `
  * Swagger UI for v2 API
  */
 swaggerRoute.get("/v2", (c) => {
-  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
-  const specUrl = `${baseUrl}${API_V2_URL}/openapi.json`;
-  return c.html(getSwaggerHtml(specUrl, "Documenso API v2 - Swagger UI"));
+  const specPath = `${API_V2_URL}/openapi.json`;
+  return c.html(getSwaggerHtml(specPath, "Documenso API v2 - Swagger UI"));
 });
 
 /**
  * Swagger UI for v2 beta API
  */
 swaggerRoute.get("/v2-beta", (c) => {
-  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
-  const specUrl = `${baseUrl}${API_V2_BETA_URL}/openapi.json`;
-  return c.html(getSwaggerHtml(specUrl, "Documenso API v2 Beta - Swagger UI"));
+  const specPath = `${API_V2_BETA_URL}/openapi.json`;
+  return c.html(getSwaggerHtml(specPath, "Documenso API v2 Beta - Swagger UI"));
 });
 
 /**
@@ -92,7 +89,6 @@ swaggerRoute.get("/", (c) => {
  * API documentation index page
  */
 swaggerRoute.get("/docs", (c) => {
-  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
   return c.html(`
 <!DOCTYPE html>
 <html lang="en">
@@ -225,8 +221,8 @@ swaggerRoute.get("/docs", (c) => {
     
     <div class="json-links">
       <h4>OpenAPI Specifications (JSON)</h4>
-      <a href="${baseUrl}${API_V2_URL}/openapi.json" target="_blank">v2 OpenAPI Spec</a>
-      <a href="${baseUrl}${API_V2_BETA_URL}/openapi.json" target="_blank">v2 Beta OpenAPI Spec</a>
+      <a href="${API_V2_URL}/openapi.json" target="_blank">v2 OpenAPI Spec</a>
+      <a href="${API_V2_BETA_URL}/openapi.json" target="_blank">v2 Beta OpenAPI Spec</a>
     </div>
   </div>
 </body>
