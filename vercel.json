@@ -6,29 +6,9 @@
   "framework": null,
   "functions": {
     "apps/remix/api/index.js": {
-      "includeFiles": "apps/remix/build/**/*.js",
+      "includeFiles": "apps/remix/build/**/*",
       "maxDuration": 30,
-      "memory": 1024,
-      "external": [
-        "@prisma/client",
-        "prisma",
-        "@sentry/remix",
-        "@sentry/node",
-        "sharp",
-        "canvas",
-        "@napi-rs/canvas",
-        "playwright",
-        "playwright-core",
-        "konva",
-        "pdfjs-dist",
-        "recharts",
-        "posthog-js",
-        "posthog-node",
-        "luxon",
-        "satori",
-        "@tanstack/react-query",
-        "framer-motion"
-      ]
+      "memory": 1024
     }
   },
   "routes": [
