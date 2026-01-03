@@ -1,17 +1,17 @@
-import type { OrganisationMemberInviteStatus } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { OrganisationMemberInviteStatus } from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindOrganisationMemberInvitesRequestSchema,
   ZFindOrganisationMemberInvitesResponseSchema,
-} from './find-organisation-member-invites.types';
+} from "./find-organisation-member-invites.types";
 
 export const findOrganisationMemberInvitesRoute = authenticatedProcedure
   //   .meta(getOrganisationMemberInvitesMeta)
@@ -58,7 +58,7 @@ export const findOrganisationMemberInvites = async ({
     where: buildOrganisationWhereQuery({
       organisationId,
       userId,
-      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
     }),
   });
 
@@ -84,7 +84,7 @@ export const findOrganisationMemberInvites = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       // Exclude token attribute.
       select: {

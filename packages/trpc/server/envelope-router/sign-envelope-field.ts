@@ -1,19 +1,24 @@
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
-import { match } from 'ts-pattern';
+import {
+  DocumentStatus,
+  FieldType,
+  RecipientRole,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
-import { isBase64Image } from '@signtusk/lib/constants/signatures';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { validateFieldAuth } from '@signtusk/lib/server-only/document/validate-field-auth';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@signtusk/lib/types/document-audit-logs';
-import { createDocumentAuditLogData } from '@signtusk/lib/utils/document-audit-logs';
-import { extractFieldInsertionValues } from '@signtusk/lib/utils/envelope-signing';
-import { prisma } from '@signtusk/prisma';
+import { isBase64Image } from "@signtusk/lib/constants/signatures";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { validateFieldAuth } from "@signtusk/lib/server-only/document/validate-field-auth";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
+import { createDocumentAuditLogData } from "@signtusk/lib/utils/document-audit-logs";
+import { extractFieldInsertionValues } from "@signtusk/lib/utils/envelope-signing";
+import { prisma } from "@signtusk/prisma";
 
-import { procedure } from '../trpc';
+import { procedure } from "../trpc";
 import {
   ZSignEnvelopeFieldRequestSchema,
   ZSignEnvelopeFieldResponseSchema,
-} from './sign-envelope-field.types';
+} from "./sign-envelope-field.types";
 
 // Note that this is an unauthenticated public procedure route.
 export const signEnvelopeFieldRoute = procedure
@@ -45,16 +50,16 @@ export const signEnvelopeFieldRoute = procedure
         recipient: {
           ...(recipient.role === RecipientRole.ASSISTANT
             ? {
-              signingStatus: {
-                not: SigningStatus.SIGNED,
-              },
-              signingOrder: {
-                gte: recipient.signingOrder ?? 0,
-              },
-            }
+                signingStatus: {
+                  not: SigningStatus.SIGNED,
+                },
+                signingOrder: {
+                  gte: recipient.signingOrder ?? 0,
+                },
+              }
             : {
-              id: recipient.id,
-            }),
+                id: recipient.id,
+              }),
         },
       },
       include: {
@@ -95,7 +100,7 @@ export const signEnvelopeFieldRoute = procedure
 
     if (fieldValue.type !== field.type) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Selected values do not match the field values',
+        message: "Selected values do not match the field values",
       });
     }
 
@@ -131,7 +136,11 @@ export const signEnvelopeFieldRoute = procedure
       throw new Error(`Field ${fieldId} has no recipientId`);
     }
 
-    const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
+    const insertionValues = extractFieldInsertionValues({
+      fieldValue,
+      field,
+      documentMeta,
+    });
 
     // Early return for uninserting fields.
     if (!insertionValues.inserted) {
@@ -141,7 +150,7 @@ export const signEnvelopeFieldRoute = procedure
             id: field.id,
           },
           data: {
-            customText: '',
+            customText: "",
             inserted: false,
           },
         });
@@ -184,7 +193,8 @@ export const signEnvelopeFieldRoute = procedure
       authOptions,
     });
 
-    const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
+    const assistant =
+      recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
 
     let signatureImageAsBase64: string | null = null;
     let typedSignature: string | null = null;
@@ -262,7 +272,7 @@ export const signEnvelopeFieldRoute = procedure
             field: match(updatedField.type)
               .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
                 type,
-                data: signatureImageAsBase64 || typedSignature || '',
+                data: signatureImageAsBase64 || typedSignature || "",
               }))
               .with(
                 FieldType.DATE,
@@ -273,7 +283,7 @@ export const signEnvelopeFieldRoute = procedure
                 (type) => ({
                   type,
                   data: updatedField.customText,
-                }),
+                })
               )
               .with(
                 FieldType.NUMBER,
@@ -283,13 +293,13 @@ export const signEnvelopeFieldRoute = procedure
                 (type) => ({
                   type,
                   data: updatedField.customText,
-                }),
+                })
               )
               .exhaustive(),
             fieldSecurity: derivedRecipientActionAuth
               ? {
-                type: derivedRecipientActionAuth,
-              }
+                  type: derivedRecipientActionAuth,
+                }
               : undefined,
           },
         }),

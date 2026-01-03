@@ -1,19 +1,22 @@
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import {
+  DocumentDataType,
+  EnvelopeType,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { createDocumentData } from '@signtusk/lib/server-only/document-data/create-document-data';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { getPresignPostUrl } from '@signtusk/lib/universal/upload/server-actions';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
-import { prisma } from '@signtusk/prisma';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { createDocumentData } from "@signtusk/lib/server-only/document-data/create-document-data";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { getPresignPostUrl } from "@signtusk/lib/universal/upload/server-actions";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateDocumentTemporaryRequestSchema,
   ZCreateDocumentTemporaryResponseSchema,
   createDocumentTemporaryMeta,
-} from './create-document-temporary.types';
+} from "./create-document-temporary.types";
 
 /**
  * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
@@ -44,14 +47,15 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
 
     if (remaining.documents <= 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-        message: 'You have reached your document limit for this month. Please upgrade your plan.',
+        message:
+          "You have reached your document limit for this month. Please upgrade your plan.",
         statusCode: 400,
       });
     }
 
-    const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+    const fileName = title.endsWith(".pdf") ? title : `${title}.pdf`;
 
-    const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+    const { url, key } = await getPresignPostUrl(fileName, "application/pdf");
 
     const documentData = await createDocumentData({
       data: key,
@@ -105,12 +109,14 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       },
     });
 
-    const legacyDocumentId = mapSecondaryIdToDocumentId(createdEnvelope.secondaryId);
+    const legacyDocumentId = mapSecondaryIdToDocumentId(
+      createdEnvelope.secondaryId
+    );
 
     const firstDocumentData = envelopeItems[0].documentData;
 
     if (!firstDocumentData) {
-      throw new Error('Document data not found');
+      throw new Error("Document data not found");
     }
 
     return {

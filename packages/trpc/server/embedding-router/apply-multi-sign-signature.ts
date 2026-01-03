@@ -1,17 +1,21 @@
-import { FieldType, ReadStatus, SigningStatus } from '@prisma/client';
+import {
+  FieldType,
+  ReadStatus,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getDocumentByToken } from '@signtusk/lib/server-only/document/get-document-by-token';
-import { signFieldWithToken } from '@signtusk/lib/server-only/field/sign-field-with-token';
-import { getRecipientByToken } from '@signtusk/lib/server-only/recipient/get-recipient-by-token';
-import { extractDocumentAuthMethods } from '@signtusk/lib/utils/document-auth';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getDocumentByToken } from "@signtusk/lib/server-only/document/get-document-by-token";
+import { signFieldWithToken } from "@signtusk/lib/server-only/field/sign-field-with-token";
+import { getRecipientByToken } from "@signtusk/lib/server-only/recipient/get-recipient-by-token";
+import { extractDocumentAuthMethods } from "@signtusk/lib/utils/document-auth";
+import { prisma } from "@signtusk/prisma";
 
-import { procedure } from '../trpc';
+import { procedure } from "../trpc";
 import {
   ZApplyMultiSignSignatureRequestSchema,
   ZApplyMultiSignSignatureResponseSchema,
-} from './apply-multi-sign-signature.types';
+} from "./apply-multi-sign-signature.types";
 
 export const applyMultiSignSignatureRoute = procedure
   .input(ZApplyMultiSignSignatureRequestSchema)
@@ -27,17 +31,17 @@ export const applyMultiSignSignatureRoute = procedure
           const recipient = await getRecipientByToken({ token });
 
           return { document, recipient };
-        }),
+        })
       );
 
       // Check if all documents have been viewed
       const hasUnviewedDocuments = envelopes.some(
-        (envelope) => envelope.recipient.readStatus !== ReadStatus.OPENED,
+        (envelope) => envelope.recipient.readStatus !== ReadStatus.OPENED
       );
 
       if (hasUnviewedDocuments) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'All documents must be viewed before signing',
+          message: "All documents must be viewed before signing",
         });
       }
 
@@ -54,7 +58,7 @@ export const applyMultiSignSignatureRoute = procedure
         ) {
           throw new AppError(AppErrorCode.INVALID_REQUEST, {
             message:
-              'Documents that require additional authentication cannot be multi signed at the moment',
+              "Documents that require additional authentication cannot be multi signed at the moment",
           });
         }
       }
@@ -83,10 +87,10 @@ export const applyMultiSignSignatureRoute = procedure
                 value: signature,
                 isBase64,
                 requestMetadata: metadata.requestMetadata,
-              }),
-            ),
+              })
+            )
           );
-        }),
+        })
       );
 
       return { success: true };
@@ -96,7 +100,7 @@ export const applyMultiSignSignatureRoute = procedure
       }
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to apply multi-sign signature',
+        message: "Failed to apply multi-sign signature",
       });
     }
   });

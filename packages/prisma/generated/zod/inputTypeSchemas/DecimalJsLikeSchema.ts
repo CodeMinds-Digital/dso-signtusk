@@ -1,20 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 
-// Browser-safe DecimalJsLike type (equivalent to Prisma.DecimalJsLike)
-interface DecimalJsLike {
-  d: number[];
-  e: number;
-  s: number;
-  toFixed: () => string;
-}
-
-export const DecimalJsLikeSchema: z.ZodType<DecimalJsLike> = z.object({
+export const DecimalJsLikeSchema: z.ZodType<Prisma.DecimalJsLike> = z.object({
   d: z.array(z.number()),
   e: z.number(),
   s: z.number(),
   toFixed: z.any(),
-});
-
-export type { DecimalJsLike };
+})
 
 export default DecimalJsLikeSchema;

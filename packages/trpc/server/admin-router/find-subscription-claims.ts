@@ -1,15 +1,15 @@
-import type { Prisma } from '@prisma/client';
-import type { z } from 'zod';
+import type { Prisma } from "@signtusk/prisma";
+import type { z } from "zod";
 
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { prisma } from '@signtusk/prisma';
-import type SubscriptionClaimSchema from '@signtusk/prisma/generated/zod/modelSchema/SubscriptionClaimSchema';
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { prisma } from "@signtusk/prisma";
+import type SubscriptionClaimSchema from "@signtusk/prisma/generated/zod/modelSchema/SubscriptionClaimSchema";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZFindSubscriptionClaimsRequestSchema,
   ZFindSubscriptionClaimsResponseSchema,
-} from './find-subscription-claims.types';
+} from "./find-subscription-claims.types";
 
 export const findSubscriptionClaimsRoute = adminProcedure
   .input(ZFindSubscriptionClaimsRequestSchema)
@@ -39,13 +39,13 @@ export const findSubscriptionClaims = async ({
         {
           id: {
             contains: query,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           name: {
             contains: query,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
       ],
@@ -58,7 +58,7 @@ export const findSubscriptionClaims = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     }),
     prisma.subscriptionClaim.count({

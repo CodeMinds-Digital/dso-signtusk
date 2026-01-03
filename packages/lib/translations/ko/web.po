@@ -2551,6 +2551,7 @@ msgstr "템플릿 구성"
 msgid "Configure Template"
 msgstr "템플릿 구성"
 
+#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type] )
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -3015,7 +3016,7 @@ msgstr "브랜딩은 현재 Teams 요금제 이상에서만 구성할 수 있습
 msgid "Currently email domains can only be configured for Platform and above plans."
 msgstr "현재 이메일 도메인은 Platform 요금제 이상에서만 구성할 수 있습니다."
 
-#. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
+#. placeholder {0}: ( field.value.size / (1024 * 1024) ).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Custom {0} MB file"
 msgstr "사용자 정의 {0} MB 파일"
@@ -5341,7 +5342,7 @@ msgstr "커뮤니티 지원과 논의를 위해 <0>Discord</0> 커뮤니티에 �
 msgid "Joined"
 msgstr "가입일"
 
-#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
+#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: "short", })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "{0}에 가입함"
@@ -9488,7 +9489,7 @@ msgid "To mark this document as viewed, you need to be logged in."
 msgstr "이 문서를 열람 완료로 표시하려면 로그인해야 합니다."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
+#. placeholder {0}: emptyCheckboxFields.length > 0 ? "Checkbox" : emptyRadioFields.length > 0 ? "Radio" : "Select"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "To proceed further, please set at least one value for the {0} field."

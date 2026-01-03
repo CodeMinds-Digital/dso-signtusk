@@ -2546,6 +2546,7 @@ msgstr "Configurar modelo"
 msgid "Configure Template"
 msgstr "Configurar Modelo"
 
+#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type] )
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -3010,7 +3011,7 @@ msgstr "Atualmente, a marca só pode ser configurada para planos Teams e superio
 msgid "Currently email domains can only be configured for Platform and above plans."
 msgstr "Atualmente, domínios de e-mail só podem ser configurados para planos Platform e superiores."
 
-#. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
+#. placeholder {0}: ( field.value.size / (1024 * 1024) ).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Custom {0} MB file"
 msgstr "Arquivo personalizado de {0} MB"
@@ -5336,7 +5337,7 @@ msgstr "Junte-se à nossa comunidade no <0>Discord</0> para suporte e discussão
 msgid "Joined"
 msgstr "Entrou"
 
-#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
+#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: "short", })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Entrou {0}"
@@ -9483,7 +9484,7 @@ msgid "To mark this document as viewed, you need to be logged in."
 msgstr "Para marcar este documento como visualizado, você precisa estar logado."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
+#. placeholder {0}: emptyCheckboxFields.length > 0 ? "Checkbox" : emptyRadioFields.length > 0 ? "Radio" : "Select"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "To proceed further, please set at least one value for the {0} field."

@@ -1,13 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
-// Browser-safe null value symbols (equivalent to Prisma.DbNull and Prisma.JsonNull)
-const DbNull = Symbol.for("prisma.dbnull");
-const JsonNull = Symbol.for("prisma.jsonnull");
-
-export const NullableJsonNullValueInputSchema = z
-  .enum(["DbNull", "JsonNull"])
-  .transform((value) =>
-    value === "JsonNull" ? JsonNull : value === "DbNull" ? DbNull : value
-  );
-
-export { DbNull, JsonNull };
+export const NullableJsonNullValueInputSchema = z.enum(['DbNull','JsonNull',]).transform((value) => value === 'JsonNull' ? Prisma.JsonNull : value === 'DbNull' ? Prisma.DbNull : value);

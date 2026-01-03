@@ -1,15 +1,15 @@
-import { OrganisationGroupType } from '@prisma/client';
+import { OrganisationGroupType } from "@signtusk/lib/constants/prisma-enums";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZDeleteOrganisationGroupRequestSchema,
   ZDeleteOrganisationGroupResponseSchema,
-} from './delete-organisation-group.types';
+} from "./delete-organisation-group.types";
 
 export const deleteOrganisationGroupRoute = authenticatedProcedure
   // .meta(deleteOrganisationGroupMeta)
@@ -30,7 +30,7 @@ export const deleteOrganisationGroupRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId,
         userId: user.id,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
     });
 
@@ -47,7 +47,7 @@ export const deleteOrganisationGroupRoute = authenticatedProcedure
 
     if (!group) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Organisation group not found',
+        message: "Organisation group not found",
       });
     }
 
@@ -56,7 +56,7 @@ export const deleteOrganisationGroupRoute = authenticatedProcedure
       group.type === OrganisationGroupType.INTERNAL_TEAM
     ) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You are not allowed to delete internal groups',
+        message: "You are not allowed to delete internal groups",
       });
     }
 

@@ -1,4 +1,4 @@
-import type { Session } from "@prisma/client";
+import type { Session } from "@signtusk/lib/constants/prisma-enums";
 import type { Context } from "hono";
 import type { Logger } from "pino";
 import { z } from "zod";

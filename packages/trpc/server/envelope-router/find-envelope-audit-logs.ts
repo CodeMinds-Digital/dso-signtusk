@@ -1,17 +1,17 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { parseDocumentAuditLogData } from '@signtusk/lib/utils/document-audit-logs';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getEnvelopeWhereInput } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { parseDocumentAuditLogData } from "@signtusk/lib/utils/document-audit-logs";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindEnvelopeAuditLogsRequestSchema,
   ZFindEnvelopeAuditLogsResponseSchema,
   findEnvelopeAuditLogsMeta,
-} from './find-envelope-audit-logs.types';
+} from "./find-envelope-audit-logs.types";
 
 export const findEnvelopeAuditLogsRoute = authenticatedProcedure
   .meta(findEnvelopeAuditLogsMeta)
@@ -22,8 +22,8 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
       envelopeId,
       page = 1,
       perPage = 50,
-      orderByColumn = 'createdAt',
-      orderByDirection = 'desc',
+      orderByColumn = "createdAt",
+      orderByDirection = "desc",
     } = input;
 
     ctx.logger.info({
@@ -34,7 +34,7 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
 
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: {
-        type: 'envelopeId',
+        type: "envelopeId",
         id: envelopeId,
       },
       type: null,
@@ -53,7 +53,7 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
     // Only documents have audit logs.
     if (envelope.type !== EnvelopeType.DOCUMENT) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Templates do not have audit logs.',
+        message: "Templates do not have audit logs.",
       });
     }
 
@@ -71,7 +71,9 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
       }),
     ]);
 
-    const parsedData = data.map((auditLog) => parseDocumentAuditLogData(auditLog));
+    const parsedData = data.map((auditLog) =>
+      parseDocumentAuditLogData(auditLog)
+    );
 
     return {
       data: parsedData,

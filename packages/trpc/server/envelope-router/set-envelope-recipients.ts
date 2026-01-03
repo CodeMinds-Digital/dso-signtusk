@@ -1,14 +1,14 @@
-import { EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
-import { setDocumentRecipients } from '@signtusk/lib/server-only/recipient/set-document-recipients';
-import { setTemplateRecipients } from '@signtusk/lib/server-only/recipient/set-template-recipients';
+import { setDocumentRecipients } from "@signtusk/lib/server-only/recipient/set-document-recipients";
+import { setTemplateRecipients } from "@signtusk/lib/server-only/recipient/set-template-recipients";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZSetEnvelopeRecipientsRequestSchema,
   ZSetEnvelopeRecipientsResponseSchema,
-} from './set-envelope-recipients.types';
+} from "./set-envelope-recipients.types";
 
 export const setEnvelopeRecipientsRoute = authenticatedProcedure
   .input(ZSetEnvelopeRecipientsRequestSchema)
@@ -29,23 +29,23 @@ export const setEnvelopeRecipientsRoute = authenticatedProcedure
           userId: ctx.user.id,
           teamId,
           id: {
-            type: 'envelopeId',
+            type: "envelopeId",
             id: envelopeId,
           },
           recipients,
           requestMetadata: ctx.metadata,
-        }),
+        })
       )
       .with(EnvelopeType.TEMPLATE, async () =>
         setTemplateRecipients({
           userId: ctx.user.id,
           teamId,
           id: {
-            type: 'envelopeId',
+            type: "envelopeId",
             id: envelopeId,
           },
           recipients,
-        }),
+        })
       )
       .exhaustive();
 

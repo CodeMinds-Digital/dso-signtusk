@@ -1,15 +1,15 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { jobs } from '@signtusk/lib/jobs/client';
-import { unsafeGetEntireEnvelope } from '@signtusk/lib/server-only/admin/get-entire-document';
-import { isDocumentCompleted } from '@signtusk/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
+import { jobs } from "@signtusk/lib/jobs/client";
+import { unsafeGetEntireEnvelope } from "@signtusk/lib/server-only/admin/get-entire-document";
+import { isDocumentCompleted } from "@signtusk/lib/utils/document";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZResealDocumentRequestSchema,
   ZResealDocumentResponseSchema,
-} from './reseal-document.types';
+} from "./reseal-document.types";
 
 export const resealDocumentRoute = adminProcedure
   .input(ZResealDocumentRequestSchema)
@@ -25,7 +25,7 @@ export const resealDocumentRoute = adminProcedure
 
     const envelope = await unsafeGetEntireEnvelope({
       id: {
-        type: 'envelopeId',
+        type: "envelopeId",
         id,
       },
       type: EnvelopeType.DOCUMENT,
@@ -34,7 +34,7 @@ export const resealDocumentRoute = adminProcedure
     const isResealing = isDocumentCompleted(envelope.status);
 
     await jobs.triggerJob({
-      name: 'internal.seal-document',
+      name: "internal.seal-document",
       payload: {
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         isResealing,

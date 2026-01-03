@@ -1,18 +1,18 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
 import {
   mapSecondaryIdToDocumentId,
   unsafeBuildEnvelopeIdQuery,
-} from '@signtusk/lib/utils/envelope';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/envelope";
+import { prisma } from "@signtusk/prisma";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZFindDocumentJobsRequestSchema,
   ZFindDocumentJobsResponseSchema,
-} from './find-document-jobs.types';
+} from "./find-document-jobs.types";
 
 export const findDocumentJobsRoute = adminProcedure
   .input(ZFindDocumentJobsRequestSchema)
@@ -23,39 +23,39 @@ export const findDocumentJobsRoute = adminProcedure
     const envelope = await prisma.envelope.findFirst({
       where: unsafeBuildEnvelopeIdQuery(
         {
-          type: 'envelopeId',
+          type: "envelopeId",
           id: envelopeId,
         },
-        EnvelopeType.DOCUMENT,
+        EnvelopeType.DOCUMENT
       ),
     });
 
     if (!envelope) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Envelope not found',
+        message: "Envelope not found",
       });
     }
 
     const [data, count] = await Promise.all([
       prisma.backgroundJob.findMany({
         where: {
-          jobId: 'internal.seal-document',
+          jobId: "internal.seal-document",
           payload: {
-            path: ['documentId'],
+            path: ["documentId"],
             equals: mapSecondaryIdToDocumentId(envelope.secondaryId),
           },
         },
         skip: Math.max(page - 1, 0) * perPage,
         take: perPage,
         orderBy: {
-          submittedAt: 'desc',
+          submittedAt: "desc",
         },
       }),
       prisma.backgroundJob.count({
         where: {
-          jobId: 'internal.seal-document',
+          jobId: "internal.seal-document",
           payload: {
-            path: ['documentId'],
+            path: ["documentId"],
             equals: mapSecondaryIdToDocumentId(envelope.secondaryId),
           },
         },

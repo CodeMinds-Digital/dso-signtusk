@@ -1,19 +1,19 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { sendDocument } from '@signtusk/lib/server-only/document/send-document';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { createDocumentFromTemplate } from '@signtusk/lib/server-only/template/create-document-from-template';
-import { putNormalizedPdfFileServerSide } from '@signtusk/lib/universal/upload/put-file.server';
-import { formatSigningLink } from '@signtusk/lib/utils/recipients';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { sendDocument } from "@signtusk/lib/server-only/document/send-document";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { createDocumentFromTemplate } from "@signtusk/lib/server-only/template/create-document-from-template";
+import { putNormalizedPdfFileServerSide } from "@signtusk/lib/universal/upload/put-file.server";
+import { formatSigningLink } from "@signtusk/lib/utils/recipients";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZUseEnvelopeRequestSchema,
   ZUseEnvelopeResponseSchema,
   useEnvelopeMeta,
-} from './use-envelope.types';
+} from "./use-envelope.types";
 
 export const useEnvelopeRoute = authenticatedProcedure
   .meta(useEnvelopeMeta)
@@ -47,14 +47,14 @@ export const useEnvelopeRoute = authenticatedProcedure
 
     if (limits.remaining.documents === 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-        message: 'You have reached your document limit.',
+        message: "You have reached your document limit.",
       });
     }
 
     // Verify the template exists and get envelope items
     const envelope = await getEnvelopeById({
       id: {
-        type: 'envelopeId',
+        type: "envelopeId",
         id: envelopeId,
       },
       type: EnvelopeType.TEMPLATE,
@@ -72,20 +72,22 @@ export const useEnvelopeRoute = authenticatedProcedure
       (file, index) =>
         payload.customDocumentData &&
         payload.customDocumentData.some(
-          (mapping) => mapping.identifier === file.name || mapping.identifier === index,
-        ),
+          (mapping) =>
+            mapping.identifier === file.name || mapping.identifier === index
+        )
     );
 
     // Process uploaded files and create document data for them
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        const { id: documentDataId } =
+          await putNormalizedPdfFileServerSide(file);
 
         return {
           name: file.name,
           documentDataId,
         };
-      }),
+      })
     );
 
     // Map custom document data using identifiers
@@ -93,13 +95,13 @@ export const useEnvelopeRoute = authenticatedProcedure
       let documentDataId: string | undefined;
 
       // Find the uploaded file by identifier
-      if (typeof mapping.identifier === 'string') {
+      if (typeof mapping.identifier === "string") {
         documentDataId = uploadedFiles.find(
-          (file) => file.name === mapping.identifier,
+          (file) => file.name === mapping.identifier
         )?.documentDataId;
       }
 
-      if (typeof mapping.identifier === 'number') {
+      if (typeof mapping.identifier === "number") {
         documentDataId = uploadedFiles.at(mapping.identifier)?.documentDataId;
       }
 
@@ -115,7 +117,7 @@ export const useEnvelopeRoute = authenticatedProcedure
 
       // Verify that the envelopeItemId exists in the template
       const envelopeItem = envelope.envelopeItems.find(
-        (item) => item.id === mapping.envelopeItemId,
+        (item) => item.id === mapping.envelopeItemId
       );
 
       if (!envelopeItem) {
@@ -133,7 +135,7 @@ export const useEnvelopeRoute = authenticatedProcedure
     // Create document from template
     const createdEnvelope = await createDocumentFromTemplate({
       id: {
-        type: 'envelopeId',
+        type: "envelopeId",
         id: envelopeId,
       },
       externalId,
@@ -152,7 +154,7 @@ export const useEnvelopeRoute = authenticatedProcedure
     if (distributeDocument) {
       await sendDocument({
         id: {
-          type: 'envelopeId',
+          type: "envelopeId",
           id: createdEnvelope.id,
         },
         userId: user.id,
@@ -161,7 +163,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       }).catch((err) => {
         console.error(err);
 
-        throw new AppError('DOCUMENT_SEND_FAILED');
+        throw new AppError("DOCUMENT_SEND_FAILED");
       });
     }
 

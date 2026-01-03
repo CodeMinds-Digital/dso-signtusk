@@ -1,20 +1,25 @@
-import { DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
-import { z } from 'zod';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  EnvelopeType,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { prisma } from '@signtusk/prisma';
-import DocumentMetaSchema from '@signtusk/prisma/generated/zod/modelSchema/DocumentMetaSchema';
-import EnvelopeItemSchema from '@signtusk/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
-import EnvelopeSchema from '@signtusk/prisma/generated/zod/modelSchema/EnvelopeSchema';
-import SignatureSchema from '@signtusk/prisma/generated/zod/modelSchema/SignatureSchema';
-import TeamSchema from '@signtusk/prisma/generated/zod/modelSchema/TeamSchema';
-import UserSchema from '@signtusk/prisma/generated/zod/modelSchema/UserSchema';
+import { prisma } from "@signtusk/prisma";
+import DocumentMetaSchema from "@signtusk/prisma/generated/zod/modelSchema/DocumentMetaSchema";
+import EnvelopeItemSchema from "@signtusk/prisma/generated/zod/modelSchema/EnvelopeItemSchema";
+import EnvelopeSchema from "@signtusk/prisma/generated/zod/modelSchema/EnvelopeSchema";
+import SignatureSchema from "@signtusk/prisma/generated/zod/modelSchema/SignatureSchema";
+import TeamSchema from "@signtusk/prisma/generated/zod/modelSchema/TeamSchema";
+import UserSchema from "@signtusk/prisma/generated/zod/modelSchema/UserSchema";
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { TDocumentAuthMethods } from '../../types/document-auth';
-import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
-import { ZRecipientLiteSchema } from '../../types/recipient';
-import { isRecipientAuthorized } from '../document/is-recipient-authorized';
-import { getTeamSettings } from '../team/get-team-settings';
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import type { TDocumentAuthMethods } from "../../types/document-auth";
+import { ZEnvelopeFieldSchema, ZFieldSchema } from "../../types/field";
+import { ZRecipientLiteSchema } from "../../types/recipient";
+import { isRecipientAuthorized } from "../document/is-recipient-authorized";
+import { getTeamSettings } from "../team/get-team-settings";
 
 export type GetRecipientEnvelopeByTokenOptions = {
   token: string;
@@ -140,7 +145,9 @@ export const ZEnvelopeForSigningResponse = z.object({
   }),
 });
 
-export type EnvelopeForSigningResponse = z.infer<typeof ZEnvelopeForSigningResponse>;
+export type EnvelopeForSigningResponse = z.infer<
+  typeof ZEnvelopeForSigningResponse
+>;
 
 /**
  * Get all the values and details for an envelope that a recipient requires
@@ -155,7 +162,7 @@ export const getEnvelopeForRecipientSigning = async ({
 }: GetRecipientEnvelopeByTokenOptions): Promise<EnvelopeForSigningResponse> => {
   if (!token) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Missing token',
+      message: "Missing token",
     });
   }
 
@@ -189,7 +196,7 @@ export const getEnvelopeForRecipientSigning = async ({
           },
         },
         orderBy: {
-          signingOrder: 'asc',
+          signingOrder: "asc",
         },
       },
       envelopeItems: true,
@@ -212,18 +219,18 @@ export const getEnvelopeForRecipientSigning = async ({
 
   if (!envelope || !recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope not found',
+      message: "Envelope not found",
     });
   }
 
   if (envelope.envelopeItems.length === 0) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope has no items',
+      message: "Envelope has no items",
     });
   }
 
   const documentAccessValid = await isRecipientAuthorized({
-    type: 'ACCESS',
+    type: "ACCESS",
     documentAuthOptions: envelope.authOptions,
     recipient,
     userId,
@@ -232,7 +239,7 @@ export const getEnvelopeForRecipientSigning = async ({
 
   if (!documentAccessValid) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Invalid access values',
+      message: "Invalid access values",
     });
   }
 
@@ -256,7 +263,9 @@ export const getEnvelopeForRecipientSigning = async ({
 
   let isRecipientsTurn = true;
 
-  const currentRecipientIndex = envelope.recipients.findIndex((r) => r.token === token);
+  const currentRecipientIndex = envelope.recipients.findIndex(
+    (r) => r.token === token
+  );
 
   if (
     envelope.documentMeta.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
@@ -273,11 +282,11 @@ export const getEnvelopeForRecipientSigning = async ({
   const sender = settings.includeSenderDetails
     ? {
         email: envelope.user.email,
-        name: envelope.user.name || '',
+        name: envelope.user.name || "",
       }
     : {
-        email: envelope.team.teamEmail?.email || '',
-        name: envelope.team.name || '',
+        email: envelope.team.teamEmail?.email || "",
+        name: envelope.team.name || "",
       };
 
   return ZEnvelopeForSigningResponse.parse({
@@ -297,5 +306,5 @@ export const getEnvelopeForRecipientSigning = async ({
       brandingEnabled: settings.brandingEnabled,
       brandingLogo: settings.brandingLogo,
     },
-  } satisfies EnvelopeForSigningResponse);
+  });
 };

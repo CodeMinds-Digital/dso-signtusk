@@ -1,19 +1,25 @@
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType } from "@signtusk/lib/constants/prisma-enums";
 
-import { createCheckoutSession } from '@signtusk/ee/server-only/stripe/create-checkout-session';
-import { createCustomer } from '@signtusk/ee/server-only/stripe/create-customer';
-import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { createOrganisation } from '@signtusk/lib/server-only/organisation/create-organisation';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@signtusk/lib/types/subscription';
-import { generateStripeOrganisationCreateMetadata } from '@signtusk/lib/utils/billing';
-import { prisma } from '@signtusk/prisma';
+import { createCheckoutSession } from "@signtusk/ee/server-only/stripe/create-checkout-session";
+import { createCustomer } from "@signtusk/ee/server-only/stripe/create-customer";
+import {
+  IS_BILLING_ENABLED,
+  NEXT_PUBLIC_WEBAPP_URL,
+} from "@signtusk/lib/constants/app";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { createOrganisation } from "@signtusk/lib/server-only/organisation/create-organisation";
+import {
+  INTERNAL_CLAIM_ID,
+  internalClaims,
+} from "@signtusk/lib/types/subscription";
+import { generateStripeOrganisationCreateMetadata } from "@signtusk/lib/utils/billing";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateOrganisationRequestSchema,
   ZCreateOrganisationResponseSchema,
-} from './create-organisation.types';
+} from "./create-organisation.types";
 
 export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
@@ -42,7 +48,7 @@ export const createOrganisationRoute = authenticatedProcedure
 
       if (userOrganisations.length >= 1) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-          message: 'You have reached the maximum number of free organisations.',
+          message: "You have reached the maximum number of free organisations.",
         });
       }
     }
@@ -58,7 +64,10 @@ export const createOrganisationRoute = authenticatedProcedure
         priceId,
         customerId: customer.id,
         returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/organisations`,
-        subscriptionMetadata: generateStripeOrganisationCreateMetadata(name, user.id),
+        subscriptionMetadata: generateStripeOrganisationCreateMetadata(
+          name,
+          user.id
+        ),
       });
 
       return {

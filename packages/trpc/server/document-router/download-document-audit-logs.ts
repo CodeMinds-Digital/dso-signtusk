@@ -1,17 +1,17 @@
-import { EnvelopeType } from '@prisma/client';
-import { DateTime } from 'luxon';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { DateTime } from "luxon";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { encryptSecondaryData } from '@signtusk/lib/server-only/crypto/encrypt';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { encryptSecondaryData } from "@signtusk/lib/server-only/crypto/encrypt";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZDownloadDocumentAuditLogsRequestSchema,
   ZDownloadDocumentAuditLogsResponseSchema,
-} from './download-document-audit-logs.types';
+} from "./download-document-audit-logs.types";
 
 export const downloadDocumentAuditLogsRoute = authenticatedProcedure
   .input(ZDownloadDocumentAuditLogsRequestSchema)
@@ -28,7 +28,7 @@ export const downloadDocumentAuditLogsRoute = authenticatedProcedure
 
     const envelope = await getEnvelopeById({
       id: {
-        type: 'documentId',
+        type: "documentId",
         id: documentId,
       },
       type: EnvelopeType.DOCUMENT,
@@ -38,7 +38,7 @@ export const downloadDocumentAuditLogsRoute = authenticatedProcedure
 
     if (!envelope) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have access to this document.',
+        message: "You do not have access to this document.",
       });
     }
 

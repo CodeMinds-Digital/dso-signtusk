@@ -1,18 +1,18 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
 import {
   buildOrganisationWhereQuery,
   getHighestOrganisationRoleInGroup,
-} from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindOrganisationMembersRequestSchema,
   ZFindOrganisationMembersResponseSchema,
-} from './find-organisation-members.types';
+} from "./find-organisation-members.types";
 
 export const findOrganisationMembersRoute = authenticatedProcedure
   //   .meta(getOrganisationMembersMeta)
@@ -33,13 +33,15 @@ export const findOrganisationMembersRoute = authenticatedProcedure
     return {
       ...organisationMembers,
       data: organisationMembers.data.map((organisationMember) => {
-        const groups = organisationMember.organisationGroupMembers.map((group) => group.group);
+        const groups = organisationMember.organisationGroupMembers.map(
+          (group) => group.group
+        );
 
         return {
           id: organisationMember.id,
           userId: organisationMember.user.id,
           email: organisationMember.user.email,
-          name: organisationMember.user.name || '',
+          name: organisationMember.user.name || "",
           createdAt: organisationMember.createdAt,
           currentOrganisationRole: getHighestOrganisationRoleInGroup(groups),
           avatarImageId: organisationMember.user.avatarImageId,
@@ -101,7 +103,7 @@ export const findOrganisationMembers = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,

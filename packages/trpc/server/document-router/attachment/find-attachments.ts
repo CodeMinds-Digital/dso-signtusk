@@ -1,22 +1,22 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { findAttachmentsByEnvelopeId } from '@signtusk/lib/server-only/envelope-attachment/find-attachments-by-envelope-id';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
+import { findAttachmentsByEnvelopeId } from "@signtusk/lib/server-only/envelope-attachment/find-attachments-by-envelope-id";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
 
-import { authenticatedProcedure } from '../../trpc';
+import { authenticatedProcedure } from "../../trpc";
 import {
   ZFindAttachmentsRequestSchema,
   ZFindAttachmentsResponseSchema,
-} from './find-attachments.types';
+} from "./find-attachments.types";
 
 export const findAttachmentsRoute = authenticatedProcedure
   .meta({
     openapi: {
-      method: 'GET',
-      path: '/document/attachment',
-      summary: 'Find attachments',
-      description: 'Find all attachments for a document',
-      tags: ['Document'],
+      method: "GET",
+      path: "/document/attachment",
+      summary: "Find attachments",
+      description: "Find all attachments for a document",
+      tags: ["Document"],
     },
   })
   .input(ZFindAttachmentsRequestSchema)
@@ -32,7 +32,7 @@ export const findAttachmentsRoute = authenticatedProcedure
 
     const envelope = await getEnvelopeById({
       id: {
-        type: 'documentId',
+        type: "documentId",
         id: documentId,
       },
       userId,

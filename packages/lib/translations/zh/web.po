@@ -2551,6 +2551,7 @@ msgstr "配置模板"
 msgid "Configure Template"
 msgstr "配置模板"
 
+#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type] )
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -3015,7 +3016,7 @@ msgstr "目前仅 Teams 及以上套餐可以配置品牌。"
 msgid "Currently email domains can only be configured for Platform and above plans."
 msgstr "目前仅 Platform 及以上套餐可以配置邮箱域名。"
 
-#. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
+#. placeholder {0}: ( field.value.size / (1024 * 1024) ).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Custom {0} MB file"
 msgstr "自定义 {0} MB 文件"
@@ -5341,7 +5342,7 @@ msgstr "加入我们在<0>Discord</0>上的社区，以获取社区支持并参�
 msgid "Joined"
 msgstr "加入时间"
 
-#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
+#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: "short", })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "加入时间 {0}"
@@ -9488,7 +9489,7 @@ msgid "To mark this document as viewed, you need to be logged in."
 msgstr "要将此文档标记为已查看，您需要先登录。"
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
+#. placeholder {0}: emptyCheckboxFields.length > 0 ? "Checkbox" : emptyRadioFields.length > 0 ? "Radio" : "Select"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "To proceed further, please set at least one value for the {0} field."

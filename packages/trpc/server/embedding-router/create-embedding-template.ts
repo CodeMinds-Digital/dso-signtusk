@@ -1,16 +1,16 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { mapSecondaryIdToTemplateId } from '@signtusk/lib/utils/envelope';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { verifyEmbeddingPresignToken } from "@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { mapSecondaryIdToTemplateId } from "@signtusk/lib/utils/envelope";
+import { prisma } from "@signtusk/prisma";
 
-import { procedure } from '../trpc';
+import { procedure } from "../trpc";
 import {
   ZCreateEmbeddingTemplateRequestSchema,
   ZCreateEmbeddingTemplateResponseSchema,
-} from './create-embedding-template.types';
+} from "./create-embedding-template.types";
 
 // Todo: Envelopes - This only supports V1 documents/templates.
 export const createEmbeddingTemplateRoute = procedure
@@ -18,19 +18,21 @@ export const createEmbeddingTemplateRoute = procedure
   .output(ZCreateEmbeddingTemplateResponseSchema)
   .mutation(async ({ input, ctx: { req, metadata } }) => {
     try {
-      const authorizationHeader = req.headers.get('authorization');
+      const authorizationHeader = req.headers.get("authorization");
 
-      const [presignToken] = (authorizationHeader || '')
-        .split('Bearer ')
+      const [presignToken] = (authorizationHeader || "")
+        .split("Bearer ")
         .filter((s) => s.length > 0);
 
       if (!presignToken) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'No presign token provided',
+          message: "No presign token provided",
         });
       }
 
-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
+      const apiToken = await verifyEmbeddingPresignToken({
+        token: presignToken,
+      });
 
       const { title, documentDataId, recipients, meta } = input;
 
@@ -60,8 +62,8 @@ export const createEmbeddingTemplateRoute = procedure
             data: {
               envelopeId: template.id,
               email: recipient.email,
-              name: recipient.name || '',
-              role: recipient.role || 'SIGNER',
+              name: recipient.name || "",
+              role: recipient.role || "SIGNER",
               token: `template-${template.id}-${recipient.email}`,
               signingOrder: recipient.signingOrder,
             },
@@ -80,7 +82,7 @@ export const createEmbeddingTemplateRoute = procedure
               positionY: field.pageY,
               width: field.width,
               height: field.height,
-              customText: '',
+              customText: "",
               inserted: false,
             })),
           });
@@ -89,12 +91,12 @@ export const createEmbeddingTemplateRoute = procedure
             ...createdRecipient,
             fields: createdFields,
           };
-        }),
+        })
       );
 
       if (!template.id) {
         throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message: 'Failed to create template: missing template ID',
+          message: "Failed to create template: missing template ID",
         });
       }
 
@@ -107,7 +109,7 @@ export const createEmbeddingTemplateRoute = procedure
       }
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to create template',
+        message: "Failed to create template",
       });
     }
   });

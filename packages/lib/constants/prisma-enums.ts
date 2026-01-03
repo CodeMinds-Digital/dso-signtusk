@@ -613,6 +613,19 @@ export const UserSecurityAuditLogType = {
   SIGN_IN_PASSKEY_FAIL: "SIGN_IN_PASSKEY_FAIL",
 } as const;
 
+export type BackgroundJobStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "FAILED";
+
+export const BackgroundJobStatus = {
+  PENDING: "PENDING",
+  PROCESSING: "PROCESSING",
+  COMPLETED: "COMPLETED",
+  FAILED: "FAILED",
+} as const;
+
 export interface OrganisationClaim {
   id: string;
   createdAt: Date;

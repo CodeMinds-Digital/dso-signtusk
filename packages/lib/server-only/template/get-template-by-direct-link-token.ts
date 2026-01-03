@@ -1,9 +1,24 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { mapSecondaryIdToTemplateId } from "../../utils/envelope";
+
+// Helper to convert Prisma Decimal to number
+const toNumber = (val: unknown): number => {
+  if (typeof val === "number") return val;
+  if (typeof val === "string") return parseFloat(val);
+  if (
+    val &&
+    typeof val === "object" &&
+    "toNumber" in val &&
+    typeof (val as { toNumber: () => number }).toNumber === "function"
+  ) {
+    return (val as { toNumber: () => number }).toNumber();
+  }
+  return 0;
+};
 
 export interface GetTemplateByDirectLinkTokenOptions {
   token: string;
@@ -51,6 +66,10 @@ export const getTemplateByDirectLinkToken = async ({
     documentId: null,
     fields: recipient.fields.map((field) => ({
       ...field,
+      positionX: toNumber(field.positionX),
+      positionY: toNumber(field.positionY),
+      width: toNumber(field.width),
+      height: toNumber(field.height),
       templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
       documentId: null,
     })),

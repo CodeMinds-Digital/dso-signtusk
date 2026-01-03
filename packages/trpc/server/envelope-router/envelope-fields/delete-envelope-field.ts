@@ -1,19 +1,19 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@signtusk/lib/types/document-audit-logs';
-import { createDocumentAuditLogData } from '@signtusk/lib/utils/document-audit-logs';
-import { canRecipientFieldsBeModified } from '@signtusk/lib/utils/recipients';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getEnvelopeWhereInput } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
+import { createDocumentAuditLogData } from "@signtusk/lib/utils/document-audit-logs";
+import { canRecipientFieldsBeModified } from "@signtusk/lib/utils/recipients";
+import { prisma } from "@signtusk/prisma";
 
-import { ZGenericSuccessResponse } from '../../schema';
-import { authenticatedProcedure } from '../../trpc';
+import { ZGenericSuccessResponse } from "../../schema";
+import { authenticatedProcedure } from "../../trpc";
 import {
   ZDeleteEnvelopeFieldRequestSchema,
   ZDeleteEnvelopeFieldResponseSchema,
   deleteEnvelopeFieldMeta,
-} from './delete-envelope-field.types';
+} from "./delete-envelope-field.types";
 
 export const deleteEnvelopeFieldRoute = authenticatedProcedure
   .meta(deleteEnvelopeFieldMeta)
@@ -40,13 +40,13 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
 
     if (!unsafeField) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Field not found',
+        message: "Field not found",
       });
     }
 
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: {
-        type: 'envelopeId',
+        type: "envelopeId",
         id: unsafeField.envelopeId,
       },
       type: null,
@@ -66,26 +66,33 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
     });
 
     const recipientWithFields = envelope?.recipients.find((recipient) =>
-      recipient.fields.some((field) => field.id === fieldId),
+      recipient.fields.some((field) => field.id === fieldId)
     );
-    const fieldToDelete = recipientWithFields?.fields.find((field) => field.id === fieldId);
+    const fieldToDelete = recipientWithFields?.fields.find(
+      (field) => field.id === fieldId
+    );
 
     if (!envelope || !recipientWithFields || !fieldToDelete) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Field not found',
+        message: "Field not found",
       });
     }
 
     if (envelope.completedAt) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope already complete',
+        message: "Envelope already complete",
       });
     }
 
     // Check whether the recipient associated with the field can have new fields created.
-    if (!canRecipientFieldsBeModified(recipientWithFields, recipientWithFields.fields)) {
+    if (
+      !canRecipientFieldsBeModified(
+        recipientWithFields,
+        recipientWithFields.fields
+      )
+    ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Recipient has already interacted with the document.',
+        message: "Recipient has already interacted with the document.",
       });
     }
 

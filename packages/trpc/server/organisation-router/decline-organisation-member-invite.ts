@@ -1,13 +1,13 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { maybeAuthenticatedProcedure } from '../trpc';
+import { maybeAuthenticatedProcedure } from "../trpc";
 import {
   ZDeclineOrganisationMemberInviteRequestSchema,
   ZDeclineOrganisationMemberInviteResponseSchema,
-} from './decline-organisation-member-invite.types';
+} from "./decline-organisation-member-invite.types";
 
 export const declineOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
   .input(ZDeclineOrganisationMemberInviteRequestSchema)
@@ -15,11 +15,12 @@ export const declineOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
   .mutation(async ({ input }) => {
     const { token } = input;
 
-    const organisationMemberInvite = await prisma.organisationMemberInvite.findFirst({
-      where: {
-        token,
-      },
-    });
+    const organisationMemberInvite =
+      await prisma.organisationMemberInvite.findFirst({
+        where: {
+          token,
+        },
+      });
 
     if (!organisationMemberInvite) {
       throw new AppError(AppErrorCode.NOT_FOUND);

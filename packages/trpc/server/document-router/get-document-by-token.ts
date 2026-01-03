@@ -1,13 +1,13 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZGetDocumentByTokenRequestSchema,
   ZGetDocumentByTokenResponseSchema,
-} from './get-document-by-token.types';
+} from "./get-document-by-token.types";
 
 export const getDocumentByTokenRoute = authenticatedProcedure
   .input(ZGetDocumentByTokenRequestSchema)
@@ -38,13 +38,13 @@ export const getDocumentByTokenRoute = authenticatedProcedure
 
     if (!envelope || !firstDocumentData) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Document not found',
+        message: "Document not found",
       });
     }
 
     if (envelope.envelopeItems.length !== 1) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'This endpoint does not support multiple items',
+        message: "This endpoint does not support multiple items",
       });
     }
 

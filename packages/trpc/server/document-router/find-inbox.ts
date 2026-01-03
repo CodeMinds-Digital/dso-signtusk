@@ -1,9 +1,10 @@
-import type { Envelope, Prisma } from "@prisma/client";
+import type { Envelope } from "@signtusk/lib/constants/prisma-enums";
 import {
   DocumentStatus,
   EnvelopeType,
   RecipientRole,
 } from "@signtusk/lib/constants/prisma-enums";
+import type { Prisma } from "@signtusk/prisma";
 
 import type { FindResultResponse } from "@signtusk/lib/types/search-params";
 import { mapEnvelopesToDocumentMany } from "@signtusk/lib/utils/document";

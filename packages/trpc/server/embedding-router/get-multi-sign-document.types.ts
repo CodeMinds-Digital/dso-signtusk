@@ -1,15 +1,15 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { ZDocumentLiteSchema } from '@signtusk/lib/types/document';
-import { ZRecipientLiteSchema } from '@signtusk/lib/types/recipient';
-import DocumentDataSchema from '@signtusk/prisma/generated/zod/modelSchema/DocumentDataSchema';
-import DocumentMetaSchema from '@signtusk/prisma/generated/zod/modelSchema/DocumentMetaSchema';
-import EnvelopeItemSchema from '@signtusk/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
-import FieldSchema from '@signtusk/prisma/generated/zod/modelSchema/FieldSchema';
-import SignatureSchema from '@signtusk/prisma/generated/zod/modelSchema/SignatureSchema';
+import { ZDocumentLiteSchema } from "@signtusk/lib/types/document";
+import { ZFieldSchema } from "@signtusk/lib/types/field";
+import { ZRecipientLiteSchema } from "@signtusk/lib/types/recipient";
+import DocumentDataSchema from "@signtusk/prisma/generated/zod/modelSchema/DocumentDataSchema";
+import DocumentMetaSchema from "@signtusk/prisma/generated/zod/modelSchema/DocumentMetaSchema";
+import EnvelopeItemSchema from "@signtusk/prisma/generated/zod/modelSchema/EnvelopeItemSchema";
+import SignatureSchema from "@signtusk/prisma/generated/zod/modelSchema/SignatureSchema";
 
 export const ZGetMultiSignDocumentRequestSchema = z.object({
-  token: z.string().min(1, { message: 'Token is required' }),
+  token: z.string().min(1, { message: "Token is required" }),
 });
 
 export const ZGetMultiSignDocumentResponseSchema = ZDocumentLiteSchema.extend({
@@ -36,10 +36,10 @@ export const ZGetMultiSignDocumentResponseSchema = ZDocumentLiteSchema.extend({
     emailSettings: true,
   }).nullable(),
   fields: z.array(
-    FieldSchema.extend({
+    ZFieldSchema.extend({
       recipient: ZRecipientLiteSchema,
       signature: SignatureSchema.nullable(),
-    }),
+    })
   ),
   envelopeItems: EnvelopeItemSchema.pick({
     id: true,
@@ -47,7 +47,9 @@ export const ZGetMultiSignDocumentResponseSchema = ZDocumentLiteSchema.extend({
   }).array(),
 });
 
-export type TGetMultiSignDocumentRequestSchema = z.infer<typeof ZGetMultiSignDocumentRequestSchema>;
+export type TGetMultiSignDocumentRequestSchema = z.infer<
+  typeof ZGetMultiSignDocumentRequestSchema
+>;
 export type TGetMultiSignDocumentResponseSchema = z.infer<
   typeof ZGetMultiSignDocumentResponseSchema
 >;

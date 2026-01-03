@@ -1,15 +1,21 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
+import {
+  DocumentStatus,
+  EnvelopeType,
+} from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { DocumentAccessAuth, type TDocumentAuthMethods } from '../../types/document-auth';
-import { extractDocumentAuthMethods } from '../../utils/document-auth';
-import { extractFieldAutoInsertValues } from '../document/send-document';
-import { getTeamSettings } from '../team/get-team-settings';
-import type { EnvelopeForSigningResponse } from './get-envelope-for-recipient-signing';
-import { ZEnvelopeForSigningResponse } from './get-envelope-for-recipient-signing';
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import {
+  DocumentAccessAuth,
+  type TDocumentAuthMethods,
+} from "../../types/document-auth";
+import { extractDocumentAuthMethods } from "../../utils/document-auth";
+import { extractFieldAutoInsertValues } from "../document/send-document";
+import { getTeamSettings } from "../team/get-team-settings";
+import type { EnvelopeForSigningResponse } from "./get-envelope-for-recipient-signing";
+import { ZEnvelopeForSigningResponse } from "./get-envelope-for-recipient-signing";
 
 export type GetRecipientEnvelopeByTokenOptions = {
   token: string;
@@ -29,7 +35,7 @@ export const getEnvelopeForDirectTemplateSigning = async ({
 }: GetRecipientEnvelopeByTokenOptions): Promise<EnvelopeForSigningResponse> => {
   if (!token) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Missing token',
+      message: "Missing token",
     });
   }
 
@@ -60,7 +66,7 @@ export const getEnvelopeForDirectTemplateSigning = async ({
           },
         },
         orderBy: {
-          signingOrder: 'asc',
+          signingOrder: "asc",
         },
       },
       envelopeItems: {
@@ -85,18 +91,18 @@ export const getEnvelopeForDirectTemplateSigning = async ({
   });
 
   const recipient = (envelope?.recipients || []).find(
-    (r) => r.id === envelope?.directLink?.directTemplateRecipientId,
+    (r) => r.id === envelope?.directLink?.directTemplateRecipientId
   );
 
   if (!envelope || !recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope not found',
+      message: "Envelope not found",
     });
   }
 
   if (envelope.envelopeItems.length === 0) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope has no items',
+      message: "Envelope has no items",
     });
   }
 
@@ -119,12 +125,12 @@ export const getEnvelopeForDirectTemplateSigning = async ({
     match(auth)
       .with(DocumentAccessAuth.ACCOUNT, () => Boolean(userId))
       .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true)
-      .exhaustive(),
+      .exhaustive()
   );
 
   if (!documentAccessValid) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Invalid access values',
+      message: "Invalid access values",
     });
   }
 
@@ -133,18 +139,18 @@ export const getEnvelopeForDirectTemplateSigning = async ({
   const sender = settings.includeSenderDetails
     ? {
         email: envelope.user.email,
-        name: envelope.user.name || '',
+        name: envelope.user.name || "",
       }
     : {
-        email: envelope.team.teamEmail?.email || '',
-        name: envelope.team.name || '',
+        email: envelope.team.teamEmail?.email || "",
+        name: envelope.team.name || "",
       };
 
   return ZEnvelopeForSigningResponse.parse({
     envelope,
     recipient: {
       ...recipient,
-      directToken: envelope.directLink?.token || '',
+      directToken: envelope.directLink?.token || "",
       fields: recipient.fields.map((field) => {
         const autoInsertValue = extractFieldAutoInsertValues(field);
 
@@ -169,5 +175,5 @@ export const getEnvelopeForDirectTemplateSigning = async ({
       brandingEnabled: settings.brandingEnabled,
       brandingLogo: settings.brandingLogo,
     },
-  } satisfies EnvelopeForSigningResponse);
+  });
 };

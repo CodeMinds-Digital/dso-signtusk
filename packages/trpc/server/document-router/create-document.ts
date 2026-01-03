@@ -1,18 +1,18 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { insertFormValuesInPdf } from '@signtusk/lib/server-only/pdf/insert-form-values-in-pdf';
-import { putNormalizedPdfFileServerSide } from '@signtusk/lib/universal/upload/put-file.server';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { insertFormValuesInPdf } from "@signtusk/lib/server-only/pdf/insert-form-values-in-pdf";
+import { putNormalizedPdfFileServerSide } from "@signtusk/lib/universal/upload/put-file.server";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentResponseSchema,
   createDocumentMeta,
-} from './create-document.types';
+} from "./create-document.types";
 
 export const createDocumentRoute = authenticatedProcedure
   .meta(createDocumentMeta)
@@ -48,7 +48,7 @@ export const createDocumentRoute = authenticatedProcedure
 
     const { id: documentDataId } = await putNormalizedPdfFileServerSide({
       name: file.name,
-      type: 'application/pdf',
+      type: "application/pdf",
       arrayBuffer: async () => Promise.resolve(pdf),
     });
 
@@ -62,7 +62,8 @@ export const createDocumentRoute = authenticatedProcedure
 
     if (remaining.documents <= 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-        message: 'You have reached your document limit for this month. Please upgrade your plan.',
+        message:
+          "You have reached your document limit for this month. Please upgrade your plan.",
         statusCode: 400,
       });
     }

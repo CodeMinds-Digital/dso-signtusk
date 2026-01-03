@@ -1,9 +1,16 @@
-import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
-import { ZGetInboxCountRequestSchema, ZGetInboxCountResponseSchema } from './get-inbox-count.types';
+import { authenticatedProcedure } from "../trpc";
+import {
+  ZGetInboxCountRequestSchema,
+  ZGetInboxCountResponseSchema,
+} from "./get-inbox-count.types";
 
 export const getInboxCountRoute = authenticatedProcedure
   .input(ZGetInboxCountRequestSchema)

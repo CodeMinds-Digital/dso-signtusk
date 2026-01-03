@@ -1,13 +1,13 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from "@signtusk/prisma";
 
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { prisma } from '@signtusk/prisma';
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { prisma } from "@signtusk/prisma";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZFindAdminOrganisationsRequestSchema,
   ZFindAdminOrganisationsResponseSchema,
-} from './find-admin-organisations.types';
+} from "./find-admin-organisations.types";
 
 export const findAdminOrganisationsRoute = adminProcedure
   .input(ZFindAdminOrganisationsRequestSchema)
@@ -74,7 +74,7 @@ export const findAdminOrganisations = async ({
     };
   }
 
-  if (query && query.startsWith('claim:')) {
+  if (query && query.startsWith("claim:")) {
     whereClause = {
       organisationClaim: {
         originalSubscriptionClaimId: {
@@ -85,7 +85,7 @@ export const findAdminOrganisations = async ({
     };
   }
 
-  if (query && query.startsWith('org_')) {
+  if (query && query.startsWith("org_")) {
     whereClause = {
       OR: [
         {
@@ -126,7 +126,7 @@ export const findAdminOrganisations = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,

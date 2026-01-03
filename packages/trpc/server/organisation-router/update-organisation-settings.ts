@@ -1,15 +1,15 @@
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType } from "@signtusk/lib/constants/prisma-enums";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZUpdateOrganisationSettingsRequestSchema,
   ZUpdateOrganisationSettingsResponseSchema,
-} from './update-organisation-settings.types';
+} from "./update-organisation-settings.types";
 
 export const updateOrganisationSettingsRoute = authenticatedProcedure
   .input(ZUpdateOrganisationSettingsRequestSchema)
@@ -55,7 +55,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
     if (Object.values(data).length === 0) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'No settings to update',
+        message: "No settings to update",
       });
     }
 
@@ -63,7 +63,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId,
         userId: user.id,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
       include: {
         organisationGlobalSettings: true,
@@ -72,7 +72,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
     if (!organisation) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to update this organisation.',
+        message: "You do not have permission to update this organisation.",
       });
     }
 
@@ -87,17 +87,20 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
       if (!email) {
         throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Email not found',
+          message: "Email not found",
         });
       }
     }
 
     const derivedTypedSignatureEnabled =
-      typedSignatureEnabled ?? organisation.organisationGlobalSettings.typedSignatureEnabled;
+      typedSignatureEnabled ??
+      organisation.organisationGlobalSettings.typedSignatureEnabled;
     const derivedUploadSignatureEnabled =
-      uploadSignatureEnabled ?? organisation.organisationGlobalSettings.uploadSignatureEnabled;
+      uploadSignatureEnabled ??
+      organisation.organisationGlobalSettings.uploadSignatureEnabled;
     const derivedDrawSignatureEnabled =
-      drawSignatureEnabled ?? organisation.organisationGlobalSettings.drawSignatureEnabled;
+      drawSignatureEnabled ??
+      organisation.organisationGlobalSettings.drawSignatureEnabled;
 
     if (
       derivedTypedSignatureEnabled === false &&
@@ -105,20 +108,22 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       derivedDrawSignatureEnabled === false
     ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'At least one signature type must be enabled',
+        message: "At least one signature type must be enabled",
       });
     }
 
-    const isPersonalOrganisation = organisation.type === OrganisationType.PERSONAL;
+    const isPersonalOrganisation =
+      organisation.type === OrganisationType.PERSONAL;
     const currentIncludeSenderDetails =
       organisation.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
-      includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
+      includeSenderDetails !== undefined &&
+      includeSenderDetails !== currentIncludeSenderDetails;
 
     if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Personal organisations cannot update the sender details',
+        message: "Personal organisations cannot update the sender details",
       });
     }
 

@@ -1,13 +1,16 @@
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { orphanEnvelopes } from '@signtusk/lib/server-only/envelope/orphan-envelopes';
-import { transferTeamEnvelopes } from '@signtusk/lib/server-only/envelope/transfer-team-envelopes';
-import { deleteTeam } from '@signtusk/lib/server-only/team/delete-team';
-import { getTeamById } from '@signtusk/lib/server-only/team/get-team';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { orphanEnvelopes } from "@signtusk/lib/server-only/envelope/orphan-envelopes";
+import { transferTeamEnvelopes } from "@signtusk/lib/server-only/envelope/transfer-team-envelopes";
+import { deleteTeam } from "@signtusk/lib/server-only/team/delete-team";
+import { getTeamById } from "@signtusk/lib/server-only/team/get-team";
 
-import { authenticatedProcedure } from '../trpc';
-import { ZDeleteTeamRequestSchema, ZDeleteTeamResponseSchema } from './delete-team.types';
+import { authenticatedProcedure } from "../trpc";
+import {
+  ZDeleteTeamRequestSchema,
+  ZDeleteTeamResponseSchema,
+} from "./delete-team.types";
 
 export const deleteTeamRoute = authenticatedProcedure
   // .meta(deleteTeamMeta)
@@ -21,7 +24,7 @@ export const deleteTeamRoute = authenticatedProcedure
 
     if (team.currentTeamRole !== TeamMemberRole.ADMIN) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You are not allowed to delete this team',
+        message: "You are not allowed to delete this team",
       });
     }
 
@@ -32,11 +35,13 @@ export const deleteTeamRoute = authenticatedProcedure
     });
 
     const transferTeam = transferTeamId
-      ? await getTeamById({ userId: user.id, teamId: transferTeamId }).catch(() => {
-          throw new AppError(AppErrorCode.INVALID_REQUEST, {
-            message: 'Invalid transfer team ID',
-          });
-        })
+      ? await getTeamById({ userId: user.id, teamId: transferTeamId }).catch(
+          () => {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: "Invalid transfer team ID",
+            });
+          }
+        )
       : undefined;
 
     if (transferTeam) {

@@ -1,13 +1,18 @@
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { maybeAuthenticatedProcedure } from '../trpc';
+import { maybeAuthenticatedProcedure } from "../trpc";
 import {
   ZSigningStatusEnvelopeRequestSchema,
   ZSigningStatusEnvelopeResponseSchema,
-} from './signing-status-envelope.types';
+} from "./signing-status-envelope.types";
 
 // Internal route - not intended for public API usage
 export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
@@ -46,37 +51,40 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
 
     if (!envelope) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Envelope not found',
+        message: "Envelope not found",
       });
     }
 
     // Check if envelope is rejected
     if (envelope.status === DocumentStatus.REJECTED) {
       return {
-        status: 'REJECTED',
+        status: "REJECTED",
       };
     }
 
     if (envelope.status === DocumentStatus.COMPLETED) {
       return {
-        status: 'COMPLETED',
+        status: "COMPLETED",
       };
     }
 
     const isComplete =
-      envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
+      envelope.recipients.some(
+        (recipient) => recipient.signingStatus === SigningStatus.REJECTED
+      ) ||
       envelope.recipients.every(
         (recipient) =>
-          recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
+          recipient.role === RecipientRole.CC ||
+          recipient.signingStatus === SigningStatus.SIGNED
       );
 
     if (isComplete) {
       return {
-        status: 'PROCESSING',
+        status: "PROCESSING",
       };
     }
 
     return {
-      status: 'PENDING',
+      status: "PENDING",
     };
   });

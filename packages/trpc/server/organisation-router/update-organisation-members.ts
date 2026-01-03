@@ -1,20 +1,20 @@
-import { OrganisationGroupType } from '@prisma/client';
+import { OrganisationGroupType } from "@signtusk/lib/constants/prisma-enums";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
 import {
   buildOrganisationWhereQuery,
   getHighestOrganisationRoleInGroup,
   isOrganisationRoleWithinUserHierarchy,
-} from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZUpdateOrganisationMemberRequestSchema,
   ZUpdateOrganisationMemberResponseSchema,
-} from './update-organisation-members.types';
+} from "./update-organisation-members.types";
 
 export const updateOrganisationMemberRoute = authenticatedProcedure
   //   .meta(updateOrganisationMemberMeta)
@@ -35,7 +35,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
       include: {
         groups: {
@@ -63,81 +63,98 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
     });
 
     if (!organisation) {
-      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Organisation not found' });
-    }
-
-    const currentUser = organisation.members.find((member) => member.userId === userId);
-
-    const organisationMemberToUpdate = organisation.members.find(
-      (member) => member.id === organisationMemberId,
-    );
-
-    if (!organisationMemberToUpdate || !currentUser) {
-      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Organisation member does not exist' });
-    }
-
-    if (organisationMemberToUpdate.userId === organisation.ownerUserId) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'Cannot update the owner' });
-    }
-
-    const currentUserOrganisationRoles = currentUser.organisationGroupMembers.filter(
-      ({ group }) => group.type === OrganisationGroupType.INTERNAL_ORGANISATION,
-    );
-
-    if (currentUserOrganisationRoles.length !== 1) {
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Current user has multiple internal organisation roles',
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: "Organisation not found",
       });
     }
 
-    const currentUserOrganisationRole = currentUserOrganisationRoles[0].group.organisationRole;
-    const currentMemberToUpdateOrganisationRole = getHighestOrganisationRoleInGroup(
-      organisationMemberToUpdate.organisationGroupMembers.flatMap((member) => member.group),
+    const currentUser = organisation.members.find(
+      (member) => member.userId === userId
     );
+
+    const organisationMemberToUpdate = organisation.members.find(
+      (member) => member.id === organisationMemberId
+    );
+
+    if (!organisationMemberToUpdate || !currentUser) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: "Organisation member does not exist",
+      });
+    }
+
+    if (organisationMemberToUpdate.userId === organisation.ownerUserId) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: "Cannot update the owner",
+      });
+    }
+
+    const currentUserOrganisationRoles =
+      currentUser.organisationGroupMembers.filter(
+        ({ group }) =>
+          group.type === OrganisationGroupType.INTERNAL_ORGANISATION
+      );
+
+    if (currentUserOrganisationRoles.length !== 1) {
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: "Current user has multiple internal organisation roles",
+      });
+    }
+
+    const currentUserOrganisationRole =
+      currentUserOrganisationRoles[0].group.organisationRole;
+    const currentMemberToUpdateOrganisationRole =
+      getHighestOrganisationRoleInGroup(
+        organisationMemberToUpdate.organisationGroupMembers.flatMap(
+          (member) => member.group
+        )
+      );
 
     const isMemberToUpdateHigherRole = !isOrganisationRoleWithinUserHierarchy(
       currentUserOrganisationRole,
-      currentMemberToUpdateOrganisationRole,
+      currentMemberToUpdateOrganisationRole
     );
 
     if (isMemberToUpdateHigherRole) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Cannot update a member with a higher role',
+        message: "Cannot update a member with a higher role",
       });
     }
 
-    const isNewMemberRoleHigherThanCurrentRole = !isOrganisationRoleWithinUserHierarchy(
-      currentUserOrganisationRole,
-      data.role,
-    );
+    const isNewMemberRoleHigherThanCurrentRole =
+      !isOrganisationRoleWithinUserHierarchy(
+        currentUserOrganisationRole,
+        data.role
+      );
 
     if (isNewMemberRoleHigherThanCurrentRole) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Cannot give a member a role higher than the user initating the update',
+        message:
+          "Cannot give a member a role higher than the user initating the update",
       });
     }
 
     const currentMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === currentMemberToUpdateOrganisationRole,
+      (group) =>
+        group.organisationRole === currentMemberToUpdateOrganisationRole
     );
 
     const newMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === data.role,
+      (group) => group.organisationRole === data.role
     );
 
     if (!currentMemberGroup) {
-      console.error('[CRITICAL]: Missing internal group');
+      console.error("[CRITICAL]: Missing internal group");
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Current member group not found',
+        message: "Current member group not found",
       });
     }
 
     if (!newMemberGroup) {
-      console.error('[CRITICAL]: Missing internal group');
+      console.error("[CRITICAL]: Missing internal group");
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'New member group not found',
+        message: "New member group not found",
       });
     }
 
@@ -154,7 +171,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
 
       await tx.organisationGroupMember.create({
         data: {
-          id: generateDatabaseId('group_member'),
+          id: generateDatabaseId("group_member"),
           organisationMemberId: organisationMemberToUpdate.id,
           groupId: newMemberGroup.id,
         },

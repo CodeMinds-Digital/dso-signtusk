@@ -1,18 +1,24 @@
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
-import { match } from 'ts-pattern';
+import {
+  OrganisationGroupType,
+  TeamMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getMemberRoles } from '@signtusk/lib/server-only/team/get-member-roles';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
-import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getMemberRoles } from "@signtusk/lib/server-only/team/get-member-roles";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
+import {
+  buildTeamWhereQuery,
+  isTeamRoleWithinUserHierarchy,
+} from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateTeamMembersRequestSchema,
   ZCreateTeamMembersResponseSchema,
-} from './create-team-members.types';
+} from "./create-team-members.types";
 
 export const createTeamMembersRoute = authenticatedProcedure
   .input(ZCreateTeamMembersRequestSchema)
@@ -53,7 +59,7 @@ export const createTeamMembers = async ({
     where: buildTeamWhereQuery({
       teamId,
       userId,
-      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_TEAM"],
     }),
     include: {
       organisation: {
@@ -80,17 +86,19 @@ export const createTeamMembers = async ({
 
   if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Team not found or missing permissions',
+      message: "Team not found or missing permissions",
     });
   }
 
   const isMembersPartOfOrganisation = membersToCreate.every((member) =>
-    team.organisation.members.some(({ id }) => id === member.organisationMemberId),
+    team.organisation.members.some(
+      ({ id }) => id === member.organisationMemberId
+    )
   );
 
   if (!isMembersPartOfOrganisation) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Some member IDs do not exist',
+      message: "Some member IDs do not exist",
     });
   }
 
@@ -98,61 +106,64 @@ export const createTeamMembers = async ({
     (group) =>
       group.organisationGroup.type === OrganisationGroupType.INTERNAL_TEAM &&
       group.teamId === teamId &&
-      group.teamRole === TeamMemberRole.MEMBER,
+      group.teamRole === TeamMemberRole.MEMBER
   );
 
   const teamManagerGroup = team.teamGroups.find(
     (group) =>
       group.organisationGroup.type === OrganisationGroupType.INTERNAL_TEAM &&
       group.teamId === teamId &&
-      group.teamRole === TeamMemberRole.MANAGER,
+      group.teamRole === TeamMemberRole.MANAGER
   );
 
   const teamAdminGroup = team.teamGroups.find(
     (group) =>
       group.organisationGroup.type === OrganisationGroupType.INTERNAL_TEAM &&
       group.teamId === teamId &&
-      group.teamRole === TeamMemberRole.ADMIN,
+      group.teamRole === TeamMemberRole.ADMIN
   );
 
   if (!teamMemberGroup || !teamManagerGroup || !teamAdminGroup) {
     console.error({
-      message: 'Team groups not found.',
+      message: "Team groups not found.",
       teamMemberGroup: Boolean(teamMemberGroup),
       teamManagerGroup: Boolean(teamManagerGroup),
       teamAdminGroup: Boolean(teamAdminGroup),
     });
 
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Team groups not found.',
+      message: "Team groups not found.",
     });
   }
 
   const { teamRole: currentUserTeamRole } = await getMemberRoles({
     teamId,
     reference: {
-      type: 'User',
+      type: "User",
       id: userId,
     },
   });
 
   if (
     !membersToCreate.every((member) =>
-      isTeamRoleWithinUserHierarchy(currentUserTeamRole, member.teamRole),
+      isTeamRoleWithinUserHierarchy(currentUserTeamRole, member.teamRole)
     )
   ) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Cannot add a member with a role higher than your own',
+      message: "Cannot add a member with a role higher than your own",
     });
   }
 
   await prisma.organisationGroupMember.createMany({
     data: membersToCreate.map((member) => ({
-      id: generateDatabaseId('group_member'),
+      id: generateDatabaseId("group_member"),
       organisationMemberId: member.organisationMemberId,
       groupId: match(member.teamRole)
         .with(TeamMemberRole.MEMBER, () => teamMemberGroup.organisationGroupId)
-        .with(TeamMemberRole.MANAGER, () => teamManagerGroup.organisationGroupId)
+        .with(
+          TeamMemberRole.MANAGER,
+          () => teamManagerGroup.organisationGroupId
+        )
         .with(TeamMemberRole.ADMIN, () => teamAdminGroup.organisationGroupId)
         .exhaustive(),
     })),

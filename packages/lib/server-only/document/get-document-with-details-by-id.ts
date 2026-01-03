@@ -1,7 +1,25 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
-import { getEnvelopeById } from '../envelope/get-envelope-by-id';
+import {
+  mapSecondaryIdToDocumentId,
+  type EnvelopeIdOptions,
+} from "../../utils/envelope";
+import { getEnvelopeById } from "../envelope/get-envelope-by-id";
+
+// Helper to convert Prisma Decimal to number
+const toNumber = (val: unknown): number => {
+  if (typeof val === "number") return val;
+  if (typeof val === "string") return parseFloat(val);
+  if (
+    val &&
+    typeof val === "object" &&
+    "toNumber" in val &&
+    typeof (val as { toNumber: () => number }).toNumber === "function"
+  ) {
+    return (val as { toNumber: () => number }).toNumber();
+  }
+  return 0;
+};
 
 export type GetDocumentWithDetailsByIdOptions = {
   id: EnvelopeIdOptions;
@@ -26,7 +44,7 @@ export const getDocumentWithDetailsById = async ({
   const firstDocumentData = envelope.envelopeItems[0].documentData;
 
   if (!firstDocumentData) {
-    throw new Error('Document data not found');
+    throw new Error("Document data not found");
   }
 
   return {
@@ -40,6 +58,10 @@ export const getDocumentWithDetailsById = async ({
     id: legacyDocumentId,
     fields: envelope.fields.map((field) => ({
       ...field,
+      positionX: toNumber(field.positionX),
+      positionY: toNumber(field.positionY),
+      width: toNumber(field.width),
+      height: toNumber(field.height),
       documentId: legacyDocumentId,
       templateId: null,
     })),

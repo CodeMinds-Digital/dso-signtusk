@@ -1,18 +1,18 @@
-import { EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { deleteDocument } from '@signtusk/lib/server-only/document/delete-document';
-import { deleteTemplate } from '@signtusk/lib/server-only/template/delete-template';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { deleteDocument } from "@signtusk/lib/server-only/document/delete-document";
+import { deleteTemplate } from "@signtusk/lib/server-only/template/delete-template";
+import { prisma } from "@signtusk/prisma";
 
-import { ZGenericSuccessResponse } from '../schema';
-import { authenticatedProcedure } from '../trpc';
+import { ZGenericSuccessResponse } from "../schema";
+import { authenticatedProcedure } from "../trpc";
 import {
   ZDeleteEnvelopeRequestSchema,
   ZDeleteEnvelopeResponseSchema,
   deleteEnvelopeMeta,
-} from './delete-envelope.types';
+} from "./delete-envelope.types";
 
 export const deleteEnvelopeRoute = authenticatedProcedure
   .meta(deleteEnvelopeMeta)
@@ -39,7 +39,7 @@ export const deleteEnvelopeRoute = authenticatedProcedure
 
     if (!unsafeEnvelope) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Envelope not found',
+        message: "Envelope not found",
       });
     }
 
@@ -49,21 +49,21 @@ export const deleteEnvelopeRoute = authenticatedProcedure
           userId: ctx.user.id,
           teamId,
           id: {
-            type: 'envelopeId',
+            type: "envelopeId",
             id: envelopeId,
           },
           requestMetadata: ctx.metadata,
-        }),
+        })
       )
       .with(EnvelopeType.TEMPLATE, async () =>
         deleteTemplate({
           userId: ctx.user.id,
           teamId,
           id: {
-            type: 'envelopeId',
+            type: "envelopeId",
             id: envelopeId,
           },
-        }),
+        })
       )
       .exhaustive();
 

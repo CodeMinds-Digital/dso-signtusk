@@ -1,22 +1,23 @@
-import type { EmailDomainStatus } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { EmailDomainStatus } from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindOrganisationEmailDomainsRequestSchema,
   ZFindOrganisationEmailDomainsResponseSchema,
-} from './find-organisation-email-domain.types';
+} from "./find-organisation-email-domain.types";
 
 export const findOrganisationEmailDomainsRoute = authenticatedProcedure
   .input(ZFindOrganisationEmailDomainsRequestSchema)
   .output(ZFindOrganisationEmailDomainsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { organisationId, emailDomainId, statuses, query, page, perPage } = input;
+    const { organisationId, emailDomainId, statuses, query, page, perPage } =
+      input;
     const { user } = ctx;
 
     ctx.logger.info({
@@ -85,7 +86,7 @@ export const findOrganisationEmailDomains = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,

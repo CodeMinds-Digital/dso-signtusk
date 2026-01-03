@@ -1,16 +1,19 @@
-import { OrganisationGroupType } from '@prisma/client';
+import { OrganisationGroupType } from "@signtusk/lib/constants/prisma-enums";
 
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getMemberRoles } from '@signtusk/lib/server-only/team/get-member-roles';
-import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getMemberRoles } from "@signtusk/lib/server-only/team/get-member-roles";
+import {
+  buildTeamWhereQuery,
+  isTeamRoleWithinUserHierarchy,
+} from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZDeleteTeamMemberRequestSchema,
   ZDeleteTeamMemberResponseSchema,
-} from './delete-team-member.types';
+} from "./delete-team-member.types";
 
 export const deleteTeamMemberRoute = authenticatedProcedure
   // .meta(deleteTeamMemberMeta)
@@ -31,7 +34,7 @@ export const deleteTeamMemberRoute = authenticatedProcedure
       where: buildTeamWhereQuery({
         teamId,
         userId: user.id,
-        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_TEAM"],
       }),
       include: {
         teamGroups: {
@@ -69,7 +72,7 @@ export const deleteTeamMemberRoute = authenticatedProcedure
     const { teamRole: currentUserTeamRole } = await getMemberRoles({
       teamId,
       reference: {
-        type: 'User',
+        type: "User",
         id: user.id,
       },
     });
@@ -77,15 +80,20 @@ export const deleteTeamMemberRoute = authenticatedProcedure
     const { teamRole: currentMemberToDeleteTeamRole } = await getMemberRoles({
       teamId,
       reference: {
-        type: 'Member',
+        type: "Member",
         id: memberId,
       },
     });
 
     // Check role permissions.
-    if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, currentMemberToDeleteTeamRole)) {
+    if (
+      !isTeamRoleWithinUserHierarchy(
+        currentUserTeamRole,
+        currentMemberToDeleteTeamRole
+      )
+    ) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Cannot remove a member with a higher role',
+        message: "Cannot remove a member with a higher role",
       });
     }
 
@@ -95,14 +103,16 @@ export const deleteTeamMemberRoute = authenticatedProcedure
     // This means that the member was inherited (which means they should not be deleted directly)
     // or it means that they are not part of any team groups relating to this?
     if (team.teamGroups.length !== 1) {
-      console.error('Member must have 1 one internal team group. This should not happen.');
+      console.error(
+        "Member must have 1 one internal team group. This should not happen."
+      );
 
       // Todo: Logging.
     }
 
     if (team.teamGroups.length === 0) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Team has no internal team groups',
+        message: "Team has no internal team groups",
       });
     }
 

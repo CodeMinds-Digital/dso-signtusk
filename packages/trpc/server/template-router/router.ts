@@ -1,35 +1,42 @@
-import type { Envelope } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import type { Envelope } from "@signtusk/lib/constants/prisma-enums";
+import {
+  DocumentDataType,
+  EnvelopeType,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { jobs } from '@signtusk/lib/jobs/client';
-import { createDocumentData } from '@signtusk/lib/server-only/document-data/create-document-data';
-import { getDocumentWithDetailsById } from '@signtusk/lib/server-only/document/get-document-with-details-by-id';
-import { sendDocument } from '@signtusk/lib/server-only/document/send-document';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { duplicateEnvelope } from '@signtusk/lib/server-only/envelope/duplicate-envelope';
-import { updateEnvelope } from '@signtusk/lib/server-only/envelope/update-envelope';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { jobs } from "@signtusk/lib/jobs/client";
+import { createDocumentData } from "@signtusk/lib/server-only/document-data/create-document-data";
+import { getDocumentWithDetailsById } from "@signtusk/lib/server-only/document/get-document-with-details-by-id";
+import { sendDocument } from "@signtusk/lib/server-only/document/send-document";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { duplicateEnvelope } from "@signtusk/lib/server-only/envelope/duplicate-envelope";
+import { updateEnvelope } from "@signtusk/lib/server-only/envelope/update-envelope";
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
   createDocumentFromDirectTemplate,
-} from '@signtusk/lib/server-only/template/create-document-from-direct-template';
-import { createDocumentFromTemplate } from '@signtusk/lib/server-only/template/create-document-from-template';
-import { createTemplateDirectLink } from '@signtusk/lib/server-only/template/create-template-direct-link';
-import { deleteTemplate } from '@signtusk/lib/server-only/template/delete-template';
-import { deleteTemplateDirectLink } from '@signtusk/lib/server-only/template/delete-template-direct-link';
-import { findTemplates } from '@signtusk/lib/server-only/template/find-templates';
-import { getTemplateById } from '@signtusk/lib/server-only/template/get-template-by-id';
-import { toggleTemplateDirectLink } from '@signtusk/lib/server-only/template/toggle-template-direct-link';
-import { putNormalizedPdfFileServerSide } from '@signtusk/lib/universal/upload/put-file.server';
-import { getPresignPostUrl } from '@signtusk/lib/universal/upload/server-actions';
-import { mapSecondaryIdToTemplateId } from '@signtusk/lib/utils/envelope';
-import { mapFieldToLegacyField } from '@signtusk/lib/utils/fields';
-import { mapRecipientToLegacyRecipient } from '@signtusk/lib/utils/recipients';
-import { mapEnvelopeToTemplateLite } from '@signtusk/lib/utils/templates';
+} from "@signtusk/lib/server-only/template/create-document-from-direct-template";
+import { createDocumentFromTemplate } from "@signtusk/lib/server-only/template/create-document-from-template";
+import { createTemplateDirectLink } from "@signtusk/lib/server-only/template/create-template-direct-link";
+import { deleteTemplate } from "@signtusk/lib/server-only/template/delete-template";
+import { deleteTemplateDirectLink } from "@signtusk/lib/server-only/template/delete-template-direct-link";
+import { findTemplates } from "@signtusk/lib/server-only/template/find-templates";
+import { getTemplateById } from "@signtusk/lib/server-only/template/get-template-by-id";
+import { toggleTemplateDirectLink } from "@signtusk/lib/server-only/template/toggle-template-direct-link";
+import { putNormalizedPdfFileServerSide } from "@signtusk/lib/universal/upload/put-file.server";
+import { getPresignPostUrl } from "@signtusk/lib/universal/upload/server-actions";
+import { mapSecondaryIdToTemplateId } from "@signtusk/lib/utils/envelope";
+import { mapFieldToLegacyField } from "@signtusk/lib/utils/fields";
+import { mapRecipientToLegacyRecipient } from "@signtusk/lib/utils/recipients";
+import { mapEnvelopeToTemplateLite } from "@signtusk/lib/utils/templates";
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
-import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from "../schema";
+import {
+  authenticatedProcedure,
+  maybeAuthenticatedProcedure,
+  router,
+} from "../trpc";
 import {
   ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -53,7 +60,7 @@ import {
   ZToggleTemplateDirectLinkResponseSchema,
   ZUpdateTemplateRequestSchema,
   ZUpdateTemplateResponseSchema,
-} from './schema';
+} from "./schema";
 
 export const templateRouter = router({
   /**
@@ -62,11 +69,11 @@ export const templateRouter = router({
   findTemplates: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/template',
-        summary: 'Find templates',
-        description: 'Find templates based on a search criteria',
-        tags: ['Template'],
+        method: "GET",
+        path: "/template",
+        summary: "Find templates",
+        description: "Find templates based on a search criteria",
+        tags: ["Template"],
       },
     })
     .input(ZFindTemplatesRequestSchema)
@@ -90,7 +97,9 @@ export const templateRouter = router({
       return {
         ...result,
         data: result.data.map((envelope) => {
-          const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+          const legacyTemplateId = mapSecondaryIdToTemplateId(
+            envelope.secondaryId
+          );
 
           return {
             id: legacyTemplateId,
@@ -109,9 +118,11 @@ export const templateRouter = router({
             folderId: envelope.folderId,
             useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
             team: envelope.team,
-            fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+            fields: envelope.fields.map((field) =>
+              mapFieldToLegacyField(field, envelope)
+            ),
             recipients: envelope.recipients.map((recipient) =>
-              mapRecipientToLegacyRecipient(recipient, envelope),
+              mapRecipientToLegacyRecipient(recipient, envelope)
             ),
             templateMeta: envelope.documentMeta,
             directLink: envelope.directLink,
@@ -126,10 +137,10 @@ export const templateRouter = router({
   getTemplateById: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/template/{templateId}',
-        summary: 'Get template',
-        tags: ['Template'],
+        method: "GET",
+        path: "/template/{templateId}",
+        summary: "Get template",
+        tags: ["Template"],
       },
     })
     .input(ZGetTemplateByIdRequestSchema)
@@ -146,7 +157,7 @@ export const templateRouter = router({
 
       return await getTemplateById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         userId: ctx.user.id,
@@ -162,12 +173,12 @@ export const templateRouter = router({
   createTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/create',
-        contentTypes: ['multipart/form-data'],
-        summary: 'Create template',
-        description: 'Create a new template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/create",
+        contentTypes: ["multipart/form-data"],
+        summary: "Create template",
+        description: "Create a new template",
+        tags: ["Template"],
       },
     })
     .input(ZCreateTemplateMutationSchema)
@@ -191,7 +202,8 @@ export const templateRouter = router({
         attachments,
       } = payload;
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
+      const { id: templateDocumentDataId } =
+        await putNormalizedPdfFileServerSide(file);
 
       ctx.logger.info({
         input: {
@@ -240,12 +252,12 @@ export const templateRouter = router({
   createTemplateTemporary: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/create/beta',
-        summary: 'Create template',
+        method: "POST",
+        path: "/template/create/beta",
+        summary: "Create template",
         description:
-          'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
-        tags: ['Template'],
+          "You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.",
+        tags: ["Template"],
       },
     })
     .input(ZCreateTemplateV2RequestSchema)
@@ -267,9 +279,9 @@ export const templateRouter = router({
         attachments,
       } = input;
 
-      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+      const fileName = title.endsWith(".pdf") ? title : `${title}.pdf`;
 
-      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+      const { url, key } = await getPresignPostUrl(fileName, "application/pdf");
 
       const templateDocumentData = await createDocumentData({
         data: key,
@@ -302,11 +314,13 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
       });
 
-      const legacyTemplateId = mapSecondaryIdToTemplateId(createdTemplate.secondaryId);
+      const legacyTemplateId = mapSecondaryIdToTemplateId(
+        createdTemplate.secondaryId
+      );
 
       const fullTemplate = await getTemplateById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: legacyTemplateId,
         },
         userId: user.id,
@@ -325,10 +339,10 @@ export const templateRouter = router({
   updateTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/update',
-        summary: 'Update template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/update",
+        summary: "Update template",
+        tags: ["Template"],
       },
     })
     .input(ZUpdateTemplateRequestSchema)
@@ -348,7 +362,7 @@ export const templateRouter = router({
         userId,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         data: {
@@ -368,10 +382,10 @@ export const templateRouter = router({
   duplicateTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/duplicate',
-        summary: 'Duplicate template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/duplicate",
+        summary: "Duplicate template",
+        tags: ["Template"],
       },
     })
     .input(ZDuplicateTemplateMutationSchema)
@@ -390,7 +404,7 @@ export const templateRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
       });
@@ -404,10 +418,10 @@ export const templateRouter = router({
   deleteTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/delete',
-        summary: 'Delete template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/delete",
+        summary: "Delete template",
+        tags: ["Template"],
       },
     })
     .input(ZDeleteTemplateMutationSchema)
@@ -426,7 +440,7 @@ export const templateRouter = router({
       await deleteTemplate({
         userId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         teamId,
@@ -441,11 +455,11 @@ export const templateRouter = router({
   createDocumentFromTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/use',
-        summary: 'Use template',
-        description: 'Use the template to create a document',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/use",
+        summary: "Use template",
+        description: "Use the template to create a document",
+        tags: ["Template"],
       },
     })
     .input(ZCreateDocumentFromTemplateRequestSchema)
@@ -473,7 +487,7 @@ export const templateRouter = router({
       const limits = await getServerLimits({ userId: ctx.user.id, teamId });
 
       if (limits.remaining.documents === 0) {
-        throw new Error('You have reached your document limit.');
+        throw new Error("You have reached your document limit.");
       }
 
       // Backwards compatibility mapping since we need the envelopeItemId for the custom document data.
@@ -488,7 +502,7 @@ export const templateRouter = router({
 
       const envelope: Envelope = await createDocumentFromTemplate({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         teamId,
@@ -506,7 +520,7 @@ export const templateRouter = router({
       if (distributeDocument) {
         await sendDocument({
           id: {
-            type: 'envelopeId',
+            type: "envelopeId",
             id: envelope.id,
           },
           userId: ctx.user.id,
@@ -515,13 +529,13 @@ export const templateRouter = router({
         }).catch((err) => {
           console.error(err);
 
-          throw new AppError('DOCUMENT_SEND_FAILED');
+          throw new AppError("DOCUMENT_SEND_FAILED");
         });
       }
 
       return getDocumentWithDetailsById({
         id: {
-          type: 'envelopeId',
+          type: "envelopeId",
           id: envelope.id,
         },
         userId: ctx.user.id,
@@ -588,11 +602,11 @@ export const templateRouter = router({
   createTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/direct/create',
-        summary: 'Create direct link',
-        description: 'Create a direct link for a template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/direct/create",
+        summary: "Create direct link",
+        description: "Create a direct link for a template",
+        tags: ["Template"],
       },
     })
     .input(ZCreateTemplateDirectLinkRequestSchema)
@@ -612,18 +626,21 @@ export const templateRouter = router({
 
       const template = await getTemplateById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         teamId,
         userId: ctx.user.id,
       });
 
-      const limits = await getServerLimits({ userId: ctx.user.id, teamId: template.teamId });
+      const limits = await getServerLimits({
+        userId: ctx.user.id,
+        teamId: template.teamId,
+      });
 
       if (limits.remaining.directTemplates === 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-          message: 'You have reached your direct templates limit.',
+          message: "You have reached your direct templates limit.",
         });
       }
 
@@ -631,7 +648,7 @@ export const templateRouter = router({
         userId,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         directRecipientId,
@@ -644,11 +661,11 @@ export const templateRouter = router({
   deleteTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/direct/delete',
-        summary: 'Delete direct link',
-        description: 'Delete a direct link for a template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/direct/delete",
+        summary: "Delete direct link",
+        description: "Delete a direct link for a template",
+        tags: ["Template"],
       },
     })
     .input(ZDeleteTemplateDirectLinkRequestSchema)
@@ -676,11 +693,11 @@ export const templateRouter = router({
   toggleTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/direct/toggle',
-        summary: 'Toggle direct link',
-        description: 'Enable or disable a direct link for a template',
-        tags: ['Template'],
+        method: "POST",
+        path: "/template/direct/toggle",
+        summary: "Toggle direct link",
+        description: "Enable or disable a direct link for a template",
+        tags: ["Template"],
       },
     })
     .input(ZToggleTemplateDirectLinkRequestSchema)
@@ -697,7 +714,12 @@ export const templateRouter = router({
         },
       });
 
-      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
+      return await toggleTemplateDirectLink({
+        userId,
+        teamId,
+        templateId,
+        enabled,
+      });
     }),
 
   /**
@@ -718,14 +740,14 @@ export const templateRouter = router({
 
       if (csv.length > 4 * 1024 * 1024) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-          message: 'File size exceeds 4MB limit',
+          message: "File size exceeds 4MB limit",
           statusCode: 400,
         });
       }
 
       const template = await getTemplateById({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         teamId,
@@ -734,12 +756,12 @@ export const templateRouter = router({
 
       if (!template) {
         throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Template not found',
+          message: "Template not found",
         });
       }
 
       await jobs.triggerJob({
-        name: 'internal.bulk-send-template',
+        name: "internal.bulk-send-template",
         payload: {
           userId: user.id,
           teamId,

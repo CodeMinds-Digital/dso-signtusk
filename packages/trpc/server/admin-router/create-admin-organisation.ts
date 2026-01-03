@@ -1,13 +1,13 @@
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType } from "@signtusk/lib/constants/prisma-enums";
 
-import { createOrganisation } from '@signtusk/lib/server-only/organisation/create-organisation';
-import { internalClaims } from '@signtusk/lib/types/subscription';
+import { createOrganisation } from "@signtusk/lib/server-only/organisation/create-organisation";
+import { internalClaims } from "@signtusk/lib/types/subscription";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZCreateAdminOrganisationRequestSchema,
   ZCreateAdminOrganisationResponseSchema,
-} from './create-admin-organisation.types';
+} from "./create-admin-organisation.types";
 
 export const createAdminOrganisationRoute = adminProcedure
   .input(ZCreateAdminOrganisationRequestSchema)

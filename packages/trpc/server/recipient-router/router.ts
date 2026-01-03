@@ -1,17 +1,17 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { completeDocumentWithToken } from '@signtusk/lib/server-only/document/complete-document-with-token';
-import { rejectDocumentWithToken } from '@signtusk/lib/server-only/document/reject-document-with-token';
-import { createEnvelopeRecipients } from '@signtusk/lib/server-only/recipient/create-envelope-recipients';
-import { deleteEnvelopeRecipient } from '@signtusk/lib/server-only/recipient/delete-envelope-recipient';
-import { getRecipientById } from '@signtusk/lib/server-only/recipient/get-recipient-by-id';
-import { setDocumentRecipients } from '@signtusk/lib/server-only/recipient/set-document-recipients';
-import { setTemplateRecipients } from '@signtusk/lib/server-only/recipient/set-template-recipients';
-import { updateEnvelopeRecipients } from '@signtusk/lib/server-only/recipient/update-envelope-recipients';
+import { completeDocumentWithToken } from "@signtusk/lib/server-only/document/complete-document-with-token";
+import { rejectDocumentWithToken } from "@signtusk/lib/server-only/document/reject-document-with-token";
+import { createEnvelopeRecipients } from "@signtusk/lib/server-only/recipient/create-envelope-recipients";
+import { deleteEnvelopeRecipient } from "@signtusk/lib/server-only/recipient/delete-envelope-recipient";
+import { getRecipientById } from "@signtusk/lib/server-only/recipient/get-recipient-by-id";
+import { setDocumentRecipients } from "@signtusk/lib/server-only/recipient/set-document-recipients";
+import { setTemplateRecipients } from "@signtusk/lib/server-only/recipient/set-template-recipients";
+import { updateEnvelopeRecipients } from "@signtusk/lib/server-only/recipient/update-envelope-recipients";
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
-import { authenticatedProcedure, procedure, router } from '../trpc';
-import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from "../schema";
+import { authenticatedProcedure, procedure, router } from "../trpc";
+import { findRecipientSuggestionsRoute } from "./find-recipient-suggestions";
 import {
   ZCompleteDocumentWithTokenMutationSchema,
   ZCreateDocumentRecipientRequestSchema,
@@ -39,7 +39,7 @@ import {
   ZUpdateTemplateRecipientResponseSchema,
   ZUpdateTemplateRecipientsRequestSchema,
   ZUpdateTemplateRecipientsResponseSchema,
-} from './schema';
+} from "./schema";
 
 export const recipientRouter = router({
   suggestions: {
@@ -52,12 +52,12 @@ export const recipientRouter = router({
   getDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/document/recipient/{recipientId}',
-        summary: 'Get document recipient',
+        method: "GET",
+        path: "/document/recipient/{recipientId}",
+        summary: "Get document recipient",
         description:
           'Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
-        tags: ['Document Recipients'],
+        tags: ["Document Recipients"],
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -86,11 +86,11 @@ export const recipientRouter = router({
   createDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/recipient/create',
-        summary: 'Create document recipient',
-        description: 'Create a single recipient for a document.',
-        tags: ['Document Recipients'],
+        method: "POST",
+        path: "/document/recipient/create",
+        summary: "Create document recipient",
+        description: "Create a single recipient for a document.",
+        tags: ["Document Recipients"],
       },
     })
     .input(ZCreateDocumentRecipientRequestSchema)
@@ -109,7 +109,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         recipients: [recipient],
@@ -125,11 +125,11 @@ export const recipientRouter = router({
   createDocumentRecipients: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/recipient/create-many',
-        summary: 'Create document recipients',
-        description: 'Create multiple recipients for a document.',
-        tags: ['Document Recipients'],
+        method: "POST",
+        path: "/document/recipient/create-many",
+        summary: "Create document recipients",
+        description: "Create multiple recipients for a document.",
+        tags: ["Document Recipients"],
       },
     })
     .input(ZCreateDocumentRecipientsRequestSchema)
@@ -148,7 +148,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         recipients,
@@ -162,11 +162,11 @@ export const recipientRouter = router({
   updateDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/recipient/update',
-        summary: 'Update document recipient',
-        description: 'Update a single recipient for a document.',
-        tags: ['Document Recipients'],
+        method: "POST",
+        path: "/document/recipient/update",
+        summary: "Update document recipient",
+        description: "Update a single recipient for a document.",
+        tags: ["Document Recipients"],
       },
     })
     .input(ZUpdateDocumentRecipientRequestSchema)
@@ -185,7 +185,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         recipients: [recipient],
@@ -201,11 +201,11 @@ export const recipientRouter = router({
   updateDocumentRecipients: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/recipient/update-many',
-        summary: 'Update document recipients',
-        description: 'Update multiple recipients for a document.',
-        tags: ['Document Recipients'],
+        method: "POST",
+        path: "/document/recipient/update-many",
+        summary: "Update document recipients",
+        description: "Update multiple recipients for a document.",
+        tags: ["Document Recipients"],
       },
     })
     .input(ZUpdateDocumentRecipientsRequestSchema)
@@ -224,7 +224,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         recipients,
@@ -238,10 +238,10 @@ export const recipientRouter = router({
   deleteDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/recipient/delete',
-        summary: 'Delete document recipient',
-        tags: ['Document Recipients'],
+        method: "POST",
+        path: "/document/recipient/delete",
+        summary: "Delete document recipient",
+        tags: ["Document Recipients"],
       },
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
@@ -286,7 +286,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         recipients: recipients.map((recipient) => ({
@@ -307,12 +307,12 @@ export const recipientRouter = router({
   getTemplateRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/template/recipient/{recipientId}',
-        summary: 'Get template recipient',
+        method: "GET",
+        path: "/template/recipient/{recipientId}",
+        summary: "Get template recipient",
         description:
           'Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
-        tags: ['Template Recipients'],
+        tags: ["Template Recipients"],
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -341,11 +341,11 @@ export const recipientRouter = router({
   createTemplateRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/recipient/create',
-        summary: 'Create template recipient',
-        description: 'Create a single recipient for a template.',
-        tags: ['Template Recipients'],
+        method: "POST",
+        path: "/template/recipient/create",
+        summary: "Create template recipient",
+        description: "Create a single recipient for a template.",
+        tags: ["Template Recipients"],
       },
     })
     .input(ZCreateTemplateRecipientRequestSchema)
@@ -365,7 +365,7 @@ export const recipientRouter = router({
         teamId,
         id: {
           id: templateId,
-          type: 'templateId',
+          type: "templateId",
         },
         recipients: [recipient],
         requestMetadata: ctx.metadata,
@@ -380,11 +380,11 @@ export const recipientRouter = router({
   createTemplateRecipients: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/recipient/create-many',
-        summary: 'Create template recipients',
-        description: 'Create multiple recipients for a template.',
-        tags: ['Template Recipients'],
+        method: "POST",
+        path: "/template/recipient/create-many",
+        summary: "Create template recipients",
+        description: "Create multiple recipients for a template.",
+        tags: ["Template Recipients"],
       },
     })
     .input(ZCreateTemplateRecipientsRequestSchema)
@@ -404,7 +404,7 @@ export const recipientRouter = router({
         teamId,
         id: {
           id: templateId,
-          type: 'templateId',
+          type: "templateId",
         },
         recipients,
         requestMetadata: ctx.metadata,
@@ -417,11 +417,11 @@ export const recipientRouter = router({
   updateTemplateRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/recipient/update',
-        summary: 'Update template recipient',
-        description: 'Update a single recipient for a template.',
-        tags: ['Template Recipients'],
+        method: "POST",
+        path: "/template/recipient/update",
+        summary: "Update template recipient",
+        description: "Update a single recipient for a template.",
+        tags: ["Template Recipients"],
       },
     })
     .input(ZUpdateTemplateRecipientRequestSchema)
@@ -440,7 +440,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         recipients: [recipient],
@@ -456,11 +456,11 @@ export const recipientRouter = router({
   updateTemplateRecipients: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/recipient/update-many',
-        summary: 'Update template recipients',
-        description: 'Update multiple recipients for a template.',
-        tags: ['Template Recipients'],
+        method: "POST",
+        path: "/template/recipient/update-many",
+        summary: "Update template recipients",
+        description: "Update multiple recipients for a template.",
+        tags: ["Template Recipients"],
       },
     })
     .input(ZUpdateTemplateRecipientsRequestSchema)
@@ -479,7 +479,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         recipients,
@@ -493,10 +493,10 @@ export const recipientRouter = router({
   deleteTemplateRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/recipient/delete',
-        summary: 'Delete template recipient',
-        tags: ['Template Recipients'],
+        method: "POST",
+        path: "/template/recipient/delete",
+        summary: "Delete template recipient",
+        tags: ["Template Recipients"],
       },
     })
     .input(ZDeleteTemplateRecipientRequestSchema)
@@ -541,7 +541,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         recipients: recipients.map((recipient) => ({
@@ -561,7 +561,13 @@ export const recipientRouter = router({
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
+      const {
+        token,
+        documentId,
+        accessAuthOptions,
+        nextSigner,
+        recipientOverride,
+      } = input;
 
       ctx.logger.info({
         input: {
@@ -572,7 +578,7 @@ export const recipientRouter = router({
       await completeDocumentWithToken({
         token,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         accessAuthOptions,
@@ -600,7 +606,7 @@ export const recipientRouter = router({
       return await rejectDocumentWithToken({
         token,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         reason,

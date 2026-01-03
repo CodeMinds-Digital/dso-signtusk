@@ -1,17 +1,17 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { createEnvelopeFields } from '@signtusk/lib/server-only/field/create-envelope-fields';
-import { deleteDocumentField } from '@signtusk/lib/server-only/field/delete-document-field';
-import { deleteTemplateField } from '@signtusk/lib/server-only/field/delete-template-field';
-import { getFieldById } from '@signtusk/lib/server-only/field/get-field-by-id';
-import { removeSignedFieldWithToken } from '@signtusk/lib/server-only/field/remove-signed-field-with-token';
-import { setFieldsForDocument } from '@signtusk/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@signtusk/lib/server-only/field/set-fields-for-template';
-import { signFieldWithToken } from '@signtusk/lib/server-only/field/sign-field-with-token';
-import { updateEnvelopeFields } from '@signtusk/lib/server-only/field/update-envelope-fields';
+import { createEnvelopeFields } from "@signtusk/lib/server-only/field/create-envelope-fields";
+import { deleteDocumentField } from "@signtusk/lib/server-only/field/delete-document-field";
+import { deleteTemplateField } from "@signtusk/lib/server-only/field/delete-template-field";
+import { getFieldById } from "@signtusk/lib/server-only/field/get-field-by-id";
+import { removeSignedFieldWithToken } from "@signtusk/lib/server-only/field/remove-signed-field-with-token";
+import { setFieldsForDocument } from "@signtusk/lib/server-only/field/set-fields-for-document";
+import { setFieldsForTemplate } from "@signtusk/lib/server-only/field/set-fields-for-template";
+import { signFieldWithToken } from "@signtusk/lib/server-only/field/sign-field-with-token";
+import { updateEnvelopeFields } from "@signtusk/lib/server-only/field/update-envelope-fields";
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
-import { authenticatedProcedure, procedure, router } from '../trpc';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from "../schema";
+import { authenticatedProcedure, procedure, router } from "../trpc";
 import {
   ZCreateDocumentFieldRequestSchema,
   ZCreateDocumentFieldResponseSchema,
@@ -39,7 +39,7 @@ import {
   ZUpdateTemplateFieldResponseSchema,
   ZUpdateTemplateFieldsRequestSchema,
   ZUpdateTemplateFieldsResponseSchema,
-} from './schema';
+} from "./schema";
 
 export const fieldRouter = router({
   /**
@@ -48,12 +48,12 @@ export const fieldRouter = router({
   getDocumentField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/document/field/{fieldId}',
-        summary: 'Get document field',
+        method: "GET",
+        path: "/document/field/{fieldId}",
+        summary: "Get document field",
         description:
           'Returns a single field. If you want to retrieve all the fields for a document, use the "Get Document" endpoint.',
-        tags: ['Document Fields'],
+        tags: ["Document Fields"],
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -82,11 +82,11 @@ export const fieldRouter = router({
   createDocumentField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/create',
-        summary: 'Create document field',
-        description: 'Create a single field for a document.',
-        tags: ['Document Fields'],
+        method: "POST",
+        path: "/document/field/create",
+        summary: "Create document field",
+        description: "Create a single field for a document.",
+        tags: ["Document Fields"],
       },
     })
     .input(ZCreateDocumentFieldRequestSchema)
@@ -105,7 +105,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         fields: [
@@ -128,11 +128,11 @@ export const fieldRouter = router({
   createDocumentFields: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/create-many',
-        summary: 'Create document fields',
-        description: 'Create multiple fields for a document.',
-        tags: ['Document Fields'],
+        method: "POST",
+        path: "/document/field/create-many",
+        summary: "Create document fields",
+        description: "Create multiple fields for a document.",
+        tags: ["Document Fields"],
       },
     })
     .input(ZCreateDocumentFieldsRequestSchema)
@@ -151,7 +151,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         fields: fields.map((field) => ({
@@ -170,11 +170,11 @@ export const fieldRouter = router({
   updateDocumentField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/update',
-        summary: 'Update document field',
-        description: 'Update a single field for a document.',
-        tags: ['Document Fields'],
+        method: "POST",
+        path: "/document/field/update",
+        summary: "Update document field",
+        description: "Update a single field for a document.",
+        tags: ["Document Fields"],
       },
     })
     .input(ZUpdateDocumentFieldRequestSchema)
@@ -193,7 +193,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         type: EnvelopeType.DOCUMENT,
@@ -210,11 +210,11 @@ export const fieldRouter = router({
   updateDocumentFields: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/update-many',
-        summary: 'Update document fields',
-        description: 'Update multiple fields for a document.',
-        tags: ['Document Fields'],
+        method: "POST",
+        path: "/document/field/update-many",
+        summary: "Update document fields",
+        description: "Update multiple fields for a document.",
+        tags: ["Document Fields"],
       },
     })
     .input(ZUpdateDocumentFieldsRequestSchema)
@@ -233,7 +233,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         type: EnvelopeType.DOCUMENT,
@@ -248,10 +248,10 @@ export const fieldRouter = router({
   deleteDocumentField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/delete',
-        summary: 'Delete document field',
-        tags: ['Document Fields'],
+        method: "POST",
+        path: "/document/field/delete",
+        summary: "Delete document field",
+        tags: ["Document Fields"],
       },
     })
     .input(ZDeleteDocumentFieldRequestSchema)
@@ -296,7 +296,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
         fields: fields.map((field) => ({
@@ -321,11 +321,11 @@ export const fieldRouter = router({
   createTemplateField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/create',
-        summary: 'Create template field',
-        description: 'Create a single field for a template.',
-        tags: ['Template Fields'],
+        method: "POST",
+        path: "/template/field/create",
+        summary: "Create template field",
+        description: "Create a single field for a template.",
+        tags: ["Template Fields"],
       },
     })
     .input(ZCreateTemplateFieldRequestSchema)
@@ -344,7 +344,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         fields: [
@@ -367,12 +367,12 @@ export const fieldRouter = router({
   getTemplateField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'GET',
-        path: '/template/field/{fieldId}',
-        summary: 'Get template field',
+        method: "GET",
+        path: "/template/field/{fieldId}",
+        summary: "Get template field",
         description:
           'Returns a single field. If you want to retrieve all the fields for a template, use the "Get Template" endpoint.',
-        tags: ['Template Fields'],
+        tags: ["Template Fields"],
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -401,11 +401,11 @@ export const fieldRouter = router({
   createTemplateFields: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/create-many',
-        summary: 'Create template fields',
-        description: 'Create multiple fields for a template.',
-        tags: ['Template Fields'],
+        method: "POST",
+        path: "/template/field/create-many",
+        summary: "Create template fields",
+        description: "Create multiple fields for a template.",
+        tags: ["Template Fields"],
       },
     })
     .input(ZCreateTemplateFieldsRequestSchema)
@@ -424,7 +424,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         fields: fields.map((field) => ({
@@ -443,11 +443,11 @@ export const fieldRouter = router({
   updateTemplateField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/update',
-        summary: 'Update template field',
-        description: 'Update a single field for a template.',
-        tags: ['Template Fields'],
+        method: "POST",
+        path: "/template/field/update",
+        summary: "Update template field",
+        description: "Update a single field for a template.",
+        tags: ["Template Fields"],
       },
     })
     .input(ZUpdateTemplateFieldRequestSchema)
@@ -466,7 +466,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         type: EnvelopeType.TEMPLATE,
@@ -483,11 +483,11 @@ export const fieldRouter = router({
   updateTemplateFields: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/update-many',
-        summary: 'Update template fields',
-        description: 'Update multiple fields for a template.',
-        tags: ['Template Fields'],
+        method: "POST",
+        path: "/template/field/update-many",
+        summary: "Update template fields",
+        description: "Update multiple fields for a template.",
+        tags: ["Template Fields"],
       },
     })
     .input(ZUpdateTemplateFieldsRequestSchema)
@@ -506,7 +506,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         type: EnvelopeType.TEMPLATE,
@@ -521,10 +521,10 @@ export const fieldRouter = router({
   deleteTemplateField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/delete',
-        summary: 'Delete template field',
-        tags: ['Template Fields'],
+        method: "POST",
+        path: "/template/field/delete",
+        summary: "Delete template field",
+        tags: ["Template Fields"],
       },
     })
     .input(ZDeleteTemplateFieldRequestSchema)
@@ -566,7 +566,7 @@ export const fieldRouter = router({
 
       return await setFieldsForTemplate({
         id: {
-          type: 'templateId',
+          type: "templateId",
           id: templateId,
         },
         userId: ctx.user.id,
@@ -603,7 +603,7 @@ export const fieldRouter = router({
       return await signFieldWithToken({
         token,
         fieldId,
-        value: value ?? '',
+        value: value ?? "",
         isBase64,
         userId: ctx.user?.id,
         authOptions,

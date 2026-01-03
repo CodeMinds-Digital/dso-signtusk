@@ -2551,6 +2551,7 @@ msgstr "Skonfiguruj szablon"
 msgid "Configure Template"
 msgstr "Skonfiguruj szablon"
 
+#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type] )
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -3015,7 +3016,7 @@ msgstr "Branding możesz skonfigurować tylko w planie Teams i wyższym."
 msgid "Currently email domains can only be configured for Platform and above plans."
 msgstr "Domeny możesz skonfigurować tylko w planie Platform lub wyższym."
 
-#. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
+#. placeholder {0}: ( field.value.size / (1024 * 1024) ).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Custom {0} MB file"
 msgstr "Niestandardowy plik {0} MB"
@@ -5341,7 +5342,7 @@ msgstr "Dołącz do naszej społeczności na <0>Discord</0>, aby uzyskać wsparc
 msgid "Joined"
 msgstr "Dołączył"
 
-#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
+#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: "short", })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Dołączył {0}"
@@ -9488,7 +9489,7 @@ msgid "To mark this document as viewed, you need to be logged in."
 msgstr "Aby oznaczyć dokument jako wyświetlony, musisz być zalogowany."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
+#. placeholder {0}: emptyCheckboxFields.length > 0 ? "Checkbox" : emptyRadioFields.length > 0 ? "Radio" : "Select"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "To proceed further, please set at least one value for the {0} field."

@@ -1,14 +1,14 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getEnvelopeWhereInput } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { prisma } from "@signtusk/prisma";
 
-import { maybeAuthenticatedProcedure } from '../trpc';
+import { maybeAuthenticatedProcedure } from "../trpc";
 import {
   ZGetEnvelopeItemsByTokenRequestSchema,
   ZGetEnvelopeItemsByTokenResponseSchema,
-} from './get-envelope-items-by-token.types';
+} from "./get-envelope-items-by-token.types";
 
 // Not intended for V2 API usage.
 // NOTE: THIS IS A PUBLIC PROCEDURE
@@ -27,10 +27,10 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
       },
     });
 
-    if (access.type === 'user') {
+    if (access.type === "user") {
       if (!user || !teamId) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'User not found',
+          message: "User not found",
         });
       }
 
@@ -83,7 +83,7 @@ const handleGetEnvelopeItemsByToken = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope could not be found',
+      message: "Envelope could not be found",
     });
   }
 
@@ -103,7 +103,7 @@ const handleGetEnvelopeItemsByUser = async ({
 }) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id: {
-      type: 'envelopeId',
+      type: "envelopeId",
       id: envelopeId,
     },
     type: null,
@@ -124,7 +124,7 @@ const handleGetEnvelopeItemsByUser = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope could not be found',
+      message: "Envelope could not be found",
     });
   }
 

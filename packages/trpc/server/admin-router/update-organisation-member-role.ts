@@ -1,15 +1,18 @@
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
-import { getHighestOrganisationRoleInGroup } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
+import { getHighestOrganisationRoleInGroup } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZUpdateOrganisationMemberRoleRequestSchema,
   ZUpdateOrganisationMemberRoleResponseSchema,
-} from './update-organisation-member-role.types';
+} from "./update-organisation-member-role.types";
 
 /**
  * Admin mutation to update organisation member role or transfer ownership.
@@ -61,7 +64,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
 
     if (!organisation) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Organisation not found',
+        message: "Organisation not found",
       });
     }
 
@@ -69,52 +72,52 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
 
     if (!member) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User is not a member of this organisation',
+        message: "User is not a member of this organisation",
       });
     }
 
     const currentOrganisationRole = getHighestOrganisationRoleInGroup(
-      member.organisationGroupMembers.flatMap((member) => member.group),
+      member.organisationGroupMembers.flatMap((member) => member.group)
     );
 
-    if (role === 'OWNER') {
+    if (role === "OWNER") {
       if (organisation.ownerUserId === userId) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'User is already the owner of this organisation',
+          message: "User is already the owner of this organisation",
         });
       }
 
       const currentMemberGroup = organisation.groups.find(
-        (group) => group.organisationRole === currentOrganisationRole,
+        (group) => group.organisationRole === currentOrganisationRole
       );
 
       const adminGroup = organisation.groups.find(
-        (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
+        (group) => group.organisationRole === OrganisationMemberRole.ADMIN
       );
 
       if (!currentMemberGroup) {
         ctx.logger.error({
-          message: '[CRITICAL]: Missing internal group',
+          message: "[CRITICAL]: Missing internal group",
           organisationId,
           userId,
           role: currentOrganisationRole,
         });
 
         throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message: 'Current member group not found',
+          message: "Current member group not found",
         });
       }
 
       if (!adminGroup) {
         ctx.logger.error({
-          message: '[CRITICAL]: Missing internal group',
+          message: "[CRITICAL]: Missing internal group",
           organisationId,
           userId,
-          targetRole: 'ADMIN',
+          targetRole: "ADMIN",
         });
 
         throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message: 'Admin group not found',
+          message: "Admin group not found",
         });
       }
 
@@ -140,7 +143,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
 
           await tx.organisationGroupMember.create({
             data: {
-              id: generateDatabaseId('group_member'),
+              id: generateDatabaseId("group_member"),
               organisationMemberId: member.id,
               groupId: adminGroup.id,
             },
@@ -155,47 +158,51 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
 
     if (currentOrganisationRole === targetRole) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'User already has this role',
+        message: "User already has this role",
       });
     }
 
-    if (userId === organisation.ownerUserId && targetRole !== OrganisationMemberRole.ADMIN) {
+    if (
+      userId === organisation.ownerUserId &&
+      targetRole !== OrganisationMemberRole.ADMIN
+    ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Organisation owner must be an admin. Transfer ownership first.',
+        message:
+          "Organisation owner must be an admin. Transfer ownership first.",
       });
     }
 
     const currentMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === currentOrganisationRole,
+      (group) => group.organisationRole === currentOrganisationRole
     );
 
     const newMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === targetRole,
+      (group) => group.organisationRole === targetRole
     );
 
     if (!currentMemberGroup) {
       ctx.logger.error({
-        message: '[CRITICAL]: Missing internal group',
+        message: "[CRITICAL]: Missing internal group",
         organisationId,
         userId,
         role: currentOrganisationRole,
       });
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Current member group not found',
+        message: "Current member group not found",
       });
     }
 
     if (!newMemberGroup) {
       ctx.logger.error({
-        message: '[CRITICAL]: Missing internal group',
+        message: "[CRITICAL]: Missing internal group",
         organisationId,
         userId,
         targetRole,
       });
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'New member group not found',
+        message: "New member group not found",
       });
     }
 
@@ -211,7 +218,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
 
       await tx.organisationGroupMember.create({
         data: {
-          id: generateDatabaseId('group_member'),
+          id: generateDatabaseId("group_member"),
           organisationMemberId: member.id,
           groupId: newMemberGroup.id,
         },

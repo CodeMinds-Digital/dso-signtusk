@@ -1,18 +1,18 @@
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType } from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { buildTeamWhereQuery } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { buildTeamWhereQuery } from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZUpdateTeamSettingsRequestSchema,
   ZUpdateTeamSettingsResponseSchema,
-} from './update-team-settings.types';
+} from "./update-team-settings.types";
 
 export const updateTeamSettingsRoute = authenticatedProcedure
   .input(ZUpdateTeamSettingsRequestSchema)
@@ -58,7 +58,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
     if (Object.values(data).length === 0) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'No settings to update',
+        message: "No settings to update",
       });
     }
 
@@ -69,7 +69,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       drawSignatureEnabled === false
     ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'At least one signature type must be enabled',
+        message: "At least one signature type must be enabled",
       });
     }
 
@@ -77,13 +77,13 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       where: buildTeamWhereQuery({
         teamId,
         userId: user.id,
-        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_TEAM"],
       }),
     });
 
     if (!team) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to update this team.',
+        message: "You do not have permission to update this team.",
       });
     }
 
@@ -98,7 +98,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
       if (!email) {
         throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Email not found',
+          message: "Email not found",
         });
       }
     }
@@ -107,7 +107,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId: team.organisationId,
         userId: user.id,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
       select: {
         type: true,
@@ -119,16 +119,18 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       },
     });
 
-    const isPersonalOrganisation = organisation?.type === OrganisationType.PERSONAL;
+    const isPersonalOrganisation =
+      organisation?.type === OrganisationType.PERSONAL;
     const currentIncludeSenderDetails =
       organisation?.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
-      includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
+      includeSenderDetails !== undefined &&
+      includeSenderDetails !== currentIncludeSenderDetails;
 
     if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Personal teams cannot update the sender details',
+        message: "Personal teams cannot update the sender details",
       });
     }
 
@@ -162,7 +164,9 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             emailReplyTo,
             // emailReplyToName,
             emailDocumentSettings:
-              emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+              emailDocumentSettings === null
+                ? Prisma.DbNull
+                : emailDocumentSettings,
 
             // AI features settings.
             aiFeaturesEnabled,

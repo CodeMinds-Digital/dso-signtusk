@@ -1,20 +1,20 @@
-import { OrganisationGroupType } from '@prisma/client';
+import { OrganisationGroupType } from "@signtusk/lib/constants/prisma-enums";
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getMemberOrganisationRole } from '@signtusk/lib/server-only/team/get-member-roles';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getMemberOrganisationRole } from "@signtusk/lib/server-only/team/get-member-roles";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
 import {
   buildOrganisationWhereQuery,
   isOrganisationRoleWithinUserHierarchy,
-} from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateOrganisationGroupRequestSchema,
   ZCreateOrganisationGroupResponseSchema,
-} from './create-organisation-group.types';
+} from "./create-organisation-group.types";
 
 export const createOrganisationGroupRoute = authenticatedProcedure
   // .meta(createOrganisationGroupMeta)
@@ -34,7 +34,7 @@ export const createOrganisationGroupRoute = authenticatedProcedure
       where: buildOrganisationWhereQuery({
         organisationId,
         userId: user.id,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
       include: {
         groups: true,
@@ -59,14 +59,19 @@ export const createOrganisationGroupRoute = authenticatedProcedure
     const currentUserOrganisationRole = await getMemberOrganisationRole({
       organisationId,
       reference: {
-        type: 'User',
+        type: "User",
         id: user.id,
       },
     });
 
-    if (!isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, organisationRole)) {
+    if (
+      !isOrganisationRoleWithinUserHierarchy(
+        currentUserOrganisationRole,
+        organisationRole
+      )
+    ) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You are not allowed to create this organisation group',
+        message: "You are not allowed to create this organisation group",
       });
     }
 
@@ -82,7 +87,7 @@ export const createOrganisationGroupRoute = authenticatedProcedure
     await prisma.$transaction(async (tx) => {
       const group = await tx.organisationGroup.create({
         data: {
-          id: generateDatabaseId('org_group'),
+          id: generateDatabaseId("org_group"),
           organisationId,
           name,
           type: OrganisationGroupType.CUSTOM,
@@ -92,7 +97,7 @@ export const createOrganisationGroupRoute = authenticatedProcedure
 
       await tx.organisationGroupMember.createMany({
         data: memberIds.map((memberId) => ({
-          id: generateDatabaseId('group_member'),
+          id: generateDatabaseId("group_member"),
           organisationMemberId: memberId,
           groupId: group.id,
         })),

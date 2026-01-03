@@ -1,15 +1,18 @@
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
-import { getHighestOrganisationRoleInGroup } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
+import { getHighestOrganisationRoleInGroup } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { adminProcedure } from '../trpc';
+import { adminProcedure } from "../trpc";
 import {
   ZPromoteMemberToOwnerRequestSchema,
   ZPromoteMemberToOwnerResponseSchema,
-} from './promote-member-to-owner.types';
+} from "./promote-member-to-owner.types";
 
 export const promoteMemberToOwnerRoute = adminProcedure
   .input(ZPromoteMemberToOwnerRequestSchema)
@@ -52,7 +55,7 @@ export const promoteMemberToOwnerRoute = adminProcedure
 
     if (!organisation) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Organisation not found',
+        message: "Organisation not found",
       });
     }
 
@@ -61,40 +64,40 @@ export const promoteMemberToOwnerRoute = adminProcedure
 
     if (!member) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User is not a member of this organisation',
+        message: "User is not a member of this organisation",
       });
     }
 
     // Verify the user is not already the owner
     if (organisation.ownerUserId === userId) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'User is already the owner of this organisation',
+        message: "User is already the owner of this organisation",
       });
     }
 
     // Get current organisation role
     const currentOrganisationRole = getHighestOrganisationRoleInGroup(
-      member.organisationGroupMembers.flatMap((member) => member.group),
+      member.organisationGroupMembers.flatMap((member) => member.group)
     );
 
     // Find the current and target organisation groups
     const currentMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === currentOrganisationRole,
+      (group) => group.organisationRole === currentOrganisationRole
     );
 
     const adminGroup = organisation.groups.find(
-      (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
+      (group) => group.organisationRole === OrganisationMemberRole.ADMIN
     );
 
     if (!currentMemberGroup) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Current member group not found',
+        message: "Current member group not found",
       });
     }
 
     if (!adminGroup) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Admin group not found',
+        message: "Admin group not found",
       });
     }
 
@@ -114,7 +117,7 @@ export const promoteMemberToOwnerRoute = adminProcedure
       if (currentOrganisationRole !== OrganisationMemberRole.ADMIN) {
         await tx.organisationGroupMember.create({
           data: {
-            id: generateDatabaseId('group_member'),
+            id: generateDatabaseId("group_member"),
             organisationMemberId: member.id,
             groupId: adminGroup.id,
           },

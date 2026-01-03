@@ -1,21 +1,17 @@
-import { z } from "zod";
+import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 
-// Browser-safe JSON value schema (equivalent to Prisma.JsonValue)
-// Using a simpler approach to avoid recursive type issues
-export const JsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
+export const JsonValueSchema: z.ZodType<Prisma.JsonValue> = z.lazy(() =>
   z.union([
     z.string(),
     z.number(),
     z.boolean(),
     z.literal(null),
-    z.record(
-      z.string(),
-      z.lazy(() => JsonValueSchema)
-    ),
+    z.record(z.string(), z.lazy(() => JsonValueSchema.optional())),
     z.array(z.lazy(() => JsonValueSchema)),
   ])
 );
 
 export type JsonValueType = z.infer<typeof JsonValueSchema>;
 
-export default JsonValueSchema;
+export default JsonValueSchema

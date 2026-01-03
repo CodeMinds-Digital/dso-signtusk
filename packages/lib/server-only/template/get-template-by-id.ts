@@ -1,11 +1,26 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import type { EnvelopeIdOptions } from "../../utils/envelope";
+import { mapSecondaryIdToTemplateId } from "../../utils/envelope";
+import { getEnvelopeWhereInput } from "../envelope/get-envelope-by-id";
+
+// Helper to convert Prisma Decimal to number
+const toNumber = (val: unknown): number => {
+  if (typeof val === "number") return val;
+  if (typeof val === "string") return parseFloat(val);
+  if (
+    val &&
+    typeof val === "object" &&
+    "toNumber" in val &&
+    typeof (val as { toNumber: () => number }).toNumber === "function"
+  ) {
+    return (val as { toNumber: () => number }).toNumber();
+  }
+  return 0;
+};
 
 export type GetTemplateByIdOptions = {
   id: EnvelopeIdOptions;
@@ -13,7 +28,11 @@ export type GetTemplateByIdOptions = {
   teamId: number;
 };
 
-export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
+export const getTemplateById = async ({
+  id,
+  userId,
+  teamId,
+}: GetTemplateByIdOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
@@ -48,7 +67,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template not found',
+      message: "Template not found",
     });
   }
 
@@ -56,7 +75,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
 
   if (!firstTemplateDocumentData) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template document data not found',
+      message: "Template document data not found",
     });
   }
 
@@ -80,6 +99,10 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
     },
     fields: envelope.fields.map((field) => ({
       ...field,
+      positionX: toNumber(field.positionX),
+      positionY: toNumber(field.positionY),
+      width: toNumber(field.width),
+      height: toNumber(field.height),
       documentId: null,
       templateId: legacyTemplateId,
     })),

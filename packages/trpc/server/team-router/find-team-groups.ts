@@ -1,23 +1,34 @@
-import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Prisma } from '@prisma/client';
-import { unique } from 'remeda';
+import type {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
+import { unique } from "remeda";
 
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildTeamWhereQuery } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildTeamWhereQuery } from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindTeamGroupsRequestSchema,
   ZFindTeamGroupsResponseSchema,
-} from './find-team-groups.types';
+} from "./find-team-groups.types";
 
 export const findTeamGroupsRoute = authenticatedProcedure
   // .meta(getTeamGroupsMeta)
   .input(ZFindTeamGroupsRequestSchema)
   .output(ZFindTeamGroupsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { teamId, types, query, page, perPage, teamGroupId, organisationRoles } = input;
+    const {
+      teamId,
+      types,
+      query,
+      page,
+      perPage,
+      teamGroupId,
+      organisationRoles,
+    } = input;
     const { user } = ctx;
 
     ctx.logger.info({
@@ -64,7 +75,8 @@ export const findTeamGroups = async ({
     team: buildTeamWhereQuery({ teamId, userId }),
     id: teamGroupId,
     organisationGroup: {
-      organisationRole: organisationRoles.length > 0 ? { in: organisationRoles } : undefined,
+      organisationRole:
+        organisationRoles.length > 0 ? { in: organisationRoles } : undefined,
       type:
         types.length > 0
           ? {
@@ -87,7 +99,7 @@ export const findTeamGroups = async ({
       take: perPage,
       orderBy: {
         organisationGroup: {
-          name: 'desc',
+          name: "desc",
         },
       },
       select: {
@@ -129,16 +141,18 @@ export const findTeamGroups = async ({
     id: group.id,
     teamId: group.teamId,
     teamRole: group.teamRole,
-    name: group.organisationGroup.name || '',
+    name: group.organisationGroup.name || "",
     organisationGroupId: group.organisationGroup.id,
     organisationGroupType: group.organisationGroup.type,
-    members: group.organisationGroup.organisationGroupMembers.map(({ organisationMember }) => ({
-      id: organisationMember.id,
-      userId: organisationMember.user.id,
-      name: organisationMember.user.name || '',
-      email: organisationMember.user.email,
-      avatarImageId: organisationMember.user.avatarImageId,
-    })),
+    members: group.organisationGroup.organisationGroupMembers.map(
+      ({ organisationMember }) => ({
+        id: organisationMember.id,
+        userId: organisationMember.user.id,
+        name: organisationMember.user.name || "",
+        email: organisationMember.user.email,
+        avatarImageId: organisationMember.user.avatarImageId,
+      })
+    ),
   }));
 
   return {

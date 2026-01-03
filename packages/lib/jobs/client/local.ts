@@ -1,20 +1,20 @@
-import { sha256 } from '@noble/hashes/sha256';
-import { BackgroundJobStatus, Prisma } from '@prisma/client';
-import type { Context as HonoContext } from 'hono';
+import { sha256 } from "@noble/hashes/sha256";
+import type { Context as HonoContext } from "hono";
 
-import { prisma } from '@signtusk/prisma';
+import { BackgroundJobStatus } from "@signtusk/lib/constants/prisma-enums";
+import { Prisma, prisma } from "@signtusk/prisma";
 
-import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
-import { sign } from '../../server-only/crypto/sign';
-import { verify } from '../../server-only/crypto/verify';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from "../../constants/app";
+import { sign } from "../../server-only/crypto/sign";
+import { verify } from "../../server-only/crypto/verify";
 import {
+  ZSimpleTriggerJobOptionsSchema,
   type JobDefinition,
   type JobRunIO,
   type SimpleTriggerJobOptions,
-  ZSimpleTriggerJobOptionsSchema,
-} from './_internal/job';
-import type { Json } from './_internal/json';
-import { BaseJobProvider } from './base';
+} from "./_internal/job";
+import type { Json } from "./_internal/json";
+import { BaseJobProvider } from "./base";
 
 export class LocalJobProvider extends BaseJobProvider {
   private static _instance: LocalJobProvider;
@@ -42,7 +42,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
     const eligibleJobs = Object.values(this._jobDefinitions).filter(
-      (job) => job.trigger.name === options.name,
+      (job) => job.trigger.name === options.name
     );
 
     await Promise.all(
@@ -65,7 +65,7 @@ export class LocalJobProvider extends BaseJobProvider {
           data: options,
           isRetry: false,
         });
-      }),
+      })
     );
   }
 
@@ -73,13 +73,13 @@ export class LocalJobProvider extends BaseJobProvider {
     return async (c: HonoContext) => {
       const req = c.req;
 
-      if (req.method !== 'POST') {
-        return c.text('Method not allowed', 405);
+      if (req.method !== "POST") {
+        return c.text("Method not allowed", 405);
       }
 
-      const jobId = req.header('x-job-id');
-      const signature = req.header('x-job-signature');
-      const isRetry = req.header('x-job-retry') !== undefined;
+      const jobId = req.header("x-job-id");
+      const signature = req.header("x-job-signature");
+      const isRetry = req.header("x-job-retry") !== undefined;
 
       const options = await req
         .json()
@@ -89,42 +89,45 @@ export class LocalJobProvider extends BaseJobProvider {
         .catch(() => null);
 
       if (!options) {
-        return c.text('Bad request', 400);
+        return c.text("Bad request", 400);
       }
 
       const definition = this._jobDefinitions[options.name];
 
       if (
-        typeof jobId !== 'string' ||
-        typeof signature !== 'string' ||
-        typeof options !== 'object'
+        typeof jobId !== "string" ||
+        typeof signature !== "string" ||
+        typeof options !== "object"
       ) {
-        return c.text('Bad request', 400);
+        return c.text("Bad request", 400);
       }
 
       if (!definition) {
-        return c.text('Job not found', 404);
+        return c.text("Job not found", 404);
       }
 
       if (definition && !definition.enabled) {
-        console.log('Attempted to trigger a disabled job', options.name);
+        console.log("Attempted to trigger a disabled job", options.name);
 
-        return c.text('Job not found', 404);
+        return c.text("Job not found", 404);
       }
 
       if (!signature || !verify(options, signature)) {
-        return c.text('Unauthorized', 401);
+        return c.text("Unauthorized", 401);
       }
 
       if (definition.trigger.schema) {
         const result = definition.trigger.schema.safeParse(options.payload);
 
         if (!result.success) {
-          return c.text('Bad request', 400);
+          return c.text("Bad request", 400);
         }
       }
 
-      console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
+      console.log(
+        `[JOBS]: Triggering job ${options.name} with payload`,
+        options.payload
+      );
 
       let backgroundJob = await prisma.backgroundJob
         .update({
@@ -143,7 +146,7 @@ export class LocalJobProvider extends BaseJobProvider {
         .catch(() => null);
 
       if (!backgroundJob) {
-        return c.text('Job not found', 404);
+        return c.text("Job not found", 404);
       }
 
       try {
@@ -165,7 +168,8 @@ export class LocalJobProvider extends BaseJobProvider {
       } catch (error) {
         console.log(`[JOBS]: Job ${options.name} failed`, error);
 
-        const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
+        const taskHasExceededRetries =
+          error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
           backgroundJob.retried >= backgroundJob.maxRetries &&
           !(error instanceof BackgroundTaskFailedError);
@@ -182,7 +186,7 @@ export class LocalJobProvider extends BaseJobProvider {
             },
           });
 
-          return c.text('Task exceeded retries', 500);
+          return c.text("Task exceeded retries", 500);
         }
 
         backgroundJob = await prisma.backgroundJob.update({
@@ -203,7 +207,7 @@ export class LocalJobProvider extends BaseJobProvider {
         });
       }
 
-      return c.text('OK', 200);
+      return c.text("OK", 200);
     };
   }
 
@@ -219,19 +223,19 @@ export class LocalJobProvider extends BaseJobProvider {
     const signature = sign(data);
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-Job-Id': jobId,
-      'X-Job-Signature': signature,
+      "Content-Type": "application/json",
+      "X-Job-Id": jobId,
+      "X-Job-Signature": signature,
     };
 
     if (isRetry) {
-      headers['X-Job-Retry'] = '1';
+      headers["X-Job-Retry"] = "1";
     }
 
-    console.log('Submitting job to endpoint:', endpoint);
+    console.log("Submitting job to endpoint:", endpoint);
     await Promise.race([
       fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(data),
         headers,
       }).catch(() => null),
@@ -243,8 +247,11 @@ export class LocalJobProvider extends BaseJobProvider {
 
   private createJobRunIO(jobId: string): JobRunIO {
     return {
-      runTask: async <T extends void | Json>(cacheKey: string, callback: () => Promise<T>) => {
-        const hashedKey = Buffer.from(sha256(cacheKey)).toString('hex');
+      runTask: async <T extends void | Json>(
+        cacheKey: string,
+        callback: () => Promise<T>
+      ) => {
+        const hashedKey = Buffer.from(sha256(cacheKey)).toString("hex");
 
         let task = await prisma.backgroundJobTask.findFirst({
           where: {
@@ -270,7 +277,7 @@ export class LocalJobProvider extends BaseJobProvider {
         }
 
         if (task.retried >= 3) {
-          throw new BackgroundTaskExceededRetriesError('Task exceeded retries');
+          throw new BackgroundTaskExceededRetriesError("Task exceeded retries");
         }
 
         try {
@@ -305,7 +312,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
           console.log(`[JOBS:${task.id}] Task failed`, err);
 
-          throw new BackgroundTaskFailedError('Task failed');
+          throw new BackgroundTaskFailedError("Task failed");
         }
       },
       triggerJob: async (_cacheKey, payload) => await this.triggerJob(payload),
@@ -318,7 +325,7 @@ export class LocalJobProvider extends BaseJobProvider {
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       wait: async () => {
-        throw new Error('Not implemented');
+        throw new Error("Not implemented");
       },
     };
   }
@@ -327,13 +334,13 @@ export class LocalJobProvider extends BaseJobProvider {
 class BackgroundTaskFailedError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'BackgroundTaskFailedError';
+    this.name = "BackgroundTaskFailedError";
   }
 }
 
 class BackgroundTaskExceededRetriesError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'BackgroundTaskExceededRetriesError';
+    this.name = "BackgroundTaskExceededRetriesError";
   }
 }

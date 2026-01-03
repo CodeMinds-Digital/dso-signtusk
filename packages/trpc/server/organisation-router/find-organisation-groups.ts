@@ -1,24 +1,34 @@
-import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+} from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindOrganisationGroupsRequestSchema,
   ZFindOrganisationGroupsResponseSchema,
-} from './find-organisation-groups.types';
+} from "./find-organisation-groups.types";
 
 export const findOrganisationGroupsRoute = authenticatedProcedure
   // .meta(findOrganisationGroupsMeta)
   .input(ZFindOrganisationGroupsRequestSchema)
   .output(ZFindOrganisationGroupsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { organisationId, types, query, page, perPage, organisationGroupId, organisationRoles } =
-      input;
+    const {
+      organisationId,
+      types,
+      query,
+      page,
+      perPage,
+      organisationGroupId,
+      organisationRoles,
+    } = input;
     const { user } = ctx;
 
     ctx.logger.info({
@@ -98,7 +108,7 @@ export const findOrganisationGroups = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        name: 'desc',
+        name: "desc",
       },
       select: {
         id: true,
@@ -154,7 +164,7 @@ export const findOrganisationGroups = async ({
     members: group.organisationGroupMembers.map(({ organisationMember }) => ({
       id: organisationMember.id,
       userId: organisationMember.user.id,
-      name: organisationMember.user.name || '',
+      name: organisationMember.user.name || "",
       email: organisationMember.user.email,
       avatarImageId: organisationMember.user.avatarImageId,
     })),

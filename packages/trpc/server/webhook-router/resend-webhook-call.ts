@@ -1,16 +1,16 @@
-import { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { WebhookCallStatus } from "@signtusk/lib/constants/prisma-enums";
+import { Prisma } from "@signtusk/prisma";
 
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildTeamWhereQuery } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { buildTeamWhereQuery } from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZResendWebhookCallRequestSchema,
   ZResendWebhookCallResponseSchema,
-} from './resend-webhook-call.types';
+} from "./resend-webhook-call.types";
 
 export const resendWebhookCallRoute = authenticatedProcedure
   .input(ZResendWebhookCallRequestSchema)
@@ -48,17 +48,18 @@ export const resendWebhookCallRoute = authenticatedProcedure
 
     // Note: This is duplicated in `execute-webhook.handler.ts`.
     const response = await fetch(webhookCall.url, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(webhookCall.requestBody),
       headers: {
-        'Content-Type': 'application/json',
-        'X-Documenso-Secret': webhook.secret ?? '',
+        "Content-Type": "application/json",
+        "X-Documenso-Secret": webhook.secret ?? "",
       },
     });
 
     const body = await response.text();
 
-    let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput = Prisma.JsonNull;
+    let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput =
+      Prisma.JsonNull;
 
     try {
       responseBody = JSON.parse(body);
@@ -71,7 +72,9 @@ export const resendWebhookCallRoute = authenticatedProcedure
         id: webhookCall.id,
       },
       data: {
-        status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
+        status: response.ok
+          ? WebhookCallStatus.SUCCESS
+          : WebhookCallStatus.FAILED,
         responseCode: response.status,
         responseBody,
         responseHeaders: (() => {

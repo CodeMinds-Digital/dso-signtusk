@@ -75,13 +75,8 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     );
   }
 
-  const fields = template.fields.map((field) => ({
-    ...field,
-    positionX: field.positionX.toNumber(),
-    positionY: field.positionY.toNumber(),
-    width: field.width.toNumber(),
-    height: field.height.toNumber(),
-  }));
+  // Fields already have decimal values converted to numbers by getTemplateById
+  const fields = template.fields;
 
   return {
     token,

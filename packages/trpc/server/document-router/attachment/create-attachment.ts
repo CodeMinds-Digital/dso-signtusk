@@ -1,22 +1,22 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { createAttachment } from '@signtusk/lib/server-only/envelope-attachment/create-attachment';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
+import { createAttachment } from "@signtusk/lib/server-only/envelope-attachment/create-attachment";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
 
-import { authenticatedProcedure } from '../../trpc';
+import { authenticatedProcedure } from "../../trpc";
 import {
   ZCreateAttachmentRequestSchema,
   ZCreateAttachmentResponseSchema,
-} from './create-attachment.types';
+} from "./create-attachment.types";
 
 export const createAttachmentRoute = authenticatedProcedure
   .meta({
     openapi: {
-      method: 'POST',
-      path: '/document/attachment/create',
-      summary: 'Create attachment',
-      description: 'Create a new attachment for a document',
-      tags: ['Document'],
+      method: "POST",
+      path: "/document/attachment/create",
+      summary: "Create attachment",
+      description: "Create a new attachment for a document",
+      tags: ["Document"],
     },
   })
   .input(ZCreateAttachmentRequestSchema)
@@ -33,7 +33,7 @@ export const createAttachmentRoute = authenticatedProcedure
 
     const envelope = await getEnvelopeById({
       id: {
-        type: 'documentId',
+        type: "documentId",
         id: documentId,
       },
       userId,

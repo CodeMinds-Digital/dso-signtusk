@@ -1,18 +1,18 @@
-import { EnvelopeType } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
-import { DateTime } from 'luxon';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { TRPCError } from "@trpc/server";
+import { DateTime } from "luxon";
 
-import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from '@signtusk/lib/server-only/2fa/email/constants';
-import { send2FATokenEmail } from '@signtusk/lib/server-only/2fa/email/send-2fa-token-email';
-import { DocumentAuth } from '@signtusk/lib/types/document-auth';
-import { extractDocumentAuthMethods } from '@signtusk/lib/utils/document-auth';
-import { prisma } from '@signtusk/prisma';
+import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from "@signtusk/lib/server-only/2fa/email/constants";
+import { send2FATokenEmail } from "@signtusk/lib/server-only/2fa/email/send-2fa-token-email";
+import { DocumentAuth } from "@signtusk/lib/types/document-auth";
+import { extractDocumentAuthMethods } from "@signtusk/lib/utils/document-auth";
+import { prisma } from "@signtusk/prisma";
 
-import { procedure } from '../trpc';
+import { procedure } from "../trpc";
 import {
   ZAccessAuthRequest2FAEmailRequestSchema,
   ZAccessAuthRequest2FAEmailResponseSchema,
-} from './access-auth-request-2fa-email.types';
+} from "./access-auth-request-2fa-email.types";
 
 export const accessAuthRequest2FAEmailRoute = procedure
   .input(ZAccessAuthRequest2FAEmailRequestSchema)
@@ -44,8 +44,8 @@ export const accessAuthRequest2FAEmailRoute = procedure
 
       if (!envelope) {
         throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Document not found',
+          code: "NOT_FOUND",
+          message: "Document not found",
         });
       }
 
@@ -58,8 +58,8 @@ export const accessAuthRequest2FAEmailRoute = procedure
 
       if (!derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: '2FA is not required for this document',
+          code: "BAD_REQUEST",
+          message: "2FA is not required for this document",
         });
       }
 
@@ -70,7 +70,9 @@ export const accessAuthRequest2FAEmailRoute = procedure
       //   });
       // }
 
-      const expiresAt = DateTime.now().plus({ minutes: TWO_FACTOR_EMAIL_EXPIRATION_MINUTES });
+      const expiresAt = DateTime.now().plus({
+        minutes: TWO_FACTOR_EMAIL_EXPIRATION_MINUTES,
+      });
 
       await send2FATokenEmail({
         token,
@@ -82,15 +84,15 @@ export const accessAuthRequest2FAEmailRoute = procedure
         expiresAt: expiresAt.toJSDate(),
       };
     } catch (error) {
-      console.error('Error sending access auth 2FA email:', error);
+      console.error("Error sending access auth 2FA email:", error);
 
       if (error instanceof TRPCError) {
         throw error;
       }
 
       throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to send 2FA email',
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to send 2FA email",
       });
     }
   });

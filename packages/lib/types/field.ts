@@ -1,14 +1,13 @@
 import { FieldType } from "@signtusk/lib/constants/prisma-enums";
 import { z } from "zod";
 
-import { FieldSchema } from "@signtusk/prisma/generated/zod/modelSchema/FieldSchema";
-
 import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
   ZDropdownFieldMeta,
   ZEmailFieldMeta,
+  ZFieldMetaNotOptionalSchema,
   ZInitialsFieldMeta,
   ZNameFieldMeta,
   ZNumberFieldMeta,
@@ -16,6 +15,59 @@ import {
   ZSignatureFieldMeta,
   ZTextFieldMeta,
 } from "./field-meta";
+
+// Browser-safe FieldType schema (mirrors the generated one but without @prisma/client)
+const FieldTypeSchema = z.enum([
+  "SIGNATURE",
+  "FREE_SIGNATURE",
+  "INITIALS",
+  "NAME",
+  "EMAIL",
+  "DATE",
+  "TEXT",
+  "NUMBER",
+  "RADIO",
+  "CHECKBOX",
+  "DROPDOWN",
+]);
+
+// Browser-safe decimal schema - accepts string, number, or Decimal-like objects and outputs number
+// This handles Prisma Decimal objects on the server and plain numbers on the client
+const BrowserSafeDecimalSchema = z.preprocess((val) => {
+  if (typeof val === "number") return val;
+  if (typeof val === "string") return parseFloat(val);
+  // Handle Prisma Decimal objects
+  if (
+    val &&
+    typeof val === "object" &&
+    "toNumber" in val &&
+    typeof (val as { toNumber: () => number }).toNumber === "function"
+  ) {
+    return (val as { toNumber: () => number }).toNumber();
+  }
+  return val;
+}, z.number());
+
+/**
+ * Browser-safe FieldSchema that doesn't import from @prisma/client.
+ * This replaces the generated FieldSchema for client-side code.
+ */
+const BrowserSafeFieldSchema = z.object({
+  type: FieldTypeSchema,
+  id: z.number(),
+  secondaryId: z.string(),
+  envelopeId: z.string(),
+  envelopeItemId: z.string(),
+  recipientId: z.number(),
+  page: z.number(),
+  positionX: BrowserSafeDecimalSchema,
+  positionY: BrowserSafeDecimalSchema,
+  width: BrowserSafeDecimalSchema,
+  height: BrowserSafeDecimalSchema,
+  customText: z.string(),
+  inserted: z.boolean(),
+  fieldMeta: ZFieldMetaNotOptionalSchema.nullable(),
+});
 
 /**
  * The full field response schema.
@@ -29,7 +81,7 @@ import {
  * - ./documents.ts
  * - ./templates.ts
  */
-export const ZFieldSchema = FieldSchema.pick({
+export const ZFieldSchema = BrowserSafeFieldSchema.pick({
   envelopeId: true,
   envelopeItemId: true,
   type: true,
@@ -110,18 +162,8 @@ export const ZClampedFieldHeightSchema = z
 
 // ---------------------------------------------
 
-// Browser-safe decimal schema - accepts string or number and coerces to number
-const DecimalSchema = z.preprocess(
-  (val) => (typeof val === "string" ? parseFloat(val) : val),
-  z.number()
-);
-
-export const BaseFieldSchemaUsingNumbers = ZFieldSchema.extend({
-  positionX: DecimalSchema,
-  positionY: DecimalSchema,
-  width: DecimalSchema,
-  height: DecimalSchema,
-});
+// BaseFieldSchemaUsingNumbers - ZFieldSchema already uses browser-safe decimal handling
+export const BaseFieldSchemaUsingNumbers = ZFieldSchema;
 
 export const ZFieldTextSchema = BaseFieldSchemaUsingNumbers.extend({
   type: z.literal(FieldType.TEXT),

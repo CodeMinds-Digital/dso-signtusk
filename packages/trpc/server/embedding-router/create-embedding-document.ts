@@ -1,15 +1,15 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { mapSecondaryIdToDocumentId } from '@signtusk/lib/utils/envelope';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { verifyEmbeddingPresignToken } from "@signtusk/lib/server-only/embedding-presign/verify-embedding-presign-token";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { mapSecondaryIdToDocumentId } from "@signtusk/lib/utils/envelope";
 
-import { procedure } from '../trpc';
+import { procedure } from "../trpc";
 import {
   ZCreateEmbeddingDocumentRequestSchema,
   ZCreateEmbeddingDocumentResponseSchema,
-} from './create-embedding-document.types';
+} from "./create-embedding-document.types";
 
 // Todo: Envelopes - This only supports V1 documents/templates.
 export const createEmbeddingDocumentRoute = procedure
@@ -17,19 +17,21 @@ export const createEmbeddingDocumentRoute = procedure
   .output(ZCreateEmbeddingDocumentResponseSchema)
   .mutation(async ({ input, ctx: { req, metadata } }) => {
     try {
-      const authorizationHeader = req.headers.get('authorization');
+      const authorizationHeader = req.headers.get("authorization");
 
-      const [presignToken] = (authorizationHeader || '')
-        .split('Bearer ')
+      const [presignToken] = (authorizationHeader || "")
+        .split("Bearer ")
         .filter((s) => s.length > 0);
 
       if (!presignToken) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'No presign token provided',
+          message: "No presign token provided",
         });
       }
 
-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
+      const apiToken = await verifyEmbeddingPresignToken({
+        token: presignToken,
+      });
 
       const { title, documentDataId, externalId, recipients, meta } = input;
 
@@ -63,7 +65,7 @@ export const createEmbeddingDocumentRoute = procedure
 
       if (!envelope.id) {
         throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message: 'Failed to create document: missing document ID',
+          message: "Failed to create document: missing document ID",
         });
       }
 
@@ -78,7 +80,7 @@ export const createEmbeddingDocumentRoute = procedure
       }
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to create document',
+        message: "Failed to create document",
       });
     }
   });

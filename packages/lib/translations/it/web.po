@@ -2551,6 +2551,7 @@ msgstr "Configura il modello"
 msgid "Configure Template"
 msgstr "Configura Modello"
 
+#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type] )
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -3015,7 +3016,7 @@ msgstr "Attualmente il marchio può essere configurato solo per i piani Team e s
 msgid "Currently email domains can only be configured for Platform and above plans."
 msgstr "Attualmente i domini email possono essere configurati solo per i piani Platform e superiori."
 
-#. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
+#. placeholder {0}: ( field.value.size / (1024 * 1024) ).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Custom {0} MB file"
 msgstr "File personalizzato da {0} MB"
@@ -5341,7 +5342,7 @@ msgstr "Unisciti alla nostra comunità su <0>Discord</0> per supporto e discussi
 msgid "Joined"
 msgstr "Iscritto"
 
-#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
+#. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: "short", })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Iscritto a {0}"
@@ -9488,7 +9489,7 @@ msgid "To mark this document as viewed, you need to be logged in."
 msgstr "Per segnare questo documento come visualizzato, devi essere loggato."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
+#. placeholder {0}: emptyCheckboxFields.length > 0 ? "Checkbox" : emptyRadioFields.length > 0 ? "Radio" : "Select"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "To proceed further, please set at least one value for the {0} field."

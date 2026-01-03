@@ -1,16 +1,20 @@
-import { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import {
+  WebhookCallStatus,
+  WebhookTriggerEvents,
+} from "@signtusk/lib/constants/prisma-enums";
+import type { Prisma } from "@signtusk/prisma";
 
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildTeamWhereQuery } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildTeamWhereQuery } from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindWebhookCallsRequestSchema,
   ZFindWebhookCallsResponseSchema,
-} from './find-webhook-calls.types';
+} from "./find-webhook-calls.types";
 
 export const findWebhookCallsRoute = authenticatedProcedure
   .input(ZFindWebhookCallsRequestSchema)
@@ -52,7 +56,7 @@ export const findWebhookCalls = async ({
   page = 1,
   perPage = 20,
   events,
-  query = '',
+  query = "",
   status,
 }: FindWebhookCallsOptions) => {
   const webhook = await prisma.webhook.findFirst({
@@ -88,7 +92,7 @@ export const findWebhookCalls = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     }),
     prisma.webhookCall.count({

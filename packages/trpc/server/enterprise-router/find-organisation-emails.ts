@@ -1,15 +1,15 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from "@signtusk/prisma";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZFindOrganisationEmailsRequestSchema,
   ZFindOrganisationEmailsResponseSchema,
-} from './find-organisation-emails.types';
+} from "./find-organisation-emails.types";
 
 export const findOrganisationEmailsRoute = authenticatedProcedure
   .input(ZFindOrganisationEmailsRequestSchema)
@@ -77,7 +77,7 @@ export const findOrganisationEmails = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,
