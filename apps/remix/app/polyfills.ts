@@ -155,6 +155,21 @@ if (typeof (globalThis as any).Buffer === "undefined") {
 
       return result;
     }
+
+    static byteLength(string: string, encoding?: string): number {
+      const enc = encoding || "utf8";
+      if (enc === "base64") {
+        // Remove padding and calculate length
+        const cleanString = string.replace(/=/g, "");
+        return Math.floor((cleanString.length * 3) / 4);
+      } else if (enc === "hex") {
+        return string.length / 2;
+      } else {
+        // utf8 or other
+        const encoder = new TextEncoder();
+        return encoder.encode(string).length;
+      }
+    }
   }
 
   // Set up Buffer globally

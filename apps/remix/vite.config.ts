@@ -98,6 +98,35 @@ export default defineConfig({
           src: cMapsDir,
           dest: "static",
         },
+        {
+          src: path.resolve(__dirname, "../../packages/assets/fonts"),
+          dest: "fonts",
+        },
+        {
+          src: path.resolve(
+            __dirname,
+            "../../packages/assets/site.webmanifest"
+          ),
+          dest: "",
+        },
+        {
+          src: path.resolve(__dirname, "../../packages/assets/favicon-*.png"),
+          dest: "",
+        },
+        {
+          src: path.resolve(
+            __dirname,
+            "../../packages/assets/apple-touch-icon.png"
+          ),
+          dest: "",
+        },
+        {
+          src: path.resolve(
+            __dirname,
+            "../../packages/assets/android-chrome-*.png"
+          ),
+          dest: "",
+        },
       ],
     }),
     reactRouter(),

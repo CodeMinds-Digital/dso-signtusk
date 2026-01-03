@@ -1,33 +1,36 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
-import { KeyRoundIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { FaIdCardClip } from 'react-icons/fa6';
-import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import {
+  browserSupportsWebAuthn,
+  startAuthentication,
+} from "@simplewebauthn/browser";
+import { KeyRoundIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { FaIdCardClip } from "react-icons/fa6";
+import { FcGoogle } from "react-icons/fc";
+import { Link, useNavigate } from "react-router";
+import { match } from "ts-pattern";
+import { z } from "zod";
 
-import { authClient } from '@signtusk/auth/client';
-import { AuthenticationErrorCode } from '@signtusk/auth/server/lib/errors/error-codes';
-import { AppError } from '@signtusk/lib/errors/app-error';
-import { trpc } from '@signtusk/trpc/react';
-import { ZCurrentPasswordSchema } from '@signtusk/trpc/server/auth-router/schema';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
+import { authClient } from "@signtusk/auth/client";
+import { AuthenticationErrorCode } from "@signtusk/auth/server/lib/errors/error-codes";
+import { AppError } from "@signtusk/lib/errors/app-error";
+import { trpc } from "@signtusk/trpc/react";
+import { ZCurrentPasswordSchema } from "@signtusk/trpc/server/auth-router/schema";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -35,11 +38,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { PasswordInput } from '@signtusk/ui/primitives/password-input';
-import { PinInput, PinInputGroup, PinInputSlot } from '@signtusk/ui/primitives/pin-input';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { PasswordInput } from "@signtusk/ui/primitives/password-input";
+import {
+  PinInput,
+  PinInputGroup,
+  PinInputSlot,
+} from "@signtusk/ui/primitives/pin-input";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
 const CommonErrorMessages: Record<string, MessageDescriptor> = {
   [AuthenticationErrorCode.AccountDisabled]: msg`This account has been disabled. Please contact support.`,
@@ -55,7 +62,7 @@ const handleFallbackErrorMessages = (code: string) => {
   return message;
 };
 
-const LOGIN_REDIRECT_PATH = '/';
+const LOGIN_REDIRECT_PATH = "/";
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
@@ -90,21 +97,23 @@ export const SignInForm = ({
 
   const navigate = useNavigate();
 
-  const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
-    useState(false);
+  const [
+    isTwoFactorAuthenticationDialogOpen,
+    setIsTwoFactorAuthenticationDialogOpen,
+  ] = useState(false);
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
-  const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
-    'totp' | 'backup'
-  >('totp');
+  const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] =
+    useState<"totp" | "backup">("totp");
 
-  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+  const hasSocialAuthEnabled =
+    isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
   const redirectPath = useMemo(() => {
     // Handle SSR
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return LOGIN_REDIRECT_PATH;
     }
 
@@ -123,10 +132,10 @@ export const SignInForm = ({
 
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: initialEmail ?? '',
-      password: '',
-      totpCode: '',
-      backupCode: '',
+      email: initialEmail ?? "",
+      password: "",
+      totpCode: "",
+      backupCode: "",
     },
     resolver: zodResolver(ZSignInFormSchema),
   });
@@ -134,21 +143,21 @@ export const SignInForm = ({
   const isSubmitting = form.formState.isSubmitting;
 
   const onCloseTwoFactorAuthenticationDialog = () => {
-    form.setValue('totpCode', '');
-    form.setValue('backupCode', '');
+    form.setValue("totpCode", "");
+    form.setValue("backupCode", "");
 
     setIsTwoFactorAuthenticationDialogOpen(false);
   };
 
   const onToggleTwoFactorAuthenticationMethodClick = () => {
-    const method = twoFactorAuthenticationMethod === 'totp' ? 'backup' : 'totp';
+    const method = twoFactorAuthenticationMethod === "totp" ? "backup" : "totp";
 
-    if (method === 'totp') {
-      form.setValue('backupCode', '');
+    if (method === "totp") {
+      form.setValue("backupCode", "");
     }
 
-    if (method === 'backup') {
-      form.setValue('totpCode', '');
+    if (method === "backup") {
+      form.setValue("totpCode", "");
     }
 
     setTwoFactorAuthenticationMethod(method);
@@ -160,7 +169,7 @@ export const SignInForm = ({
         title: _(msg`Not supported`),
         description: _(msg`Passkeys are not supported on this browser`),
         duration: 10000,
-        variant: 'destructive',
+        variant: "destructive",
       });
 
       return;
@@ -182,7 +191,7 @@ export const SignInForm = ({
       setIsPasskeyLoading(false);
 
       // Error from library.
-      if (err instanceof Error && err.name === 'NotAllowedError') {
+      if (err instanceof Error && err.name === "NotAllowedError") {
         return;
       }
 
@@ -192,11 +201,11 @@ export const SignInForm = ({
         .with(
           AuthenticationErrorCode.NotSetup,
           () =>
-            msg`This passkey is not configured for this application. Please login and add one in the user settings.`,
+            msg`This passkey is not configured for this application. Please login and add one in the user settings.`
         )
         .with(
           AuthenticationErrorCode.SessionExpired,
-          () => msg`This session has expired. Please try again.`,
+          () => msg`This session has expired. Please try again.`
         )
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
@@ -204,12 +213,17 @@ export const SignInForm = ({
         title: _(msg`Something went wrong`),
         description: _(errorMessage),
         duration: 10000,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
-  const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
+  const onFormSubmit = async ({
+    email,
+    password,
+    totpCode,
+    backupCode,
+  }: TSignInFormSchema) => {
     try {
       await authClient.emailPassword.signIn({
         email,
@@ -223,18 +237,18 @@ export const SignInForm = ({
 
       const error = AppError.parseError(err);
 
-      if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
+      if (error.code === "TWO_FACTOR_MISSING_CREDENTIALS") {
         setIsTwoFactorAuthenticationDialogOpen(true);
         return;
       }
 
       if (error.code === AuthenticationErrorCode.UnverifiedEmail) {
-        await navigate('/unverified-account');
+        await navigate("/unverified-account");
 
         toast({
           title: _(msg`Unable to sign in`),
           description: _(
-            msg`This account has not been verified. Please verify your account before signing in.`,
+            msg`This account has not been verified. Please verify your account before signing in.`
           ),
         });
 
@@ -244,18 +258,18 @@ export const SignInForm = ({
       const errorMessage = match(error.code)
         .with(
           AuthenticationErrorCode.InvalidCredentials,
-          () => msg`The email or password provided is incorrect.`,
+          () => msg`The email or password provided is incorrect.`
         )
         .with(
           AuthenticationErrorCode.InvalidTwoFactorCode,
-          () => msg`The two-factor authentication code provided is incorrect.`,
+          () => msg`The two-factor authentication code provided is incorrect.`
         )
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
         title: _(msg`Unable to sign in`),
         description: _(errorMessage),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -269,9 +283,9 @@ export const SignInForm = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
+          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -285,9 +299,9 @@ export const SignInForm = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
+          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -301,9 +315,9 @@ export const SignInForm = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
+          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`
         ),
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -313,19 +327,19 @@ export const SignInForm = ({
 
     const params = new URLSearchParams(hash);
 
-    const email = params.get('email');
+    const email = params.get("email");
 
     if (email) {
-      form.setValue('email', email);
+      form.setValue("email", email);
     }
 
-    setIsEmbeddedRedirect(params.get('embedded') === 'true');
+    setIsEmbeddedRedirect(params.get("embedded") === "true");
   }, [form]);
 
   return (
     <Form {...form}>
       <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
+        className={cn("flex w-full flex-col gap-y-4", className)}
         onSubmit={form.handleSubmit(onFormSubmit)}
       >
         <fieldset
@@ -360,7 +374,7 @@ export const SignInForm = ({
                 </FormLabel>
 
                 <FormControl>
-                  <PasswordInput {...field} />
+                  <PasswordInput {...field} autoComplete="current-password" />
                 </FormControl>
 
                 <FormMessage />
@@ -383,7 +397,11 @@ export const SignInForm = ({
             loading={isSubmitting}
             className="dark:bg-documenso dark:hover:opacity-90"
           >
-            {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
+            {isSubmitting ? (
+              <Trans>Signing in...</Trans>
+            ) : (
+              <Trans>Sign In</Trans>
+            )}
           </Button>
 
           {!isEmbeddedRedirect && (
@@ -424,7 +442,7 @@ export const SignInForm = ({
                   <img
                     className="mr-2 h-4 w-4"
                     alt="Microsoft Logo"
-                    src={'/static/microsoft.svg'}
+                    src={"/static/microsoft.svg"}
                   />
                   Microsoft
                 </Button>
@@ -440,7 +458,7 @@ export const SignInForm = ({
                   onClick={onSignInWithOIDCClick}
                 >
                   <FaIdCardClip className="mr-2 h-5 w-5" />
-                  {oidcProviderLabel || 'OIDC'}
+                  {oidcProviderLabel || "OIDC"}
                 </Button>
               )}
             </>
@@ -455,7 +473,9 @@ export const SignInForm = ({
             className="bg-background text-muted-foreground border"
             onClick={onSignInWithPasskey}
           >
-            {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
+            {!isPasskeyLoading && (
+              <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
+            )}
             <Trans>Passkey</Trans>
           </Button>
         </fieldset>
@@ -474,7 +494,7 @@ export const SignInForm = ({
 
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset disabled={isSubmitting}>
-              {twoFactorAuthenticationMethod === 'totp' && (
+              {twoFactorAuthenticationMethod === "totp" && (
                 <FormField
                   control={form.control}
                   name="totpCode"
@@ -482,7 +502,11 @@ export const SignInForm = ({
                     <FormItem>
                       <FormLabel>Token</FormLabel>
                       <FormControl>
-                        <PinInput {...field} value={field.value ?? ''} maxLength={6}>
+                        <PinInput
+                          {...field}
+                          value={field.value ?? ""}
+                          maxLength={6}
+                        >
                           {Array(6)
                             .fill(null)
                             .map((_, i) => (
@@ -498,7 +522,7 @@ export const SignInForm = ({
                 />
               )}
 
-              {twoFactorAuthenticationMethod === 'backup' && (
+              {twoFactorAuthenticationMethod === "backup" && (
                 <FormField
                   control={form.control}
                   name="backupCode"
@@ -522,7 +546,7 @@ export const SignInForm = ({
                   variant="secondary"
                   onClick={onToggleTwoFactorAuthenticationMethodClick}
                 >
-                  {twoFactorAuthenticationMethod === 'totp' ? (
+                  {twoFactorAuthenticationMethod === "totp" ? (
                     <Trans>Use Backup Code</Trans>
                   ) : (
                     <Trans>Use Authenticator</Trans>
@@ -530,7 +554,11 @@ export const SignInForm = ({
                 </Button>
 
                 <Button type="submit" loading={isSubmitting}>
-                  {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
+                  {isSubmitting ? (
+                    <Trans>Signing in...</Trans>
+                  ) : (
+                    <Trans>Sign In</Trans>
+                  )}
                 </Button>
               </DialogFooter>
             </fieldset>
