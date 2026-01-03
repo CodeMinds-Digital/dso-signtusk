@@ -1,11 +1,7 @@
-// Server router for Hono + React Router
-import { captureException } from "./instrument";
-
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
-import { HTTPException } from "hono/http-exception";
 import type { RequestIdVariables } from "hono/request-id";
 import { requestId } from "hono/request-id";
 import type { Logger } from "pino";
@@ -37,25 +33,6 @@ export interface HonoEnv {
 }
 
 const app = new Hono<HonoEnv>();
-
-/**
- * Error handler - logs errors and optionally reports to Sentry
- */
-app.onError((err, c) => {
-  // Log error with context
-  captureException(err, {
-    url: c.req.url,
-    method: c.req.method,
-    path: c.req.path,
-  });
-
-  if (err instanceof HTTPException) {
-    return err.getResponse();
-  }
-
-  console.error("[Hono Error]", err);
-  return c.json({ error: "Internal server error" }, 500);
-});
 
 /**
  * Rate limiting for v1 and v2 API routes only.

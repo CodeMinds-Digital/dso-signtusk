@@ -153,15 +153,6 @@ export default defineConfig({
       "playwright",
       "playwright-core",
       "@playwright/browser-chromium",
-      // Sentry packages should be external to reduce bundle size
-      "@sentry/node",
-      "@sentry/remix",
-      // Large packages that should be external
-      "pdfjs-dist",
-      "konva",
-      "recharts",
-      "satori",
-      "posthog-node",
     ],
   },
   optimizeDeps: {

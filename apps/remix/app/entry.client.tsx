@@ -1,24 +1,53 @@
-import { startTransition, StrictMode } from "react";
+// Comprehensive polyfills for browser - must be first
+import "./polyfills";
+
+import { StrictMode, startTransition, useEffect } from "react";
+
+import { i18n } from "@lingui/core";
+import { detect, fromHtmlTag } from "@lingui/detect-locale";
+import { I18nProvider } from "@lingui/react";
+import posthog from "posthog-js";
 import { hydrateRoot } from "react-dom/client";
 import { HydratedRouter } from "react-router/dom";
 
-// Client-side error tracking can be added later with a lighter solution
-// For now, we log errors to console
-if (typeof window !== "undefined") {
-  window.addEventListener("error", (event) => {
-    console.error("[Client Error]", event.error);
-  });
+import { extractPostHogConfig } from "@signtusk/lib/constants/feature-flags";
+import { dynamicActivate } from "@signtusk/lib/utils/i18n";
 
-  window.addEventListener("unhandledrejection", (event) => {
-    console.error("[Unhandled Promise Rejection]", event.reason);
+import "./utils/polyfills/promise-with-resolvers";
+
+function PosthogInit() {
+  const postHogConfig = extractPostHogConfig();
+
+  useEffect(() => {
+    if (postHogConfig) {
+      posthog.init(postHogConfig.key, {
+        api_host: postHogConfig.host,
+        capture_exceptions: true,
+      });
+    }
+  }, []);
+
+  return null;
+}
+
+async function main() {
+  const locale = detect(fromHtmlTag("lang")) || "en";
+
+  await dynamicActivate(locale);
+
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <StrictMode>
+        <I18nProvider i18n={i18n}>
+          <HydratedRouter />
+        </I18nProvider>
+
+        <PosthogInit />
+      </StrictMode>
+    );
   });
 }
 
-startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <HydratedRouter />
-    </StrictMode>
-  );
-});
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+main();
