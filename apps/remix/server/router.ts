@@ -110,9 +110,6 @@ app.route("/api/ai", aiRoute);
 // Swagger UI for API documentation.
 app.route("/api/swagger", swaggerRoute);
 
-// Test endpoint for debugging
-app.route("/api/test", (await import("./api/test/route")).default);
-
 // API servers.
 app.use(`/api/v1/*`, cors());
 app.route("/api/v1", tsRestHonoApp);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -37,90 +37,6 @@ export default function DashboardPage() {
   const { t } = useLingui();
 
   const { user, organisations, session } = useSession();
-
-  // Debug logging for session status
-  useEffect(() => {
-    console.log("[Dashboard] Session active:", !!session);
-    console.log("[Dashboard] Session data:", session);
-    console.log("[Dashboard] User:", user);
-    console.log("[Dashboard] Organisations count:", organisations?.length);
-    console.log("[Dashboard] Current URL:", window.location.href);
-    console.log("[Dashboard] Base URL for tRPC:", window.location.origin);
-
-    // Test polyfills
-    console.log("[Dashboard] Polyfill test:");
-    console.log("  - exports:", typeof exports, exports);
-    console.log("  - module:", typeof module, module);
-    console.log("  - require:", typeof require);
-    console.log("  - process:", typeof process, process);
-    console.log("  - Buffer:", typeof Buffer, Buffer);
-    console.log("  - global:", typeof global, global);
-
-    // Test environment
-    console.log("[Dashboard] Environment test:");
-    console.log("  - window.location.origin:", window.location.origin);
-    console.log("  - NODE_ENV:", process.env.NODE_ENV);
-    console.log("  - window.__ENV__:", (window as any).__ENV__);
-
-    // Test if basic API is working
-    fetch("/api/test", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("[Dashboard] Basic API test success:", data);
-      })
-      .catch((error) => {
-        console.error("[Dashboard] Basic API test error:", error);
-      });
-
-    // Test auth endpoint
-    fetch("/api/auth/session-json", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        console.log(
-          "[Dashboard] Auth endpoint response:",
-          response.status,
-          response.statusText
-        );
-        return response.text();
-      })
-      .then((text) => {
-        console.log("[Dashboard] Auth endpoint body:", text);
-      })
-      .catch((error) => {
-        console.error("[Dashboard] Auth endpoint error:", error);
-      });
-
-    // Test if tRPC endpoint is reachable
-    fetch(
-      "/api/trpc/document.inbox.find?batch=1&input=%7B%220%22%3A%7B%22json%22%3A%7B%22page%22%3A1%2C%22perPage%22%3A10%7D%7D%7D",
-      {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => {
-        console.log(
-          "[Dashboard] tRPC endpoint test response:",
-          response.status,
-          response.statusText
-        );
-        return response.text();
-      })
-      .then((text) => {
-        console.log("[Dashboard] tRPC endpoint test body:", text);
-      })
-      .catch((error) => {
-        console.error("[Dashboard] tRPC endpoint test error:", error);
-      });
-  }, [session, user, organisations]);
 
   // Todo: Sort by recent access (TBD by cookies)
   // Teams, flattened with the organisation data still attached.
