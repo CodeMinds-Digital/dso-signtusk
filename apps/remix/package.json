@@ -41,7 +41,6 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@sentry/remix": "^10.32.1",
     "@signtusk/api": "*",
     "@signtusk/assets": "*",
     "@signtusk/auth": "*",

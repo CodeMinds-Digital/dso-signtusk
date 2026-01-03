@@ -1,5 +1,4 @@
 import { createReadableStreamFromReadable } from "@react-router/node";
-import * as Sentry from "@sentry/remix";
 import { isbot } from "isbot";
 import { PassThrough } from "node:stream";
 import { renderToPipeableStream } from "react-dom/server";
@@ -7,16 +6,6 @@ import type { EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
 const ABORT_DELAY = 5_000;
-
-// Server-side Sentry initialization for Remix SSR
-Sentry.init({
-  dsn:
-    process.env.SENTRY_DSN ||
-    "https://0fc9f9fb64f65238b82bc6029d3d3175@o4510100871380992.ingest.de.sentry.io/4510647583572048",
-  tracesSampleRate: 0.1, // Sample 10% of transactions
-  environment: process.env.NODE_ENV || "development",
-  enabled: process.env.NODE_ENV === "production",
-});
 
 export default function handleRequest(
   request: Request,
@@ -126,10 +115,10 @@ function handleBrowserRequest(
 }
 
 export function handleError(error: unknown, { request }: { request: Request }) {
-  Sentry.captureException(error, {
-    extra: {
-      url: request.url,
-      method: request.method,
-    },
+  // Log errors server-side
+  console.error("[SSR Error]", {
+    error,
+    url: request.url,
+    method: request.method,
   });
 }

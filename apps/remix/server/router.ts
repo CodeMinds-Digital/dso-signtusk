@@ -1,6 +1,5 @@
-// IMPORTANT: Import Sentry instrumentation first
-import * as Sentry from "@sentry/remix";
-import "./instrument";
+// Server router for Hono + React Router
+import { captureException } from "./instrument";
 
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
@@ -40,16 +39,14 @@ export interface HonoEnv {
 const app = new Hono<HonoEnv>();
 
 /**
- * Sentry error handler - captures all unhandled exceptions
+ * Error handler - logs errors and optionally reports to Sentry
  */
 app.onError((err, c) => {
-  // Report all unhandled errors to Sentry
-  Sentry.captureException(err, {
-    extra: {
-      url: c.req.url,
-      method: c.req.method,
-      path: c.req.path,
-    },
+  // Log error with context
+  captureException(err, {
+    url: c.req.url,
+    method: c.req.method,
+    path: c.req.path,
   });
 
   if (err instanceof HTTPException) {

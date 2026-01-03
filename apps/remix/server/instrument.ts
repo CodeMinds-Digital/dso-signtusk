@@ -1,11 +1,27 @@
-import * as Sentry from "@sentry/remix";
+// Sentry server-side initialization
+// Note: Sentry is loaded dynamically to reduce initial bundle size
 
-Sentry.init({
-  dsn:
-    process.env.SENTRY_DSN_NODE ||
-    "https://3d22ec4efbdd38f3c22f4c79eeebf003@o4510100871380992.ingest.de.sentry.io/4510647614636112",
-  tracesSampleRate: 0.1, // Reduced for production performance
-  environment: process.env.NODE_ENV || "development",
-  // Only enable in production
-  enabled: process.env.NODE_ENV === "production",
-});
+export const initSentry = async () => {
+  if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN_NODE) {
+    try {
+      const Sentry = await import("@sentry/remix");
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN_NODE,
+        tracesSampleRate: 0.1,
+        environment: process.env.NODE_ENV || "production",
+      });
+      return Sentry;
+    } catch (e) {
+      console.warn("Failed to initialize Sentry:", e);
+    }
+  }
+  return null;
+};
+
+// Export a no-op captureException for when Sentry is not loaded
+export const captureException = (
+  error: unknown,
+  context?: Record<string, unknown>
+) => {
+  console.error("[Error]", error, context);
+};
