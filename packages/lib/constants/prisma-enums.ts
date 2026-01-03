@@ -571,3 +571,55 @@ export interface DocumentAuditLog {
   ipAddress: string | null;
   envelopeId: string;
 }
+
+export type UserSecurityAuditLogType =
+  | "ACCOUNT_PROFILE_UPDATE"
+  | "ACCOUNT_SSO_LINK"
+  | "ACCOUNT_SSO_UNLINK"
+  | "ORGANISATION_SSO_LINK"
+  | "ORGANISATION_SSO_UNLINK"
+  | "AUTH_2FA_DISABLE"
+  | "AUTH_2FA_ENABLE"
+  | "PASSKEY_CREATED"
+  | "PASSKEY_DELETED"
+  | "PASSKEY_UPDATED"
+  | "PASSWORD_RESET"
+  | "PASSWORD_UPDATE"
+  | "SESSION_REVOKED"
+  | "SIGN_OUT"
+  | "SIGN_IN"
+  | "SIGN_IN_FAIL"
+  | "SIGN_IN_2FA_FAIL"
+  | "SIGN_IN_PASSKEY_FAIL";
+
+export const UserSecurityAuditLogType = {
+  ACCOUNT_PROFILE_UPDATE: "ACCOUNT_PROFILE_UPDATE",
+  ACCOUNT_SSO_LINK: "ACCOUNT_SSO_LINK",
+  ACCOUNT_SSO_UNLINK: "ACCOUNT_SSO_UNLINK",
+  ORGANISATION_SSO_LINK: "ORGANISATION_SSO_LINK",
+  ORGANISATION_SSO_UNLINK: "ORGANISATION_SSO_UNLINK",
+  AUTH_2FA_DISABLE: "AUTH_2FA_DISABLE",
+  AUTH_2FA_ENABLE: "AUTH_2FA_ENABLE",
+  PASSKEY_CREATED: "PASSKEY_CREATED",
+  PASSKEY_DELETED: "PASSKEY_DELETED",
+  PASSKEY_UPDATED: "PASSKEY_UPDATED",
+  PASSWORD_RESET: "PASSWORD_RESET",
+  PASSWORD_UPDATE: "PASSWORD_UPDATE",
+  SESSION_REVOKED: "SESSION_REVOKED",
+  SIGN_OUT: "SIGN_OUT",
+  SIGN_IN: "SIGN_IN",
+  SIGN_IN_FAIL: "SIGN_IN_FAIL",
+  SIGN_IN_2FA_FAIL: "SIGN_IN_2FA_FAIL",
+  SIGN_IN_PASSKEY_FAIL: "SIGN_IN_PASSKEY_FAIL",
+} as const;
+
+export interface OrganisationClaim {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  originalSubscriptionClaimId: string | null;
+  teamCount: number;
+  memberCount: number;
+  envelopeItemCount: number;
+  flags: AnyJson;
+}

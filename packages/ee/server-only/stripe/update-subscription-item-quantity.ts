@@ -1,12 +1,15 @@
-import type { OrganisationClaim, Subscription } from '@prisma/client';
-import type Stripe from 'stripe';
+import type {
+  OrganisationClaim,
+  Subscription,
+} from "@signtusk/lib/constants/prisma-enums";
+import type Stripe from "stripe";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { stripe } from '@signtusk/lib/server-only/stripe';
-import { appLog } from '@signtusk/lib/utils/debugger';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { stripe } from "@signtusk/lib/server-only/stripe";
+import { appLog } from "@signtusk/lib/utils/debugger";
+import { prisma } from "@signtusk/prisma";
 
-import { isPriceSeatsBased } from './is-price-seats-based';
+import { isPriceSeatsBased } from "./is-price-seats-based";
 
 export type UpdateSubscriptionItemQuantityOptions = {
   subscriptionId: string;
@@ -21,13 +24,17 @@ export const updateSubscriptionItemQuantity = async ({
 }: UpdateSubscriptionItemQuantityOptions) => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-  const items = subscription.items.data.filter((item) => item.price.id === priceId);
+  const items = subscription.items.data.filter(
+    (item) => item.price.id === priceId
+  );
 
   if (items.length !== 1) {
-    throw new Error('Subscription does not contain required item');
+    throw new Error("Subscription does not contain required item");
   }
 
-  const hasYearlyItem = items.find((item) => item.price.recurring?.interval === 'year');
+  const hasYearlyItem = items.find(
+    (item) => item.price.recurring?.interval === "year"
+  );
   const oldQuantity = items[0].quantity;
 
   if (oldQuantity === quantity) {
@@ -43,7 +50,7 @@ export const updateSubscriptionItemQuantity = async ({
 
   // Only invoice immediately when changing the quantity of yearly item.
   if (hasYearlyItem) {
-    subscriptionUpdatePayload.proration_behavior = 'always_invoice';
+    subscriptionUpdatePayload.proration_behavior = "always_invoice";
   }
 
   await stripe.subscriptions.update(subscriptionId, subscriptionUpdatePayload);
@@ -62,7 +69,7 @@ export const updateSubscriptionItemQuantity = async ({
 export const syncMemberCountWithStripeSeatPlan = async (
   subscription: Subscription,
   organisationClaim: OrganisationClaim,
-  quantity: number,
+  quantity: number
 ) => {
   const maximumMemberCount = organisationClaim.memberCount;
 
@@ -71,18 +78,20 @@ export const syncMemberCountWithStripeSeatPlan = async (
     return;
   }
 
-  const syncMemberCountWithStripe = await isPriceSeatsBased(subscription.priceId);
+  const syncMemberCountWithStripe = await isPriceSeatsBased(
+    subscription.priceId
+  );
 
   // Throw error if quantity exceeds maximum member count and the subscription is not seats based.
   if (quantity > maximumMemberCount && !syncMemberCountWithStripe) {
     throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-      message: 'Maximum member count reached',
+      message: "Maximum member count reached",
     });
   }
 
   // Bill the user with the new quantity.
   if (syncMemberCountWithStripe) {
-    appLog('BILLING', 'Updating seat based plan');
+    appLog("BILLING", "Updating seat based plan");
 
     await updateSubscriptionItemQuantity({
       priceId: subscription.priceId,

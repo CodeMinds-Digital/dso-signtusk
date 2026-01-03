@@ -1,10 +1,10 @@
-import { GetEmailIdentityCommand } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
+import { GetEmailIdentityCommand } from "@aws-sdk/client-sesv2";
+import { EmailDomainStatus } from "@signtusk/lib/constants/prisma-enums";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { getSesClient } from './create-email-domain';
+import { getSesClient } from "./create-email-domain";
 
 export const verifyEmailDomain = async (emailDomainId: string) => {
   const emailDomain = await prisma.emailDomain.findUnique({
@@ -15,7 +15,7 @@ export const verifyEmailDomain = async (emailDomainId: string) => {
 
   if (!emailDomain) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Email domain not found',
+      message: "Email domain not found",
     });
   }
 
@@ -24,10 +24,10 @@ export const verifyEmailDomain = async (emailDomainId: string) => {
   const response = await sesClient.send(
     new GetEmailIdentityCommand({
       EmailIdentity: emailDomain.domain,
-    }),
+    })
   );
 
-  const isVerified = response.VerificationStatus === 'SUCCESS';
+  const isVerified = response.VerificationStatus === "SUCCESS";
 
   const updatedEmailDomain = await prisma.emailDomain.update({
     where: {

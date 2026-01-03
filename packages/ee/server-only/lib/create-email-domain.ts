@@ -1,24 +1,25 @@
-import { CreateEmailIdentityCommand, SESv2Client } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
-import { generateKeyPair } from 'node:crypto';
-import { promisify } from 'util';
+import { CreateEmailIdentityCommand, SESv2Client } from "@aws-sdk/client-sesv2";
+import type { Prisma } from "@prisma/client";
+import { EmailDomainStatus } from "@signtusk/lib/constants/prisma-enums";
+import { generateKeyPair } from "node:crypto";
+import { promisify } from "util";
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '@signtusk/lib/constants/crypto';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { symmetricEncrypt } from '@signtusk/lib/universal/crypto';
-import { generateDatabaseId } from '@signtusk/lib/universal/id';
-import { generateEmailDomainRecords } from '@signtusk/lib/utils/email-domains';
-import { env } from '@signtusk/lib/utils/env';
-import { prisma } from '@signtusk/prisma';
+import { DOCUMENSO_ENCRYPTION_KEY } from "@signtusk/lib/constants/crypto";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { symmetricEncrypt } from "@signtusk/lib/universal/crypto";
+import { generateDatabaseId } from "@signtusk/lib/universal/id";
+import { generateEmailDomainRecords } from "@signtusk/lib/utils/email-domains";
+import { env } from "@signtusk/lib/utils/env";
+import { prisma } from "@signtusk/prisma";
 
 export const getSesClient = () => {
-  const accessKeyId = env('NEXT_PRIVATE_SES_ACCESS_KEY_ID');
-  const secretAccessKey = env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
-  const region = env('NEXT_PRIVATE_SES_REGION');
+  const accessKeyId = env("NEXT_PRIVATE_SES_ACCESS_KEY_ID");
+  const secretAccessKey = env("NEXT_PRIVATE_SES_SECRET_ACCESS_KEY");
+  const region = env("NEXT_PRIVATE_SES_REGION");
 
   if (!accessKeyId || !secretAccessKey || !region) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: 'Missing AWS SES credentials',
+      message: "Missing AWS SES credentials",
     });
   }
 
@@ -35,10 +36,14 @@ export const getSesClient = () => {
  * Removes first and last line, then removes all newlines
  */
 const flattenKey = (key: string) => {
-  return key.trim().split('\n').slice(1, -1).join('');
+  return key.trim().split("\n").slice(1, -1).join("");
 };
 
-export async function verifyDomainWithDKIM(domain: string, selector: string, privateKey: string) {
+export async function verifyDomainWithDKIM(
+  domain: string,
+  selector: string,
+  privateKey: string
+) {
   const command = new CreateEmailIdentityCommand({
     EmailIdentity: domain,
     DkimSigningAttributes: {
@@ -61,14 +66,17 @@ type DomainRecord = {
   type: string;
 };
 
-export const createEmailDomain = async ({ domain, organisationId }: CreateEmailDomainOptions) => {
+export const createEmailDomain = async ({
+  domain,
+  organisationId,
+}: CreateEmailDomainOptions) => {
   const encryptionKey = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+    throw new Error("Missing DOCUMENSO_ENCRYPTION_KEY");
   }
 
-  const selector = `documenso-${organisationId}`.replace(/[_.]/g, '-');
+  const selector = `documenso-${organisationId}`.replace(/[_.]/g, "-");
   const recordName = `${selector}._domainkey.${domain}`;
 
   // Check if domain already exists
@@ -80,22 +88,22 @@ export const createEmailDomain = async ({ domain, organisationId }: CreateEmailD
 
   if (existingDomain) {
     throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-      message: 'Domain already exists in database',
+      message: "Domain already exists in database",
     });
   }
 
   // Generate DKIM key pair
   const generateKeyPairAsync = promisify(generateKeyPair);
 
-  const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
+  const { publicKey, privateKey } = await generateKeyPairAsync("rsa", {
     modulusLength: 2048,
     publicKeyEncoding: {
-      type: 'spki',
-      format: 'pem',
+      type: "spki",
+      format: "pem",
     },
     privateKeyEncoding: {
-      type: 'pkcs8',
-      format: 'pem',
+      type: "pkcs8",
+      format: "pem",
     },
   });
 
@@ -104,48 +112,55 @@ export const createEmailDomain = async ({ domain, organisationId }: CreateEmailD
   const privateKeyFlattened = flattenKey(privateKey);
 
   // Create DNS records
-  const records: DomainRecord[] = generateEmailDomainRecords(recordName, publicKeyFlattened);
+  const records: DomainRecord[] = generateEmailDomainRecords(
+    recordName,
+    publicKeyFlattened
+  );
 
   const encryptedPrivateKey = symmetricEncrypt({
     key: encryptionKey,
     data: privateKeyFlattened,
   });
 
-  const emailDomain = await prisma.$transaction(async (tx) => {
-    await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch((err) => {
-      if (err.name === 'AlreadyExistsException') {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-          message: 'Domain already exists in SES',
-        });
-      }
+  const emailDomain = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch(
+        (err) => {
+          if (err.name === "AlreadyExistsException") {
+            throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+              message: "Domain already exists in SES",
+            });
+          }
 
-      throw err;
-    });
+          throw err;
+        }
+      );
 
-    // Create email domain record.
-    return await tx.emailDomain.create({
-      data: {
-        id: generateDatabaseId('email_domain'),
-        domain,
-        status: EmailDomainStatus.PENDING,
-        organisationId,
-        selector: recordName,
-        publicKey: publicKeyFlattened,
-        privateKey: encryptedPrivateKey,
-      },
-      select: {
-        id: true,
-        status: true,
-        organisationId: true,
-        domain: true,
-        selector: true,
-        publicKey: true,
-        createdAt: true,
-        updatedAt: true,
-        emails: true,
-      },
-    });
-  });
+      // Create email domain record.
+      return await tx.emailDomain.create({
+        data: {
+          id: generateDatabaseId("email_domain"),
+          domain,
+          status: EmailDomainStatus.PENDING,
+          organisationId,
+          selector: recordName,
+          publicKey: publicKeyFlattened,
+          privateKey: encryptedPrivateKey,
+        },
+        select: {
+          id: true,
+          status: true,
+          organisationId: true,
+          domain: true,
+          selector: true,
+          publicKey: true,
+          createdAt: true,
+          updatedAt: true,
+          emails: true,
+        },
+      });
+    }
+  );
 
   return {
     emailDomain,

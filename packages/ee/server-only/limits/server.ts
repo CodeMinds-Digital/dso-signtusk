@@ -1,18 +1,22 @@
-import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@prisma/client';
-import { DateTime } from 'luxon';
+import {
+  DocumentSource,
+  EnvelopeType,
+  SubscriptionStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { DateTime } from "luxon";
 
-import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
-import { INTERNAL_CLAIM_ID } from '@signtusk/lib/types/subscription';
-import { prisma } from '@signtusk/prisma';
+import { IS_BILLING_ENABLED } from "@signtusk/lib/constants/app";
+import { INTERNAL_CLAIM_ID } from "@signtusk/lib/types/subscription";
+import { prisma } from "@signtusk/prisma";
 
 import {
   FREE_PLAN_LIMITS,
   INACTIVE_PLAN_LIMITS,
   PAID_PLAN_LIMITS,
   SELFHOSTED_PLAN_LIMITS,
-} from './constants';
-import { ERROR_CODES } from './errors';
-import type { TLimitsResponseSchema } from './schema';
+} from "./constants";
+import { ERROR_CODES } from "./errors";
+import type { TLimitsResponseSchema } from "./schema";
 
 export type GetServerLimitsOptions = {
   userId: number;
@@ -50,7 +54,8 @@ export const getServerLimits = async ({
   const remaining = structuredClone(FREE_PLAN_LIMITS);
 
   const subscription = organisation.subscription;
-  const maximumEnvelopeItemCount = organisation.organisationClaim.envelopeItemCount;
+  const maximumEnvelopeItemCount =
+    organisation.organisationClaim.envelopeItemCount;
 
   if (!IS_BILLING_ENABLED()) {
     return {
@@ -96,7 +101,7 @@ export const getServerLimits = async ({
           organisationId: organisation.id,
         },
         createdAt: {
-          gte: DateTime.utc().startOf('month').toJSDate(),
+          gte: DateTime.utc().startOf("month").toJSDate(),
         },
         source: {
           not: DocumentSource.TEMPLATE_DIRECT_LINK,
@@ -117,7 +122,10 @@ export const getServerLimits = async ({
   ]);
 
   remaining.documents = Math.max(remaining.documents - documents, 0);
-  remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
+  remaining.directTemplates = Math.max(
+    remaining.directTemplates - directTemplates,
+    0
+  );
 
   return {
     quota,

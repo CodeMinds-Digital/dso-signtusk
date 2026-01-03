@@ -1,16 +1,16 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from "@signtusk/lib/constants/prisma-enums";
 
-import { getOrganisationAuthenticationPortalOptions } from '@signtusk/auth/server/lib/utils/organisation-portal';
-import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
+import { getOrganisationAuthenticationPortalOptions } from "@signtusk/auth/server/lib/utils/organisation-portal";
+import { IS_BILLING_ENABLED } from "@signtusk/lib/constants/app";
 import {
   ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER,
   ORGANISATION_USER_ACCOUNT_TYPE,
-} from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { addUserToOrganisation } from '@signtusk/lib/server-only/organisation/accept-organisation-invitation';
-import { ZOrganisationAccountLinkMetadataSchema } from '@signtusk/lib/types/organisation';
-import type { RequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { addUserToOrganisation } from "@signtusk/lib/server-only/organisation/accept-organisation-invitation";
+import { ZOrganisationAccountLinkMetadataSchema } from "@signtusk/lib/types/organisation";
+import type { RequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { prisma } from "@signtusk/prisma";
 
 export interface LinkOrganisationAccountOptions {
   token: string;
@@ -23,7 +23,7 @@ export const linkOrganisationAccount = async ({
 }: LinkOrganisationAccountOptions) => {
   if (!IS_BILLING_ENABLED()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Billing is not enabled',
+      message: "Billing is not enabled",
     });
   }
 
@@ -51,38 +51,39 @@ export const linkOrganisationAccount = async ({
 
   if (!verificationToken) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Verification token not found, used or expired',
+      message: "Verification token not found, used or expired",
     });
   }
 
   if (verificationToken.completed) {
-    throw new AppError('ALREADY_USED');
+    throw new AppError("ALREADY_USED");
   }
 
   if (verificationToken.expires < new Date()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Verification token not found, used or expired',
+      message: "Verification token not found, used or expired",
     });
   }
 
   const tokenMetadata = ZOrganisationAccountLinkMetadataSchema.safeParse(
-    verificationToken.metadata,
+    verificationToken.metadata
   );
 
   if (!tokenMetadata.success) {
-    console.error('Invalid token metadata', tokenMetadata.error);
+    console.error("Invalid token metadata", tokenMetadata.error);
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Verification token not found, used or expired',
+      message: "Verification token not found, used or expired",
     });
   }
 
   const user = verificationToken.user;
 
-  const { clientOptions, organisation } = await getOrganisationAuthenticationPortalOptions({
-    type: 'id',
-    organisationId: tokenMetadata.data.organisationId,
-  });
+  const { clientOptions, organisation } =
+    await getOrganisationAuthenticationPortalOptions({
+      type: "id",
+      organisationId: tokenMetadata.data.organisationId,
+    });
 
   const organisationMember = await prisma.organisationMember.findFirst({
     where: {
@@ -96,7 +97,7 @@ export const linkOrganisationAccount = async ({
   const userAlreadyLinked = user.accounts.find(
     (account) =>
       account.provider === clientOptions.id &&
-      account.providerAccountId === oauthConfig.providerAccountId,
+      account.providerAccountId === oauthConfig.providerAccountId
   );
 
   if (organisationMember && userAlreadyLinked) {
@@ -114,7 +115,7 @@ export const linkOrganisationAccount = async ({
             providerAccountId: oauthConfig.providerAccountId,
             access_token: oauthConfig.accessToken,
             expires_at: oauthConfig.expiresAt,
-            token_type: 'Bearer',
+            token_type: "Bearer",
             id_token: oauthConfig.idToken,
             userId: user.id,
           },
@@ -154,10 +155,11 @@ export const linkOrganisationAccount = async ({
           organisationId: tokenMetadata.data.organisationId,
           organisationGroups: organisation.groups,
           organisationMemberRole:
-            organisation.organisationAuthenticationPortal.defaultOrganisationRole,
+            organisation.organisationAuthenticationPortal
+              .defaultOrganisationRole,
         });
       }
     },
-    { timeout: 30_000 },
+    { timeout: 30_000 }
   );
 };

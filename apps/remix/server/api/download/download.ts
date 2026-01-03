@@ -1,19 +1,19 @@
-import { sValidator } from '@hono/standard-validator';
-import { EnvelopeType } from '@prisma/client';
-import { Hono } from 'hono';
+import { sValidator } from "@hono/standard-validator";
+import { EnvelopeType } from "@signtusk/lib/constants/prisma-enums";
+import { Hono } from "hono";
 
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { getEnvelopeById } from '@signtusk/lib/server-only/envelope/get-envelope-by-id';
-import { getApiTokenByToken } from '@signtusk/lib/server-only/public-api/get-api-token-by-token';
-import { buildTeamWhereQuery } from '@signtusk/lib/utils/teams';
-import { prisma } from '@signtusk/prisma';
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { getEnvelopeById } from "@signtusk/lib/server-only/envelope/get-envelope-by-id";
+import { getApiTokenByToken } from "@signtusk/lib/server-only/public-api/get-api-token-by-token";
+import { buildTeamWhereQuery } from "@signtusk/lib/utils/teams";
+import { prisma } from "@signtusk/prisma";
 
-import type { HonoEnv } from '../../router';
-import { handleEnvelopeItemFileRequest } from '../files/files.helpers';
+import type { HonoEnv } from "../../router";
+import { handleEnvelopeItemFileRequest } from "../files/files.helpers";
 import {
   ZDownloadDocumentRequestParamsSchema,
   ZDownloadEnvelopeItemRequestParamsSchema,
-} from './download.types';
+} from "./download.types";
 
 export const downloadRoute = new Hono<HonoEnv>()
   /**
@@ -21,21 +21,23 @@ export const downloadRoute = new Hono<HonoEnv>()
    * Requires API key authentication via Authorization header.
    */
   .get(
-    '/envelope/item/:envelopeItemId/download',
-    sValidator('param', ZDownloadEnvelopeItemRequestParamsSchema),
+    "/envelope/item/:envelopeItemId/download",
+    sValidator("param", ZDownloadEnvelopeItemRequestParamsSchema),
     async (c) => {
-      const logger = c.get('logger');
+      const logger = c.get("logger");
 
       try {
-        const { envelopeItemId, version } = c.req.valid('param');
-        const authorizationHeader = c.req.header('authorization');
+        const { envelopeItemId, version } = c.req.valid("param");
+        const authorizationHeader = c.req.header("authorization");
 
         // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
-        const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+        const [token] = (authorizationHeader || "")
+          .split("Bearer ")
+          .filter((s) => s.length > 0);
 
         if (!token) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
-            message: 'API token was not provided',
+            message: "API token was not provided",
           });
         }
 
@@ -43,13 +45,13 @@ export const downloadRoute = new Hono<HonoEnv>()
 
         if (apiToken.user.disabled) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
-            message: 'User is disabled',
+            message: "User is disabled",
           });
         }
 
         logger.info({
-          auth: 'api',
-          source: 'apiV2',
+          auth: "api",
+          source: "apiV2",
           path: c.req.path,
           userId: apiToken.user.id,
           apiTokenId: apiToken.id,
@@ -61,7 +63,10 @@ export const downloadRoute = new Hono<HonoEnv>()
           where: {
             id: envelopeItemId,
             envelope: {
-              team: buildTeamWhereQuery({ teamId: apiToken.teamId, userId: apiToken.user.id }),
+              team: buildTeamWhereQuery({
+                teamId: apiToken.teamId,
+                userId: apiToken.user.id,
+              }),
             },
           },
           include: {
@@ -71,18 +76,18 @@ export const downloadRoute = new Hono<HonoEnv>()
         });
 
         if (!envelopeItem) {
-          return c.json({ error: 'Envelope item not found' }, 404);
+          return c.json({ error: "Envelope item not found" }, 404);
         }
 
         if (!envelopeItem.documentData) {
-          return c.json({ error: 'Document data not found' }, 404);
+          return c.json({ error: "Document data not found" }, 404);
         }
 
         return await handleEnvelopeItemFileRequest({
           title: envelopeItem.title,
           status: envelopeItem.envelope.status,
           documentData: envelopeItem.documentData,
-          version: version || 'signed',
+          version: version || "signed",
           isDownload: true,
           context: c,
         });
@@ -97,30 +102,32 @@ export const downloadRoute = new Hono<HonoEnv>()
           return c.json({ error: error.message }, 400);
         }
 
-        return c.json({ error: 'Internal server error' }, 500);
+        return c.json({ error: "Internal server error" }, 500);
       }
-    },
+    }
   )
   /**
    * Download a document by its ID.
    * Requires API key authentication via Authorization header.
    */
   .get(
-    '/document/:documentId/download',
-    sValidator('param', ZDownloadDocumentRequestParamsSchema),
+    "/document/:documentId/download",
+    sValidator("param", ZDownloadDocumentRequestParamsSchema),
     async (c) => {
-      const logger = c.get('logger');
+      const logger = c.get("logger");
 
       try {
-        const { documentId, version } = c.req.valid('param');
-        const authorizationHeader = c.req.header('authorization');
+        const { documentId, version } = c.req.valid("param");
+        const authorizationHeader = c.req.header("authorization");
 
         // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
-        const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+        const [token] = (authorizationHeader || "")
+          .split("Bearer ")
+          .filter((s) => s.length > 0);
 
         if (!token) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
-            message: 'API token was not provided',
+            message: "API token was not provided",
           });
         }
 
@@ -128,13 +135,13 @@ export const downloadRoute = new Hono<HonoEnv>()
 
         if (apiToken.user.disabled) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
-            message: 'User is disabled',
+            message: "User is disabled",
           });
         }
 
         logger.info({
-          auth: 'api',
-          source: 'apiV2',
+          auth: "api",
+          source: "apiV2",
           path: c.req.path,
           userId: apiToken.user.id,
           apiTokenId: apiToken.id,
@@ -144,7 +151,7 @@ export const downloadRoute = new Hono<HonoEnv>()
 
         const envelope = await getEnvelopeById({
           id: {
-            type: 'documentId',
+            type: "documentId",
             id: documentId,
           },
           type: EnvelopeType.DOCUMENT,
@@ -153,25 +160,25 @@ export const downloadRoute = new Hono<HonoEnv>()
         }).catch(() => null);
 
         if (!envelope) {
-          return c.json({ error: 'Document not found' }, 404);
+          return c.json({ error: "Document not found" }, 404);
         }
 
         // Get the first envelope item (documents have exactly one)
         const [envelopeItem] = envelope.envelopeItems;
 
         if (!envelopeItem) {
-          return c.json({ error: 'Document item not found' }, 404);
+          return c.json({ error: "Document item not found" }, 404);
         }
 
         if (!envelopeItem.documentData) {
-          return c.json({ error: 'Document data not found' }, 404);
+          return c.json({ error: "Document data not found" }, 404);
         }
 
         return await handleEnvelopeItemFileRequest({
           title: envelopeItem.title,
           status: envelope.status,
           documentData: envelopeItem.documentData,
-          version: version || 'signed',
+          version: version || "signed",
           isDownload: true,
           context: c,
         });
@@ -186,7 +193,7 @@ export const downloadRoute = new Hono<HonoEnv>()
           return c.json({ error: error.message }, 400);
         }
 
-        return c.json({ error: 'Internal server error' }, 500);
+        return c.json({ error: "Internal server error" }, 500);
       }
-    },
+    }
   );

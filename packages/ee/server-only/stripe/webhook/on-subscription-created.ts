@@ -1,22 +1,25 @@
-import { OrganisationType, SubscriptionStatus } from '@prisma/client';
-import { match } from 'ts-pattern';
+import {
+  OrganisationType,
+  SubscriptionStatus,
+} from "@signtusk/lib/constants/prisma-enums";
+import { match } from "ts-pattern";
 
 import {
   createOrganisation,
   createOrganisationClaimUpsertData,
-} from '@signtusk/lib/server-only/organisation/create-organisation';
-import { type Stripe } from '@signtusk/lib/server-only/stripe';
+} from "@signtusk/lib/server-only/organisation/create-organisation";
+import { type Stripe } from "@signtusk/lib/server-only/stripe";
 import type {
   InternalClaim,
   StripeOrganisationCreateMetadata,
-} from '@signtusk/lib/types/subscription';
+} from "@signtusk/lib/types/subscription";
 import {
   INTERNAL_CLAIM_ID,
   ZStripeOrganisationCreateMetadataSchema,
-} from '@signtusk/lib/types/subscription';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/types/subscription";
+import { prisma } from "@signtusk/prisma";
 
-import { extractStripeClaim } from './on-subscription-updated';
+import { extractStripeClaim } from "./on-subscription-updated";
 
 export type OnSubscriptionCreatedOptions = {
   subscription: Stripe.Subscription;
@@ -32,20 +35,24 @@ type StripeWebhookResponse = {
  * fails after this would be automatically rerun by Stripe, which means duplicate organisations can be
  * potentially created.
  */
-export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCreatedOptions) => {
+export const onSubscriptionCreated = async ({
+  subscription,
+}: OnSubscriptionCreatedOptions) => {
   const customerId =
-    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
 
   // Todo: logging
   if (subscription.items.data.length !== 1) {
-    console.error('No support for multiple items');
+    console.error("No support for multiple items");
 
     throw Response.json(
       {
         success: false,
-        message: 'No support for multiple items',
+        message: "No support for multiple items",
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -54,14 +61,16 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
 
   // Todo: logging
   if (!claim) {
-    console.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
+    console.error(
+      `Subscription claim on ${subscriptionItem.price.id} not found`
+    );
 
     throw Response.json(
       {
         success: false,
         message: `Subscription claim on ${subscriptionItem.price.id} not found`,
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -70,23 +79,23 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
   // A new subscription can be for an existing organisation or a new one.
   const organisationId = organisationCreateData
     ? await handleOrganisationCreate({
-      customerId,
-      claim,
-      unknownCreateData: organisationCreateData,
-    })
+        customerId,
+        claim,
+        unknownCreateData: organisationCreateData,
+      })
     : await handleOrganisationUpdate({
-      customerId,
-      claim,
-    });
+        customerId,
+        claim,
+      });
 
   const status = match(subscription.status)
-    .with('active', () => SubscriptionStatus.ACTIVE)
-    .with('trialing', () => SubscriptionStatus.ACTIVE)
-    .with('past_due', () => SubscriptionStatus.PAST_DUE)
+    .with("active", () => SubscriptionStatus.ACTIVE)
+    .with("trialing", () => SubscriptionStatus.ACTIVE)
+    .with("past_due", () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
   const periodEnd =
-    subscription.status === 'trialing' && subscription.trial_end
+    subscription.status === "trialing" && subscription.trial_end
       ? new Date(subscription.trial_end * 1000)
       : new Date(subscription.current_period_end * 1000);
 
@@ -128,21 +137,22 @@ const handleOrganisationCreate = async ({
   claim,
   unknownCreateData,
 }: HandleOrganisationCreateOptions) => {
-  let organisationCreateFlowData: StripeOrganisationCreateMetadata | null = null;
+  let organisationCreateFlowData: StripeOrganisationCreateMetadata | null =
+    null;
 
   const parseResult = ZStripeOrganisationCreateMetadataSchema.safeParse(
-    JSON.parse(unknownCreateData),
+    JSON.parse(unknownCreateData)
   );
 
   if (!parseResult.success) {
-    console.error('Invalid organisation create flow data');
+    console.error("Invalid organisation create flow data");
 
     throw Response.json(
       {
         success: false,
-        message: 'Invalid organisation create flow data',
+        message: "Invalid organisation create flow data",
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -167,7 +177,10 @@ type HandleOrganisationUpdateOptions = {
 /**
  * Handles the updating an exist organisation claims.
  */
-const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisationUpdateOptions) => {
+const handleOrganisationUpdate = async ({
+  customerId,
+  claim,
+}: HandleOrganisationUpdateOptions) => {
   const organisation = await prisma.organisation.findFirst({
     where: {
       customerId,
@@ -184,7 +197,7 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
         success: false,
         message: `Organisation not found`,
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -193,7 +206,7 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
     organisation.subscription &&
     organisation.subscription.status !== SubscriptionStatus.INACTIVE
   ) {
-    console.error('Organisation already has an active subscription');
+    console.error("Organisation already has an active subscription");
 
     // This should never happen
     throw Response.json(
@@ -201,7 +214,7 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
         success: false,
         message: `Organisation already has an active subscription`,
       } satisfies StripeWebhookResponse,
-      { status: 500 },
+      { status: 500 }
     );
   }
 
