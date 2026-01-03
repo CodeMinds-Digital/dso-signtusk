@@ -3,8 +3,25 @@
  * This file should be imported before any other modules that might need these globals
  */
 
+// CommonJS compatibility - must be first
+if (typeof (globalThis as any).exports === "undefined") {
+  (globalThis as any).exports = {};
+}
+
+if (typeof (globalThis as any).module === "undefined") {
+  (globalThis as any).module = { exports: {} };
+}
+
+if (typeof (globalThis as any).require === "undefined") {
+  (globalThis as any).require = function (id: string) {
+    if (id === "buffer") return { Buffer: (globalThis as any).Buffer };
+    if (id === "process") return (globalThis as any).process;
+    return {};
+  };
+}
+
 // Process polyfill
-if (typeof globalThis.process === "undefined") {
+if (typeof (globalThis as any).process === "undefined") {
   const processPolyfill = {
     env: { NODE_ENV: "production" },
     browser: true,
@@ -17,12 +34,12 @@ if (typeof globalThis.process === "undefined") {
     stderr: { write: () => {} },
   };
 
-  globalThis.process = processPolyfill as any;
+  (globalThis as any).process = processPolyfill;
   (globalThis as any).global = globalThis;
 }
 
 // Buffer polyfill
-if (typeof globalThis.Buffer === "undefined") {
+if (typeof (globalThis as any).Buffer === "undefined") {
   class BufferPolyfill {
     private _arr: Uint8Array;
     public length: number;
@@ -141,7 +158,7 @@ if (typeof globalThis.Buffer === "undefined") {
   }
 
   // Set up Buffer globally
-  globalThis.Buffer = BufferPolyfill as any;
+  (globalThis as any).Buffer = BufferPolyfill;
 }
 
 export {};

@@ -138,10 +138,6 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="google" content="notranslate" />
-        <Meta />
-        <Links />
-        <meta name="google" content="notranslate" />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
 
         {disableAnimations && (
           <style
@@ -154,39 +150,10 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
 
-        {/* Ensure polyfills are available - backup inline script */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Backup polyfills in case the module import doesn't work
-              if (typeof process === 'undefined') {
-                globalThis.process = {
-                  env: { NODE_ENV: '${process.env.NODE_ENV || "production"}' },
-                  browser: true,
-                  version: '',
-                  versions: {},
-                  platform: 'browser',
-                  cwd: function() { return '/'; },
-                  nextTick: function(fn) { setTimeout(fn, 0); }
-                };
-              }
-              
-              if (typeof Buffer === 'undefined') {
-                // Simple Buffer constructor for basic compatibility
-                globalThis.Buffer = function(data, encoding) {
-                  if (typeof data === 'string') {
-                    return { toString: () => data, length: data.length };
-                  }
-                  return { toString: () => String(data), length: 0 };
-                };
-                globalThis.Buffer.from = (data) => globalThis.Buffer(data);
-                globalThis.Buffer.alloc = (size) => globalThis.Buffer(''.repeat(size));
-                globalThis.Buffer.isBuffer = () => false;
-                globalThis.Buffer.concat = (list) => globalThis.Buffer(list.join(''));
-              }
-            `,
-          }}
-        />
+        <Meta />
+        <Links />
+        <meta name="google" content="notranslate" />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
       </head>
       <body>
         <SessionProvider initialSession={session}>

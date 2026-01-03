@@ -159,6 +159,8 @@ export default defineConfig({
       "playwright-core",
       "@playwright/browser-chromium",
     ],
+    // Force pre-bundling of polyfills
+    force: true,
   },
   resolve: {
     alias: {

@@ -66,6 +66,24 @@ export const InboxTable = () => {
     {
       page: page || 1,
       perPage: perPage || 10,
+    },
+    {
+      onError: (error) => {
+        console.error("[InboxTable] tRPC query error:", error);
+        console.error("[InboxTable] Error details:", {
+          message: error.message,
+          code: error.data?.code,
+          httpStatus: error.data?.httpStatus,
+          stack: error.stack,
+        });
+      },
+      onSuccess: (data) => {
+        console.log("[InboxTable] tRPC query success:", data);
+      },
+      retry: (failureCount, error) => {
+        console.log("[InboxTable] tRPC retry attempt:", failureCount, error);
+        return failureCount < 3;
+      },
     }
   );
 
