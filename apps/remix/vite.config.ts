@@ -153,6 +153,8 @@ export default defineConfig({
       "playwright",
       "playwright-core",
       "@playwright/browser-chromium",
+      // Sentry packages should be external to reduce bundle size
+      "@sentry/node",
     ],
   },
   optimizeDeps: {

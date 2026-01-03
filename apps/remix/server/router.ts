@@ -1,5 +1,5 @@
 // IMPORTANT: Import Sentry instrumentation first
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/remix";
 import "./instrument";
 
 import { Hono } from "hono";

@@ -7,7 +7,8 @@
   "functions": {
     "apps/remix/api/index.js": {
       "includeFiles": "apps/remix/build/**/*",
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
   },
   "routes": [
