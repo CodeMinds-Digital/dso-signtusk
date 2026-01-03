@@ -70,26 +70,36 @@ export const SessionProvider = ({
   const location = useLocation();
 
   const refreshSession = useCallback(async () => {
-    const newSession = await authClient.getSession();
+    try {
+      const newSession = await authClient.getSession();
 
-    if (!newSession.isAuthenticated) {
-      setSession(null);
-      return;
+      if (!newSession.isAuthenticated) {
+        // Only clear session if we're sure the user is logged out
+        // Don't clear on network errors
+        setSession(null);
+        return;
+      }
+
+      const organisations =
+        await trpc.organisation.internal.getOrganisationSession
+          .query(undefined, SKIP_QUERY_BATCH_META.trpc)
+          .catch((err) => {
+            console.error(
+              "[SessionProvider] Failed to fetch organisations:",
+              err
+            );
+            return [];
+          });
+
+      setSession({
+        session: newSession.session,
+        user: newSession.user,
+        organisations,
+      });
+    } catch (err) {
+      // Don't clear session on network errors - keep the existing session
+      console.error("[SessionProvider] Failed to refresh session:", err);
     }
-
-    const organisations =
-      await trpc.organisation.internal.getOrganisationSession
-        .query(undefined, SKIP_QUERY_BATCH_META.trpc)
-        .catch(() => {
-          // Todo: (RR7) Log
-          return [];
-        });
-
-    setSession({
-      session: newSession.session,
-      user: newSession.user,
-      organisations,
-    });
   }, []);
 
   useEffect(() => {

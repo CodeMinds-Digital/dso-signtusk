@@ -39,7 +39,7 @@ export const getSessionCookieOptions = () =>
   ({
     httpOnly: true,
     path: "/",
-    sameSite: useSecureCookies() ? "none" : "lax",
+    sameSite: "lax",
     secure: useSecureCookies(),
     domain: getCookieDomain(),
     expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
@@ -63,7 +63,17 @@ export const extractSessionCookieFromHeaders = (
 export const getSessionCookie = async (c: Context): Promise<string | null> => {
   const cookieName = getSessionCookieName();
 
+  // Debug logging (temporary)
+  const rawCookieHeader = c.req.raw.headers.get("cookie");
+  console.log("[Session Cookie Debug] Cookie name looking for:", cookieName);
+  console.log(
+    "[Session Cookie Debug] Raw cookie header:",
+    rawCookieHeader?.substring(0, 200)
+  );
+
   const sessionId = await getSignedCookie(c, getAuthSecret(), cookieName);
+
+  console.log("[Session Cookie Debug] Session ID found:", !!sessionId);
 
   return sessionId || null;
 };
