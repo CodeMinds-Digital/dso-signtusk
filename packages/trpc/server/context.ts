@@ -1,20 +1,20 @@
-import type { Session } from '@prisma/client';
-import type { Context } from 'hono';
-import type { Logger } from 'pino';
-import { z } from 'zod';
+import type { Session } from "@prisma/client";
+import type { Context } from "hono";
+import type { Logger } from "pino";
+import { z } from "zod";
 
-import type { SessionUser } from '@signtusk/auth/server/lib/session/session';
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import type { RootApiLog } from '@signtusk/lib/types/api-logs';
-import type { ApiRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { alphaid } from '@signtusk/lib/universal/id';
-import { logger } from '@signtusk/lib/utils/logger';
+import type { SessionUser } from "@signtusk/auth/server/lib/session/session";
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import type { RootApiLog } from "@signtusk/lib/types/api-logs";
+import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { alphaid } from "@signtusk/lib/universal/id";
+import { logger } from "@signtusk/lib/utils/logger";
 // This is a bit nasty. Todo: Extract
-import type { HonoEnv } from '@signtusk/remix/server/router';
+import type { HonoEnv } from "@signtusk/remix/server/router";
 
 type CreateTrpcContextOptions = {
   c: Context<HonoEnv>;
-  requestSource: 'app' | 'apiV1' | 'apiV2';
+  requestSource: "app" | "apiV1" | "apiV2";
 };
 
 export const createTrpcContext = async ({
@@ -23,10 +23,19 @@ export const createTrpcContext = async ({
 }: CreateTrpcContextOptions): Promise<TrpcContext> => {
   const { session, user } = await getOptionalSession(c);
 
+  // Debug logging for session status
+  console.log("[TRPC Context] Request source:", requestSource);
+  console.log("[TRPC Context] Session exists:", !!session);
+  console.log("[TRPC Context] User exists:", !!user);
+  if (user) {
+    console.log("[TRPC Context] User ID:", user.id);
+    console.log("[TRPC Context] User email:", user.email);
+  }
+
   const req = c.req.raw;
   const res = c.res;
 
-  const requestMetadata = c.get('context').requestMetadata;
+  const requestMetadata = c.get("context").requestMetadata;
 
   const metadata: ApiRequestMetadata = {
     requestMetadata,
@@ -34,7 +43,7 @@ export const createTrpcContext = async ({
     auth: null,
   };
 
-  const rawTeamId = req.headers.get('x-team-id') || undefined;
+  const rawTeamId = req.headers.get("x-team-id") || undefined;
 
   const trpcLogger = logger.child({
     ipAddress: requestMetadata.ipAddress,

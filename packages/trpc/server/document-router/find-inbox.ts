@@ -1,13 +1,20 @@
-import type { Envelope, Prisma } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
+import type { Envelope, Prisma } from "@prisma/client";
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+} from "@signtusk/lib/constants/prisma-enums";
 
-import type { FindResultResponse } from '@signtusk/lib/types/search-params';
-import { mapEnvelopesToDocumentMany } from '@signtusk/lib/utils/document';
-import { maskRecipientTokensForDocument } from '@signtusk/lib/utils/mask-recipient-tokens-for-document';
-import { prisma } from '@signtusk/prisma';
+import type { FindResultResponse } from "@signtusk/lib/types/search-params";
+import { mapEnvelopesToDocumentMany } from "@signtusk/lib/utils/document";
+import { maskRecipientTokensForDocument } from "@signtusk/lib/utils/mask-recipient-tokens-for-document";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
-import { ZFindInboxRequestSchema, ZFindInboxResponseSchema } from './find-inbox.types';
+import { authenticatedProcedure } from "../trpc";
+import {
+  ZFindInboxRequestSchema,
+  ZFindInboxResponseSchema,
+} from "./find-inbox.types";
 
 export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
@@ -34,12 +41,17 @@ export type FindInboxOptions = {
   page?: number;
   perPage?: number;
   orderBy?: {
-    column: keyof Omit<Envelope, 'envelope'>;
-    direction: 'asc' | 'desc';
+    column: keyof Omit<Envelope, "envelope">;
+    direction: "asc" | "desc";
   };
 };
 
-export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: FindInboxOptions) => {
+export const findInbox = async ({
+  userId,
+  page = 1,
+  perPage = 10,
+  orderBy,
+}: FindInboxOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -50,8 +62,8 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
     },
   });
 
-  const orderByColumn = orderBy?.column ?? 'createdAt';
-  const orderByDirection = orderBy?.direction ?? 'desc';
+  const orderByColumn = orderBy?.column ?? "createdAt";
+  const orderByDirection = orderBy?.direction ?? "desc";
 
   const whereClause: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.DOCUMENT,
@@ -111,7 +123,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
     maskRecipientTokensForDocument({
       document,
       user,
-    }),
+    })
   );
 
   return {
