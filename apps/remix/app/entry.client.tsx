@@ -1,53 +1,30 @@
-// Comprehensive polyfills for browser - must be first
-import "./polyfills";
-
-import { StrictMode, startTransition, useEffect } from "react";
-
-import { i18n } from "@lingui/core";
-import { detect, fromHtmlTag } from "@lingui/detect-locale";
-import { I18nProvider } from "@lingui/react";
-import posthog from "posthog-js";
+import * as Sentry from "@sentry/remix";
+import { startTransition, StrictMode, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { useLocation, useMatches } from "react-router";
 import { HydratedRouter } from "react-router/dom";
 
-import { extractPostHogConfig } from "@signtusk/lib/constants/feature-flags";
-import { dynamicActivate } from "@signtusk/lib/utils/i18n";
+Sentry.init({
+  dsn: "https://0fc9f9fb64f65238b82bc6029d3d3175@o4510100871380992.ingest.de.sentry.io/4510647583572048",
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  integrations: [
+    Sentry.browserTracingIntegration({
+      useEffect,
+      useLocation,
+      useMatches,
+    }),
+    Sentry.replayIntegration(),
+  ],
+  environment: process.env.NODE_ENV,
+});
 
-import "./utils/polyfills/promise-with-resolvers";
-
-function PosthogInit() {
-  const postHogConfig = extractPostHogConfig();
-
-  useEffect(() => {
-    if (postHogConfig) {
-      posthog.init(postHogConfig.key, {
-        api_host: postHogConfig.host,
-        capture_exceptions: true,
-      });
-    }
-  }, []);
-
-  return null;
-}
-
-async function main() {
-  const locale = detect(fromHtmlTag("lang")) || "en";
-
-  await dynamicActivate(locale);
-
-  startTransition(() => {
-    hydrateRoot(
-      document,
-      <StrictMode>
-        <I18nProvider i18n={i18n}>
-          <HydratedRouter />
-        </I18nProvider>
-
-        <PosthogInit />
-      </StrictMode>
-    );
-  });
-}
-
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-main();
+startTransition(() => {
+  hydrateRoot(
+    document,
+    <StrictMode>
+      <HydratedRouter />
+    </StrictMode>
+  );
+});

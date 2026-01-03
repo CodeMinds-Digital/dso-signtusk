@@ -1,61 +1,63 @@
-import { i18n } from '@lingui/core';
-import { I18nProvider } from '@lingui/react';
-import { createReadableStreamFromReadable } from '@react-router/node';
-import { isbot } from 'isbot';
-import { PassThrough } from 'node:stream';
-import type { RenderToPipeableStreamOptions } from 'react-dom/server';
-import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from 'react-router';
-import { ServerRouter } from 'react-router';
+import { createReadableStreamFromReadable } from "@react-router/node";
+import * as Sentry from "@sentry/remix";
+import { isbot } from "isbot";
+import { PassThrough } from "node:stream";
+import { renderToPipeableStream } from "react-dom/server";
+import type { EntryContext } from "react-router";
+import { ServerRouter } from "react-router";
 
-import { APP_I18N_OPTIONS } from '@signtusk/lib/constants/i18n';
-import { dynamicActivate, extractLocaleData } from '@signtusk/lib/utils/i18n';
+const ABORT_DELAY = 5_000;
 
-import { langCookie } from './storage/lang-cookie.server';
+Sentry.init({
+  dsn: "https://0fc9f9fb64f65238b82bc6029d3d3175@o4510100871380992.ingest.de.sentry.io/4510647583572048",
+  tracesSampleRate: 1.0,
+  environment: process.env.NODE_ENV,
+});
 
-export const streamTimeout = 5_000;
-
-export default async function handleRequest(
+export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  routerContext: EntryContext,
-  _loadContext: AppLoadContext,
+  routerContext: EntryContext
 ) {
-  let language = await langCookie.parse(request.headers.get('cookie') ?? '');
+  return isbot(request.headers.get("user-agent") || "")
+    ? handleBotRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        routerContext
+      )
+    : handleBrowserRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        routerContext
+      );
+}
 
-  if (!APP_I18N_OPTIONS.supportedLangs.includes(language)) {
-    language = extractLocaleData({ headers: request.headers }).lang;
-  }
-
-  await dynamicActivate(language);
-
+function handleBotRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  routerContext: EntryContext
+) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;
-    const userAgent = request.headers.get('user-agent');
-
-    // Ensure requests from bots and SPA Mode renders wait for all content to load before responding
-    // https://react.dev/reference/react-dom/server/renderToPipeableStream#waiting-for-all-content-to-load-for-crawlers-and-static-generation
-    const readyOption: keyof RenderToPipeableStreamOptions =
-      (userAgent && isbot(userAgent)) || routerContext.isSpaMode ? 'onAllReady' : 'onShellReady';
-
     const { pipe, abort } = renderToPipeableStream(
-      <I18nProvider i18n={i18n}>
-        <ServerRouter context={routerContext} url={request.url} />
-      </I18nProvider>,
+      <ServerRouter context={routerContext} url={request.url} />,
       {
-        [readyOption]() {
+        onAllReady() {
           shellRendered = true;
           const body = new PassThrough();
           const stream = createReadableStreamFromReadable(body);
 
-          responseHeaders.set('Content-Type', 'text/html');
+          responseHeaders.set("Content-Type", "text/html");
 
           resolve(
             new Response(stream, {
               headers: responseHeaders,
               status: responseStatusCode,
-            }),
+            })
           );
 
           pipe(body);
@@ -65,18 +67,65 @@ export default async function handleRequest(
         },
         onError(error: unknown) {
           responseStatusCode = 500;
-          // Log streaming rendering errors from inside the shell.  Don't log
-          // errors encountered during initial shell rendering since they'll
-          // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
             console.error(error);
           }
         },
-      },
+      }
     );
 
-    // Abort the rendering stream after the `streamTimeout` so it has time to
-    // flush down the rejected boundaries
-    setTimeout(abort, streamTimeout + 1000);
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+
+function handleBrowserRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  routerContext: EntryContext
+) {
+  return new Promise((resolve, reject) => {
+    let shellRendered = false;
+    const { pipe, abort } = renderToPipeableStream(
+      <ServerRouter context={routerContext} url={request.url} />,
+      {
+        onShellReady() {
+          shellRendered = true;
+          const body = new PassThrough();
+          const stream = createReadableStreamFromReadable(body);
+
+          responseHeaders.set("Content-Type", "text/html");
+
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            })
+          );
+
+          pipe(body);
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          responseStatusCode = 500;
+          if (shellRendered) {
+            console.error(error);
+          }
+        },
+      }
+    );
+
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+
+export function handleError(error: unknown, { request }: { request: Request }) {
+  Sentry.captureException(error, {
+    extra: {
+      url: request.url,
+      method: request.method,
+    },
   });
 }
