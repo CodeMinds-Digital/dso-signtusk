@@ -45,7 +45,8 @@ export class AuthClient {
 
   constructor(options: { baseUrl: string }) {
     this.client = hc<AuthAppType>(options.baseUrl, {
-      fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, credentials: "include" }),
     });
   }
 
