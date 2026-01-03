@@ -8,27 +8,36 @@ import {
   isRouteErrorResponse,
   useLoaderData,
   useLocation,
-} from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+} from "react-router";
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from "remix-themes";
 
-import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { SessionProvider } from '@signtusk/lib/client-only/providers/session';
-import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@signtusk/lib/constants/i18n';
-import { createPublicEnv } from '@signtusk/lib/utils/env';
-import { extractLocaleData } from '@signtusk/lib/utils/i18n';
-import { TrpcProvider } from '@signtusk/trpc/react';
-import { getOrganisationSession } from '@signtusk/trpc/server/organisation-router/get-organisation-session';
-import { Toaster } from '@signtusk/ui/primitives/toaster';
-import { TooltipProvider } from '@signtusk/ui/primitives/tooltip';
+import { getOptionalSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { SessionProvider } from "@signtusk/lib/client-only/providers/session";
+import {
+  APP_I18N_OPTIONS,
+  type SupportedLanguageCodes,
+} from "@signtusk/lib/constants/i18n";
+import { createPublicEnv } from "@signtusk/lib/utils/env";
+import { extractLocaleData } from "@signtusk/lib/utils/i18n";
+import { TrpcProvider } from "@signtusk/trpc/react";
+import { getOrganisationSession } from "@signtusk/trpc/server/organisation-router/get-organisation-session";
+import { Toaster } from "@signtusk/ui/primitives/toaster";
+import { TooltipProvider } from "@signtusk/ui/primitives/tooltip";
 
-import type { Route } from './+types/root';
-import stylesheet from './app.css?url';
-import { GenericErrorLayout } from './components/general/generic-error-layout';
-import { langCookie } from './storage/lang-cookie.server';
-import { themeSessionResolver } from './storage/theme-session.server';
-import { appMetaTags } from './utils/meta';
+import type { Route } from "./+types/root";
+import stylesheet from "./app.css?url";
+import { GenericErrorLayout } from "./components/general/generic-error-layout";
+import { langCookie } from "./storage/lang-cookie.server";
+import { themeSessionResolver } from "./storage/theme-session.server";
+import { appMetaTags } from "./utils/meta";
 
-export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
+export const links: Route.LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
 
 export function meta() {
   return appMetaTags();
@@ -46,7 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const { getTheme } = await themeSessionResolver(request);
 
-  const cookieHeader = request.headers.get('cookie') ?? '';
+  const cookieHeader = request.headers.get("cookie") ?? "";
 
   let lang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
 
@@ -54,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     lang = extractLocaleData({ headers: request.headers }).lang;
   }
 
-  const disableAnimations = cookieHeader.includes('__disable_animations=true');
+  const disableAnimations = cookieHeader.includes("__disable_animations=true");
 
   let organisations = null;
 
@@ -78,9 +87,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     },
     {
       headers: {
-        'Set-Cookie': await langCookie.serialize(lang),
+        "Set-Cookie": await langCookie.serialize(lang),
       },
-    },
+    }
   );
 }
 
@@ -103,12 +112,26 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   const [theme] = useTheme();
 
   return (
-    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
+    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ""}>
       <head>
         <meta charSet="utf-8" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="google" content="notranslate" />
@@ -127,6 +150,26 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
+
+        {/* Process polyfill for browser - must be loaded before any other scripts */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof process === 'undefined') {
+                window.process = {
+                  env: { NODE_ENV: '${process.env.NODE_ENV || "production"}' },
+                  browser: true,
+                  version: '',
+                  versions: {},
+                  platform: 'browser',
+                  cwd: function() { return '/'; },
+                  nextTick: function(fn) { setTimeout(fn, 0); }
+                };
+                globalThis.process = window.process;
+              }
+            `,
+          }}
+        />
       </head>
       <body>
         <SessionProvider initialSession={session}>
@@ -160,7 +203,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   if (errorCode !== 404) {
-    console.error('[RootErrorBoundary]', error);
+    console.error("[RootErrorBoundary]", error);
   }
 
   return <GenericErrorLayout errorCode={errorCode} />;

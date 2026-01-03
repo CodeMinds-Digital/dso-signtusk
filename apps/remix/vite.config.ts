@@ -75,6 +75,14 @@ export default defineConfig({
     // Define process for browser environments
     "process.browser": "true",
     "process.version": '""',
+    // Define global process object for browser
+    "global.process": JSON.stringify({
+      env: { NODE_ENV: process.env.NODE_ENV || "production" },
+      browser: true,
+      version: "",
+      versions: {},
+      platform: "browser",
+    }),
   },
   plugins: [
     prismaClientBrowserStub(),
