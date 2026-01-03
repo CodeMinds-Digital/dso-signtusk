@@ -19,6 +19,8 @@ export const trpc = createTRPCClient<AppRouter>({
       true: httpLink({
         url: `${getBaseUrl()}/api/trpc`,
         transformer: dataTransformer,
+        fetch: (input, init) =>
+          fetch(input, { ...init, credentials: "include" }),
         headers: (opts) => {
           if (typeof opts.op.context.teamId === "string") {
             return {
@@ -32,6 +34,8 @@ export const trpc = createTRPCClient<AppRouter>({
       false: httpBatchLink({
         url: `${getBaseUrl()}/api/trpc`,
         transformer: dataTransformer,
+        fetch: (input, init) =>
+          fetch(input, { ...init, credentials: "include" }),
         headers: (opts) => {
           const operationWithTeamId = opts.opList.find(
             (op) => op.context.teamId && typeof op.context.teamId === "string"

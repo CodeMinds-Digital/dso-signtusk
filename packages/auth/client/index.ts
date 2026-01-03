@@ -44,7 +44,9 @@ export class AuthClient {
   private signOutredirectPath: string = "/signin";
 
   constructor(options: { baseUrl: string }) {
-    this.client = hc<AuthAppType>(options.baseUrl);
+    this.client = hc<AuthAppType>(options.baseUrl, {
+      fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
+    });
   }
 
   public async signOut({ redirectPath }: { redirectPath?: string } = {}) {

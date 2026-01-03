@@ -62,20 +62,8 @@ export const extractSessionCookieFromHeaders = (
  */
 export const getSessionCookie = async (c: Context): Promise<string | null> => {
   const cookieName = getSessionCookieName();
-  const cookieOptions = getSessionCookieOptions();
-
-  // Debug logging for cookie extraction
-  console.log("[Session Cookie] Cookie name:", cookieName);
-  console.log(
-    "[Session Cookie] Cookie options:",
-    JSON.stringify(cookieOptions)
-  );
-  console.log("[Session Cookie] useSecureCookies:", useSecureCookies());
-  console.log("[Session Cookie] Cookie domain:", getCookieDomain());
 
   const sessionId = await getSignedCookie(c, getAuthSecret(), cookieName);
-
-  console.log("[Session Cookie] Session ID found:", !!sessionId);
 
   return sessionId || null;
 };

@@ -55,11 +55,15 @@ export function TrpcProvider({ children, headers }: TrpcProviderProps) {
               url: `${getBaseUrl()}/api/trpc`,
               headers,
               transformer: dataTransformer,
+              fetch: (input, init) =>
+                fetch(input, { ...init, credentials: "include" }),
             }),
             false: httpBatchLink({
               url: `${getBaseUrl()}/api/trpc`,
               headers,
               transformer: dataTransformer,
+              fetch: (input, init) =>
+                fetch(input, { ...init, credentials: "include" }),
             }),
           }),
         ],
