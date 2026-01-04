@@ -6635,10 +6635,6 @@ msgstr "Per favore completa il documento una volta rivisto"
 msgid "Please configure the document first"
 msgstr "Si prega di configurare prima il documento"
 
-#: packages/lib/server-only/auth/send-confirmation-email.ts
-msgid "Please confirm your email"
-msgstr "Per favore conferma la tua email"
-
 #: packages/email/templates/confirm-email.tsx
 msgid "Please confirm your email address"
 msgstr "Per favore conferma il tuo indirizzo email"

@@ -128,3 +128,5 @@ logs/
 dso-signtusk-re-structure.zip
 dso-signtusk-re-structure/
 packages/lib/translations/
+.vercel
+.env*.local

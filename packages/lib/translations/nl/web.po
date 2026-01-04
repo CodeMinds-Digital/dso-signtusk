@@ -6635,10 +6635,6 @@ msgstr "Voltooi het document nadat u het heeft gecontroleerd"
 msgid "Please configure the document first"
 msgstr "Configureer eerst het document"
 
-#: packages/lib/server-only/auth/send-confirmation-email.ts
-msgid "Please confirm your email"
-msgstr "Bevestig je e-mailadres"
-
 #: packages/email/templates/confirm-email.tsx
 msgid "Please confirm your email address"
 msgstr "Bevestig je e-mailadres"

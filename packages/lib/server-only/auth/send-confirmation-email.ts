@@ -1,18 +1,15 @@
 import { createElement } from "react";
 
-import { msg } from "@lingui/core/macro";
-
 import { mailer } from "@signtusk/email/mailer";
-import { ConfirmEmailTemplate } from "@signtusk/email/templates/confirm-email";
+import { renderSimple } from "@signtusk/email/render-simple";
+import { ConfirmEmailSimpleTemplate } from "@signtusk/email/templates/confirm-email-simple";
 import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from "../../client-only/providers/i18n-server";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
 import {
   DOCUMENSO_INTERNAL_EMAIL,
   USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
 } from "../../constants/email";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 
 export interface SendConfirmationEmailProps {
   userId: number;
@@ -59,24 +56,32 @@ export const sendConfirmationEmail = async ({
     confirmationLink
   );
 
-  const confirmationTemplate = createElement(ConfirmEmailTemplate, {
+  // Use simple template without lingui hooks to avoid React version conflicts
+  // with @react-email/render in serverless environments
+  const confirmationTemplate = createElement(ConfirmEmailSimpleTemplate, {
     assetBaseUrl,
     confirmationLink,
+    translations: {
+      previewText: "Please confirm your email address",
+      welcomeTitle: "Welcome to Signtusk!",
+      confirmInstructions:
+        "Before you get started, please confirm your email address by clicking the button below:",
+      confirmButton: "Confirm email",
+      linkExpiry: "(link expires in 1 hour)",
+    },
   });
 
   console.log("[SEND_CONFIRMATION_EMAIL_FN] Rendering email template...");
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(confirmationTemplate),
-    renderEmailWithI18N(confirmationTemplate, { plainText: true }),
+    renderSimple(confirmationTemplate),
+    renderSimple(confirmationTemplate, { plainText: true }),
   ]);
 
   console.log(
     "[SEND_CONFIRMATION_EMAIL_FN] Email template rendered, HTML length:",
     html?.length
   );
-
-  const i18n = await getI18nInstance();
 
   console.log("[SEND_CONFIRMATION_EMAIL_FN] Sending email via mailer...");
   console.log("[SEND_CONFIRMATION_EMAIL_FN] To:", user.email);
@@ -88,7 +93,7 @@ export const sendConfirmationEmail = async ({
       name: user.name || "",
     },
     from: DOCUMENSO_INTERNAL_EMAIL,
-    subject: i18n._(msg`Please confirm your email`),
+    subject: "Please confirm your email",
     html,
     text,
   });
