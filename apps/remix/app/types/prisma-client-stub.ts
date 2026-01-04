@@ -151,6 +151,24 @@ export const kyselyPrisma = {
 
 export const prismaWithLogging = prisma;
 
+// ============================================
+// pg (PostgreSQL) stubs
+// ============================================
+
+// Stub Pool class from pg
+export class Pool {
+  constructor(_config?: unknown) {
+    throw new Error("pg Pool cannot be used in the browser");
+  }
+}
+
+// Stub Client class from pg
+export class Client {
+  constructor(_config?: unknown) {
+    throw new Error("pg Client cannot be used in the browser");
+  }
+}
+
 // Type exports for DB
 export type DB = Record<string, unknown>;
 

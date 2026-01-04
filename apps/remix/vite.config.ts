@@ -217,6 +217,12 @@ export default defineConfig({
     alias: {
       https: "node:https",
       canvas: path.resolve(__dirname, "./app/types/empty-module.ts"),
+      // Redirect kysely to our stub for client builds
+      kysely: path.resolve(__dirname, "./app/types/prisma-client-stub.ts"),
+      // Redirect pg to empty module for client builds
+      pg: path.resolve(__dirname, "./app/types/empty-module.ts"),
+      "pg-native": path.resolve(__dirname, "./app/types/empty-module.ts"),
+      "pg-pool": path.resolve(__dirname, "./app/types/empty-module.ts"),
       // Use the npm buffer package for browser environments
       // This provides a more complete Buffer implementation than our polyfill
       buffer: "buffer",
