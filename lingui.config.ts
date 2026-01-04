@@ -2,11 +2,12 @@ import { defineConfig } from '@lingui/cli';
 import type { LinguiConfig } from '@lingui/conf';
 import { formatter } from '@lingui/format-po';
 
-import { APP_I18N_OPTIONS } from '@signtusk/lib/constants/i18n';
+// Inlined from @signtusk/lib/constants/i18n to avoid module resolution issues on Vercel
+const SUPPORTED_LANGUAGE_CODES = ['de', 'en', 'fr', 'es', 'it', 'nl', 'pl', 'pt-BR', 'ja', 'ko', 'zh'] as const;
 
 const config: LinguiConfig = {
-    sourceLocale: APP_I18N_OPTIONS.sourceLang,
-    locales: APP_I18N_OPTIONS.supportedLangs as unknown as string[],
+    sourceLocale: 'en',
+    locales: SUPPORTED_LANGUAGE_CODES as unknown as string[],
     // Any changes to these catalogue paths should be reflected in crowdin.yml
     catalogs: [
         {
