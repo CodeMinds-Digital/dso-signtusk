@@ -219,6 +219,17 @@ export class LocalJobProvider extends BaseJobProvider {
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;
 
+    // On Vercel/serverless, run jobs inline instead of making HTTP requests
+    // This avoids issues with serverless function termination
+    const isServerless =
+      process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+    if (isServerless) {
+      console.log(`[JOBS]: Running job inline (serverless mode): ${data.name}`);
+      await this.runJobInline(jobId, data, isRetry);
+      return;
+    }
+
     const endpoint = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/api/jobs/${jobDefinitionId}/${jobId}`;
     const signature = sign(data);
 
@@ -243,6 +254,102 @@ export class LocalJobProvider extends BaseJobProvider {
         setTimeout(resolve, 150);
       }),
     ]);
+  }
+
+  private async runJobInline(
+    jobId: string,
+    options: SimpleTriggerJobOptions,
+    isRetry: boolean = false
+  ) {
+    const definition = this._jobDefinitions[options.name];
+
+    if (!definition) {
+      console.log(`[JOBS]: Job definition not found: ${options.name}`);
+      return;
+    }
+
+    if (!definition.enabled) {
+      console.log(`[JOBS]: Job is disabled: ${options.name}`);
+      return;
+    }
+
+    let backgroundJob = await prisma.backgroundJob
+      .update({
+        where: {
+          id: jobId,
+          status: BackgroundJobStatus.PENDING,
+        },
+        data: {
+          status: BackgroundJobStatus.PROCESSING,
+          retried: {
+            increment: isRetry ? 1 : 0,
+          },
+          lastRetriedAt: isRetry ? new Date() : undefined,
+        },
+      })
+      .catch(() => null);
+
+    if (!backgroundJob) {
+      console.log(`[JOBS]: Background job not found or not pending: ${jobId}`);
+      return;
+    }
+
+    try {
+      console.log(
+        `[JOBS]: Executing job ${options.name} with payload`,
+        options.payload
+      );
+
+      await definition.handler({
+        payload: options.payload,
+        io: this.createJobRunIO(jobId),
+      });
+
+      await prisma.backgroundJob.update({
+        where: {
+          id: jobId,
+          status: BackgroundJobStatus.PROCESSING,
+        },
+        data: {
+          status: BackgroundJobStatus.COMPLETED,
+          completedAt: new Date(),
+        },
+      });
+
+      console.log(`[JOBS]: Job ${options.name} completed successfully`);
+    } catch (error) {
+      console.error(`[JOBS]: Job ${options.name} failed`, error);
+
+      const taskHasExceededRetries =
+        error instanceof BackgroundTaskExceededRetriesError;
+      const jobHasExceededRetries =
+        backgroundJob.retried >= backgroundJob.maxRetries &&
+        !(error instanceof BackgroundTaskFailedError);
+
+      if (taskHasExceededRetries || jobHasExceededRetries) {
+        await prisma.backgroundJob.update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PROCESSING,
+          },
+          data: {
+            status: BackgroundJobStatus.FAILED,
+            completedAt: new Date(),
+          },
+        });
+        return;
+      }
+
+      await prisma.backgroundJob.update({
+        where: {
+          id: jobId,
+          status: BackgroundJobStatus.PROCESSING,
+        },
+        data: {
+          status: BackgroundJobStatus.PENDING,
+        },
+      });
+    }
   }
 
   private createJobRunIO(jobId: string): JobRunIO {
