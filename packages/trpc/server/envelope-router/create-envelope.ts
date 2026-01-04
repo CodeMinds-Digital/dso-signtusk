@@ -1,15 +1,15 @@
-import { getServerLimits } from '@signtusk/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { createEnvelope } from '@signtusk/lib/server-only/envelope/create-envelope';
-import { putNormalizedPdfFileServerSide } from '@signtusk/lib/universal/upload/put-file.server';
+import { getServerLimits } from "@signtusk/ee/server-only/limits/server";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { createEnvelope } from "@signtusk/lib/server-only/envelope/create-envelope";
+import { putNormalizedPdfFileServerSide } from "@signtusk/lib/universal/upload/put-file.server";
 
-import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
-import { authenticatedProcedure } from '../trpc';
+import { insertFormValuesInPdf } from "../../../lib/server-only/pdf/insert-form-values-in-pdf";
+import { authenticatedProcedure } from "../trpc";
 import {
   ZCreateEnvelopeRequestSchema,
   ZCreateEnvelopeResponseSchema,
   createEnvelopeMeta,
-} from './create-envelope.types';
+} from "./create-envelope.types";
 
 export const createEnvelopeRoute = authenticatedProcedure
   .meta(createEnvelopeMeta)
@@ -19,6 +19,11 @@ export const createEnvelopeRoute = authenticatedProcedure
     const { user, teamId } = ctx;
 
     const { payload, files } = input;
+
+    console.log("[CREATE_ENVELOPE] Starting envelope creation");
+    console.log("[CREATE_ENVELOPE] User ID:", user.id);
+    console.log("[CREATE_ENVELOPE] Team ID:", teamId);
+    console.log("[CREATE_ENVELOPE] Files count:", files.length);
 
     const {
       title,
@@ -45,52 +50,84 @@ export const createEnvelopeRoute = authenticatedProcedure
       teamId,
     });
 
+    console.log("[CREATE_ENVELOPE] Remaining documents:", remaining.documents);
+
     if (remaining.documents <= 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-        message: 'You have reached your document limit for this month. Please upgrade your plan.',
+        message:
+          "You have reached your document limit for this month. Please upgrade your plan.",
         statusCode: 400,
       });
     }
 
     if (files.length > maximumEnvelopeItemCount) {
-      throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
+      throw new AppError("ENVELOPE_ITEM_LIMIT_EXCEEDED", {
         message: `You cannot upload more than ${maximumEnvelopeItemCount} envelope items per envelope`,
         statusCode: 400,
       });
     }
 
-    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
-      throw new AppError('INVALID_DOCUMENT_FILE', {
-        message: 'You cannot upload non-PDF files',
+    if (files.some((file) => !file.type.startsWith("application/pdf"))) {
+      throw new AppError("INVALID_DOCUMENT_FILE", {
+        message: "You cannot upload non-PDF files",
         statusCode: 400,
       });
     }
 
+    console.log("[CREATE_ENVELOPE] Processing files...");
+
     // For each file, stream to s3 and create the document data.
     const envelopeItems = await Promise.all(
-      files.map(async (file) => {
-        let pdf = Buffer.from(await file.arrayBuffer());
+      files.map(async (file, index) => {
+        console.log(
+          `[CREATE_ENVELOPE] Processing file ${index + 1}:`,
+          file.name
+        );
 
-        if (formValues) {
-          // eslint-disable-next-line require-atomic-updates
-          pdf = await insertFormValuesInPdf({
-            pdf,
-            formValues,
+        try {
+          let pdf = Buffer.from(await file.arrayBuffer());
+          console.log(
+            `[CREATE_ENVELOPE] File ${index + 1} buffer size:`,
+            pdf.length
+          );
+
+          if (formValues) {
+            console.log(
+              `[CREATE_ENVELOPE] Inserting form values for file ${index + 1}`
+            );
+            // eslint-disable-next-line require-atomic-updates
+            pdf = await insertFormValuesInPdf({
+              pdf,
+              formValues,
+            });
+          }
+
+          console.log(`[CREATE_ENVELOPE] Uploading file ${index + 1}...`);
+          const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+            name: file.name,
+            type: "application/pdf",
+            arrayBuffer: async () => Promise.resolve(pdf),
           });
+          console.log(
+            `[CREATE_ENVELOPE] File ${index + 1} uploaded, documentDataId:`,
+            documentDataId
+          );
+
+          return {
+            title: file.name,
+            documentDataId,
+          };
+        } catch (error) {
+          console.error(
+            `[CREATE_ENVELOPE] Error processing file ${index + 1}:`,
+            error
+          );
+          throw error;
         }
-
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide({
-          name: file.name,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(pdf),
-        });
-
-        return {
-          title: file.name,
-          documentDataId,
-        };
-      }),
+      })
     );
+
+    console.log("[CREATE_ENVELOPE] All files processed, creating envelope...");
 
     const recipientsToCreate = recipients?.map((recipient) => ({
       email: recipient.email,
@@ -102,13 +139,13 @@ export const createEnvelopeRoute = authenticatedProcedure
       fields: recipient.fields?.map((field) => {
         let documentDataId: string | undefined = undefined;
 
-        if (typeof field.identifier === 'string') {
+        if (typeof field.identifier === "string") {
           documentDataId = envelopeItems.find(
-            (item) => item.title === field.identifier,
+            (item) => item.title === field.identifier
           )?.documentDataId;
         }
 
-        if (typeof field.identifier === 'number') {
+        if (typeof field.identifier === "number") {
           documentDataId = envelopeItems.at(field.identifier)?.documentDataId;
         }
 
@@ -118,7 +155,7 @@ export const createEnvelopeRoute = authenticatedProcedure
 
         if (!documentDataId) {
           throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Document data not found',
+            message: "Document data not found",
           });
         }
 
