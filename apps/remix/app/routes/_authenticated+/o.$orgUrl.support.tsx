@@ -1,19 +1,19 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { Trans } from '@lingui/react/macro';
-import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
+import { Trans } from "@lingui/react/macro";
+import { BookIcon, HelpCircleIcon, Link2Icon } from "lucide-react";
+import { Link, useSearchParams } from "react-router";
 
-import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
-import { Button } from '@signtusk/ui/primitives/button';
+import { useCurrentOrganisation } from "@signtusk/lib/client-only/providers/organisation";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { IS_BILLING_ENABLED } from "@signtusk/lib/constants/app";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { SupportTicketForm } from '~/components/forms/support-ticket-form';
-import { appMetaTags } from '~/utils/meta';
+import { SupportTicketForm } from "~/components/forms/support-ticket-form";
+import { appMetaTags } from "~/utils/meta";
 
 export function meta() {
-  return appMetaTags('Support');
+  return appMetaTags("Support");
 }
 
 export default function SupportPage() {
@@ -23,7 +23,7 @@ export default function SupportPage() {
 
   const [searchParams] = useSearchParams();
 
-  const teamId = searchParams.get('team');
+  const teamId = searchParams.get("team");
 
   const subscriptionStatus = organisation.subscription?.status;
 
@@ -44,7 +44,9 @@ export default function SupportPage() {
         </h1>
 
         <p className="text-muted-foreground mt-2">
-          <Trans>Your current plan includes the following support channels:</Trans>
+          <Trans>
+            Your current plan includes the following support channels:
+          </Trans>
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
@@ -52,7 +54,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <BookIcon className="text-muted-foreground h-5 w-5" />
               <Link
-                to="https://docs.documenso.com"
+                to="https://docs.signtusk.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -61,7 +63,9 @@ export default function SupportPage() {
               </Link>
             </h2>
             <p className="text-muted-foreground mt-1">
-              <Trans>Read our documentation to get started with Documenso.</Trans>
+              <Trans>
+                Read our documentation to get started with Signtusk.
+              </Trans>
             </p>
           </div>
           <div className="rounded-lg border p-4">
@@ -78,7 +82,7 @@ export default function SupportPage() {
             </h2>
             <p className="text-muted-foreground mt-1">
               <Trans>
-                Join our community on{' '}
+                Join our community on{" "}
                 <Link
                   to="https://documen.so/discord"
                   target="_blank"
@@ -86,7 +90,7 @@ export default function SupportPage() {
                   className="hover:underline"
                 >
                   Discord
-                </Link>{' '}
+                </Link>{" "}
                 for community support and discussion.
               </Trans>
             </p>
@@ -99,11 +103,17 @@ export default function SupportPage() {
                   <Trans>Contact us</Trans>
                 </h2>
                 <p className="text-muted-foreground mt-1">
-                  <Trans>We'll get back to you as soon as possible via email.</Trans>
+                  <Trans>
+                    We'll get back to you as soon as possible via email.
+                  </Trans>
                 </p>
                 <div className="mt-4">
                   {!showForm ? (
-                    <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowForm(true)}
+                    >
                       <Trans>Create a support ticket</Trans>
                     </Button>
                   ) : (

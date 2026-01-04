@@ -1,25 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { AlertTriangle, CheckCircle2, Loader, XCircle } from 'lucide-react';
-import { Link, redirect, useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { AlertTriangle, CheckCircle2, Loader, XCircle } from "lucide-react";
+import { Link, redirect, useNavigate } from "react-router";
+import { match } from "ts-pattern";
 
-import { authClient } from '@signtusk/auth/client';
-import { useOptionalSession } from '@signtusk/lib/client-only/providers/session';
-import { EMAIL_VERIFICATION_STATE } from '@signtusk/lib/constants/email';
-import { Button } from '@signtusk/ui/primitives/button';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+import { authClient } from "@signtusk/auth/client";
+import { useOptionalSession } from "@signtusk/lib/client-only/providers/session";
+import { EMAIL_VERIFICATION_STATE } from "@signtusk/lib/constants/email";
+import { Button } from "@signtusk/ui/primitives/button";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import type { Route } from './+types/verify-email.$token';
+import type { Route } from "./+types/verify-email.$token";
 
 export const loader = ({ params }: Route.LoaderArgs) => {
   const { token } = params;
 
   if (!token) {
-    throw redirect('/verify-email');
+    throw redirect("/verify-email");
   }
 
   return {
@@ -35,7 +35,9 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [state, setState] = useState<keyof typeof EMAIL_VERIFICATION_STATE | null>(null);
+  const [state, setState] = useState<
+    keyof typeof EMAIL_VERIFICATION_STATE | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const verifyToken = async () => {
@@ -57,7 +59,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
         description: _(msg`We were unable to verify your email at this time.`),
       });
 
-      await navigate('/verify-email');
+      await navigate("/verify-email");
     }
 
     setIsLoading(false);
@@ -70,7 +72,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   if (isLoading || state === null) {
     return (
       <div className="relative">
-        <Loader className="text-documenso h-8 w-8 animate-spin" />
+        <Loader className="text-primary h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -80,7 +82,10 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
-            <AlertTriangle className="h-10 w-10 text-yellow-500" strokeWidth={2} />
+            <AlertTriangle
+              className="h-10 w-10 text-yellow-500"
+              strokeWidth={2}
+            />
           </div>
 
           <div>
@@ -90,8 +95,8 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
 
             <p className="text-muted-foreground mt-4">
               <Trans>
-                We were unable to verify your email. If your email is not verified already, please
-                try again.
+                We were unable to verify your email. If your email is not
+                verified already, please try again.
               </Trans>
             </p>
 
@@ -118,8 +123,8 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
 
             <p className="text-muted-foreground mt-4">
               <Trans>
-                It seems that the provided token has expired. We've just sent you another token,
-                please check your email and try again.
+                It seems that the provided token has expired. We've just sent
+                you another token, please check your email and try again.
               </Trans>
             </p>
 
@@ -136,7 +141,10 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
-            <CheckCircle2 className="h-10 w-10 text-green-500" strokeWidth={2} />
+            <CheckCircle2
+              className="h-10 w-10 text-green-500"
+              strokeWidth={2}
+            />
           </div>
 
           <div>
@@ -146,8 +154,8 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
 
             <p className="text-muted-foreground mt-4">
               <Trans>
-                Your email has been successfully confirmed! You can now use all features of
-                Documenso.
+                Your email has been successfully confirmed! You can now use all
+                features of Signtusk.
               </Trans>
             </p>
 
@@ -164,7 +172,10 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
-            <CheckCircle2 className="h-10 w-10 text-green-500" strokeWidth={2} />
+            <CheckCircle2
+              className="h-10 w-10 text-green-500"
+              strokeWidth={2}
+            />
           </div>
 
           <div>
@@ -174,7 +185,8 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
 
             <p className="text-muted-foreground mt-4">
               <Trans>
-                Your email has already been confirmed. You can now use all features of Documenso.
+                Your email has already been confirmed. You can now use all
+                features of Signtusk.
               </Trans>
             </p>
 

@@ -390,7 +390,7 @@ export const EnvelopeDistributeDialog = ({
                                           ))}
 
                                           <SelectItem value={"-1"}>
-                                            Documenso
+                                            Signtusk
                                           </SelectItem>
                                         </SelectContent>
                                       </Select>

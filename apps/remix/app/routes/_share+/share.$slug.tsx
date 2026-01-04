@@ -1,61 +1,64 @@
-import { redirect, useLoaderData } from 'react-router';
+import { redirect, useLoaderData } from "react-router";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { getDocumentByAccessToken } from '@signtusk/lib/server-only/document/get-document-by-access-token';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { getDocumentByAccessToken } from "@signtusk/lib/server-only/document/get-document-by-access-token";
 
-import { DocumentCertificateQRView } from '~/components/general/document/document-certificate-qr-view';
+import { DocumentCertificateQRView } from "~/components/general/document/document-certificate-qr-view";
 
-import type { Route } from './+types/share.$slug';
+import type { Route } from "./+types/share.$slug";
 
 export function meta({ params: { slug } }: Route.MetaArgs) {
-  if (slug.startsWith('qr_')) {
+  if (slug.startsWith("qr_")) {
     return undefined;
   }
 
   return [
-    { title: 'Documenso - Share' },
-    { description: 'I just signed a document in style with Documenso!' },
+    { title: "Signtusk - Share" },
+    { description: "I just signed a document in style with Signtusk!" },
     {
-      property: 'og:title',
-      content: 'Documenso - Join the open source signing revolution',
+      property: "og:title",
+      content: "Signtusk - Join the open source signing revolution",
     },
     {
-      property: 'og:description',
-      content: 'I just signed with Documenso!',
+      property: "og:description",
+      content: "I just signed with Signtusk!",
     },
     {
-      property: 'og:type',
-      content: 'website',
+      property: "og:type",
+      content: "website",
     },
     {
-      property: 'og:image',
+      property: "og:image",
       content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
     },
     {
-      name: 'twitter:site',
-      content: '@documenso',
+      name: "twitter:site",
+      content: "@signtusk",
     },
     {
-      name: 'twitter:card',
-      content: 'summary_large_image',
+      name: "twitter:card",
+      content: "summary_large_image",
     },
     {
-      name: 'twitter:image',
+      name: "twitter:image",
       content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
     },
     {
-      name: 'twitter:description',
-      content: 'I just signed with Documenso!',
+      name: "twitter:description",
+      content: "I just signed with Signtusk!",
     },
   ];
 }
 
-export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) => {
-  if (slug.startsWith('qr_')) {
+export const loader = async ({
+  request,
+  params: { slug },
+}: Route.LoaderArgs) => {
+  if (slug.startsWith("qr_")) {
     const document = await getDocumentByAccessToken({ token: slug });
 
     if (!document) {
-      throw redirect('/');
+      throw redirect("/");
     }
 
     return {
@@ -64,14 +67,18 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
     };
   }
 
-  const userAgent = request.headers.get('User-Agent') ?? '';
+  const userAgent = request.headers.get("User-Agent") ?? "";
 
-  if (/bot|facebookexternalhit|WhatsApp|google|bing|duckduckbot|MetaInspector/i.test(userAgent)) {
+  if (
+    /bot|facebookexternalhit|WhatsApp|google|bing|duckduckbot|MetaInspector/i.test(
+      userAgent
+    )
+  ) {
     return {};
   }
 
-  // Is hardcoded because this whole meta is hardcoded anyway for Documenso.
-  throw redirect('https://documenso.com');
+  // Is hardcoded because this whole meta is hardcoded anyway for Signtusk.
+  throw redirect("https://signtusk.com");
 };
 
 export default function SharePage() {

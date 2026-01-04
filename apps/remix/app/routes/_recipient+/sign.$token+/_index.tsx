@@ -384,7 +384,7 @@ const SigningPageV1 = ({
           {user ? (
             <Link
               to="/"
-              className="text-documenso-700 hover:text-documenso-600 mt-36"
+              className="text-primary hover:text-primary/80 mt-36"
             >
               <Trans>Go Back Home</Trans>
             </Link>
@@ -393,10 +393,10 @@ const SigningPageV1 = ({
               <Trans>
                 Want to send slick signing links like this one?{" "}
                 <Link
-                  to="https://documenso.com"
-                  className="text-documenso-700 hover:text-documenso-600"
+                  to="https://signtusk.com"
+                  className="text-primary hover:text-primary/80"
                 >
-                  Check out Documenso
+                  Check out Signtusk
                 </Link>
                 .
               </Trans>
@@ -491,7 +491,7 @@ const SigningPageV2 = ({
           {user ? (
             <Link
               to="/"
-              className="text-documenso-700 hover:text-documenso-600 mt-36"
+              className="text-primary hover:text-primary/80 mt-36"
             >
               <Trans>Go Back Home</Trans>
             </Link>
@@ -500,10 +500,10 @@ const SigningPageV2 = ({
               <Trans>
                 Want to send slick signing links like this one?{" "}
                 <Link
-                  to="https://documenso.com"
-                  className="text-documenso-700 hover:text-documenso-600"
+                  to="https://signtusk.com"
+                  className="text-primary hover:text-primary/80"
                 >
-                  Check out Documenso
+                  Check out Signtusk
                 </Link>
                 .
               </Trans>

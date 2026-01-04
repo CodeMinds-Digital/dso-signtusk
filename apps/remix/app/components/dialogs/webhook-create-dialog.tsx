@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { trpc } from '@signtusk/trpc/react';
-import { ZCreateWebhookRequestSchema } from '@signtusk/trpc/server/webhook-router/schema';
-import { Button } from '@signtusk/ui/primitives/button';
+import { trpc } from "@signtusk/trpc/react";
+import { ZCreateWebhookRequestSchema } from "@signtusk/trpc/server/webhook-router/schema";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@signtusk/ui/primitives/dialog';
+} from "@signtusk/ui/primitives/dialog";
 import {
   Form,
   FormControl,
@@ -28,15 +28,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@signtusk/ui/primitives/form/form';
-import { Input } from '@signtusk/ui/primitives/input';
-import { PasswordInput } from '@signtusk/ui/primitives/password-input';
-import { Switch } from '@signtusk/ui/primitives/switch';
-import { useToast } from '@signtusk/ui/primitives/use-toast';
+} from "@signtusk/ui/primitives/form/form";
+import { Input } from "@signtusk/ui/primitives/input";
+import { PasswordInput } from "@signtusk/ui/primitives/password-input";
+import { Switch } from "@signtusk/ui/primitives/switch";
+import { useToast } from "@signtusk/ui/primitives/use-toast";
 
-import { useCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from "~/providers/team";
 
-import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
+import { WebhookMultiSelectCombobox } from "../general/webhook-multiselect-combobox";
 
 const ZCreateWebhookFormSchema = ZCreateWebhookRequestSchema;
 
@@ -44,9 +44,12 @@ type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
 export type WebhookCreateDialogProps = {
   trigger?: React.ReactNode;
-} & Omit<DialogPrimitive.DialogProps, 'children'>;
+} & Omit<DialogPrimitive.DialogProps, "children">;
 
-export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogProps) => {
+export const WebhookCreateDialog = ({
+  trigger,
+  ...props
+}: WebhookCreateDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -57,14 +60,15 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
   const form = useForm<TCreateWebhookFormSchema>({
     resolver: zodResolver(ZCreateWebhookFormSchema),
     values: {
-      webhookUrl: '',
+      webhookUrl: "",
       eventTriggers: [],
-      secret: '',
+      secret: "",
       enabled: true,
     },
   });
 
-  const { mutateAsync: createWebhook } = trpc.webhook.createWebhook.useMutation();
+  const { mutateAsync: createWebhook } =
+    trpc.webhook.createWebhook.useMutation();
 
   const onSubmit = async ({
     enabled,
@@ -91,8 +95,10 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
     } catch (err) {
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while creating the webhook. Please try again.`),
-        variant: 'destructive',
+        description: _(
+          msg`An error occurred while creating the webhook. Please try again.`
+        ),
+        variant: "destructive",
       });
     }
   };
@@ -141,7 +147,9 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                       </FormControl>
 
                       <FormDescription>
-                        <Trans>The URL for Documenso to send webhook events to.</Trans>
+                        <Trans>
+                          The URL for Signtusk to send webhook events to.
+                        </Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -192,7 +200,10 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The events that will trigger a webhook to be sent to your URL.</Trans>
+                      <Trans>
+                        The events that will trigger a webhook to be sent to
+                        your URL.
+                      </Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -212,14 +223,14 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                       <PasswordInput
                         className="bg-background"
                         {...field}
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
 
                     <FormDescription>
                       <Trans>
-                        A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso.
+                        A secret that will be sent to your URL so you can verify
+                        that the request has been sent by Signtusk.
                       </Trans>
                     </FormDescription>
                     <FormMessage />
@@ -228,7 +239,11 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
               />
 
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpen(false)}
+                >
                   <Trans>Cancel</Trans>
                 </Button>
 

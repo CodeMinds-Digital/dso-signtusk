@@ -1,25 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { PlusIcon } from 'lucide-react';
-import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { PlusIcon } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
+import { Link, Outlet, isRouteErrorResponse } from "react-router";
 
-import LogoIcon from '@signtusk/assets/logo_icon.png';
-import { useOptionalSession } from '@signtusk/lib/client-only/providers/session';
-import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
+import LogoIcon from "@signtusk/assets/logo_icon.png";
+import { useOptionalSession } from "@signtusk/lib/client-only/providers/session";
+import { cn } from "@signtusk/ui/lib/utils";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { Header as AuthenticatedHeader } from '~/components/general/app-header';
-import { BrandingLogo } from '~/components/general/branding-logo';
-import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { appMetaTags } from '~/utils/meta';
+import { Header as AuthenticatedHeader } from "~/components/general/app-header";
+import { BrandingLogo } from "~/components/general/branding-logo";
+import { GenericErrorLayout } from "~/components/general/generic-error-layout";
+import { appMetaTags } from "~/utils/meta";
 
-import type { Route } from './+types/_layout';
+import type { Route } from "./+types/_layout";
 
 export function meta() {
-  return appMetaTags('Profile');
+  return appMetaTags("Profile");
 }
 
 export default function PublicProfileLayout() {
@@ -32,9 +32,9 @@ export default function PublicProfileLayout() {
       setScrollY(window.scrollY);
     };
 
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll);
 
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
@@ -44,8 +44,8 @@ export default function PublicProfileLayout() {
       ) : (
         <header
           className={cn(
-            'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200',
-            scrollY > 5 && 'border-b-border',
+            "supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200",
+            scrollY > 5 && "border-b-border"
           )}
         >
           <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:px-8">
@@ -57,7 +57,7 @@ export default function PublicProfileLayout() {
 
               <img
                 src={LogoIcon}
-                alt="Documenso Logo"
+                alt="Signtusk Logo"
                 width={48}
                 height={48}
                 className="h-10 w-auto sm:hidden dark:invert"
@@ -70,7 +70,9 @@ export default function PublicProfileLayout() {
                   <Trans>Want your own public profile?</Trans>
                 </span>
                 <span className="hidden text-sm sm:block">
-                  <Trans>Like to have your own public profile with agreements?</Trans>
+                  <Trans>
+                    Like to have your own public profile with agreements?
+                  </Trans>
                 </span>
               </p>
 

@@ -66,7 +66,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
               ) : (
                 <Img
                   src={getAssetUrl("/static/logo.png")}
-                  alt="Documenso Logo"
+                  alt="Signtusk Logo"
                   className="mb-4 h-6"
                 />
               )}
@@ -90,7 +90,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
 
                 <Section className="my-6 text-center">
                   <Button
-                    className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                    className="bg-signtusk-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
                     href={documentLink}
                   >
                     <Trans>View document</Trans>

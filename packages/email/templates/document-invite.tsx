@@ -37,9 +37,9 @@ export type DocumentInviteEmailTemplateProps =
 
 export const DocumentInviteEmailTemplate = ({
   inviterName = "Lucas Smith",
-  inviterEmail = "lucas@documenso.com",
+  inviterEmail = "lucas@signtusk.com",
   documentName = "Open Source Pledge.pdf",
-  signDocumentLink = "https://documenso.com",
+  signDocumentLink = "https://signtusk.com",
   assetBaseUrl = "http://localhost:3002",
   customBody,
   role,
@@ -87,7 +87,7 @@ export const DocumentInviteEmailTemplate = ({
               ) : (
                 <Img
                   src={getAssetUrl("/static/logo.png")}
-                  alt="Documenso Logo"
+                  alt="Signtusk Logo"
                   className="mb-4 h-6"
                 />
               )}

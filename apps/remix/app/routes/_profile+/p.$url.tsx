@@ -1,15 +1,19 @@
-import { Trans } from '@lingui/react/macro';
-import { FileIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
+import { Trans } from "@lingui/react/macro";
+import { FileIcon } from "lucide-react";
+import { DateTime } from "luxon";
+import { Link, redirect } from "react-router";
 
-import { useOptionalSession } from '@signtusk/lib/client-only/providers/session';
-import { getPublicProfileByUrl } from '@signtusk/lib/server-only/profile/get-public-profile-by-url';
-import { formatAvatarUrl } from '@signtusk/lib/utils/avatars';
-import { extractInitials } from '@signtusk/lib/utils/recipient-formatter';
-import { formatDirectTemplatePath } from '@signtusk/lib/utils/templates';
-import { Avatar, AvatarFallback, AvatarImage } from '@signtusk/ui/primitives/avatar';
-import { Button } from '@signtusk/ui/primitives/button';
+import { useOptionalSession } from "@signtusk/lib/client-only/providers/session";
+import { getPublicProfileByUrl } from "@signtusk/lib/server-only/profile/get-public-profile-by-url";
+import { formatAvatarUrl } from "@signtusk/lib/utils/avatars";
+import { extractInitials } from "@signtusk/lib/utils/recipient-formatter";
+import { formatDirectTemplatePath } from "@signtusk/lib/utils/templates";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@signtusk/ui/primitives/avatar";
+import { Button } from "@signtusk/ui/primitives/button";
 import {
   Table,
   TableBody,
@@ -17,19 +21,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@signtusk/ui/primitives/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@signtusk/ui/primitives/tooltip';
+} from "@signtusk/ui/primitives/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@signtusk/ui/primitives/tooltip";
 
-import type { Route } from './+types/p.$url';
+import type { Route } from "./+types/p.$url";
 
 const BADGE_DATA = {
   Premium: {
-    imageSrc: '/static/premium-user-badge.svg',
-    name: 'Premium',
+    imageSrc: "/static/premium-user-badge.svg",
+    name: "Premium",
   },
   EarlySupporter: {
-    imageSrc: '/static/early-supporter-badge.svg',
-    name: 'Early supporter',
+    imageSrc: "/static/early-supporter-badge.svg",
+    name: "Early supporter",
   },
 };
 
@@ -37,7 +45,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const { url: profileUrl } = params;
 
   if (!profileUrl) {
-    throw redirect('/');
+    throw redirect("/");
   }
 
   const publicProfile = await getPublicProfileByUrl({
@@ -45,7 +53,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!publicProfile || !publicProfile.profile.enabled) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   return {
@@ -53,7 +61,9 @@ export async function loader({ params }: Route.LoaderArgs) {
   };
 }
 
-export default function PublicProfilePage({ loaderData }: Route.ComponentProps) {
+export default function PublicProfilePage({
+  loaderData,
+}: Route.ComponentProps) {
   const { publicProfile } = loaderData;
 
   const { profile, templates } = publicProfile;
@@ -75,7 +85,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         </Avatar>
 
         <div className="mt-4 flex flex-row items-center justify-center">
-          <h2 className="text-xl font-semibold md:text-2xl">{publicProfile.name}</h2>
+          <h2 className="text-xl font-semibold md:text-2xl">
+            {publicProfile.name}
+          </h2>
 
           {publicProfile.badge && (
             <Tooltip>
@@ -104,7 +116,10 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                   </p>
                   <p className="text-muted-foreground mt-0.5 text-sm">
                     <Trans>
-                      Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
+                      Since{" "}
+                      {DateTime.fromJSDate(publicProfile.badge.since).toFormat(
+                        "LLL ‘yy"
+                      )}
                     </Trans>
                   </p>
                 </div>
@@ -114,7 +129,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         </div>
 
         <div className="text-muted-foreground mt-4 space-y-1">
-          {(profile.bio ?? '').split('\n').map((line, index) => (
+          {(profile.bio ?? "").split("\n").map((line, index) => (
             <p
               key={index}
               className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm"
@@ -129,23 +144,25 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         <div className="mt-4 w-full max-w-xl border-t pt-4">
           <p className="text-muted-foreground max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm leading-relaxed">
             <Trans>
-              It looks like {publicProfile.name} hasn't added any documents to their profile yet.
-            </Trans>{' '}
+              It looks like {publicProfile.name} hasn't added any documents to
+              their profile yet.
+            </Trans>{" "}
             {!user?.id && (
               <span className="mt-2 inline-block">
                 <Trans>
-                  While waiting for them to do so you can create your own Documenso account and get
-                  started with document signing right away.
+                  While waiting for them to do so you can create your own
+                  Signtusk account and get started with document signing right
+                  away.
                 </Trans>
               </span>
             )}
-            {'userId' in profile && user?.id === profile.userId && (
+            {"userId" in profile && user?.id === profile.userId && (
               <span className="mt-2 inline-block">
                 <Trans>
-                  Go to your{' '}
+                  Go to your{" "}
                   <Link to="/settings/public-profile" className="underline">
                     public profile settings
-                  </Link>{' '}
+                  </Link>{" "}
                   to add documents.
                 </Trans>
               </span>
@@ -185,7 +202,11 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                         </div>
 
                         <Button asChild className="w-20">
-                          <Link to={formatDirectTemplatePath(template.directLink.token)}>
+                          <Link
+                            to={formatDirectTemplatePath(
+                              template.directLink.token
+                            )}
+                          >
                             <Trans>Sign</Trans>
                           </Link>
                         </Button>

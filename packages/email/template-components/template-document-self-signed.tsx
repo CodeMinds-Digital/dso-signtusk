@@ -49,7 +49,7 @@ export const TemplateDocumentSelfSigned = ({
             <Link
               href={signUpUrl}
               target="_blank"
-              className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
+              className="text-signtusk-700 hover:text-signtusk-600 whitespace-nowrap"
             >
               free account
             </Link>{' '}
@@ -71,7 +71,7 @@ export const TemplateDocumentSelfSigned = ({
 
           <Button
             className="rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
-            href="https://documenso.com/pricing"
+            href="https://signtusk.com/pricing"
           >
             <Img
               src={getAssetUrl('/static/review.png')}

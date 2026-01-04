@@ -67,7 +67,7 @@ const getSwaggerHtml = (specPath: string, title: string) => `
  */
 swaggerRoute.get("/v2", (c) => {
   const specPath = `${API_V2_URL}/openapi.json`;
-  return c.html(getSwaggerHtml(specPath, "Documenso API v2 - Swagger UI"));
+  return c.html(getSwaggerHtml(specPath, "Signtusk API v2 - Swagger UI"));
 });
 
 /**
@@ -75,7 +75,7 @@ swaggerRoute.get("/v2", (c) => {
  */
 swaggerRoute.get("/v2-beta", (c) => {
   const specPath = `${API_V2_BETA_URL}/openapi.json`;
-  return c.html(getSwaggerHtml(specPath, "Documenso API v2 Beta - Swagger UI"));
+  return c.html(getSwaggerHtml(specPath, "Signtusk API v2 Beta - Swagger UI"));
 });
 
 /**
@@ -95,7 +95,7 @@ swaggerRoute.get("/docs", (c) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Documenso API Documentation</title>
+  <title>Signtusk API Documentation</title>
   <style>
     * {
       box-sizing: border-box;
@@ -199,7 +199,7 @@ swaggerRoute.get("/docs", (c) => {
 <body>
   <div class="container">
     <h1>📚 API Documentation</h1>
-    <p>Welcome to the Documenso API documentation. Choose an API version below to explore the available endpoints using Swagger UI.</p>
+    <p>Welcome to the Signtusk API documentation. Choose an API version below to explore the available endpoints using Swagger UI.</p>
     
     <div class="api-links">
       <a href="/api/swagger/v2" class="api-link">
