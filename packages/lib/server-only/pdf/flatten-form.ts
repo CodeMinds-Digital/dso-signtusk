@@ -1,8 +1,7 @@
-import type { PDFField, PDFWidgetAnnotation } from '@cantoo/pdf-lib';
+import type { PDFField, PDFWidgetAnnotation } from "@cantoo/pdf-lib";
 import {
   PDFCheckBox,
   PDFDict,
-  type PDFDocument,
   PDFName,
   PDFRadioGroup,
   PDFRef,
@@ -11,16 +10,17 @@ import {
   pushGraphicsState,
   rotateInPlace,
   translate,
-} from '@cantoo/pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+  type PDFDocument,
+} from "@cantoo/pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 
-import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from "../../constants/app";
 
 export const removeOptionalContentGroups = (document: PDFDocument) => {
   const context = document.context;
   const catalog = context.lookup(context.trailerInfo.Root);
   if (catalog instanceof PDFDict) {
-    catalog.delete(PDFName.of('OCProperties'));
+    catalog.delete(PDFName.of("OCProperties"));
   }
 };
 
@@ -29,30 +29,73 @@ export const flattenForm = async (document: PDFDocument) => {
 
   const form = document.getForm();
 
-  const fontNoto = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
-    async (res) => res.arrayBuffer(),
-  );
+  // Skip font embedding if there are no form fields
+  const fields = form.getFields();
+  if (fields.length === 0) {
+    return;
+  }
 
-  document.registerFontkit(fontkit);
+  try {
+    const fontUrl = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`;
+    console.log("[FLATTEN_FORM] Fetching font from:", fontUrl);
 
-  const font = await document.embedFont(fontNoto);
+    const fontResponse = await fetch(fontUrl);
 
-  form.updateFieldAppearances(font);
-
-  for (const field of form.getFields()) {
-    for (const widget of field.acroField.getWidgets()) {
-      flattenWidget(document, field, widget);
+    if (!fontResponse.ok) {
+      console.error(
+        `[FLATTEN_FORM] Font fetch failed with status ${fontResponse.status}`
+      );
+      // Skip form flattening if font is not available
+      return;
     }
 
-    try {
-      form.removeField(field);
-    } catch (error) {
-      console.error(error);
+    const contentType = fontResponse.headers.get("content-type");
+    if (
+      contentType &&
+      !contentType.includes("font") &&
+      !contentType.includes("octet-stream")
+    ) {
+      console.error(`[FLATTEN_FORM] Invalid font content-type: ${contentType}`);
+      // Skip form flattening if response is not a font
+      return;
     }
+
+    const fontNoto = await fontResponse.arrayBuffer();
+
+    if (fontNoto.byteLength < 1000) {
+      console.error(
+        `[FLATTEN_FORM] Font file too small: ${fontNoto.byteLength} bytes`
+      );
+      return;
+    }
+
+    document.registerFontkit(fontkit);
+
+    const font = await document.embedFont(fontNoto);
+
+    form.updateFieldAppearances(font);
+
+    for (const field of fields) {
+      for (const widget of field.acroField.getWidgets()) {
+        flattenWidget(document, field, widget);
+      }
+
+      try {
+        form.removeField(field);
+      } catch (error) {
+        console.error("[FLATTEN_FORM] Error removing field:", error);
+      }
+    }
+  } catch (error) {
+    console.error("[FLATTEN_FORM] Error during form flattening:", error);
+    // Don't throw - just skip form flattening if there's an error
   }
 };
 
-const getPageForWidget = (document: PDFDocument, widget: PDFWidgetAnnotation) => {
+const getPageForWidget = (
+  document: PDFDocument,
+  widget: PDFWidgetAnnotation
+) => {
   const pageRef = widget.P();
 
   let page = document.getPages().find((page) => page.ref === pageRef);
@@ -74,7 +117,10 @@ const getPageForWidget = (document: PDFDocument, widget: PDFWidgetAnnotation) =>
   return page;
 };
 
-const getAppearanceRefForWidget = (field: PDFField, widget: PDFWidgetAnnotation) => {
+const getAppearanceRefForWidget = (
+  field: PDFField,
+  widget: PDFWidgetAnnotation
+) => {
   try {
     const normalAppearance = widget.getNormalAppearance();
     let normalAppearanceRef: PDFRef | null = null;
@@ -88,7 +134,8 @@ const getAppearanceRefForWidget = (field: PDFField, widget: PDFWidgetAnnotation)
       (field instanceof PDFCheckBox || field instanceof PDFRadioGroup)
     ) {
       const value = field.acroField.getValue();
-      const ref = normalAppearance.get(value) ?? normalAppearance.get(PDFName.of('Off'));
+      const ref =
+        normalAppearance.get(value) ?? normalAppearance.get(PDFName.of("Off"));
 
       if (ref instanceof PDFRef) {
         normalAppearanceRef = ref;
@@ -103,7 +150,11 @@ const getAppearanceRefForWidget = (field: PDFField, widget: PDFWidgetAnnotation)
   }
 };
 
-const flattenWidget = (document: PDFDocument, field: PDFField, widget: PDFWidgetAnnotation) => {
+const flattenWidget = (
+  document: PDFDocument,
+  field: PDFField,
+  widget: PDFWidgetAnnotation
+) => {
   try {
     const page = getPageForWidget(document, widget);
 
@@ -117,7 +168,7 @@ const flattenWidget = (document: PDFDocument, field: PDFField, widget: PDFWidget
       return;
     }
 
-    const xObjectKey = page.node.newXObject('FlatWidget', appearanceRef);
+    const xObjectKey = page.node.newXObject("FlatWidget", appearanceRef);
 
     const rectangle = widget.getRectangle();
     const operators = [
