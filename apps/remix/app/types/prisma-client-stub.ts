@@ -1,6 +1,6 @@
 /**
- * Browser-safe stub for @prisma/client.
- * This file is used as an alias for @prisma/client in the client bundle.
+ * Browser-safe stub for @prisma/client and @signtusk/prisma.
+ * This file is used as an alias for these packages in the client bundle.
  * It re-exports the browser-safe enums from @signtusk/lib/constants/prisma-enums.
  */
 
@@ -80,5 +80,78 @@ export class PrismaClient {
     throw new Error("PrismaClient cannot be used in the browser");
   }
 }
+
+// ============================================
+// Kysely stubs for @signtusk/prisma compatibility
+// ============================================
+
+// Stub Kysely class
+export class Kysely<T = unknown> {
+  constructor(_config?: unknown) {
+    throw new Error("Kysely cannot be used in the browser");
+  }
+}
+
+// Stub PostgresDialect
+export class PostgresDialect {
+  constructor(_config?: unknown) {
+    throw new Error("PostgresDialect cannot be used in the browser");
+  }
+}
+
+// Stub sql tagged template function
+export const sql = Object.assign(
+  (_strings: TemplateStringsArray, ..._values: unknown[]) => {
+    throw new Error("sql cannot be used in the browser");
+  },
+  {
+    raw: (_value: string) => {
+      throw new Error("sql.raw cannot be used in the browser");
+    },
+    ref: (_value: string) => {
+      throw new Error("sql.ref cannot be used in the browser");
+    },
+    table: (_value: string) => {
+      throw new Error("sql.table cannot be used in the browser");
+    },
+    id: (..._values: string[]) => {
+      throw new Error("sql.id cannot be used in the browser");
+    },
+    lit: (_value: unknown) => {
+      throw new Error("sql.lit cannot be used in the browser");
+    },
+    join: (_values: unknown[], _separator?: unknown) => {
+      throw new Error("sql.join cannot be used in the browser");
+    },
+  }
+);
+
+// Stub prisma and kysely instances
+export const prisma = new Proxy(
+  {},
+  {
+    get() {
+      throw new Error("prisma cannot be used in the browser");
+    },
+  }
+);
+
+export const kysely = new Proxy(
+  {},
+  {
+    get() {
+      throw new Error("kysely cannot be used in the browser");
+    },
+  }
+);
+
+export const kyselyPrisma = {
+  $kysely: kysely,
+};
+
+export const prismaWithLogging = prisma;
+
+// Type exports for DB
+export type DB = Record<string, unknown>;
 
 export default {};

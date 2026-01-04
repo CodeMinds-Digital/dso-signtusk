@@ -53,9 +53,9 @@ function prismaClientBrowserStub(): Plugin {
         return emptyModulePath;
       }
 
-      // Block kysely from client builds
+      // Redirect kysely to our stub which has Kysely exports
       if (source === "kysely" || source === "prisma-extension-kysely") {
-        return emptyModulePath;
+        return stubPath;
       }
 
       return null;
