@@ -23,16 +23,6 @@ export const createTrpcContext = async ({
 }: CreateTrpcContextOptions): Promise<TrpcContext> => {
   const { session, user } = await getOptionalSession(c);
 
-  // Debug logging for session status (temporary)
-  const cookieHeader = c.req.raw.headers.get("cookie");
-  console.log("[TRPC Context Debug] Request source:", requestSource);
-  console.log("[TRPC Context Debug] Cookie header exists:", !!cookieHeader);
-  console.log("[TRPC Context Debug] Session exists:", !!session);
-  console.log("[TRPC Context Debug] User exists:", !!user);
-  if (user) {
-    console.log("[TRPC Context Debug] User ID:", user.id);
-  }
-
   const req = c.req.raw;
   const res = c.res;
 

@@ -22,6 +22,10 @@ const cMapsDir = normalizePath(path.join(pdfjsDistPath, "cmaps"));
  */
 function prismaClientBrowserStub(): Plugin {
   const stubPath = path.resolve(__dirname, "./app/types/prisma-client-stub.ts");
+  const emptyModulePath = path.resolve(
+    __dirname,
+    "./app/types/empty-module.ts"
+  );
 
   return {
     name: "prisma-client-browser-stub",
@@ -42,6 +46,16 @@ function prismaClientBrowserStub(): Plugin {
       // since it re-exports from @prisma/client
       if (source === "@signtusk/prisma") {
         return stubPath;
+      }
+
+      // Block pg and related packages from client builds
+      if (source === "pg" || source === "pg-native" || source === "pg-pool") {
+        return emptyModulePath;
+      }
+
+      // Block kysely from client builds
+      if (source === "kysely" || source === "prisma-extension-kysely") {
+        return emptyModulePath;
       }
 
       return null;
@@ -153,6 +167,10 @@ export default defineConfig({
       "playwright",
       "playwright-core",
       "@playwright/browser-chromium",
+      // PostgreSQL packages
+      "pg",
+      "pg-native",
+      "pg-pool",
     ],
   },
   optimizeDeps: {
@@ -187,6 +205,10 @@ export default defineConfig({
       "playwright",
       "playwright-core",
       "@playwright/browser-chromium",
+      // PostgreSQL packages
+      "pg",
+      "pg-native",
+      "pg-pool",
     ],
     // Force pre-bundling of polyfills
     force: true,
@@ -195,7 +217,8 @@ export default defineConfig({
     alias: {
       https: "node:https",
       canvas: path.resolve(__dirname, "./app/types/empty-module.ts"),
-      // Additional Node.js polyfills for browser
+      // Use the npm buffer package for browser environments
+      // This provides a more complete Buffer implementation than our polyfill
       buffer: "buffer",
       process: "process/browser",
       util: "util",
@@ -222,6 +245,10 @@ export default defineConfig({
         /playwright/,
         "@playwright/browser-chromium",
         "skia-canvas",
+        // PostgreSQL client should never be in browser
+        "pg",
+        "pg-native",
+        "pg-pool",
       ],
     },
   },

@@ -34,6 +34,11 @@ const getAuthSecret = () => {
 /**
  * Generic auth session cookie options.
  * Returns fresh options each time to ensure dynamic values are current.
+ *
+ * IMPORTANT for Vercel deployments:
+ * - sameSite: "lax" works for same-origin requests
+ * - secure: true is required for __Secure- prefixed cookies
+ * - domain: undefined allows cookies to work on preview deployments
  */
 export const getSessionCookieOptions = () =>
   ({
@@ -62,19 +67,7 @@ export const extractSessionCookieFromHeaders = (
  */
 export const getSessionCookie = async (c: Context): Promise<string | null> => {
   const cookieName = getSessionCookieName();
-
-  // Debug logging (temporary)
-  const rawCookieHeader = c.req.raw.headers.get("cookie");
-  console.log("[Session Cookie Debug] Cookie name looking for:", cookieName);
-  console.log(
-    "[Session Cookie Debug] Raw cookie header:",
-    rawCookieHeader?.substring(0, 200)
-  );
-
   const sessionId = await getSignedCookie(c, getAuthSecret(), cookieName);
-
-  console.log("[Session Cookie Debug] Session ID found:", !!sessionId);
-
   return sessionId || null;
 };
 

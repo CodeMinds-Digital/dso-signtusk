@@ -12,29 +12,36 @@
   },
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/site\\.webmanifest",
       "headers": {
         "Content-Type": "application/manifest+json",
         "Cache-Control": "public, max-age=86400"
-      }
+      },
+      "continue": true
     },
     {
       "src": "/fonts/(.*)",
       "headers": {
         "Cache-Control": "public, max-age=31536000"
-      }
+      },
+      "continue": true
     },
     {
       "src": "/(favicon|apple-touch-icon|android-chrome).*\\.(png|ico)",
       "headers": {
         "Cache-Control": "public, max-age=86400"
-      }
+      },
+      "continue": true
     },
     {
       "src": "/assets/(.*)",
       "headers": {
         "Cache-Control": "public, immutable, max-age=31536000"
-      }
+      },
+      "continue": true
     },
     {
       "src": "/api/(.*)",
