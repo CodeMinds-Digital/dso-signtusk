@@ -15,35 +15,6 @@
       "handle": "filesystem"
     },
     {
-      "src": "/site\\.webmanifest",
-      "headers": {
-        "Content-Type": "application/manifest+json",
-        "Cache-Control": "public, max-age=86400"
-      },
-      "continue": true
-    },
-    {
-      "src": "/fonts/(.*)",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(favicon|apple-touch-icon|android-chrome).*\\.(png|ico)",
-      "headers": {
-        "Cache-Control": "public, max-age=86400"
-      },
-      "continue": true
-    },
-    {
-      "src": "/assets/(.*)",
-      "headers": {
-        "Cache-Control": "public, immutable, max-age=31536000"
-      },
-      "continue": true
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/apps/remix/api"
     },
@@ -52,9 +23,33 @@
       "dest": "/apps/remix/api"
     }
   ],
+  "headers": [
+    {
+      "source": "/site.webmanifest",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, immutable, max-age=31536000"
+        }
+      ]
+    }
+  ],
   "env": {
     "NODE_ENV": "production",
-    "ALLOWED_ORIGINS": "https://dso-signtusk.vercel.app,https://dso-signtusk-remix-vpsy-cnv81yn0e-codemindsdigitals-projects.vercel.app,https://dso-signtusk-remix-vpsy-pb01iyucs-codemindsdigitals-projects.vercel.app,https://dso-signtusk-remix-vpsy-769v5j5lr-codemindsdigitals-projects.vercel.app,https://dso-signtusk-remix-vpsy-8dk4scl0d-codemindsdigitals-projects.vercel.app,https://*.vercel.app"
+    "ALLOWED_ORIGINS": "https://dso-signtusk.vercel.app,https://*.vercel.app"
   },
   "build": {
     "env": {

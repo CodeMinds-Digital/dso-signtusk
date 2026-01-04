@@ -99,6 +99,27 @@ export class PostgresDialect {
   }
 }
 
+// Stub PostgresAdapter
+export class PostgresAdapter {
+  constructor() {
+    throw new Error("PostgresAdapter cannot be used in the browser");
+  }
+}
+
+// Stub PostgresIntrospector
+export class PostgresIntrospector {
+  constructor(_db?: unknown) {
+    throw new Error("PostgresIntrospector cannot be used in the browser");
+  }
+}
+
+// Stub PostgresQueryCompiler
+export class PostgresQueryCompiler {
+  constructor() {
+    throw new Error("PostgresQueryCompiler cannot be used in the browser");
+  }
+}
+
 // Stub sql tagged template function
 export const sql = Object.assign(
   (_strings: TemplateStringsArray, ..._values: unknown[]) => {

@@ -1,7 +1,13 @@
 /// <reference types="@signtusk/prisma/types/types.d.ts" />
 import { PrismaClient } from "@prisma/client";
-import { Kysely, PostgresDialect, sql } from "kysely";
-import { Pool } from "pg";
+import {
+  Kysely,
+  PostgresAdapter,
+  PostgresIntrospector,
+  PostgresQueryCompiler,
+} from "kysely";
+import kyselyExtension from "prisma-extension-kysely";
+
 import type { DB } from "./generated/types.js";
 
 // Simple database URL helper (inline to avoid import issues)
@@ -57,28 +63,34 @@ export const prisma = remember(
     })
 );
 
-// Create Kysely instance for direct SQL queries
-export const kysely = remember(
-  "kysely",
-  () =>
-    new Kysely<DB>({
-      dialect: new PostgresDialect({
-        pool: new Pool({
-          connectionString: getDatabaseUrl(),
+// Create Kysely instance using prisma-extension-kysely (no direct pg dependency)
+export const kyselyPrisma = remember("kyselyPrisma", () =>
+  prisma.$extends(
+    kyselyExtension({
+      kysely: (driver) =>
+        new Kysely<DB>({
+          dialect: {
+            createAdapter: () => new PostgresAdapter(),
+            createDriver: () => driver,
+            createIntrospector: (db) => new PostgresIntrospector(db),
+            createQueryCompiler: () => new PostgresQueryCompiler(),
+          },
         }),
-      }),
     })
+  )
 );
 
-// For compatibility with existing code that expects kyselyPrisma.$kysely
-export const kyselyPrisma = {
-  $kysely: kysely,
+// For backward compatibility - expose kysely through kyselyPrisma
+export const kysely = {
+  get $kysely() {
+    return kyselyPrisma.$kysely;
+  },
 };
 
 export const prismaWithLogging = prisma;
 
-// Export sql function
-export { sql };
+// Export sql function from kysely
+export { sql } from "kysely";
 
 // Export Prisma types for server-side code only
 // Note: Do NOT use "export * from '@prisma/client'" as it causes browser bundling issues

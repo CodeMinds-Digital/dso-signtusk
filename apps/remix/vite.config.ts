@@ -38,23 +38,37 @@ function prismaClientBrowserStub(): Plugin {
       }
 
       // Replace @prisma/client imports with our browser-safe stub
-      if (source === "@prisma/client") {
+      if (source === "@prisma/client" || source.startsWith("@prisma/client/")) {
         return stubPath;
       }
 
-      // Also handle @signtusk/prisma imports in client builds
-      // since it re-exports from @prisma/client
-      if (source === "@signtusk/prisma") {
+      // Handle @signtusk/prisma and ALL its subpaths in client builds
+      // This includes @signtusk/prisma/types/*, etc.
+      if (
+        source === "@signtusk/prisma" ||
+        source.startsWith("@signtusk/prisma/")
+      ) {
         return stubPath;
       }
 
       // Block pg and related packages from client builds
-      if (source === "pg" || source === "pg-native" || source === "pg-pool") {
+      if (
+        source === "pg" ||
+        source === "pg-native" ||
+        source === "pg-pool" ||
+        source.startsWith("pg/") ||
+        source.startsWith("pg-native/") ||
+        source.startsWith("pg-pool/")
+      ) {
         return emptyModulePath;
       }
 
       // Redirect kysely to our stub which has Kysely exports
-      if (source === "kysely" || source === "prisma-extension-kysely") {
+      if (
+        source === "kysely" ||
+        source.startsWith("kysely/") ||
+        source === "prisma-extension-kysely"
+      ) {
         return stubPath;
       }
 
@@ -113,7 +127,8 @@ export default defineConfig({
           dest: "static",
         },
         {
-          src: path.resolve(__dirname, "../../packages/assets/fonts"),
+          // Copy font files directly to /fonts/ (not fonts/fonts/)
+          src: path.resolve(__dirname, "../../packages/assets/fonts/*"),
           dest: "fonts",
         },
         {
@@ -192,12 +207,7 @@ export default defineConfig({
     exclude: [
       "node_modules",
       "@napi-rs/canvas",
-      "@prisma/client",
       "@signtusk/pdf-sign",
-      "@signtusk/prisma",
-      "prisma",
-      "kysely",
-      "prisma-extension-kysely",
       "sharp",
       "@img/sharp-wasm32",
       "@img/sharp-libvips-dev",
@@ -205,10 +215,6 @@ export default defineConfig({
       "playwright",
       "playwright-core",
       "@playwright/browser-chromium",
-      // PostgreSQL packages
-      "pg",
-      "pg-native",
-      "pg-pool",
     ],
     // Force pre-bundling of polyfills
     force: true,
@@ -240,6 +246,10 @@ export default defineConfig({
    * Note: @prisma/client is NOT in external here because we use the
    * prismaClientBrowserStub plugin to replace it with a browser-safe
    * stub for client builds. Server builds use ssr.external instead.
+   *
+   * IMPORTANT: Do NOT add pg, kysely, or @prisma/client to external here
+   * as that would cause the browser to try to load them as ES modules.
+   * Instead, they are stubbed by the prismaClientBrowserStub plugin.
    */
   build: {
     rollupOptions: {
@@ -251,10 +261,6 @@ export default defineConfig({
         /playwright/,
         "@playwright/browser-chromium",
         "skia-canvas",
-        // PostgreSQL client should never be in browser
-        "pg",
-        "pg-native",
-        "pg-pool",
       ],
     },
   },
