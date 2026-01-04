@@ -1,10 +1,10 @@
-import type { Transporter } from 'nodemailer';
-import { createTransport } from 'nodemailer';
+import type { Transporter } from "nodemailer";
+import { createTransport } from "nodemailer";
 
-import { env } from '@signtusk/lib/utils/env';
-import { ResendTransport } from '@documenso/nodemailer-resend';
+import { ResendTransport } from "@documenso/nodemailer-resend";
+import { env } from "@signtusk/lib/utils/env";
 
-import { MailChannelsTransport } from './transports/mailchannels';
+import { MailChannelsTransport } from "./transports/mailchannels";
 
 /**
  * Creates a Nodemailer transport object for sending emails.
@@ -52,56 +52,88 @@ import { MailChannelsTransport } from './transports/mailchannels';
  * - `NEXT_PRIVATE_SMTP_SERVICE` is optional and used specifically for well-known services like Gmail.
  */
 const getTransport = (): Transporter => {
-  const transport = env('NEXT_PRIVATE_SMTP_TRANSPORT') ?? 'smtp-auth';
+  const transport = env("NEXT_PRIVATE_SMTP_TRANSPORT") ?? "smtp-auth";
+  const apiKey = env("NEXT_PRIVATE_RESEND_API_KEY");
 
-  if (transport === 'mailchannels') {
+  console.log("[MAILER] Creating transport:", transport);
+  console.log("[MAILER] Resend API key present:", !!apiKey);
+  console.log(
+    "[MAILER] Resend API key prefix:",
+    apiKey?.substring(0, 10) + "..."
+  );
+
+  if (transport === "mailchannels") {
     return createTransport(
       MailChannelsTransport.makeTransport({
-        apiKey: env('NEXT_PRIVATE_MAILCHANNELS_API_KEY'),
-        endpoint: env('NEXT_PRIVATE_MAILCHANNELS_ENDPOINT'),
-      }),
+        apiKey: env("NEXT_PRIVATE_MAILCHANNELS_API_KEY"),
+        endpoint: env("NEXT_PRIVATE_MAILCHANNELS_ENDPOINT"),
+      })
     );
   }
 
-  if (transport === 'resend') {
+  if (transport === "resend") {
+    if (!apiKey) {
+      console.error("[MAILER] ERROR: NEXT_PRIVATE_RESEND_API_KEY is not set!");
+    }
     return createTransport(
       ResendTransport.makeTransport({
-        apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
-      }),
+        apiKey: apiKey || "",
+      })
     );
   }
 
-  if (transport === 'smtp-api') {
-    if (!env('NEXT_PRIVATE_SMTP_HOST') || !env('NEXT_PRIVATE_SMTP_APIKEY')) {
+  if (transport === "smtp-api") {
+    if (!env("NEXT_PRIVATE_SMTP_HOST") || !env("NEXT_PRIVATE_SMTP_APIKEY")) {
       throw new Error(
-        'SMTP API transport requires NEXT_PRIVATE_SMTP_HOST and NEXT_PRIVATE_SMTP_APIKEY',
+        "SMTP API transport requires NEXT_PRIVATE_SMTP_HOST and NEXT_PRIVATE_SMTP_APIKEY"
       );
     }
 
     return createTransport({
-      host: env('NEXT_PRIVATE_SMTP_HOST'),
-      port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
-      secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
+      host: env("NEXT_PRIVATE_SMTP_HOST"),
+      port: Number(env("NEXT_PRIVATE_SMTP_PORT")) || 587,
+      secure: env("NEXT_PRIVATE_SMTP_SECURE") === "true",
       auth: {
-        user: env('NEXT_PRIVATE_SMTP_APIKEY_USER') ?? 'apikey',
-        pass: env('NEXT_PRIVATE_SMTP_APIKEY') ?? '',
+        user: env("NEXT_PRIVATE_SMTP_APIKEY_USER") ?? "apikey",
+        pass: env("NEXT_PRIVATE_SMTP_APIKEY") ?? "",
       },
     });
   }
 
   return createTransport({
-    host: env('NEXT_PRIVATE_SMTP_HOST') ?? '127.0.0.1:2500',
-    port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
-    secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
-    ignoreTLS: env('NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS') === 'true',
-    auth: env('NEXT_PRIVATE_SMTP_USERNAME')
+    host: env("NEXT_PRIVATE_SMTP_HOST") ?? "127.0.0.1:2500",
+    port: Number(env("NEXT_PRIVATE_SMTP_PORT")) || 587,
+    secure: env("NEXT_PRIVATE_SMTP_SECURE") === "true",
+    ignoreTLS: env("NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS") === "true",
+    auth: env("NEXT_PRIVATE_SMTP_USERNAME")
       ? {
-        user: env('NEXT_PRIVATE_SMTP_USERNAME'),
-        pass: env('NEXT_PRIVATE_SMTP_PASSWORD') ?? '',
-      }
+          user: env("NEXT_PRIVATE_SMTP_USERNAME"),
+          pass: env("NEXT_PRIVATE_SMTP_PASSWORD") ?? "",
+        }
       : undefined,
-    ...(env('NEXT_PRIVATE_SMTP_SERVICE') ? { service: env('NEXT_PRIVATE_SMTP_SERVICE') } : {}),
+    ...(env("NEXT_PRIVATE_SMTP_SERVICE")
+      ? { service: env("NEXT_PRIVATE_SMTP_SERVICE") }
+      : {}),
   });
 };
 
-export const mailer = getTransport();
+// Lazy initialization to ensure env vars are loaded
+let _mailer: Transporter | null = null;
+
+export const mailer = {
+  sendMail: async (options: Parameters<Transporter["sendMail"]>[0]) => {
+    if (!_mailer) {
+      _mailer = getTransport();
+    }
+    console.log("[MAILER] Sending email to:", options.to);
+    console.log("[MAILER] From:", options.from);
+    try {
+      const result = await _mailer.sendMail(options);
+      console.log("[MAILER] Email sent successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("[MAILER] Failed to send email:", error);
+      throw error;
+    }
+  },
+};
