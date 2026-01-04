@@ -1,12 +1,12 @@
-import crypto from 'node:crypto';
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
+import crypto from "node:crypto";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
-import { ONE_HOUR } from '../../constants/time';
-import { sendConfirmationEmail } from '../auth/send-confirmation-email';
-import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
+import { USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from "../../constants/email";
+import { ONE_HOUR } from "../../constants/time";
+import { sendConfirmationEmail } from "../auth/send-confirmation-email";
+import { getMostRecentEmailVerificationToken } from "./get-most-recent-email-verification-token";
 
 type SendConfirmationTokenOptions = { email: string; force?: boolean };
 
@@ -14,7 +14,7 @@ export const sendConfirmationToken = async ({
   email,
   force = false,
 }: SendConfirmationTokenOptions) => {
-  const token = crypto.randomBytes(20).toString('hex');
+  const token = crypto.randomBytes(20).toString("hex");
 
   const user = await prisma.user.findFirst({
     where: {
@@ -23,20 +23,23 @@ export const sendConfirmationToken = async ({
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   if (user.emailVerified) {
-    throw new Error('Email verified');
+    throw new Error("Email verified");
   }
 
-  const mostRecentToken = await getMostRecentEmailVerificationToken({ userId: user.id });
+  const mostRecentToken = await getMostRecentEmailVerificationToken({
+    userId: user.id,
+  });
 
   // If we've sent a token in the last 5 minutes, don't send another one
   if (
     !force &&
     mostRecentToken?.createdAt &&
-    DateTime.fromJSDate(mostRecentToken.createdAt).diffNow('minutes').minutes > -5
+    DateTime.fromJSDate(mostRecentToken.createdAt).diffNow("minutes").minutes >
+      -5
   ) {
     // return;
   }
@@ -59,11 +62,28 @@ export const sendConfirmationToken = async ({
   }
 
   try {
+    console.log(
+      "[SEND_CONFIRMATION_TOKEN] Attempting to send email for userId:",
+      user.id
+    );
     await sendConfirmationEmail({ userId: user.id });
-
+    console.log("[SEND_CONFIRMATION_TOKEN] Email sent successfully");
     return { success: true };
   } catch (err) {
-    console.log(err);
-    throw new Error(`Failed to send the confirmation email`);
+    console.error(
+      "[SEND_CONFIRMATION_TOKEN] Failed to send email. Error:",
+      err
+    );
+    console.error(
+      "[SEND_CONFIRMATION_TOKEN] Error message:",
+      err instanceof Error ? err.message : String(err)
+    );
+    console.error(
+      "[SEND_CONFIRMATION_TOKEN] Error stack:",
+      err instanceof Error ? err.stack : "No stack"
+    );
+    throw new Error(
+      `Failed to send the confirmation email: ${err instanceof Error ? err.message : String(err)}`
+    );
   }
 };
