@@ -42,12 +42,22 @@ function prismaClientBrowserStub(): Plugin {
         return stubPath;
       }
 
-      // Handle @signtusk/prisma and ALL its subpaths in client builds
-      // This includes @signtusk/prisma/types/*, etc.
+      // Handle @signtusk/prisma imports EXCEPT for generated zod schemas and types
+      // The generated zod schemas are browser-safe and should not be stubbed
+      if (source === "@signtusk/prisma") {
+        return stubPath;
+      }
+
+      // Allow generated zod schemas and type definitions to pass through
       if (
-        source === "@signtusk/prisma" ||
-        source.startsWith("@signtusk/prisma/")
+        source.startsWith("@signtusk/prisma/generated/zod/") ||
+        source.startsWith("@signtusk/prisma/types/")
       ) {
+        return null; // Let it resolve normally
+      }
+
+      // Block other @signtusk/prisma subpaths that might contain server code
+      if (source.startsWith("@signtusk/prisma/")) {
         return stubPath;
       }
 
