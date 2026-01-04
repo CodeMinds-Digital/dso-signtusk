@@ -1,49 +1,26 @@
 /**
- * Simple email rendering without I18nProvider to avoid React version conflicts.
+ * Simple email rendering without I18nProvider or Tailwind to avoid React version
+ * conflicts and Suspense issues in serverless environments.
  *
- * The issue: @react-email/render bundles its own React version, which conflicts
- * with @lingui/react's hooks (useRef, etc.) when used in serverless environments.
+ * Issues solved:
+ * 1. @react-email/render bundles its own React version, which conflicts with @lingui/react hooks
+ * 2. @react-email/tailwind uses Suspense which causes "component suspended" errors
  *
- * Solution: Pass pre-translated strings as props instead of using useLingui() hooks.
+ * Solution: Use inline styles and pass pre-translated strings as props.
  */
 import * as ReactEmail from "@react-email/render";
 
-import config from "@signtusk/tailwind-config";
-
-import { Tailwind } from "./components";
-import { BrandingProvider, type BrandingSettings } from "./providers/branding";
-
-export type SimpleRenderOptions = ReactEmail.Options & {
-  branding?: BrandingSettings;
-};
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const colors = (config.theme?.extend?.colors || {}) as Record<string, string>;
+export type SimpleRenderOptions = ReactEmail.Options;
 
 /**
- * Render email without I18nProvider - use this for serverless environments
- * where React version conflicts occur.
+ * Render email without I18nProvider or Tailwind - use this for serverless environments
+ * where React version conflicts or Suspense issues occur.
+ *
+ * Templates using this renderer should use inline styles instead of Tailwind classes.
  */
 export const renderSimple = async (
   element: React.ReactNode,
   options?: SimpleRenderOptions
 ) => {
-  const { branding, ...otherOptions } = options ?? {};
-
-  return ReactEmail.render(
-    <BrandingProvider branding={branding}>
-      <Tailwind
-        config={{
-          theme: {
-            extend: {
-              colors,
-            },
-          },
-        }}
-      >
-        {element}
-      </Tailwind>
-    </BrandingProvider>,
-    otherOptions
-  );
+  return ReactEmail.render(element, options);
 };

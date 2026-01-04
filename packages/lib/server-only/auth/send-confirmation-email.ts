@@ -2,7 +2,7 @@ import { createElement } from "react";
 
 import { mailer } from "@signtusk/email/mailer";
 import { renderSimple } from "@signtusk/email/render-simple";
-import { ConfirmEmailSimpleTemplate } from "@signtusk/email/templates/confirm-email-simple";
+import { ConfirmEmailHtmlTemplate } from "@signtusk/email/templates/confirm-email-html";
 import { prisma } from "@signtusk/prisma";
 
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
@@ -56,9 +56,9 @@ export const sendConfirmationEmail = async ({
     confirmationLink
   );
 
-  // Use simple template without lingui hooks to avoid React version conflicts
-  // with @react-email/render in serverless environments
-  const confirmationTemplate = createElement(ConfirmEmailSimpleTemplate, {
+  // Use pure HTML template without Tailwind or lingui hooks to avoid
+  // React version conflicts and Suspense issues in serverless environments
+  const confirmationTemplate = createElement(ConfirmEmailHtmlTemplate, {
     assetBaseUrl,
     confirmationLink,
     translations: {
