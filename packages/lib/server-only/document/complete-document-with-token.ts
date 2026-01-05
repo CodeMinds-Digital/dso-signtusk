@@ -66,6 +66,8 @@ export const completeDocumentWithToken = async ({
   nextSigner,
   recipientOverride,
 }: CompleteDocumentWithTokenOptions) => {
+  console.log("[COMPLETE-DOCUMENT] Function called with token:", token);
+
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
       ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
@@ -404,7 +406,67 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  if (haveAllRecipientsSigned) {
+  console.log(
+    "[COMPLETE-DOCUMENT] Query result:",
+    haveAllRecipientsSigned ? "FOUND" : "NULL"
+  );
+
+  // Double-check with a simpler query if the first one fails
+  if (!haveAllRecipientsSigned) {
+    console.log(
+      "[COMPLETE-DOCUMENT] First query returned NULL, trying alternative check..."
+    );
+
+    const envelopeWithRecipients = await prisma.envelope.findFirst({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: true,
+      },
+    });
+
+    if (envelopeWithRecipients) {
+      const allSigned = envelopeWithRecipients.recipients.every(
+        (r) =>
+          r.signingStatus === SigningStatus.SIGNED ||
+          r.role === RecipientRole.CC
+      );
+
+      console.log(
+        "[COMPLETE-DOCUMENT] Alternative check result:",
+        allSigned ? "ALL SIGNED" : "NOT ALL SIGNED"
+      );
+
+      if (allSigned) {
+        console.log(
+          "[COMPLETE-DOCUMENT] All recipients have signed (via alternative check), triggering seal-document job"
+        );
+        console.log(
+          "[COMPLETE-DOCUMENT] Document ID:",
+          legacyDocumentId,
+          "Envelope ID:",
+          envelope.id
+        );
+
+        await jobs.triggerJob({
+          name: "internal.seal-document",
+          payload: {
+            documentId: legacyDocumentId,
+            requestMetadata,
+          },
+        });
+
+        console.log(
+          "[COMPLETE-DOCUMENT] Seal-document job triggered successfully"
+        );
+      } else {
+        console.log(
+          "[COMPLETE-DOCUMENT] Not all recipients have signed yet (alternative check)"
+        );
+      }
+    }
+  } else {
     console.log(
       "[COMPLETE-DOCUMENT] All recipients have signed, triggering seal-document job"
     );
@@ -424,8 +486,6 @@ export const completeDocumentWithToken = async ({
     });
 
     console.log("[COMPLETE-DOCUMENT] Seal-document job triggered successfully");
-  } else {
-    console.log("[COMPLETE-DOCUMENT] Not all recipients have signed yet");
   }
 
   const updatedDocument = await prisma.envelope.findFirstOrThrow({

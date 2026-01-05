@@ -1,13 +1,13 @@
-import type { Prisma } from '@prisma/client';
-import type { EnvelopeType } from '@prisma/client';
+import type { Prisma } from "@prisma/client";
+import type { EnvelopeType } from "@prisma/client";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { getTeamById } from '../team/get-team';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from "../../constants/teams";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import type { EnvelopeIdOptions } from "../../utils/envelope";
+import { unsafeBuildEnvelopeIdQuery } from "../../utils/envelope";
+import { getTeamById } from "../team/get-team";
 
 export type GetEnvelopeByIdOptions = {
   id: EnvelopeIdOptions;
@@ -30,7 +30,12 @@ export type GetEnvelopeByIdOptions = {
   type: EnvelopeType | null;
 };
 
-export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeByIdOptions) => {
+export const getEnvelopeById = async ({
+  id,
+  userId,
+  teamId,
+  type,
+}: GetEnvelopeByIdOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     userId,
@@ -46,7 +51,7 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
           documentData: true,
         },
         orderBy: {
-          order: 'asc',
+          order: "asc",
         },
       },
       folder: true,
@@ -60,10 +65,14 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
       },
       recipients: {
         orderBy: {
-          id: 'asc',
+          id: "asc",
         },
       },
-      fields: true,
+      fields: {
+        include: {
+          signature: true,
+        },
+      },
       team: {
         select: {
           id: true,
@@ -83,7 +92,7 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope could not be found',
+      message: "Envelope could not be found",
     });
   }
 
@@ -91,13 +100,15 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
     ...envelope,
     user: {
       id: envelope.user.id,
-      name: envelope.user.name || '',
+      name: envelope.user.name || "",
       email: envelope.user.email,
     },
   };
 };
 
-export type GetEnvelopeByIdResponse = Awaited<ReturnType<typeof getEnvelopeById>>;
+export type GetEnvelopeByIdResponse = Awaited<
+  ReturnType<typeof getEnvelopeById>
+>;
 
 export type GetEnvelopeWhereInputOptions = {
   id: EnvelopeIdOptions;
@@ -138,7 +149,7 @@ export const getEnvelopeWhereInput = async ({
     console.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
 
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope ID not found',
+      message: "Envelope ID not found",
     });
   }
 
@@ -187,7 +198,7 @@ export const getEnvelopeWhereInput = async ({
     teamId !== team.id
   ) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Query not valid',
+      message: "Query not valid",
     });
   }
 
