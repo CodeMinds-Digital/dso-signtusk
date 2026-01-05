@@ -1,29 +1,29 @@
-import { P, match } from 'ts-pattern';
+import { P, match } from "ts-pattern";
 
-import type { BrandingSettings } from '@signtusk/email/providers/branding';
-import { prisma } from '@signtusk/prisma';
+import type { BrandingSettings } from "@signtusk/email/providers/branding";
+import { prisma } from "@signtusk/prisma";
 import type {
-    DocumentMeta,
-    EmailDomain,
-    Organisation,
-    OrganisationClaim,
-    OrganisationEmail,
-    OrganisationGlobalSettings,
-    OrganisationType,
-} from '@signtusk/prisma/client';
-import {
-    EmailDomainStatus,
-} from '@signtusk/prisma/client';
+  DocumentMeta,
+  EmailDomain,
+  Organisation,
+  OrganisationClaim,
+  OrganisationEmail,
+  OrganisationGlobalSettings,
+  OrganisationType,
+} from "@signtusk/prisma/client";
+import { EmailDomainStatus } from "@signtusk/prisma/client";
 
-import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
-import { AppError, AppErrorCode } from '../../errors/app-error';
+import { DOCUMENSO_INTERNAL_EMAIL } from "../../constants/email";
+import { AppError, AppErrorCode } from "../../errors/app-error";
 import {
-    organisationGlobalSettingsToBranding,
-    teamGlobalSettingsToBranding,
-} from '../../utils/team-global-settings-to-branding';
-import { extractDerivedTeamSettings } from '../../utils/teams';
+  organisationGlobalSettingsToBranding,
+  teamGlobalSettingsToBranding,
+} from "../../utils/team-global-settings-to-branding";
+import { extractDerivedTeamSettings } from "../../utils/teams";
 
-type EmailMetaOption = Partial<Pick<DocumentMeta, 'emailId' | 'emailReplyTo' | 'language'>>;
+type EmailMetaOption = Partial<
+  Pick<DocumentMeta, "emailId" | "emailReplyTo" | "language">
+>;
 
 type BaseGetEmailContextOptions = {
   /**
@@ -33,11 +33,11 @@ type BaseGetEmailContextOptions = {
    */
   source:
     | {
-        type: 'team';
+        type: "team";
         teamId: number;
       }
     | {
-        type: 'organisation';
+        type: "organisation";
         organisationId: string;
       };
 
@@ -46,16 +46,16 @@ type BaseGetEmailContextOptions = {
    * - INTERNAL: Emails to users, such as team invites, etc.
    * - RECIPIENT: Emails to recipients, such as document sent, document signed, etc.
    */
-  emailType: 'INTERNAL' | 'RECIPIENT';
+  emailType: "INTERNAL" | "RECIPIENT";
 };
 
 type InternalGetEmailContextOptions = BaseGetEmailContextOptions & {
-  emailType: 'INTERNAL';
+  emailType: "INTERNAL";
   meta?: EmailMetaOption | null;
 };
 
 type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
-  emailType: 'RECIPIENT';
+  emailType: "RECIPIENT";
 
   /**
    * Force meta options as a typesafe way to ensure developers don't forget to
@@ -64,12 +64,14 @@ type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
   meta: EmailMetaOption | null | undefined;
 };
 
-type GetEmailContextOptions = InternalGetEmailContextOptions | RecipientGetEmailContextOptions;
+type GetEmailContextOptions =
+  | InternalGetEmailContextOptions
+  | RecipientGetEmailContextOptions;
 
 type EmailContextResponse = {
   allowedEmails: OrganisationEmail[];
   branding: BrandingSettings;
-  settings: Omit<OrganisationGlobalSettings, 'id'>;
+  settings: Omit<OrganisationGlobalSettings, "id">;
   claims: OrganisationClaim;
   organisationType: OrganisationType;
   senderEmail: {
@@ -81,22 +83,26 @@ type EmailContextResponse = {
 };
 
 export const getEmailContext = async (
-  options: GetEmailContextOptions,
+  options: GetEmailContextOptions
 ): Promise<EmailContextResponse> => {
   const { source, meta } = options;
 
-  let emailContext: Omit<EmailContextResponse, 'senderEmail' | 'replyToEmail' | 'emailLanguage'>;
+  let emailContext: Omit<
+    EmailContextResponse,
+    "senderEmail" | "replyToEmail" | "emailLanguage"
+  >;
 
-  if (source.type === 'organisation') {
+  if (source.type === "organisation") {
     emailContext = await handleOrganisationEmailContext(source.organisationId);
   } else {
     emailContext = await handleTeamEmailContext(source.teamId);
   }
 
-  const emailLanguage = meta?.language || emailContext.settings.documentLanguage;
+  const emailLanguage =
+    meta?.language || emailContext.settings.documentLanguage;
 
   // Immediate return for internal emails.
-  if (options.emailType === 'INTERNAL') {
+  if (options.emailType === "INTERNAL") {
     return {
       ...emailContext,
       senderEmail: DOCUMENSO_INTERNAL_EMAIL,
@@ -105,7 +111,8 @@ export const getEmailContext = async (
     };
   }
 
-  const replyToEmail = meta?.emailReplyTo || emailContext.settings.emailReplyTo || undefined;
+  const replyToEmail =
+    meta?.emailReplyTo || emailContext.settings.emailReplyTo || undefined;
 
   const senderEmailId = match(meta?.emailId)
     .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
@@ -113,7 +120,9 @@ export const getEmailContext = async (
     .with(null, () => null) // Explicit null means to use the Documenso email.
     .exhaustive();
 
-  const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
+  const foundSenderEmail = emailContext.allowedEmails.find(
+    (email) => email.id === senderEmailId
+  );
 
   // Reset the emailId to null if not found.
   if (!foundSenderEmail) {
@@ -144,10 +153,15 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
       organisationClaim: true,
       organisationGlobalSettings: true,
       emailDomains: {
-        omit: {
-          privateKey: true,
-        },
-        include: {
+        select: {
+          id: true,
+          status: true,
+          organisationId: true,
+          domain: true,
+          selector: true,
+          publicKey: true,
+          createdAt: true,
+          updatedAt: true,
           emails: true,
         },
       },
@@ -167,7 +181,7 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     branding: organisationGlobalSettingsToBranding(
       organisation.organisationGlobalSettings,
       organisation.id,
-      claims.flags.hidePoweredBy ?? false,
+      claims.flags.hidePoweredBy ?? false
     ),
     settings: organisation.organisationGlobalSettings,
     claims,
@@ -187,10 +201,15 @@ const handleTeamEmailContext = async (teamId: number) => {
           organisationClaim: true,
           organisationGlobalSettings: true,
           emailDomains: {
-            omit: {
-              privateKey: true,
-            },
-            include: {
+            select: {
+              id: true,
+              status: true,
+              organisationId: true,
+              domain: true,
+              selector: true,
+              publicKey: true,
+              createdAt: true,
+              updatedAt: true,
               emails: true,
             },
           },
@@ -210,7 +229,7 @@ const handleTeamEmailContext = async (teamId: number) => {
 
   const teamSettings = extractDerivedTeamSettings(
     organisation.organisationGlobalSettings,
-    team.teamGlobalSettings,
+    team.teamGlobalSettings
   );
 
   return {
@@ -218,7 +237,7 @@ const handleTeamEmailContext = async (teamId: number) => {
     branding: teamGlobalSettingsToBranding(
       teamSettings,
       teamId,
-      claims.flags.hidePoweredBy ?? false,
+      claims.flags.hidePoweredBy ?? false
     ),
     settings: teamSettings,
     claims,
@@ -228,15 +247,19 @@ const handleTeamEmailContext = async (teamId: number) => {
 
 const getAllowedEmails = (
   organisation: Organisation & {
-    emailDomains: (Pick<EmailDomain, 'status'> & { emails: OrganisationEmail[] })[];
+    emailDomains: (Pick<EmailDomain, "status"> & {
+      emails: OrganisationEmail[];
+    })[];
     organisationClaim: OrganisationClaim;
-  },
+  }
 ) => {
   if (!organisation.organisationClaim.flags.emailDomains) {
     return [];
   }
 
   return organisation.emailDomains
-    .filter((emailDomain: any) => emailDomain.status === EmailDomainStatus.ACTIVE)
+    .filter(
+      (emailDomain: any) => emailDomain.status === EmailDomainStatus.ACTIVE
+    )
     .flatMap((emailDomain: any) => emailDomain.emails);
 };

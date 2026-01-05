@@ -1,13 +1,13 @@
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { buildOrganisationWhereQuery } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
 
-import { authenticatedProcedure } from '../trpc';
+import { authenticatedProcedure } from "../trpc";
 import {
   ZGetOrganisationEmailDomainRequestSchema,
   ZGetOrganisationEmailDomainResponseSchema,
-} from './get-organisation-email-domain.types';
+} from "./get-organisation-email-domain.types";
 
 export const getOrganisationEmailDomainRoute = authenticatedProcedure
   .input(ZGetOrganisationEmailDomainRequestSchema)
@@ -42,20 +42,25 @@ export const getOrganisationEmailDomain = async ({
       organisation: buildOrganisationWhereQuery({
         organisationId: undefined,
         userId,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
       }),
     },
-    omit: {
-      privateKey: true,
-    },
-    include: {
+    select: {
+      id: true,
+      status: true,
+      organisationId: true,
+      domain: true,
+      selector: true,
+      publicKey: true,
+      createdAt: true,
+      updatedAt: true,
       emails: true,
     },
   });
 
   if (!emailDomain) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Email domain not found',
+      message: "Email domain not found",
     });
   }
 

@@ -15,6 +15,13 @@ dist/
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.local
+
+# Certificate files (security)
+*.p12
+*.pfx
+*.base64.txt
+cert.base64.txt
 
 # Logs
 npm-debug.log*
