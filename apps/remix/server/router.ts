@@ -17,6 +17,7 @@ import { logger } from "@signtusk/lib/utils/logger";
 import { openApiDocument } from "@signtusk/trpc/server/open-api";
 
 import { aiRoute } from "./api/ai/route";
+import cronRoute from "./api/cron/route";
 import { downloadRoute } from "./api/download/download";
 import { filesRoute } from "./api/files/files";
 import { swaggerRoute } from "./api/swagger/route";
@@ -99,6 +100,9 @@ app.use("/api/v2/*", rateLimitMiddleware);
 
 // Auth server.
 app.route("/api/auth", auth);
+
+// Cron jobs (Vercel Cron)
+app.route("/api/cron", cronRoute);
 
 // Files route.
 app.route("/api/files", filesRoute);

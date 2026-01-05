@@ -10,6 +10,12 @@
       "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/process-pending-documents",
+      "schedule": "* * * * *"
+    }
+  ],
   "routes": [
     {
       "handle": "filesystem"

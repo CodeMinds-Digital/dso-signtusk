@@ -219,10 +219,11 @@ export class LocalJobProvider extends BaseJobProvider {
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;
 
-    // On Vercel/serverless, run jobs inline instead of making HTTP requests
-    // This avoids issues with serverless function termination
-    const isServerless =
-      process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+    // DISABLED: Inline execution causes timeout issues on Vercel
+    // Long-running jobs (seal-document) exceed 10-second timeout
+    // Jobs are now triggered via HTTP and processed asynchronously
+    // Use Vercel Cron to process stuck jobs
+    const isServerless = false;
 
     if (isServerless) {
       console.log(`[JOBS]: Running job inline (serverless mode): ${data.name}`);
@@ -244,6 +245,8 @@ export class LocalJobProvider extends BaseJobProvider {
     }
 
     console.log("Submitting job to endpoint:", endpoint);
+    // Increased timeout from 150ms to 2000ms to give jobs more time to start
+    // This helps prevent race conditions on serverless platforms
     await Promise.race([
       fetch(endpoint, {
         method: "POST",
@@ -251,7 +254,7 @@ export class LocalJobProvider extends BaseJobProvider {
         headers,
       }).catch(() => null),
       new Promise((resolve) => {
-        setTimeout(resolve, 150);
+        setTimeout(resolve, 2000);
       }),
     ]);
   }
