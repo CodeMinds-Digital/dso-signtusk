@@ -1,8 +1,23 @@
-# Nixpacks Configuration for Signtusk Remix App
-# Dokploy will auto-detect this file and use Nixpacks instead of Dockerfile
+# Enhanced Nixpacks Configuration for Signtusk Remix App
+# Use this if standard nixpacks.toml fails due to native dependencies
+# Includes additional system packages for @napi-rs/canvas and sharp
 
 [phases.setup]
-nixPkgs = ["nodejs-22_x", "python3", "bash"]
+nixPkgs = [
+  "nodejs-22_x",
+  "python3",
+  "bash",
+  "pkg-config",
+  "cairo",
+  "pango",
+  "libpng",
+  "libjpeg",
+  "giflib",
+  "librsvg",
+  "pixman",
+  "gcc",
+  "gnumake"
+]
 
 [phases.install]
 cmds = [
@@ -22,3 +37,4 @@ cmd = "npm start"
 [variables]
 NODE_ENV = "production"
 NEXT_TELEMETRY_DISABLED = "1"
+NODE_OPTIONS = "--max-old-space-size=4096"
