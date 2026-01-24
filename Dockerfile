@@ -1,6 +1,9 @@
 # Multi-stage Dockerfile for production builds
 FROM node:22-alpine AS base
 
+# Upgrade npm to latest version
+RUN npm install -g npm@11.8.0
+
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat python3 make g++
@@ -37,7 +40,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run prisma:generate
 
 # Build the application
-RUN npm run build
+# Skip building pdf-sign package (uses pre-built native binaries)
+RUN npm run build -- --filter=!@signtusk/pdf-sign
 
 # Production image, copy all the files and run the application
 FROM base AS runner
