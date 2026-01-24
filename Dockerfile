@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for production builds
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -13,7 +13,8 @@ COPY packages ./packages
 COPY apps ./apps
 
 # Install ALL dependencies (including dev) for building
-RUN npm ci --legacy-peer-deps
+# Use npm install instead of npm ci to handle lock file sync issues
+RUN npm install --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
