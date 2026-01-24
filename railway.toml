@@ -1,0 +1,17 @@
+# Railway/Railpack Configuration for Signtusk Remix App
+# Can also be used with Dokploy if it supports Railway buildpacks
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install -g npm@11.8.0 && npm install --legacy-peer-deps && npm run prisma:generate && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[env]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"

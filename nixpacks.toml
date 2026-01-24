@@ -1,0 +1,24 @@
+# Nixpacks Configuration for Signtusk Remix App
+# Dokploy will auto-detect this file and use Nixpacks instead of Dockerfile
+
+[phases.setup]
+nixPkgs = ["nodejs-22_x", "python3", "bash"]
+
+[phases.install]
+cmds = [
+  "npm install -g npm@11.8.0",
+  "npm install --legacy-peer-deps"
+]
+
+[phases.build]
+cmds = [
+  "npm run prisma:generate",
+  "npm run build"
+]
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"

@@ -1,0 +1,48 @@
+# Enhanced Nixpacks Configuration for Signtusk Remix App
+# Use this if basic nixpacks.toml fails due to native dependencies
+# Rename to nixpacks.toml to use
+
+[phases.setup]
+# Include additional packages for native dependencies
+nixPkgs = [
+  "nodejs-22_x",
+  "python3",
+  "bash",
+  "pkg-config",
+  "cairo",
+  "pango",
+  "libpng",
+  "libjpeg"
+]
+
+# Additional apt packages for canvas and sharp
+aptPkgs = [
+  "build-essential",
+  "libcairo2-dev",
+  "libpango1.0-dev",
+  "libjpeg-dev",
+  "libgif-dev",
+  "librsvg2-dev",
+  "libpixman-1-dev"
+]
+
+[phases.install]
+cmds = [
+  "npm install -g npm@11.8.0",
+  "npm install --legacy-peer-deps"
+]
+
+[phases.build]
+cmds = [
+  "npm run prisma:generate",
+  "npm run build"
+]
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"
+SKIP_PATCHES = "false"
+INSTALL_PLAYWRIGHT = "false"
