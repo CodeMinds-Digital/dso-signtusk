@@ -85,3 +85,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Start the application
 CMD ["npm", "start"]
+# Force rebuild 1769238373 - bypass Docker cache
