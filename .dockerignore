@@ -69,7 +69,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# Note: Don't exclude public folder - Remix needs apps/remix/public for static assets
 
 # Storybook build outputs
 .out
