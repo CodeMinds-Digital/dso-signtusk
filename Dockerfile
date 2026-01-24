@@ -21,6 +21,7 @@ RUN npm install --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
+RUN apk add --no-cache bash
 WORKDIR /app
 
 # Copy dependencies and source
