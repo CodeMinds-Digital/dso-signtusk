@@ -32,7 +32,7 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --pipe \"prettier -w\"",
+    "build": "echo 'Skipping build - using pre-built native binaries'",
     "build:debug": "napi build --platform --pipe \"prettier -w\"",
     "format": "run-p format:eslint format:prettier format:rs",
     "format:prettier": "prettier . -w",

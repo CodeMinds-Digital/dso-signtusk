@@ -40,8 +40,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run prisma:generate
 
 # Build the application
-# Skip building pdf-sign package (uses pre-built native binaries)
-RUN npm run build -- --filter=!@signtusk/pdf-sign
+# Note: pdf-sign build script is a no-op (uses pre-built native binaries)
+RUN npm run build
 
 # Production image, copy all the files and run the application
 FROM base AS runner
