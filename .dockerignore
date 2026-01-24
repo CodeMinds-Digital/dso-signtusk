@@ -1,13 +1,21 @@
-# Dependencies
+# Dependencies - CRITICAL: Prevent binary corruption
 node_modules
+**/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production builds
+# Production builds - CRITICAL: Prevent stale binaries
 .next
 dist
 build
+.out
+.turbo
+.prisma
+**/.prisma
+**/dist
+**/build
+**/.next
 
 # Environment files
 .env
