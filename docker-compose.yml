@@ -1,5 +1,5 @@
 # Production Docker Compose configuration
-version: '3.8'
+# Note: version field is deprecated in Docker Compose v2+
 
 services:
   app:
@@ -12,11 +12,68 @@ services:
       - "3000:3000"
       - "9090:9090"
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:password@database:5432/signtusk
-      - REDIS_URL=redis://redis:6379
+      # Core
+      - NODE_ENV=${NODE_ENV:-production}
+
+      # Database
+      - DATABASE_URL=${DATABASE_URL}
+      - POSTGRES_PRISMA_URL=${POSTGRES_PRISMA_URL}
+      - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL}
+
+      # Redis
+      - REDIS_URL=${REDIS_URL}
+
+      # Security & Encryption
       - JWT_SECRET=${JWT_SECRET}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY}
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY}
+      - NEXT_PRIVATE_SIGNING_TRANSPORT=${NEXT_PRIVATE_SIGNING_TRANSPORT}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+
+      # AWS S3
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=${NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID}
+      - NEXT_PRIVATE_UPLOAD_BUCKET=${NEXT_PRIVATE_UPLOAD_BUCKET}
+      - NEXT_PRIVATE_UPLOAD_REGION=${NEXT_PRIVATE_UPLOAD_REGION}
+      - NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=${NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY}
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
+
+      # Email / SMTP
+      - NEXT_PRIVATE_RESEND_API_KEY=${NEXT_PRIVATE_RESEND_API_KEY}
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=${NEXT_PRIVATE_SMTP_FROM_ADDRESS}
+      - NEXT_PRIVATE_SMTP_FROM_NAME=${NEXT_PRIVATE_SMTP_FROM_NAME}
+      - NEXT_PRIVATE_SMTP_HOST=${NEXT_PRIVATE_SMTP_HOST}
+      - NEXT_PRIVATE_SMTP_TRANSPORT=${NEXT_PRIVATE_SMTP_TRANSPORT}
+
+      # Stripe
+      - NEXT_PRIVATE_STRIPE_API_KEY=${NEXT_PRIVATE_STRIPE_API_KEY}
+      - NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET=${NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+
+      # URLs
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - NEXT_PUBLIC_DOCS_URL=${NEXT_PUBLIC_DOCS_URL}
+      - NEXT_PUBLIC_MARKETING_URL=${NEXT_PUBLIC_MARKETING_URL}
+      - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
+
+      # Feature Flags
+      - NEXT_PUBLIC_FEATURE_BILLING_ENABLED=${NEXT_PUBLIC_FEATURE_BILLING_ENABLED}
+      - NEXT_PUBLIC_FEATURE_WEBHOOKS_ENABLED=${NEXT_PUBLIC_FEATURE_WEBHOOKS_ENABLED}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED}
+
+      # Analytics & Monitoring
+      - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST}
+      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_DSN_NODE=${SENTRY_DSN_NODE}
+
     depends_on:
       database:
         condition: service_healthy
@@ -38,9 +95,9 @@ services:
   database:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: signtusk
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-signtusk}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:
@@ -85,7 +142,15 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

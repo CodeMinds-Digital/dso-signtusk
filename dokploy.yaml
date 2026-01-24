@@ -1,0 +1,51 @@
+# Dokploy Configuration for SignTusk
+# This file helps Dokploy understand how to deploy your application
+
+# Application Configuration
+app:
+  name: signtusk
+  type: docker-compose
+
+# Build Configuration
+build:
+  context: .
+  dockerfile: Dockerfile
+  compose_file: docker-compose.yml
+
+# Environment
+environment:
+  NODE_ENV: production
+
+# Ports
+ports:
+  - "3000:3000" # Application
+  - "80:80" # Nginx HTTP
+  - "443:443" # Nginx HTTPS
+
+# Health Check
+healthcheck:
+  enabled: true
+  path: /health
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Resources (adjust based on your VPS)
+resources:
+  limits:
+    memory: 4G
+    cpus: "2"
+  reservations:
+    memory: 2G
+    cpus: "1"
+
+# Volumes (persistent data)
+volumes:
+  - postgres_data
+  - redis_data
+  - uploads
+  - logs
+
+# Networks
+networks:
+  - app-network
