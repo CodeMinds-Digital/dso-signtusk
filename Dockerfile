@@ -64,7 +64,8 @@ COPY --from=deps /app/packages ./packages
 
 # Copy built application
 COPY --from=builder /app/apps/remix/build ./apps/remix/build
-COPY --from=builder /app/apps/remix/public ./apps/remix/public
+# Copy public folder from deps stage (before build) to ensure it exists
+COPY --from=deps /app/apps/remix/public ./apps/remix/public
 COPY --from=builder /app/apps/remix/package.json ./apps/remix/package.json
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/turbo.json ./turbo.json
