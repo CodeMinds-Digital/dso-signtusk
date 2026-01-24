@@ -1,0 +1,157 @@
+# Optimized Production Dockerfile based on original Documenso approach
+# This version uses turbo prune for smaller images and faster builds
+
+###########################
+#     BASE CONTAINER      #
+###########################
+FROM node:22-bookworm-slim AS base
+
+# Install OpenSSL (required for Prisma)
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade npm to latest
+RUN npm install -g npm@11.8.0
+
+###########################
+#    BUILDER CONTAINER    #
+###########################
+FROM base AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy entire project for pruning
+COPY . .
+
+# Install turbo globally
+RUN npm install -g "turbo@^2.7.2"
+
+# Use turbo prune to create minimal subset for @signtusk/remix
+# This outputs to /app/out with only necessary dependencies
+RUN turbo prune --scope=@signtusk/remix --docker
+
+###########################
+#   INSTALLER CONTAINER   #
+###########################
+FROM base AS installer
+
+# Install build dependencies (including cmake for aws-crt)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    cmake \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Disable husky hooks in Docker
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
+ENV NEXT_TELEMETRY_DISABLED=1
+# Add node_modules/.bin to PATH for workspace binaries
+ENV PATH="/app/node_modules/.bin:$PATH"
+# Memory optimization for build
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# Copy pruned package.json files and lockfile
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
+
+# Copy package.json for packages that turbo prune might miss
+COPY --from=builder /app/packages/pdf-processing/package.json ./packages/pdf-processing/package.json
+COPY --from=builder /app/packages/notifications/package.json ./packages/notifications/package.json
+
+# Copy config files needed for build
+COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
+COPY --from=builder /app/turbo.json ./turbo.json
+
+# Install dependencies (including dev dependencies for building)
+RUN npm ci --legacy-peer-deps
+
+# Copy pruned source code
+COPY --from=builder /app/out/full/ .
+
+# Copy additional packages that turbo prune might miss
+COPY --from=builder /app/packages/pdf-processing ./packages/pdf-processing
+COPY --from=builder /app/packages/notifications ./packages/notifications
+
+# Install turbo globally
+RUN npm install -g "turbo@^2.7.2"
+
+# Build only the Remix app and its dependencies
+RUN turbo run build --filter=@signtusk/remix...
+
+###########################
+#     RUNNER CONTAINER    #
+###########################
+FROM base AS runner
+
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+# Reduced memory for runtime
+ENV NODE_OPTIONS="--max-old-space-size=512"
+
+# Create non-root user with home directory
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --create-home nodejs
+
+WORKDIR /app
+
+# Copy pruned package.json files
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
+
+# Copy shared config packages that are needed at runtime
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tsconfig ./packages/tsconfig
+
+# Install production dependencies only (as root to avoid permission issues)
+RUN npm ci --omit=dev --legacy-peer-deps
+
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to nodejs user after installation
+USER nodejs
+
+# Copy built application
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
+
+# Copy Prisma schema and migrations
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
+
+# Generate Prisma Client for production environment
+RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+
+# Create necessary directories
+RUN mkdir -p /app/uploads /app/logs
+
+# Copy startup script (create this file separately)
+COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
+
+WORKDIR /app/apps/remix
+
+# Expose ports
+EXPOSE 3000 9090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Start using the startup script
+CMD ["sh", "start.sh"]
