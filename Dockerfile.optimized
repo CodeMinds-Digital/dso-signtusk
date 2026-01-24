@@ -1,5 +1,5 @@
-# Simplified Production Dockerfile without turbo prune
-# This avoids dependency resolution issues while maintaining good optimization
+# Optimized Production Dockerfile based on original Documenso approach
+# This version uses turbo prune for smaller images and faster builds
 
 ###########################
 #     BASE CONTAINER      #
@@ -14,6 +14,31 @@ RUN apt-get update && apt-get install -y \
 
 # Upgrade npm to latest
 RUN npm install -g npm@11.8.0
+
+###########################
+#    BUILDER CONTAINER    #
+###########################
+FROM base AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy entire project for pruning
+COPY . .
+
+# Install turbo globally
+RUN npm install -g "turbo@^2.7.2"
+
+# Use turbo prune to create minimal subset for @signtusk/remix
+# This outputs to /app/out with only necessary dependencies
+RUN turbo prune --scope=@signtusk/remix --docker
 
 ###########################
 #   INSTALLER CONTAINER   #
@@ -35,32 +60,30 @@ WORKDIR /app
 ENV HUSKY=0
 ENV DOCKER_OUTPUT=1
 ENV NEXT_TELEMETRY_DISABLED=1
+# Add node_modules/.bin to PATH for workspace binaries
+ENV PATH="/app/node_modules/.bin:$PATH"
 # Memory optimization for build
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
-# Copy package files
-COPY package.json package-lock.json ./
-COPY packages/*/package.json ./packages/
-COPY apps/*/package.json ./apps/
+# Copy pruned package.json files and lockfile
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
 
-# Copy shared config packages (needed before npm ci)
-COPY packages/tsconfig ./packages/tsconfig
-COPY packages/eslint-config ./packages/eslint-config
-COPY packages/prettier-config ./packages/prettier-config
-COPY packages/tailwind-config ./packages/tailwind-config
+# Copy config files needed for build
+COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
+COPY --from=builder /app/turbo.json ./turbo.json
 
 # Install dependencies (including dev dependencies for building)
 RUN npm ci --legacy-peer-deps
 
-# Install turbo globally for easier access
-RUN npm install -g turbo
+# Copy pruned source code
+COPY --from=builder /app/out/full/ .
 
-# Copy source code
-COPY . .
+# Install turbo globally
+RUN npm install -g "turbo@^2.7.2"
 
-# Build only the Remix app and its dependencies (exclude docs)
-# Add workspace node_modules to PATH so binaries can be found
-RUN cd /app && PATH="/app/node_modules/.bin:$PATH" npx turbo run build --filter=@signtusk/remix... --filter=!@signtusk/docs
+# Build only the Remix app and its dependencies
+RUN turbo run build --filter=@signtusk/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
@@ -80,14 +103,12 @@ RUN groupadd --system --gid 1001 nodejs && \
 
 WORKDIR /app
 
-# Copy package files
-COPY --chown=nodejs:nodejs package.json package-lock.json ./
-COPY --chown=nodejs:nodejs packages/*/package.json ./packages/
-COPY --chown=nodejs:nodejs apps/*/package.json ./apps/
+# Copy pruned package.json files
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 
 # Copy shared config packages that are needed at runtime
-COPY --from=installer --chown=nodejs:nodejs /app/packages/tailwind-config ./packages/tailwind-config
-COPY --from=installer --chown=nodejs:nodejs /app/packages/tsconfig ./packages/tsconfig
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tsconfig ./packages/tsconfig
 
 # Install production dependencies only (as root to avoid permission issues)
 RUN npm ci --omit=dev --legacy-peer-deps
@@ -112,7 +133,7 @@ RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 # Create necessary directories
 RUN mkdir -p /app/uploads /app/logs
 
-# Copy startup script
+# Copy startup script (create this file separately)
 COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
 
 WORKDIR /app/apps/remix

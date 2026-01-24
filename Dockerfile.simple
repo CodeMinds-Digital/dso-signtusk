@@ -59,8 +59,8 @@ RUN npm install -g turbo
 COPY . .
 
 # Build only the Remix app and its dependencies (exclude docs)
-# Add workspace node_modules to PATH so binaries can be found
-RUN cd /app && PATH="/app/node_modules/.bin:$PATH" npx turbo run build --filter=@signtusk/remix... --filter=!@signtusk/docs
+# Use full path to node_modules binaries
+RUN cd /app && npx turbo run build --filter=@signtusk/remix... --filter=!@signtusk/docs
 
 ###########################
 #     RUNNER CONTAINER    #

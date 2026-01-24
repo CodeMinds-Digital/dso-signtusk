@@ -171,7 +171,10 @@ export default defineConfig({
     reactRouter(),
     macrosPlugin(),
     lingui(),
-    tsconfigPaths(),
+    tsconfigPaths({
+      // Ignore reference folders to prevent tsconfig parsing errors
+      ignoreConfigErrors: true,
+    }),
     serverAdapter({
       entry: "server/router.ts",
     }),
@@ -185,6 +188,8 @@ export default defineConfig({
       "kysely",
       "prisma-extension-kysely",
       "@signtusk/tailwind-config",
+      "@signtusk/pdf-processing",
+      "@react-email/components",
       "sharp",
       "@img/sharp-wasm32",
       "@img/sharp-libvips-dev",
@@ -266,6 +271,8 @@ export default defineConfig({
       external: [
         "@napi-rs/canvas",
         "@signtusk/pdf-sign",
+        "@signtusk/pdf-processing",
+        "@react-email/components",
         "@aws-sdk/cloudfront-signer",
         "nodemailer",
         /playwright/,

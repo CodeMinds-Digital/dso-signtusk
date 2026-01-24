@@ -1,0 +1,108 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:16-alpine
+    container_name: signtusk-db
+    environment:
+      POSTGRES_USER: signtusk
+      POSTGRES_PASSWORD: signtusk_password
+      POSTGRES_DB: signtusk
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U signtusk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Remix Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: signtusk-app
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      NEXT_PRIVATE_DATABASE_URL: "postgresql://signtusk:signtusk_password@database:5432/signtusk"
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: "postgresql://signtusk:signtusk_password@database:5432/signtusk"
+
+      # Application URLs
+      NEXT_PUBLIC_WEBAPP_URL: "http://localhost:3000"
+      NEXT_PRIVATE_INTERNAL_WEBAPP_URL: "http://localhost:3000"
+
+      # Security (CHANGE THESE IN PRODUCTION!)
+      NEXTAUTH_SECRET: "development-secret-change-in-production"
+      NEXT_PRIVATE_ENCRYPTION_KEY: "development-encryption-key-32-chars"
+      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: "development-secondary-key-32-chars"
+
+      # Email (Configure for production)
+      NEXT_PRIVATE_SMTP_HOST: "mailhog"
+      NEXT_PRIVATE_SMTP_PORT: "1025"
+      NEXT_PRIVATE_SMTP_FROM_NAME: "Signtusk"
+      NEXT_PRIVATE_SMTP_FROM_ADDRESS: "noreply@signtusk.local"
+
+      # Document Signing (Optional)
+      NEXT_PRIVATE_SIGNING_TRANSPORT: "local"
+      NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: "/app/cert.p12"
+      NEXT_PRIVATE_SIGNING_PASSPHRASE: "test"
+
+      # Storage (Local for development)
+      NEXT_PUBLIC_UPLOAD_TRANSPORT: "local"
+
+      # Features
+      NEXT_PUBLIC_FEATURE_BILLING_ENABLED: "false"
+      NEXT_PUBLIC_DISABLE_SIGNUP: "false"
+
+      # Node
+      NODE_ENV: "production"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      # Mount certificate if you have one
+      # - ./cert.p12:/app/cert.p12:ro
+      # Mount uploads directory
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # MailHog (Email testing)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: signtusk-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8025",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  default:
+    name: signtusk-network

@@ -1,90 +1,55 @@
 {
-    "extends": "./packages/tsconfig/base.json",
-    "compilerOptions": {
-        "target": "ES2022",
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "ES6"
-        ],
-        "allowJs": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "noEmit": true,
-        "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "bundler",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "preserve",
-        "incremental": false,
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
-        "baseUrl": ".",
-        "paths": {
-            "@/*": [
-                "./src/*"
-            ],
-            "@signtusk/lib": [
-                "./packages/lib/src"
-            ],
-            "@signtusk/ui": [
-                "./packages/ui/src"
-            ],
-            "@signtusk/database": [
-                "./packages/database/src"
-            ],
-            "@signtusk/auth": [
-                "./packages/auth/src"
-            ],
-            "@signtusk/pdf": [
-                "./packages/pdf/src"
-            ],
-            "@signtusk/signing": [
-                "./packages/signing/src"
-            ],
-            "@signtusk/workflow": [
-                "./packages/workflow/src"
-            ],
-            "@signtusk/templates": [
-                "./packages/templates/src"
-            ],
-            "@signtusk/billing": [
-                "./packages/billing/src"
-            ],
-            "@signtusk/analytics": [
-                "./packages/analytics/src"
-            ],
-            "@signtusk/notifications": [
-                "./packages/notifications/src"
-            ],
-            "@signtusk/integrations": [
-                "./packages/integrations/src"
-            ],
-            "@signtusk/ai": [
-                "./packages/ai/src"
-            ],
-            "@signtusk/search": [
-                "./packages/search/src"
-            ],
-            "@signtusk/email": [
-                "./packages/email/src"
-            ],
-            "@signtusk/tsconfig": [
-                "./packages/tsconfig"
-            ]
-        }
-    },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        ".next/types/**/*.ts"
+  "extends": "./packages/tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
     ],
-    "exclude": [
-        "node_modules"
-    ]
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@signtusk/lib": ["./packages/lib/src"],
+      "@signtusk/ui": ["./packages/ui/src"],
+      "@signtusk/database": ["./packages/database/src"],
+      "@signtusk/auth": ["./packages/auth/src"],
+      "@signtusk/pdf": ["./packages/pdf/src"],
+      "@signtusk/signing": ["./packages/signing/src"],
+      "@signtusk/workflow": ["./packages/workflow/src"],
+      "@signtusk/templates": ["./packages/templates/src"],
+      "@signtusk/billing": ["./packages/billing/src"],
+      "@signtusk/analytics": ["./packages/analytics/src"],
+      "@signtusk/notifications": ["./packages/notifications/src"],
+      "@signtusk/integrations": ["./packages/integrations/src"],
+      "@signtusk/ai": ["./packages/ai/src"],
+      "@signtusk/search": ["./packages/search/src"],
+      "@signtusk/email": ["./packages/email/src"],
+      "@signtusk/tsconfig": ["./packages/tsconfig"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "documenso-main",
+    "dso-signtusk-working",
+    "dso-pdf-sign",
+    "backups",
+    ".turbo",
+    ".vercel",
+    "dist",
+    "build"
+  ]
 }

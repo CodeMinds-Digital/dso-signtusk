@@ -6,6 +6,14 @@
     ".react-router/types/**/*",
     "../../packages/prisma/types/types.d.ts"
   ],
+  "exclude": [
+    "../../documenso-main",
+    "../../dso-signtusk-working",
+    "../../dso-pdf-sign",
+    "../../backups",
+    "../../node_modules",
+    "node_modules"
+  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["node", "vite/client"],

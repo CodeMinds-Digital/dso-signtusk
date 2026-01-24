@@ -109,6 +109,13 @@ README.md
 CHANGELOG.md
 LICENSE
 
+# Reference projects (not part of build)
+documenso-main/
+documenso-main.zip
+dso-signtusk-working/
+dso-signtusk-working.zip
+dso-pdf-sign/
+
 # Test files
 **/*.test.ts
 **/*.test.js

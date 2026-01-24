@@ -1,260 +1,92 @@
-# Development Docker Compose configuration for Hybrid Architecture
-version: '3.8'
+# Development Docker Compose configuration
+# Based on Documenso-Main best practices
+# Usage: docker-compose -f docker-compose.dev.yml up
+
+name: signtusk-development
 
 services:
-  # Next.js Marketing Site (apps/web)
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      target: web-dev
-      args:
-        NODE_ENV: development
-    ports:
-      - "3000:3000"      # Next.js marketing site
-      - "24678:24678"    # Next.js HMR WebSocket
-    environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_APP_URL=http://localhost:3001
-      - NEXT_PUBLIC_API_URL=http://localhost:3002
-      - NEXT_PUBLIC_WEB_URL=http://localhost:3000
-      - DATABASE_URL=postgresql://postgres:password@database:5432/signtusk_dev
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=development-jwt-secret-that-is-long-enough-for-validation
-      - ENCRYPTION_KEY=development-encryption-key-32-chars
-      - LOG_LEVEL=debug
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-      - FAST_REFRESH=true
-      - TURBOPACK=1              # Enable Turbopack for faster builds
-      - NEXT_TELEMETRY_DISABLED=1
-      - WDS_SOCKET_HOST=localhost
-      - WDS_SOCKET_PORT=24678
-      - FORCE_COLOR=1            # Enable colored output
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - web_node_modules:/app/apps/web/node_modules
-      - packages_node_modules:/app/packages
-      - ~/.npm:/root/.npm
-      - /app/apps/web/.next        # Exclude .next from volume for better performance
-    networks:
-      - dev-network
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    working_dir: /app
-    command: >
-      sh -c "
-        echo 'Installing dependencies for web app...' &&
-        npm ci &&
-        echo 'Starting Next.js marketing site with enhanced hot reloading...' &&
-        cd apps/web &&
-        npm run dev -- --port 3000 --hostname 0.0.0.0
-      "
-
-  # Remix Main Application (apps/app)
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      target: app-dev
-      args:
-        NODE_ENV: development
-    ports:
-      - "3001:3001"      # Remix main application
-      - "24679:24679"    # Remix HMR WebSocket
-      - "9229:9229"      # Node.js debugger
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - NEXT_PUBLIC_WEB_URL=http://localhost:3000
-      - DATABASE_URL=postgresql://postgres:password@database:5432/signtusk_dev
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=development-jwt-secret-that-is-long-enough-for-validation
-      - ENCRYPTION_KEY=development-encryption-key-32-chars
-      - SESSION_SECRET=development-session-secret-that-is-long-enough
-      - LOG_LEVEL=debug
-      - ENABLE_AI_FEATURES=true
-      - ENABLE_EXPERIMENTAL_FEATURES=true
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-      - REMIX_DEV_SERVER_WS_PORT=24679
-      - FORCE_COLOR=1            # Enable colored output
-      - NODE_OPTIONS=--inspect=0.0.0.0:9229  # Enable debugging
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - app_node_modules:/app/apps/app/node_modules
-      - packages_node_modules:/app/packages
-      - uploads_dev:/app/uploads
-      - logs_dev:/app/logs
-      - ~/.npm:/root/.npm
-      - /app/apps/app/build        # Exclude build from volume for better performance
-    networks:
-      - dev-network
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    working_dir: /app
-    command: >
-      sh -c "
-        echo 'Installing dependencies for Remix app...' &&
-        npm ci &&
-        echo 'Starting Remix application with enhanced hot reloading and debugging...' &&
-        cd apps/app &&
-        npm run dev -- --host 0.0.0.0 --port 3001
-      "
-
-  # tRPC API Server (standalone for development)
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      target: api-dev
-      args:
-        NODE_ENV: development
-    ports:
-      - "3002:3002"      # tRPC API server
-      - "5555:5555"      # Prisma Studio
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:password@database:5432/signtusk_dev
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=development-jwt-secret-that-is-long-enough-for-validation
-      - ENCRYPTION_KEY=development-encryption-key-32-chars
-      - LOG_LEVEL=debug
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/packages/*/node_modules
-      - uploads_dev:/app/uploads
-      - logs_dev:/app/logs
-      - ~/.npm:/root/.npm
-    networks:
-      - dev-network
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    working_dir: /app
-    command: >
-      sh -c "
-        echo 'Starting tRPC API server...' &&
-        npm run dev:api
-      "
-
   database:
     image: postgres:16-alpine
+    container_name: signtusk-database
     environment:
-      POSTGRES_DB: signtusk_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      - POSTGRES_USER=signtusk
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=signtusk
     ports:
-      - "5432:5432"
+      - 54320:5432
     volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
-      - ./packages/database/migrations:/docker-entrypoint-initdb.d
-    networks:
-      - dev-network
-    restart: unless-stopped
+      - dev_database:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U signtusk"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - dev-network
 
   redis:
     image: redis:7-alpine
+    container_name: signtusk-redis
     ports:
-      - "6379:6379"
+      - 6379:6379
     volumes:
-      - redis_dev_data:/data
+      - dev_redis:/data
+    command: redis-server --appendonly yes
     networks:
       - dev-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    command: redis-server --appendonly yes
 
   mailhog:
-    image: mailhog/mailhog:latest
+    image: mailhog/mailhog
+    container_name: signtusk-mailhog
     ports:
-      - "1025:1025" # SMTP
-      - "8025:8025" # Web UI
+      - 1025:1025 # SMTP server
+      - 8025:8025 # Web UI
     networks:
       - dev-network
-    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: signtusk-minio
+    ports:
+      - 9000:9000 # API
+      - 9001:9001 # Console
+    environment:
+      MINIO_ROOT_USER: signtusk
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - minio:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - dev-network
 
   adminer:
-    image: adminer:latest
+    image: adminer
+    container_name: signtusk-adminer
     ports:
-      - "8080:8080"
+      - 8080:8080
     environment:
       ADMINER_DEFAULT_SERVER: database
+    depends_on:
+      - database
     networks:
       - dev-network
-    restart: unless-stopped
 
   redis-commander:
     image: rediscommander/redis-commander:latest
-    ports:
-      - "8081:8081"
+    container_name: signtusk-redis-commander
     environment:
-      REDIS_HOSTS: local:redis:6379
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis
     networks:
       - dev-network
-    restart: unless-stopped
 
 volumes:
-  postgres_dev_data:
-    driver: local
-  redis_dev_data:
-    driver: local
-  uploads_dev:
-    driver: local
-  logs_dev:
-    driver: local
-  web_node_modules:
-    driver: local
-  app_node_modules:
-    driver: local
-  packages_node_modules:
-    driver: local
+  dev_database:
+  dev_redis:
+  minio:
 
 networks:
   dev-network:
