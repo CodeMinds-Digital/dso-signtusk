@@ -6,7 +6,7 @@ RUN npm install -g npm@11.8.0
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat python3 make g++
+RUN apk add --no-cache libc6-compat python3 make g++ bash
 WORKDIR /app
 
 # Copy package files
