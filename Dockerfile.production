@@ -116,9 +116,8 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages/tailwind-config ./pack
 # Install ONLY production dependencies
 RUN npm ci --omit=dev --legacy-peer-deps
 
-# Copy built application
+# Copy built application (public assets are already in build/client)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
 # Copy Prisma files
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma

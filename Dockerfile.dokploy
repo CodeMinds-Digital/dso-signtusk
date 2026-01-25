@@ -98,9 +98,8 @@ RUN chown -R nodejs:nodejs /app
 # Switch to nodejs user after installation
 USER nodejs
 
-# Copy built application
+# Copy built application (public assets are already in build/client)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
 # Copy Prisma schema and migrations
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
