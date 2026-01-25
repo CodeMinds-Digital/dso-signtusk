@@ -23,6 +23,9 @@ dist/
 *.base64.txt
 cert.base64.txt
 
+# Documentation (NOT ignored - should be committed)
+# docs/ folder is tracked and committed to git
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
@@ -137,3 +140,5 @@ dso-signtusk-re-structure/
 packages/lib/translations/
 .vercel
 .env*.local
+docs/
+.env.dokploy
