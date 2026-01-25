@@ -1,6 +1,5 @@
 # Production Dockerfile for Remix App (Dokploy/Docker Ready)
 # Based on official Documenso Dockerfile but without turbo prune
-# Last updated: 2026-01-25 - Fixed workspace dependencies
 
 ###########################
 #     BASE CONTAINER      #
@@ -113,16 +112,20 @@ COPY --chown=nodejs:nodejs package.json package-lock.json ./
 COPY --chown=nodejs:nodejs apps/remix/package.json ./apps/remix/
 COPY --chown=nodejs:nodejs packages/*/package.json ./packages/
 
-# Copy ALL workspace packages (they contain the dependencies we need)
-COPY --from=installer --chown=nodejs:nodejs /app/packages ./packages
+# Copy tailwind config (needed at runtime)
+COPY --from=installer --chown=nodejs:nodejs /app/packages/tailwind-config ./packages/tailwind-config
 
-# Install ALL dependencies (including workspace deps)
-RUN npm ci --production=false --legacy-peer-deps
+# Install ONLY production dependencies
+RUN npm ci --omit=dev --legacy-peer-deps
 
 # Copy built application (public assets are already in build/client)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
 
-# Prisma is already in packages/ copied above, just generate client
+# Copy Prisma files
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
+
+# Generate Prisma Client in production
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
 # Create necessary directories
