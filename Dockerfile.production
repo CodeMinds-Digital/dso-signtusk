@@ -93,6 +93,13 @@ RUN ls -la build/ && ls -la build/server/
 ###########################
 FROM base AS runner
 
+# Install Python and build tools for native modules (BEFORE switching user)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 ENV HUSKY=0
 ENV DOCKER_OUTPUT=1
