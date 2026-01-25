@@ -1,5 +1,6 @@
 # Production Dockerfile for Remix App (Dokploy/Docker Ready)
 # Based on official Documenso Dockerfile but without turbo prune
+# Last updated: 2026-01-25 - Fixed workspace dependencies
 
 ###########################
 #     BASE CONTAINER      #
