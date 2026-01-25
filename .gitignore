@@ -8,6 +8,7 @@ node_modules/
 out/
 build/
 dist/
+docs/
 
 # Environment variables
 .env
@@ -140,5 +141,7 @@ dso-signtusk-re-structure/
 packages/lib/translations/
 .vercel
 .env*.local
-docs/
 .env.dokploy
+
+# Documentation folder (docs/) is tracked and committed to git
+# All markdown documentation should be version controlled

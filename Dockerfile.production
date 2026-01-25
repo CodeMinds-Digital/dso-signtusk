@@ -46,8 +46,10 @@ ENV TURBO_TELEMETRY_DISABLED=1
 ENV CI=true
 
 # Placeholder database URLs for build (real ones provided at runtime)
-ENV NEXT_PRIVATE_DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
-ENV NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+# ENV NEXT_PRIVATE_DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+# ENV NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV NEXT_PRIVATE_DATABASE_URL="postgresql://postgres:EnUmAfT@2)2%@db.bukcppqfgxomzddugnpe.supabase.co:5432/postgres"
+ENV NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://postgres:EnUmAfT@2)2%@db.bukcppqfgxomzddugnpe.supabase.co:5432/postgres"
 
 # Copy package files
 COPY package.json package-lock.json ./
