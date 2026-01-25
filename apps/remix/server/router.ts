@@ -76,6 +76,17 @@ app.use(contextStorage());
 app.use(appContext);
 
 /**
+ * Health check endpoint (no authentication or rate limiting required)
+ */
+app.get("/health", (c) => {
+  return c.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
+/**
  * RR7 app middleware.
  */
 app.use("*", appMiddleware);
