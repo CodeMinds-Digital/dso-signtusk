@@ -180,7 +180,18 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    noExternal: ["react-dropzone", "plausible-tracker"],
+    noExternal: [
+      "react-dropzone",
+      "plausible-tracker",
+      // Bundle these Node.js polyfills for browser compatibility
+      "stream",
+      "buffer",
+      "crypto",
+      "events",
+      "path",
+      "querystring",
+      "url",
+    ],
     external: [
       "@napi-rs/canvas",
       "@prisma/client",
@@ -201,6 +212,16 @@ export default defineConfig({
       "pg",
       "pg-native",
       "pg-pool",
+      // Node.js built-in modules (use native versions for SSR)
+      "util",
+      "node:util",
+      "node:crypto",
+      "node:stream",
+      "node:buffer",
+      "node:events",
+      "node:path",
+      "node:url",
+      "node:querystring",
     ],
   },
   optimizeDeps: {
@@ -248,7 +269,8 @@ export default defineConfig({
       // This provides a more complete Buffer implementation than our polyfill
       buffer: "buffer",
       process: "process/browser",
-      util: "util",
+      // Don't alias util - let Node.js built-in be used for SSR
+      // util: "util",
       stream: "stream-browserify",
       crypto: "crypto-browserify",
     },

@@ -7,6 +7,15 @@
 // Re-export all browser-safe enums
 export * from "@signtusk/lib/constants/prisma-enums";
 
+// Type guard functions (browser-safe stubs)
+export function isExtendedDocumentStatus(_value: unknown): boolean {
+  return false;
+}
+
+export function isSignatureFieldType(_value: unknown): boolean {
+  return false;
+}
+
 // Browser-safe Decimal class for type compatibility
 class BrowserDecimal {
   private value: number;
@@ -85,10 +94,18 @@ export class PrismaClient {
 // Kysely stubs for @signtusk/prisma compatibility
 // ============================================
 
-// Stub Kysely class
+// Stub Kysely class - don't throw in constructor, only when methods are called
 export class Kysely<T = unknown> {
   constructor(_config?: unknown) {
-    throw new Error("Kysely cannot be used in the browser");
+    // Allow construction but throw on method calls
+    return new Proxy(this, {
+      get(_target, prop) {
+        if (prop === "constructor" || prop === Symbol.toStringTag) {
+          return undefined;
+        }
+        throw new Error(`Kysely.${String(prop)} cannot be used in the browser`);
+      },
+    });
   }
 }
 
