@@ -1,139 +1,162 @@
-import { EmailTemplateCustomization, TemplateError } from '../../types';
-import { Logger } from 'pino';
-import { render } from '@react-email/render';
-import React from 'react';
+import { Logger } from "pino";
+import { EmailTemplateCustomization, TemplateError } from "../../types";
 
 /**
  * React Email Template Renderer
  * Provides React-based email template rendering with JSX support
  */
 export class ReactEmailRenderer {
-    private logger: Logger;
+  private logger: Logger;
 
-    constructor(logger: Logger) {
-        this.logger = logger.child({ renderer: 'react-email' });
+  constructor(logger: Logger) {
+    this.logger = logger.child({ renderer: "react-email" });
+  }
+
+  async render(
+    template: EmailTemplateCustomization,
+    data: Record<string, any>
+  ): Promise<{ html: string; text?: string; subject: string }> {
+    try {
+      this.logger.debug(
+        {
+          templateId: template.id,
+          templateName: template.name,
+        },
+        "Rendering React Email template"
+      );
+
+      // For this stub implementation, we'll treat the htmlTemplate as a React component string
+      // In production, this would involve proper JSX compilation and component rendering
+
+      // Prepare context with styles and data
+      const context = {
+        ...data,
+        styles: this.prepareStyles(template.styles || {}),
+        template: {
+          name: template.name,
+          id: template.id,
+        },
+      };
+
+      // Stub implementation - in production, this would compile and render actual React components
+      const html = this.renderStubTemplate(template.htmlTemplate, context);
+      const subject = this.renderStubTemplate(template.subject, context);
+      const text = template.textTemplate
+        ? this.renderStubTemplate(template.textTemplate, context)
+        : undefined;
+
+      this.logger.debug(
+        {
+          templateId: template.id,
+          htmlLength: html.length,
+          hasText: !!text,
+        },
+        "React Email template rendered successfully"
+      );
+
+      return { html, text, subject };
+    } catch (error) {
+      this.logger.error(
+        {
+          error,
+          templateId: template.id,
+          templateName: template.name,
+        },
+        "Failed to render React Email template"
+      );
+
+      throw new TemplateError(
+        `React Email rendering failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    }
+  }
+
+  private renderStubTemplate(
+    templateString: string,
+    data: Record<string, any>
+  ): string {
+    // Stub implementation - simple variable replacement
+    // In production, this would use proper React component rendering
+    let result = templateString;
+
+    // Replace simple variables like {{variable}}
+    result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      return data[key] || match;
+    });
+
+    // Replace nested variables like {{object.property}}
+    result = result.replace(/\{\{(\w+)\.(\w+)\}\}/g, (match, obj, prop) => {
+      return data[obj]?.[prop] || match;
+    });
+
+    // Replace style variables
+    if (data.styles) {
+      result = result.replace(/\{\{styles\.(\w+)\}\}/g, (match, key) => {
+        return data.styles[key] || match;
+      });
     }
 
-    async render(template: EmailTemplateCustomization, data: Record<string, any>): Promise<{ html: string; text?: string; subject: string }> {
-        try {
-            this.logger.debug({
-                templateId: template.id,
-                templateName: template.name
-            }, 'Rendering React Email template');
+    return result;
+  }
 
-            // For this stub implementation, we'll treat the htmlTemplate as a React component string
-            // In production, this would involve proper JSX compilation and component rendering
+  private prepareStyles(styles: Record<string, any>): Record<string, any> {
+    return {
+      primaryColor: styles.primaryColor || "#007bff",
+      secondaryColor: styles.secondaryColor || "#6c757d",
+      fontFamily: styles.fontFamily || "Arial, sans-serif",
+      fontSize: styles.fontSize || "14px",
+      backgroundColor: styles.backgroundColor || "#ffffff",
+      headerImage: styles.headerImage || "",
+      footerText: styles.footerText || "",
+      // React Email compatible styles
+      button: {
+        backgroundColor: styles.primaryColor || "#007bff",
+        color: "white",
+        padding: "12px 24px",
+        textDecoration: "none",
+        borderRadius: "4px",
+        display: "inline-block",
+      },
+      link: {
+        color: styles.primaryColor || "#007bff",
+        textDecoration: "none",
+      },
+      container: {
+        fontFamily: styles.fontFamily || "Arial, sans-serif",
+        fontSize: styles.fontSize || "14px",
+        backgroundColor: styles.backgroundColor || "#ffffff",
+      },
+    };
+  }
 
-            // Prepare context with styles and data
-            const context = {
-                ...data,
-                styles: this.prepareStyles(template.styles || {}),
-                template: {
-                    name: template.name,
-                    id: template.id
-                }
-            };
-
-            // Stub implementation - in production, this would compile and render actual React components
-            const html = this.renderStubTemplate(template.htmlTemplate, context);
-            const subject = this.renderStubTemplate(template.subject, context);
-            const text = template.textTemplate ? this.renderStubTemplate(template.textTemplate, context) : undefined;
-
-            this.logger.debug({
-                templateId: template.id,
-                htmlLength: html.length,
-                hasText: !!text
-            }, 'React Email template rendered successfully');
-
-            return { html, text, subject };
-
-        } catch (error) {
-            this.logger.error({
-                error,
-                templateId: template.id,
-                templateName: template.name
-            }, 'Failed to render React Email template');
-
-            throw new TemplateError(`React Email rendering failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
-    }
-
-    private renderStubTemplate(templateString: string, data: Record<string, any>): string {
-        // Stub implementation - simple variable replacement
-        // In production, this would use proper React component rendering
-        let result = templateString;
-
-        // Replace simple variables like {{variable}}
-        result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-            return data[key] || match;
-        });
-
-        // Replace nested variables like {{object.property}}
-        result = result.replace(/\{\{(\w+)\.(\w+)\}\}/g, (match, obj, prop) => {
-            return data[obj]?.[prop] || match;
-        });
-
-        // Replace style variables
-        if (data.styles) {
-            result = result.replace(/\{\{styles\.(\w+)\}\}/g, (match, key) => {
-                return data.styles[key] || match;
-            });
-        }
-
-        return result;
-    }
-
-    private prepareStyles(styles: Record<string, any>): Record<string, any> {
-        return {
-            primaryColor: styles.primaryColor || '#007bff',
-            secondaryColor: styles.secondaryColor || '#6c757d',
-            fontFamily: styles.fontFamily || 'Arial, sans-serif',
-            fontSize: styles.fontSize || '14px',
-            backgroundColor: styles.backgroundColor || '#ffffff',
-            headerImage: styles.headerImage || '',
-            footerText: styles.footerText || '',
-            // React Email compatible styles
-            button: {
-                backgroundColor: styles.primaryColor || '#007bff',
-                color: 'white',
-                padding: '12px 24px',
-                textDecoration: 'none',
-                borderRadius: '4px',
-                display: 'inline-block'
-            },
-            link: {
-                color: styles.primaryColor || '#007bff',
-                textDecoration: 'none'
-            },
-            container: {
-                fontFamily: styles.fontFamily || 'Arial, sans-serif',
-                fontSize: styles.fontSize || '14px',
-                backgroundColor: styles.backgroundColor || '#ffffff'
-            }
-        };
-    }
-
-    /**
-     * Create a basic React Email component template
-     */
-    createBasicTemplate(options: {
-        title: string;
-        headerText?: string;
-        bodyContent: string;
-        footerText?: string;
-        buttonText?: string;
-        buttonUrl?: string;
-    }): string {
-        return `
-import { Html, Head, Body, Container, Section, Text, Button, Img } from '@react-email/components';
+  /**
+   * Create a basic React Email component template
+   */
+  createBasicTemplate(options: {
+    title: string;
+    headerText?: string;
+    bodyContent: string;
+    footerText?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+  }): string {
+    return `
+import { Html } from '@react-email/html';
+import { Head } from '@react-email/head';
+import { Body } from '@react-email/body';
+import { Container } from '@react-email/container';
+import { Section } from '@react-email/section';
+import { Text } from '@react-email/text';
+import { Button } from '@react-email/button';
+import { Img } from '@react-email/img';
 
 export default function EmailTemplate({ 
     title = "${options.title}",
-    headerText = "${options.headerText || ''}",
+    headerText = "${options.headerText || ""}",
     bodyContent = "${options.bodyContent}",
-    footerText = "${options.footerText || ''}",
-    buttonText = "${options.buttonText || ''}",
-    buttonUrl = "${options.buttonUrl || '#'}",
+    footerText = "${options.footerText || ""}",
+    buttonText = "${options.buttonText || ""}",
+    buttonUrl = "${options.buttonUrl || "#"}",
     styles = {}
 }) {
     return (
@@ -179,52 +202,62 @@ export default function EmailTemplate({
         </Html>
     );
 }`;
+  }
+
+  /**
+   * Validate React component template
+   */
+  validateTemplate(templateString: string): { valid: boolean; error?: string } {
+    try {
+      // Basic JSX syntax validation
+      // In production, this would use proper React/JSX parsing
+      if (
+        !templateString.includes("export default") &&
+        !templateString.includes("function")
+      ) {
+        return {
+          valid: false,
+          error: "Template must export a default React component",
+        };
+      }
+
+      return { valid: true };
+    } catch (error) {
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : "Unknown syntax error",
+      };
     }
+  }
 
-    /**
-     * Validate React component template
-     */
-    validateTemplate(templateString: string): { valid: boolean; error?: string } {
-        try {
-            // Basic JSX syntax validation
-            // In production, this would use proper React/JSX parsing
-            if (!templateString.includes('export default') && !templateString.includes('function')) {
-                return { valid: false, error: 'Template must export a default React component' };
-            }
+  /**
+   * Generate component props interface
+   */
+  generatePropsInterface(
+    variables: Array<{ name: string; type: string; required: boolean }>
+  ): string {
+    const props = variables
+      .map((v) => {
+        const optional = v.required ? "" : "?";
+        let type = v.type;
 
-            return { valid: true };
-        } catch (error) {
-            return {
-                valid: false,
-                error: error instanceof Error ? error.message : 'Unknown syntax error'
-            };
+        // Map template types to TypeScript types
+        switch (v.type) {
+          case "date":
+            type = "Date | string";
+            break;
+          case "object":
+            type = "Record<string, any>";
+            break;
         }
-    }
 
-    /**
-     * Generate component props interface
-     */
-    generatePropsInterface(variables: Array<{ name: string; type: string; required: boolean }>): string {
-        const props = variables.map(v => {
-            const optional = v.required ? '' : '?';
-            let type = v.type;
+        return `  ${v.name}${optional}: ${type};`;
+      })
+      .join("\n");
 
-            // Map template types to TypeScript types
-            switch (v.type) {
-                case 'date':
-                    type = 'Date | string';
-                    break;
-                case 'object':
-                    type = 'Record<string, any>';
-                    break;
-            }
-
-            return `  ${v.name}${optional}: ${type};`;
-        }).join('\n');
-
-        return `interface EmailTemplateProps {
+    return `interface EmailTemplateProps {
 ${props}
   styles?: Record<string, any>;
 }`;
-    }
+  }
 }
