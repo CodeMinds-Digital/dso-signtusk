@@ -18,8 +18,7 @@ fi
 
 printf "\n📚 Useful Links:\n"
 printf "🏥 Health check: http://localhost:3000/health\n"
-printf "📊 API docs: http://localhost:3000/api/swagger\n"
-printf "👥 GitHub: https://github.com/documenso/documenso\n\n"
+printf "📊 API docs: http://localhost:3000/api/swagger\n\n"
 
 printf "🗄️  Running database migrations...\n"
 npx prisma migrate deploy --schema ../../packages/prisma/schema.prisma
