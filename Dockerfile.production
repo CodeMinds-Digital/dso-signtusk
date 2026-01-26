@@ -30,14 +30,19 @@ RUN apt-get update && apt-get install -y \
     bash \
     jq \
     curl \
+    pkg-config \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Rust toolchain for building native modules
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Add the Linux x64 GNU target for cross-compilation
-RUN rustup target add x86_64-unknown-linux-gnu
+# Verify Rust installation
+RUN rustc --version && cargo --version
+
+# Add the Linux x64 GNU target (should already be default on x64 Linux)
+RUN rustup target add x86_64-unknown-linux-gnu || echo "Target already installed"
 
 WORKDIR /app
 
@@ -102,21 +107,19 @@ RUN cd packages/prisma && npx prisma generate
 # Extract and compile translations
 RUN npx lingui extract --clean && npx lingui compile
 
-# Copy pre-built native module from dso-pdf-sign (has all platforms)
-# This is much simpler than building with Rust during Docker build
-WORKDIR /app
-RUN if [ -f dso-pdf-sign/pdf-sign.darwin-arm64.node ]; then \
-      echo "📦 Using dso-pdf-sign as source for native modules"; \
-      cp dso-pdf-sign/pdf-sign.darwin-arm64.node packages/pdf-sign/ 2>/dev/null || true; \
-    fi
-
 # Build the pdf-sign native module for Linux x64 GNU
-# The npm folder structure is already set up, we just need to build the .node file
+# Try to build, but don't fail if it doesn't work (optional native module)
 WORKDIR /app/packages/pdf-sign
-RUN npm run build -- --target x86_64-unknown-linux-gnu || \
-    echo "Build failed, will try to use pre-built module if available"
+RUN echo "🔨 Attempting to build native pdf-sign module..." && \
+    npm run build -- --target x86_64-unknown-linux-gnu 2>&1 | tee /tmp/build.log || \
+    echo "⚠️  Native module build failed - will use fallback signing method"
 
-# Native module verification removed - build script confirms success
+# Check if the build succeeded
+RUN if [ -f "pdf-sign.linux-x64-gnu.node" ]; then \
+      echo "✅ Native module built successfully"; \
+    else \
+      echo "⚠️  Native module not available - PDF signing will use fallback method"; \
+    fi
 
 # Build all workspace packages using turbo (includes pdf-processing)
 # The ^... syntax builds all dependencies of remix

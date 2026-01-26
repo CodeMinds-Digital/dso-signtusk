@@ -1,13 +1,13 @@
-# @documenso/pdf-sign
+# @signtusk/pdf-sign
 
-This package provides functionality to sign PDF documents using various signing methods, including private keys, P12 containers, and Google Cloud. It is designed to be used with the Documenso platform.
+This package provides functionality to sign PDF documents using various signing methods, including private keys, P12 containers, and Google Cloud. It is designed to be used with the SignTusk platform.
 
 ## Installation
 
 To install the package, run:
 
 ```bash
-npm install @documenso/pdf-sign
+npm install @signtusk/pdf-sign
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install @documenso/pdf-sign
 ### Signing with a Private Key
 
 ```javascript
-const { signWithPrivateKey } = require('@documenso/pdf-sign');
+const { signWithPrivateKey } = require('@signtusk/pdf-sign');
 
 const content = Buffer.from('...'); // PDF content
 const cert = Buffer.from('...'); // Certificate in PEM format
@@ -34,7 +34,7 @@ const signedPdf = await signWithPrivateKey({
 ### Signing with a P12 Container
 
 ```javascript
-const { signWithP12 } = require('@documenso/pdf-sign');
+const { signWithP12 } = require('@signtusk/pdf-sign');
 
 const content = Buffer.from('...'); // PDF content
 const p12 = Buffer.from('...'); // P12 container
@@ -52,7 +52,7 @@ const signedPdf = await signWithP12({
 ### Signing with Google Cloud
 
 ```javascript
-const { signWithGCloud } = require('@documenso/pdf-sign');
+const { signWithGCloud } = require('@signtusk/pdf-sign');
 
 const content = Buffer.from('...'); // PDF content
 const cert = Buffer.from('...'); // Certificate in PEM format
