@@ -46,7 +46,11 @@ fi
 echo "📦 Adding changes..."
 git add Dockerfile.production
 git add docker/start.sh
+git add packages/pdf-processing/package.json
+git add scripts/diagnose-document-completion.ts
 git add PYTHON_BUILD_FIX.md
+git add DOCUMENT_COMPLETION_FIX.md
+git add FIXES_APPLIED.md
 git add CURRENT_STATUS_AND_NEXT_STEPS.md
 git add deploy-to-dokploy.sh
 
@@ -56,14 +60,17 @@ if git diff --staged --quiet; then
 else
     # Commit changes
     echo "💾 Committing changes..."
-    git commit -m "fix: add Python and build tools to runner stage for pkcs11js
+    git commit -m "fix: resolve pdf-processing module error and document completion issues
 
-- Install python3, make, g++ in runner stage before user switch
+- Add Python and build tools to runner stage for pkcs11js
+- Fix pdf-processing package.json to point to compiled dist files
 - Required for pkcs11js native module compilation
 - Fixes node-gyp rebuild error during npm ci
 - Resolves @react-email/render module not found error
+- Fixes documents stuck in Processing state after signing
+- Add diagnostic script for stuck documents
 - Remove old Documenso GitHub link from startup script
-- Add comprehensive deployment documentation"
+- Add comprehensive deployment and troubleshooting documentation"
 fi
 
 # Push to remote
