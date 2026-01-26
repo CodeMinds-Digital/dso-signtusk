@@ -128,6 +128,14 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages ./packages
 # Install ALL dependencies (including workspace deps)
 RUN npm ci --production=false --legacy-peer-deps
 
+# CRITICAL: Verify workspace packages are properly linked
+RUN echo "🔍 Verifying workspace packages..." && \
+    ls -la node_modules/@signtusk/ && \
+    echo "📦 Checking pdf-processing package..." && \
+    ls -la node_modules/@signtusk/pdf-processing/ && \
+    ls -la node_modules/@signtusk/pdf-processing/dist/ && \
+    echo "✅ Workspace packages verified!"
+
 # Copy built application (public assets are already in build/client)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
 
