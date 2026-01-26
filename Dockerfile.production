@@ -78,6 +78,9 @@ RUN cd packages/prisma && npx prisma generate
 # Extract and compile translations
 RUN npx lingui extract --clean && npx lingui compile
 
+# Build pdf-processing package explicitly (required by lib package)
+RUN cd packages/pdf-processing && npm run build && cd ../..
+
 # Build all workspace packages first
 RUN npx turbo run build --filter=@signtusk/remix^...
 

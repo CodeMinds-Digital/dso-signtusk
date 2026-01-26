@@ -30,6 +30,7 @@
       "@signtusk/auth": ["../../packages/auth"],
       "@signtusk/ee": ["../../packages/ee"],
       "@signtusk/lib": ["../../packages/lib"],
+      "@signtusk/pdf-processing": ["../../packages/pdf-processing"],
       "@signtusk/prisma": ["../../packages/prisma"],
       "@signtusk/trpc": ["../../packages/trpc"],
       "@signtusk/ui": ["../../packages/ui"],

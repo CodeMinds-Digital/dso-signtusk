@@ -27,6 +27,7 @@
       "@signtusk/database": ["./packages/database/src"],
       "@signtusk/auth": ["./packages/auth/src"],
       "@signtusk/pdf": ["./packages/pdf/src"],
+      "@signtusk/pdf-processing": ["./packages/pdf-processing"],
       "@signtusk/signing": ["./packages/signing/src"],
       "@signtusk/workflow": ["./packages/workflow/src"],
       "@signtusk/templates": ["./packages/templates/src"],
