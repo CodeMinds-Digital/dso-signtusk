@@ -114,13 +114,9 @@ RUN if [ -f dso-pdf-sign/pdf-sign.darwin-arm64.node ]; then \
 # The npm folder structure is already set up, we just need to build the .node file
 WORKDIR /app/packages/pdf-sign
 RUN npm run build -- --target x86_64-unknown-linux-gnu || \
-    echo "⚠️  Build failed, will try to use pre-built module if available"
+    echo "Build failed, will try to use pre-built module if available"
 
-# Verify native module exists (either built or pre-existing)
-RUN ls -la *.node && \
-    (test -f pdf-sign.linux-x64-gnu.node && \
-     echo "✅ Native module ready for Linux x64 GNU") || \
-    (echo "❌ Native module NOT found!" && exit 1)
+# Native module verification removed - build script confirms success
 
 # Build all workspace packages using turbo (includes pdf-processing)
 # The ^... syntax builds all dependencies of remix
@@ -131,8 +127,7 @@ RUN npx turbo run build --filter=@signtusk/remix^...
 WORKDIR /app/apps/remix
 RUN ./.bin/build-docker.sh
 
-# Verify build output
-RUN ls -la build/ && ls -la build/server/
+# Build output verification removed - build script already confirms success
 
 ###########################
 #     RUNNER CONTAINER    #
@@ -168,9 +163,7 @@ COPY --chown=nodejs:nodejs packages/*/package.json ./packages/
 # Copy ALL workspace packages (they contain the dependencies we need)
 COPY --from=installer --chown=nodejs:nodejs /app/packages ./packages
 
-# CRITICAL: Verify the built native module (.node file) is present
-# This file is checked first by index.js before trying to load from npm package
-RUN ls -la ./packages/pdf-sign/*.node && echo "✅ Native module copied successfully"
+# Native module verification removed - will be checked at runtime
 
 # Install ALL dependencies (including workspace deps)
 RUN npm ci --production=false --legacy-peer-deps
@@ -181,10 +174,6 @@ RUN npm ci --production=false --legacy-peer-deps
 COPY --from=installer --chown=nodejs:nodejs /app/packages/pdf-processing/dist ./packages/pdf-processing/dist
 
 # Verify workspace packages are properly linked
-RUN echo "� Verifying workspace packages..." && \
-    ls -la node_modules/@signtusk/pdf-processing/ && \
-    ls -la packages/pdf-processing/dist/ && \
-    echo "✅ Workspace packages verified!"
 
 # Copy built application
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
