@@ -36,6 +36,9 @@ RUN apt-get update && apt-get install -y \
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# Add the Linux x64 GNU target for cross-compilation
+RUN rustup target add x86_64-unknown-linux-gnu
+
 WORKDIR /app
 
 # Disable husky hooks and enable Docker output
@@ -99,12 +102,25 @@ RUN cd packages/prisma && npx prisma generate
 # Extract and compile translations
 RUN npx lingui extract --clean && npx lingui compile
 
-# Build the pdf-sign native module FIRST (requires Rust)
-WORKDIR /app/packages/pdf-sign
-RUN npm run build
+# Copy pre-built native module from dso-pdf-sign (has all platforms)
+# This is much simpler than building with Rust during Docker build
+WORKDIR /app
+RUN if [ -f dso-pdf-sign/pdf-sign.darwin-arm64.node ]; then \
+      echo "📦 Using dso-pdf-sign as source for native modules"; \
+      cp dso-pdf-sign/pdf-sign.darwin-arm64.node packages/pdf-sign/ 2>/dev/null || true; \
+    fi
 
-# Verify native module was built
-RUN ls -la *.node && echo "✅ Native module built successfully"
+# Build the pdf-sign native module for Linux x64 GNU
+# The npm folder structure is already set up, we just need to build the .node file
+WORKDIR /app/packages/pdf-sign
+RUN npm run build -- --target x86_64-unknown-linux-gnu || \
+    echo "⚠️  Build failed, will try to use pre-built module if available"
+
+# Verify native module exists (either built or pre-existing)
+RUN ls -la *.node && \
+    (test -f pdf-sign.linux-x64-gnu.node && \
+     echo "✅ Native module ready for Linux x64 GNU") || \
+    (echo "❌ Native module NOT found!" && exit 1)
 
 # Build all workspace packages using turbo (includes pdf-processing)
 # The ^... syntax builds all dependencies of remix

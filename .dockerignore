@@ -114,7 +114,6 @@ documenso-main/
 documenso-main.zip
 dso-signtusk-working/
 dso-signtusk-working.zip
-dso-pdf-sign/
 
 # Test files
 **/*.test.ts
