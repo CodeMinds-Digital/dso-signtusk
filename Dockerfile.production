@@ -94,7 +94,7 @@ RUN cd packages/prisma && npx prisma generate
 RUN npx lingui extract --clean && npx lingui compile
 
 # Build all workspace packages using turbo (includes pdf-processing)
-# This ensures proper dependency order and builds pdf-processing first
+# The ^... syntax builds all dependencies of remix
 RUN npx turbo run build --filter=@signtusk/remix^...
 
 # Build the Remix app using Docker-specific build script (skips typecheck)
@@ -143,6 +143,7 @@ RUN npm ci --production=false --legacy-peer-deps
 
 # CRITICAL: Copy the BUILT dist folder from installer stage
 # The symlink points to packages/pdf-processing, but we need the compiled dist/
+# (Already included in the packages copy above, but explicit for clarity)
 COPY --from=installer --chown=nodejs:nodejs /app/packages/pdf-processing/dist ./packages/pdf-processing/dist
 
 # Verify workspace packages are properly linked

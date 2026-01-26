@@ -58,6 +58,7 @@
     "zod": "^3.25.76",
     "@signtusk/assets": "*",
     "@signtusk/email": "*",
+    "@signtusk/pdf-processing": "*",
     "@signtusk/prisma": "*",
     "@signtusk/signing": "*"
   },
