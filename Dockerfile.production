@@ -141,12 +141,14 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages ./packages
 # Install ALL dependencies (including workspace deps)
 RUN npm ci --production=false --legacy-peer-deps
 
-# CRITICAL: Verify workspace packages are properly linked
-RUN echo "🔍 Verifying workspace packages..." && \
-    ls -la node_modules/@signtusk/ && \
-    echo "📦 Checking pdf-processing package..." && \
+# CRITICAL: Copy the BUILT dist folder from installer stage
+# The symlink points to packages/pdf-processing, but we need the compiled dist/
+COPY --from=installer --chown=nodejs:nodejs /app/packages/pdf-processing/dist ./packages/pdf-processing/dist
+
+# Verify workspace packages are properly linked
+RUN echo "� Verifying workspace packages..." && \
     ls -la node_modules/@signtusk/pdf-processing/ && \
-    ls -la node_modules/@signtusk/pdf-processing/dist/ && \
+    ls -la packages/pdf-processing/dist/ && \
     echo "✅ Workspace packages verified!"
 
 # Copy built application (public assets are already in build/client)
