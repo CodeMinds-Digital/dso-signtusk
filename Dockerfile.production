@@ -192,6 +192,9 @@ COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/b
 # Copy public assets including fonts (needed for PDF generation)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
+# Copy example folder with certificate (if using file-based cert)
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/example ./apps/remix/example
+
 # Prisma is already in packages/ copied above, just generate client
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
