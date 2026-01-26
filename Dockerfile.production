@@ -99,8 +99,16 @@ RUN cd packages/prisma && npx prisma generate
 # Extract and compile translations
 RUN npx lingui extract --clean && npx lingui compile
 
+# Build the pdf-sign native module FIRST (requires Rust)
+WORKDIR /app/packages/pdf-sign
+RUN npm run build
+
+# Verify native module was built
+RUN ls -la *.node && echo "✅ Native module built successfully"
+
 # Build all workspace packages using turbo (includes pdf-processing)
 # The ^... syntax builds all dependencies of remix
+WORKDIR /app
 RUN npx turbo run build --filter=@signtusk/remix^...
 
 # Build the Remix app using Docker-specific build script (skips typecheck)
@@ -143,6 +151,10 @@ COPY --chown=nodejs:nodejs packages/*/package.json ./packages/
 
 # Copy ALL workspace packages (they contain the dependencies we need)
 COPY --from=installer --chown=nodejs:nodejs /app/packages ./packages
+
+# CRITICAL: Verify the built native module (.node file) is present
+# This file is checked first by index.js before trying to load from npm package
+RUN ls -la ./packages/pdf-sign/*.node && echo "✅ Native module copied successfully"
 
 # Install ALL dependencies (including workspace deps)
 RUN npm ci --production=false --legacy-peer-deps
