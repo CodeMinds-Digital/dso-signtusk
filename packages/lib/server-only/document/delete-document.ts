@@ -1,31 +1,39 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import type { DocumentMeta, Envelope, Recipient, User } from "@prisma/client";
+import {
+  DocumentStatus,
+  EnvelopeType,
+  SendStatus,
+  WebhookTriggerEvents,
+} from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import DocumentCancelTemplate from '@signtusk/email/templates/document-cancel';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import DocumentCancelTemplate from "@signtusk/email/templates/document-cancel";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "../../types/document-audit-logs";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
-import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
-import { isDocumentCompleted } from '../../utils/document';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { type EnvelopeIdOptions, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
-import { getMemberRoles } from '../team/get-member-roles';
-import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+} from "../../types/webhook-payload";
+import type { ApiRequestMetadata } from "../../universal/extract-request-metadata";
+import { isDocumentCompleted } from "../../utils/document";
+import { createDocumentAuditLogData } from "../../utils/document-audit-logs";
+import {
+  unsafeBuildEnvelopeIdQuery,
+  type EnvelopeIdOptions,
+} from "../../utils/envelope";
+import { isRecipientEmailValidForSending } from "../../utils/recipients";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { getEmailContext } from "../email/get-email-context";
+import { getMemberRoles } from "../team/get-member-roles";
+import { triggerWebhook } from "../webhooks/trigger/trigger-webhook";
 
 export type DeleteDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -48,7 +56,7 @@ export const deleteDocument = async ({
 
   if (!user) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'User not found',
+      message: "User not found",
     });
   }
 
@@ -63,14 +71,14 @@ export const deleteDocument = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: "Document not found",
     });
   }
 
   const isUserTeamMember = await getMemberRoles({
     teamId: envelope.teamId,
     reference: {
-      type: 'User',
+      type: "User",
       id: userId,
     },
   })
@@ -78,11 +86,13 @@ export const deleteDocument = async ({
     .catch(() => false);
 
   const isUserOwner = envelope.userId === userId;
-  const userRecipient = envelope.recipients.find((recipient) => recipient.email === user.email);
+  const userRecipient = envelope.recipients.find(
+    (recipient) => recipient.email === user.email
+  );
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Not allowed',
+      message: "Not allowed",
     });
   }
 
@@ -114,7 +124,9 @@ export const deleteDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    data: ZWebhookDocumentSchema.parse(
+      mapEnvelopeToWebhookDocumentPayload(envelope)
+    ),
     userId,
     teamId,
   });
@@ -140,14 +152,15 @@ const handleDocumentOwnerDelete = async ({
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   // Soft delete completed documents.
   if (isDocumentCompleted(envelope.status)) {
@@ -158,7 +171,7 @@ const handleDocumentOwnerDelete = async ({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
           metadata: requestMetadata,
           data: {
-            type: 'SOFT',
+            type: "SOFT",
           },
         }),
       });
@@ -184,7 +197,7 @@ const handleDocumentOwnerDelete = async ({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
         metadata: requestMetadata,
         data: {
-          type: 'HARD',
+          type: "HARD",
         },
       }),
     });
@@ -200,7 +213,7 @@ const handleDocumentOwnerDelete = async ({
   });
 
   const isEnvelopeDeleteEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
+    envelope.documentMeta
   ).documentDeleted;
 
   if (!isEnvelopeDeleteEmailEnabled) {
@@ -208,45 +221,59 @@ const handleDocumentOwnerDelete = async ({
   }
 
   // Send cancellation emails to recipients.
-  await Promise.all(
-    envelope.recipients.map(async (recipient) => {
-      if (recipient.sendStatus !== SendStatus.SENT || !isRecipientEmailValidForSending(recipient)) {
-        return;
-      }
+  // Wrap in try-catch to prevent email failures from blocking document deletion
+  try {
+    await Promise.all(
+      envelope.recipients.map(async (recipient) => {
+        if (
+          recipient.sendStatus !== SendStatus.SENT ||
+          !isRecipientEmailValidForSending(recipient)
+        ) {
+          return;
+        }
 
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+        const assetBaseUrl =
+          NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-      const template = createElement(DocumentCancelTemplate, {
-        documentName: envelope.title,
-        inviterName: user.name || undefined,
-        inviterEmail: user.email,
-        assetBaseUrl,
-      });
+        const template = createElement(DocumentCancelTemplate, {
+          documentName: envelope.title,
+          inviterName: user.name || undefined,
+          inviterEmail: user.email,
+          assetBaseUrl,
+        });
 
-      const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
-      ]);
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+          renderEmailWithI18N(template, {
+            lang: emailLanguage,
+            branding,
+            plainText: true,
+          }),
+        ]);
 
-      const i18n = await getI18nInstance(emailLanguage);
+        const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
-        to: {
-          address: recipient.email,
-          name: recipient.name,
-        },
-        from: senderEmail,
-        replyTo: replyToEmail,
-        subject: i18n._(msg`Document Cancelled`),
-        html,
-        text,
-      });
-    }),
-  );
+        await mailer.sendMail({
+          to: {
+            address: recipient.email,
+            name: recipient.name,
+          },
+          from: senderEmail,
+          replyTo: replyToEmail,
+          subject: i18n._(msg`Document Cancelled`),
+          html,
+          text,
+        });
+      })
+    );
+  } catch (error) {
+    console.error(
+      "[DELETE-DOCUMENT] Failed to send cancellation emails:",
+      error
+    );
+    // Continue with deletion even if emails fail
+    // This prevents email rendering issues from blocking document deletion
+  }
 
   return deletedEnvelope;
 };
