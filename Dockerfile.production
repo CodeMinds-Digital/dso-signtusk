@@ -161,6 +161,9 @@ RUN echo "� Verifying workspace packages..." && \
 # Copy built application (public assets are already in build/client)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
 
+# Copy public directory for server-side assets (fonts for PDF generation)
+COPY --chown=nodejs:nodejs apps/remix/public ./apps/remix/public
+
 # Prisma is already in packages/ copied above, just generate client
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
