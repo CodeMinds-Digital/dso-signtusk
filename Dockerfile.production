@@ -51,12 +51,27 @@ ENV CI=true
 ENV NEXT_PRIVATE_DATABASE_URL="postgresql://postgres:EnUmAfT@2)2%@db.bukcppqfgxomzddugnpe.supabase.co:5432/postgres"
 ENV NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://postgres:EnUmAfT@2)2%@db.bukcppqfgxomzddugnpe.supabase.co:5432/postgres"
 
-# Copy package files
+# Copy package files for dependency installation
 COPY package.json package-lock.json ./
-COPY apps/remix/package.json ./apps/remix/
-COPY packages/*/package.json ./packages/
+
+# Copy ALL package.json files to establish workspace structure
+COPY apps/remix/package.json ./apps/remix/package.json
+COPY packages/api/package.json ./packages/api/package.json
+COPY packages/assets/package.json ./packages/assets/package.json
+COPY packages/auth/package.json ./packages/auth/package.json
+COPY packages/ee/package.json ./packages/ee/package.json
+COPY packages/eslint-config/package.json ./packages/eslint-config/package.json
+COPY packages/lib/package.json ./packages/lib/package.json
+COPY packages/pdf-processing/package.json ./packages/pdf-processing/package.json
+COPY packages/prettier-config/package.json ./packages/prettier-config/package.json
+COPY packages/prisma/package.json ./packages/prisma/package.json
+COPY packages/tailwind-config/package.json ./packages/tailwind-config/package.json
+COPY packages/trpc/package.json ./packages/trpc/package.json
+COPY packages/tsconfig/package.json ./packages/tsconfig/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
 
 # Install ALL dependencies (including devDependencies for building)
+# This will install dependencies for all workspace packages including pdf-processing
 RUN npm ci --legacy-peer-deps
 
 # Copy configuration files
@@ -78,10 +93,8 @@ RUN cd packages/prisma && npx prisma generate
 # Extract and compile translations
 RUN npx lingui extract --clean && npx lingui compile
 
-# Build pdf-processing package explicitly (required by lib package)
-RUN cd packages/pdf-processing && npm run build && cd ../..
-
-# Build all workspace packages first
+# Build all workspace packages using turbo (includes pdf-processing)
+# This ensures proper dependency order and builds pdf-processing first
 RUN npx turbo run build --filter=@signtusk/remix^...
 
 # Build the Remix app using Docker-specific build script (skips typecheck)
