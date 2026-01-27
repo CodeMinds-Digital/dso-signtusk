@@ -1,6 +1,7 @@
 import type { I18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import * as ReactEmail from "@react-email/render";
+import React from "react";
 
 import config from "@signtusk/tailwind-config";
 
@@ -49,15 +50,15 @@ export const renderWithI18N = async (
     throw new Error("i18n is required");
   }
 
-  // Use createElement to ensure proper React context initialization
+  // Use React.createElement to ensure proper React context initialization
   // This fixes the "Cannot read properties of null (reading 'useRef')" error
-  const wrappedElement = createElement(
+  const wrappedElement = React.createElement(
     I18nProvider,
     { i18n },
-    createElement(
+    React.createElement(
       BrandingProvider,
       { branding },
-      createElement(
+      React.createElement(
         Tailwind,
         {
           config: {
