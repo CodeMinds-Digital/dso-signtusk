@@ -7,4 +7,4 @@ export const DEFAULT_SIGNATURE_TEXT_FONT_SIZE = 18;
 export const MIN_STANDARD_FONT_SIZE = 8;
 export const MIN_HANDWRITING_FONT_SIZE = 20;
 
-export const CAVEAT_FONT_PATH = () => `${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.ttf`;
+export const CAVEAT_FONT_PATH = () => `${NEXT_PUBLIC_WEBAPP_URL()}/fonts/DancingScript-Bold.ttf`;

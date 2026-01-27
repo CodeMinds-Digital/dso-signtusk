@@ -24,7 +24,7 @@ export const insertFieldInPDFV2 = async ({
   const fontPath = path.join(process.cwd(), 'public/fonts');
 
   FontLibrary.use({
-    ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
+    ['Dancing Script']: [path.join(fontPath, 'DancingScript-Bold.ttf')],
     ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
     ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
     ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],

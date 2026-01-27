@@ -30,13 +30,13 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
 
   const [interSemiBold, interRegular, caveatRegular] = await Promise.all([
-    fetch(new URL(`${baseUrl}/fonts/inter-semibold.ttf`, import.meta.url)).then(async (res) =>
+    fetch(new URL(`${baseUrl}/fonts/IBMPlexSans-SemiBold.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL(`${baseUrl}/fonts/inter-regular.ttf`, import.meta.url)).then(async (res) =>
+    fetch(new URL(`${baseUrl}/fonts/IBMPlexSans-Regular.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL(`${baseUrl}/fonts/caveat-regular.ttf`, import.meta.url)).then(async (res) =>
+    fetch(new URL(`${baseUrl}/fonts/DancingScript-Regular.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
@@ -125,7 +125,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
             justifyContent: 'center',
             textAlign: 'center',
             color: '#64748b',
-            fontFamily: 'Caveat',
+            fontFamily: 'Dancing Script',
             fontSize: Math.max(Math.min((CARD_WIDTH * 1.5) / signatureName.length, 80), 36),
             top: CARD_OFFSET_TOP,
             left: CARD_OFFSET_LEFT,
@@ -150,7 +150,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
           style={{
             fontSize: '20px',
             color: '#828282',
-            fontFamily: 'Inter',
+            fontFamily: 'IBM Plex Sans',
             fontWeight: 700,
           }}
         >
@@ -163,17 +163,17 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
       height: IMAGE_SIZE.height,
       fonts: [
         {
-          name: 'Caveat',
+          name: 'Dancing Script',
           data: caveatRegular,
           style: 'italic',
         },
         {
-          name: 'Inter',
+          name: 'IBM Plex Sans',
           data: interRegular,
           weight: 400,
         },
         {
-          name: 'Inter',
+          name: 'IBM Plex Sans',
           data: interSemiBold,
           weight: 600,
         },

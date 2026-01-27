@@ -37,7 +37,7 @@ import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) =>
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/DancingScript-Bold.ttf`).then(async (res) =>
       res.arrayBuffer(),
     ),
     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
