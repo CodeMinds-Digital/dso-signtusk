@@ -49,22 +49,29 @@ export const renderWithI18N = async (
     throw new Error("i18n is required");
   }
 
-  return ReactEmail.render(
-    <I18nProvider i18n={i18n}>
-      <BrandingProvider branding={branding}>
-        <Tailwind
-          config={{
+  // Use createElement to ensure proper React context initialization
+  // This fixes the "Cannot read properties of null (reading 'useRef')" error
+  const wrappedElement = createElement(
+    I18nProvider,
+    { i18n },
+    createElement(
+      BrandingProvider,
+      { branding },
+      createElement(
+        Tailwind,
+        {
+          config: {
             theme: {
               extend: {
                 colors,
               },
             },
-          }}
-        >
-          {element}
-        </Tailwind>
-      </BrandingProvider>
-    </I18nProvider>,
-    otherOptions
+          },
+        },
+        element
+      )
+    )
   );
+
+  return ReactEmail.render(wrappedElement, otherOptions);
 };
