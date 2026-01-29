@@ -26,7 +26,7 @@ export const API_V2_BETA_URL = "/api/v2-beta";
 export const API_V2_URL = "/api/v2";
 
 export const SUPPORT_EMAIL =
-  env("NEXT_PUBLIC_SUPPORT_EMAIL") ?? "support@documenso.com";
+  env("NEXT_PUBLIC_SUPPORT_EMAIL") ?? "support@signtusk.com";
 
 export const PDF_GENERATION_METHOD = () =>
   env("PDF_GENERATION_METHOD") ?? "server-side";
