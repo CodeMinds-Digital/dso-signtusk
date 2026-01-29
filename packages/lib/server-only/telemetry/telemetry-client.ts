@@ -110,7 +110,7 @@ export class TelemetryClient {
       "[Telemetry] To disable telemetry, set SIGNTUSK_DISABLE_TELEMETRY=true in your environment variables."
     );
     // console.log(
-    //   "[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry"
+    //   "[Telemetry] Learn more: https://signtusk.com/docs/developers/self-hosting/telemetry"
     // );
 
     // Capture startup event

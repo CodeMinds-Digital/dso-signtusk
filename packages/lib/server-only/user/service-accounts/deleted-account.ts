@@ -1,9 +1,9 @@
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
 export const deletedAccountServiceAccount = async () => {
   const serviceAccount = await prisma.user.findFirst({
     where: {
-      email: 'deleted-account@documenso.com',
+      email: "deleted-account@signtusk.com",
     },
     select: {
       id: true,
@@ -23,7 +23,7 @@ export const deletedAccountServiceAccount = async () => {
 
   if (!serviceAccount) {
     throw new Error(
-      'Deleted account service account not found, have you ran the appropriate migrations?',
+      "Deleted account service account not found, have you ran the appropriate migrations?"
     );
   }
 

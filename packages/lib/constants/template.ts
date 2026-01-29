@@ -1,6 +1,7 @@
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 
-export const TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX = /recipient\.\d+@documenso\.com/i;
+export const TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX =
+  /recipient\.\d+@signtusk\.com/i;
 export const TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX = /Recipient \d+/i;
 
 export const isTemplateRecipientEmailPlaceholder = (email: string) => {

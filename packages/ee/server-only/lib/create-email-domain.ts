@@ -76,7 +76,7 @@ export const createEmailDomain = async ({
     throw new Error("Missing SIGNTUSK_ENCRYPTION_KEY");
   }
 
-  const selector = `documenso-${organisationId}`.replace(/[_.]/g, "-");
+  const selector = `signtusk-${organisationId}`.replace(/[_.]/g, "-");
   const recordName = `${selector}._domainkey.${domain}`;
 
   // Check if domain already exists
