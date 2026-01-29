@@ -1,4 +1,4 @@
-# Optimized Production Dockerfile based on original Documenso approach
+# Optimized Production Dockerfile based on original Signtusk approach
 # This version uses turbo prune for smaller images and faster builds
 
 ###########################

@@ -44,7 +44,7 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules",
-    "documenso-main",
+    "signtusk-main",
     "dso-signtusk-working",
     "dso-pdf-sign",
     "backups",

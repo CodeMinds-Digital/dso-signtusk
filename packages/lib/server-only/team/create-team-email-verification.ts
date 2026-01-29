@@ -1,23 +1,23 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import type { Team } from '@prisma/client';
-import { Prisma } from '@prisma/client';
-import { z } from 'zod';
+import { msg } from "@lingui/core/macro";
+import type { Team } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
 
-import { mailer } from '@signtusk/email/mailer';
-import { ConfirmTeamEmailTemplate } from '@signtusk/email/templates/confirm-team-email';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { createTokenVerification } from '@signtusk/lib/utils/token-verification';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { ConfirmTeamEmailTemplate } from "@signtusk/email/templates/confirm-team-email";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { createTokenVerification } from "@signtusk/lib/utils/token-verification";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { env } from '../../utils/env';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { env } from "../../utils/env";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { buildTeamWhereQuery } from "../../utils/teams";
+import { getEmailContext } from "../email/get-email-context";
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -38,7 +38,7 @@ export const createTeamEmailVerification = async ({
       where: buildTeamWhereQuery({
         teamId,
         userId,
-        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_TEAM"],
       }),
       include: {
         teamEmail: true,
@@ -48,7 +48,7 @@ export const createTeamEmailVerification = async ({
 
     if (team.teamEmail || team.emailVerification) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Team already has an email or existing email verification.',
+        message: "Team already has an email or existing email verification.",
       });
     }
 
@@ -62,7 +62,7 @@ export const createTeamEmailVerification = async ({
 
         if (existingTeamEmail) {
           throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-            message: 'Email already taken by another team.',
+            message: "Email already taken by another team.",
           });
         }
 
@@ -80,7 +80,7 @@ export const createTeamEmailVerification = async ({
 
         await sendTeamEmailVerificationEmail(data.email, token, team);
       },
-      { timeout: 30_000 },
+      { timeout: 30_000 }
     );
   } catch (err) {
     console.error(err);
@@ -91,9 +91,13 @@ export const createTeamEmailVerification = async ({
 
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
-    if (err.code === 'P2002' && target.success && target.data.includes('email')) {
+    if (
+      err.code === "P2002" &&
+      target.success &&
+      target.data.includes("email")
+    ) {
       throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-        message: 'Email already taken by another team.',
+        message: "Email already taken by another team.",
       });
     }
 
@@ -109,8 +113,12 @@ export const createTeamEmailVerification = async ({
  * @param teamName The name of the team the user is being invited to.
  * @param teamUrl The url of the team the user is being invited to.
  */
-export const sendTeamEmailVerificationEmail = async (email: string, token: string, team: Team) => {
-  const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
+export const sendTeamEmailVerificationEmail = async (
+  email: string,
+  token: string,
+  team: Team
+) => {
+  const assetBaseUrl = env("NEXT_PUBLIC_WEBAPP_URL") || "http://localhost:3000";
 
   const template = createElement(ConfirmTeamEmailTemplate, {
     assetBaseUrl,
@@ -121,9 +129,9 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
   });
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'team',
+      type: "team",
       teamId: team.id,
     },
   });
@@ -143,7 +151,7 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
     to: email,
     from: senderEmail,
     subject: i18n._(
-      msg`A request to use your email has been initiated by ${team.name} on Documenso`,
+      msg`A request to use your email has been initiated by ${team.name} on Signtusk`
     ),
     html,
     text,

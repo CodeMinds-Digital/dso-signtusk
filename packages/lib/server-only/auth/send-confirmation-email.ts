@@ -7,7 +7,7 @@ import { prisma } from "@signtusk/prisma";
 
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
 import {
-  DOCUMENSO_INTERNAL_EMAIL,
+  SIGNTUSK_INTERNAL_EMAIL,
   USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
 } from "../../constants/email";
 
@@ -85,14 +85,14 @@ export const sendConfirmationEmail = async ({
 
   console.log("[SEND_CONFIRMATION_EMAIL_FN] Sending email via mailer...");
   console.log("[SEND_CONFIRMATION_EMAIL_FN] To:", user.email);
-  console.log("[SEND_CONFIRMATION_EMAIL_FN] From:", DOCUMENSO_INTERNAL_EMAIL);
+  console.log("[SEND_CONFIRMATION_EMAIL_FN] From:", SIGNTUSK_INTERNAL_EMAIL);
 
   return mailer.sendMail({
     to: {
       address: user.email,
       name: user.name || "",
     },
-    from: DOCUMENSO_INTERNAL_EMAIL,
+    from: SIGNTUSK_INTERNAL_EMAIL,
     subject: "Please confirm your email",
     html,
     text,

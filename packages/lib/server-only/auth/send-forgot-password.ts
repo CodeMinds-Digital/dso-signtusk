@@ -1,21 +1,23 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 
-import { mailer } from '@signtusk/email/mailer';
-import { ForgotPasswordTemplate } from '@signtusk/email/templates/forgot-password';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { ForgotPasswordTemplate } from "@signtusk/email/templates/forgot-password";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { env } from "../../utils/env";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 
 export interface SendForgotPasswordOptions {
   userId: number;
 }
 
-export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) => {
+export const sendForgotPassword = async ({
+  userId,
+}: SendForgotPasswordOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -23,7 +25,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
     include: {
       passwordResetTokens: {
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         take: 1,
       },
@@ -31,11 +33,11 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   const token = user.passwordResetTokens[0].token;
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
   const resetPasswordLink = `${NEXT_PUBLIC_WEBAPP_URL()}/reset-password/${token}`;
 
   const template = createElement(ForgotPasswordTemplate, {
@@ -53,11 +55,11 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
   return await mailer.sendMail({
     to: {
       address: user.email,
-      name: user.name || '',
+      name: user.name || "",
     },
     from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
+      name: env("NEXT_PRIVATE_SMTP_FROM_NAME") || "Signtusk",
+      address: env("NEXT_PRIVATE_SMTP_FROM_ADDRESS") || "noreply@signtusk.com",
     },
     subject: i18n._(msg`Forgot Password?`),
     html,

@@ -1,21 +1,21 @@
-import { generateOpenApiDocument } from 'trpc-to-openapi';
+import { generateOpenApiDocument } from "trpc-to-openapi";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 
-import { appRouter } from './router';
+import { appRouter } from "./router";
 
 export const openApiDocument = {
   ...generateOpenApiDocument(appRouter, {
-    title: 'Documenso v2 API',
+    title: "Signtusk v2 API",
     description:
-      'Welcome to the Documenso v2 API.\n\nThis API provides access to our system, which you can use to integrate applications, automate workflows, or build custom tools.',
-    version: '1.0.0',
+      "Welcome to the Signtusk v2 API.\n\nThis API provides access to our system, which you can use to integrate applications, automate workflows, or build custom tools.",
+    version: "1.0.0",
     baseUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/v2`,
     securitySchemes: {
       apiKey: {
-        type: 'apiKey',
-        in: 'header',
-        name: 'Authorization',
+        type: "apiKey",
+        in: "header",
+        name: "Authorization",
       },
     },
   }),

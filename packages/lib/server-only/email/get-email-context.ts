@@ -13,7 +13,7 @@ import type {
 } from "@signtusk/prisma/client";
 import { EmailDomainStatus } from "@signtusk/prisma/client";
 
-import { DOCUMENSO_INTERNAL_EMAIL } from "../../constants/email";
+import { SIGNTUSK_INTERNAL_EMAIL } from "../../constants/email";
 import { AppError, AppErrorCode } from "../../errors/app-error";
 import {
   organisationGlobalSettingsToBranding,
@@ -105,7 +105,7 @@ export const getEmailContext = async (
   if (options.emailType === "INTERNAL") {
     return {
       ...emailContext,
-      senderEmail: DOCUMENSO_INTERNAL_EMAIL,
+      senderEmail: SIGNTUSK_INTERNAL_EMAIL,
       replyToEmail: undefined,
       emailLanguage, // Not sure if we want to use this for internal emails.
     };
@@ -117,7 +117,7 @@ export const getEmailContext = async (
   const senderEmailId = match(meta?.emailId)
     .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
     .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
-    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .with(null, () => null) // Explicit null means to use the Signtusk email.
     .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find(
@@ -134,7 +134,7 @@ export const getEmailContext = async (
         name: foundSenderEmail.emailName,
         address: foundSenderEmail.email,
       }
-    : DOCUMENSO_INTERNAL_EMAIL;
+    : SIGNTUSK_INTERNAL_EMAIL;
 
   return {
     ...emailContext,

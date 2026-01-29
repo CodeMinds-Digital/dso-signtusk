@@ -1,33 +1,33 @@
-import { type User } from '@prisma/client';
-import { base32 } from '@scure/base';
-import crypto from 'node:crypto';
-import { createTOTPKeyURI } from 'oslo/otp';
+import { type User } from "@prisma/client";
+import { base32 } from "@scure/base";
+import crypto from "node:crypto";
+import { createTOTPKeyURI } from "oslo/otp";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
-import { symmetricEncrypt } from '../../universal/crypto';
+import { SIGNTUSK_ENCRYPTION_KEY } from "../../constants/crypto";
+import { symmetricEncrypt } from "../../universal/crypto";
 
 type SetupTwoFactorAuthenticationOptions = {
-  user: Pick<User, 'id' | 'email'>;
+  user: Pick<User, "id" | "email">;
 };
 
-const ISSUER = 'Documenso';
+const ISSUER = "Signtusk";
 
 export const setupTwoFactorAuthentication = async ({
   user,
 }: SetupTwoFactorAuthenticationOptions) => {
-  const key = DOCUMENSO_ENCRYPTION_KEY;
+  const key = SIGNTUSK_ENCRYPTION_KEY;
 
   if (!key) {
-    throw new Error('MISSING_ENCRYPTION_KEY');
+    throw new Error("MISSING_ENCRYPTION_KEY");
   }
 
   const secret = crypto.randomBytes(10);
 
   const backupCodes = Array.from({ length: 10 })
     .fill(null)
-    .map(() => crypto.randomBytes(5).toString('hex'))
+    .map(() => crypto.randomBytes(5).toString("hex"))
     .map((code) => `${code.slice(0, 5)}-${code.slice(5)}`.toUpperCase());
 
   const accountName = user.email;

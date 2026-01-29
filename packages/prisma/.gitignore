@@ -1,1 +1,5 @@
 # Keep generated folder tracked for browser-safe imports
+
+# Backup schema files
+*.prisma.backup
+schema.*.backup

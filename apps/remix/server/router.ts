@@ -154,7 +154,7 @@ app.use(`${API_V2_BETA_URL}/*`, async (c) =>
 );
 
 // Start telemetry client for anonymous usage tracking.
-// Can be disabled by setting DOCUMENSO_DISABLE_TELEMETRY=true
+// Can be disabled by setting SIGNTUSK_DISABLE_TELEMETRY=true
 if (env("NODE_ENV") !== "development") {
   void TelemetryClient.start();
 }

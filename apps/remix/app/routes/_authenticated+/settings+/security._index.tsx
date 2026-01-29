@@ -1,25 +1,29 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { Link } from "react-router";
 
-import { getSession } from '@signtusk/auth/server/lib/utils/get-session';
-import { useSession } from '@signtusk/lib/client-only/providers/session';
-import { prisma } from '@signtusk/prisma';
-import { Alert, AlertDescription, AlertTitle } from '@signtusk/ui/primitives/alert';
-import { Button } from '@signtusk/ui/primitives/button';
+import { getSession } from "@signtusk/auth/server/lib/utils/get-session";
+import { useSession } from "@signtusk/lib/client-only/providers/session";
+import { prisma } from "@signtusk/prisma";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@signtusk/ui/primitives/alert";
+import { Button } from "@signtusk/ui/primitives/button";
 
-import { DisableAuthenticatorAppDialog } from '~/components/forms/2fa/disable-authenticator-app-dialog';
-import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
-import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-codes-dialog';
-import { PasswordForm } from '~/components/forms/password';
-import { SettingsHeader } from '~/components/general/settings-header';
-import { appMetaTags } from '~/utils/meta';
+import { DisableAuthenticatorAppDialog } from "~/components/forms/2fa/disable-authenticator-app-dialog";
+import { EnableAuthenticatorAppDialog } from "~/components/forms/2fa/enable-authenticator-app-dialog";
+import { ViewRecoveryCodesDialog } from "~/components/forms/2fa/view-recovery-codes-dialog";
+import { PasswordForm } from "~/components/forms/password";
+import { SettingsHeader } from "~/components/general/settings-header";
+import { appMetaTags } from "~/utils/meta";
 
-import type { Route } from './+types/security._index';
+import type { Route } from "./+types/security._index";
 
 export function meta() {
-  return appMetaTags('Security');
+  return appMetaTags("Security");
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -36,7 +40,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   // });
 
   // const providers = accounts.map((account) => account.provider);
-  // let hasEmailPasswordAccount = providers.includes('DOCUMENSO');
+  // let hasEmailPasswordAccount = providers.includes('SIGNTUSK');
 
   const hasEmailPasswordAccount: boolean = await prisma.user
     .count({
@@ -65,7 +69,9 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
     <div>
       <SettingsHeader
         title={_(msg`Security`)}
-        subtitle={_(msg`Here you can manage your password and security settings.`)}
+        subtitle={_(
+          msg`Here you can manage your password and security settings.`
+        )}
       />
       {hasEmailPasswordAccount && (
         <>
@@ -87,13 +93,13 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
           <AlertDescription className="mr-4">
             {hasEmailPasswordAccount ? (
               <Trans>
-                Add an authenticator to serve as a secondary authentication method when signing in,
-                or when signing documents.
+                Add an authenticator to serve as a secondary authentication
+                method when signing in, or when signing documents.
               </Trans>
             ) : (
               <Trans>
-                Add an authenticator to serve as a secondary authentication method for signing
-                documents.
+                Add an authenticator to serve as a secondary authentication
+                method for signing documents.
               </Trans>
             )}
           </AlertDescription>
@@ -118,8 +124,9 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
 
             <AlertDescription className="mr-4">
               <Trans>
-                Two factor authentication recovery codes are used to access your account in the
-                event that you lose access to your authenticator app.
+                Two factor authentication recovery codes are used to access your
+                account in the event that you lose access to your authenticator
+                app.
               </Trans>
             </AlertDescription>
           </div>
@@ -139,7 +146,8 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
 
           <AlertDescription className="mr-4">
             <Trans>
-              Allows authenticating using biometrics, password managers, hardware keys, etc.
+              Allows authenticating using biometrics, password managers,
+              hardware keys, etc.
             </Trans>
           </AlertDescription>
         </div>
@@ -161,7 +169,9 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
           </AlertTitle>
 
           <AlertDescription className="mr-2">
-            <Trans>View all recent security activity related to your account.</Trans>
+            <Trans>
+              View all recent security activity related to your account.
+            </Trans>
           </AlertDescription>
         </div>
 
@@ -203,7 +213,9 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
           </AlertTitle>
 
           <AlertDescription className="mr-2">
-            <Trans>View and manage all login methods linked to your account.</Trans>
+            <Trans>
+              View and manage all login methods linked to your account.
+            </Trans>
           </AlertDescription>
         </div>
 

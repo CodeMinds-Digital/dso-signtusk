@@ -7,7 +7,7 @@
     "../../packages/prisma/types/types.d.ts"
   ],
   "exclude": [
-    "../../documenso-main",
+    "../../signtusk-main",
     "../../dso-signtusk-working",
     "../../dso-pdf-sign",
     "../../backups",

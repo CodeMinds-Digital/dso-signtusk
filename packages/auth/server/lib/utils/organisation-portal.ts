@@ -1,26 +1,26 @@
-import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@signtusk/lib/constants/crypto';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { symmetricDecrypt } from '@signtusk/lib/universal/crypto';
-import { formatOrganisationCallbackUrl } from '@signtusk/lib/utils/organisation-authentication-portal';
-import { prisma } from '@signtusk/prisma';
+import { IS_BILLING_ENABLED } from "@signtusk/lib/constants/app";
+import { SIGNTUSK_ENCRYPTION_KEY } from "@signtusk/lib/constants/crypto";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { symmetricDecrypt } from "@signtusk/lib/universal/crypto";
+import { formatOrganisationCallbackUrl } from "@signtusk/lib/utils/organisation-authentication-portal";
+import { prisma } from "@signtusk/prisma";
 
 type GetOrganisationAuthenticationPortalOptions =
   | {
-      type: 'url';
+      type: "url";
       organisationUrl: string;
     }
   | {
-      type: 'id';
+      type: "id";
       organisationId: string;
     };
 
 export const getOrganisationAuthenticationPortalOptions = async (
-  options: GetOrganisationAuthenticationPortalOptions,
+  options: GetOrganisationAuthenticationPortalOptions
 ) => {
   const organisation = await prisma.organisation.findFirst({
     where:
-      options.type === 'url'
+      options.type === "url"
         ? {
             url: options.organisationUrl,
           }
@@ -36,13 +36,13 @@ export const getOrganisationAuthenticationPortalOptions = async (
 
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Organisation not found',
+      message: "Organisation not found",
     });
   }
 
   if (!IS_BILLING_ENABLED()) {
     throw new AppError(AppErrorCode.NOT_SETUP, {
-      message: 'Billing is not enabled',
+      message: "Billing is not enabled",
     });
   }
 
@@ -51,7 +51,7 @@ export const getOrganisationAuthenticationPortalOptions = async (
     !organisation.organisationAuthenticationPortal.enabled
   ) {
     throw new AppError(AppErrorCode.NOT_SETUP, {
-      message: 'Authentication portal is not enabled for this organisation',
+      message: "Authentication portal is not enabled for this organisation",
     });
   }
 
@@ -63,19 +63,22 @@ export const getOrganisationAuthenticationPortalOptions = async (
 
   if (!clientId || !encryptedClientSecret || !wellKnownUrl) {
     throw new AppError(AppErrorCode.NOT_SETUP, {
-      message: 'Authentication portal is not configured for this organisation',
+      message: "Authentication portal is not configured for this organisation",
     });
   }
 
-  if (!DOCUMENSO_ENCRYPTION_KEY) {
+  if (!SIGNTUSK_ENCRYPTION_KEY) {
     throw new AppError(AppErrorCode.NOT_SETUP, {
-      message: 'Encryption key is not set',
+      message: "Encryption key is not set",
     });
   }
 
   const clientSecret = Buffer.from(
-    symmetricDecrypt({ key: DOCUMENSO_ENCRYPTION_KEY, data: encryptedClientSecret }),
-  ).toString('utf-8');
+    symmetricDecrypt({
+      key: SIGNTUSK_ENCRYPTION_KEY,
+      data: encryptedClientSecret,
+    })
+  ).toString("utf-8");
 
   return {
     organisation,
@@ -84,7 +87,7 @@ export const getOrganisationAuthenticationPortalOptions = async (
     wellKnownUrl,
     clientOptions: {
       id: organisation.id,
-      scope: ['openid', 'email', 'profile'],
+      scope: ["openid", "email", "profile"],
       clientId,
       clientSecret,
       redirectUrl: formatOrganisationCallbackUrl(organisation.url),

@@ -1,33 +1,33 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import type { Organisation, Prisma } from '@prisma/client';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { nanoid } from 'nanoid';
+import { msg } from "@lingui/core/macro";
+import type { Organisation, Prisma } from "@prisma/client";
+import { OrganisationMemberInviteStatus } from "@prisma/client";
+import { nanoid } from "nanoid";
 
-import { syncMemberCountWithStripeSeatPlan } from '@signtusk/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@signtusk/email/mailer';
-import { OrganisationInviteEmailTemplate } from '@signtusk/email/templates/organisation-invite';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { isOrganisationRoleWithinUserHierarchy } from '@signtusk/lib/utils/organisations';
-import { prisma } from '@signtusk/prisma';
-import type { TCreateOrganisationMemberInvitesRequestSchema } from '@signtusk/trpc/server/organisation-router/create-organisation-member-invites.types';
+import { syncMemberCountWithStripeSeatPlan } from "@signtusk/ee/server-only/stripe/update-subscription-item-quantity";
+import { mailer } from "@signtusk/email/mailer";
+import { OrganisationInviteEmailTemplate } from "@signtusk/email/templates/organisation-invite";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { isOrganisationRoleWithinUserHierarchy } from "@signtusk/lib/utils/organisations";
+import { prisma } from "@signtusk/prisma";
+import type { TCreateOrganisationMemberInvitesRequestSchema } from "@signtusk/trpc/server/organisation-router/create-organisation-member-invites.types";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { generateDatabaseId } from '../../universal/id';
-import { validateIfSubscriptionIsRequired } from '../../utils/billing';
-import { buildOrganisationWhereQuery } from '../../utils/organisations';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
-import { getMemberOrganisationRole } from '../team/get-member-roles';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { generateDatabaseId } from "../../universal/id";
+import { validateIfSubscriptionIsRequired } from "../../utils/billing";
+import { buildOrganisationWhereQuery } from "../../utils/organisations";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { getEmailContext } from "../email/get-email-context";
+import { getMemberOrganisationRole } from "../team/get-member-roles";
 
 export type CreateOrganisationMemberInvitesOptions = {
   userId: number;
   userName: string;
   organisationId: string;
-  invitations: TCreateOrganisationMemberInvitesRequestSchema['invitations'];
+  invitations: TCreateOrganisationMemberInvitesRequestSchema["invitations"];
 };
 
 /**
@@ -43,7 +43,7 @@ export const createOrganisationMemberInvites = async ({
     where: buildOrganisationWhereQuery({
       organisationId,
       userId,
-      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_ORGANISATION"],
     }),
     include: {
       members: {
@@ -73,18 +73,24 @@ export const createOrganisationMemberInvites = async ({
 
   const { organisationClaim } = organisation;
 
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
+  const subscription = validateIfSubscriptionIsRequired(
+    organisation.subscription
+  );
 
   const currentOrganisationMemberRole = await getMemberOrganisationRole({
     organisationId: organisation.id,
     reference: {
-      type: 'User',
+      type: "User",
       id: userId,
     },
   });
 
-  const organisationMemberEmails = organisation.members.map((member) => member.user.email);
-  const organisationMemberInviteEmails = organisation.invites.map((invite) => invite.email);
+  const organisationMemberEmails = organisation.members.map(
+    (member) => member.user.email
+  );
+  const organisationMemberInviteEmails = organisation.invites.map(
+    (invite) => invite.email
+  );
 
   const usersToInvite = invitations.filter((invitation) => {
     // Filter out users that are already members of the organisation.
@@ -102,18 +108,21 @@ export const createOrganisationMemberInvites = async ({
 
   const unauthorizedRoleAccess = usersToInvite.some(
     ({ organisationRole }) =>
-      !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, organisationRole),
+      !isOrganisationRoleWithinUserHierarchy(
+        currentOrganisationMemberRole,
+        organisationRole
+      )
   );
 
   if (unauthorizedRoleAccess) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'User does not have permission to set high level roles',
+      message: "User does not have permission to set high level roles",
     });
   }
 
   const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] =
     usersToInvite.map(({ email, organisationRole }) => ({
-      id: generateDatabaseId('member_invite'),
+      id: generateDatabaseId("member_invite"),
       email,
       organisationId,
       organisationRole,
@@ -132,7 +141,7 @@ export const createOrganisationMemberInvites = async ({
     await syncMemberCountWithStripeSeatPlan(
       subscription,
       organisationClaim,
-      totalMemberCountWithInvites,
+      totalMemberCountWithInvites
     );
   }
 
@@ -147,19 +156,19 @@ export const createOrganisationMemberInvites = async ({
         token,
         organisation,
         senderName: userName,
-      }),
-    ),
+      })
+    )
   );
 
   const sendEmailResultErrorList = sendEmailResult.filter(
-    (result): result is PromiseRejectedResult => result.status === 'rejected',
+    (result): result is PromiseRejectedResult => result.status === "rejected"
   );
 
   if (sendEmailResultErrorList.length > 0) {
     console.error(JSON.stringify(sendEmailResultErrorList));
 
-    throw new AppError('EmailDeliveryFailed', {
-      message: 'Failed to send invite emails to one or more users.',
+    throw new AppError("EmailDeliveryFailed", {
+      message: "Failed to send invite emails to one or more users.",
       userMessage: `Failed to send invites to ${sendEmailResultErrorList.length}/${organisationMemberInvites.length} users.`,
     });
   }
@@ -169,7 +178,7 @@ type SendOrganisationMemberInviteEmailOptions = {
   email: string;
   senderName: string;
   token: string;
-  organisation: Pick<Organisation, 'id' | 'name'>;
+  organisation: Pick<Organisation, "id" | "name">;
 };
 
 /**
@@ -190,9 +199,9 @@ export const sendOrganisationMemberInviteEmail = async ({
   });
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'organisation',
+      type: "organisation",
       organisationId: organisation.id,
     },
   });
@@ -214,7 +223,9 @@ export const sendOrganisationMemberInviteEmail = async ({
   await mailer.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`You have been invited to join ${organisation.name} on Documenso`),
+    subject: i18n._(
+      msg`You have been invited to join ${organisation.name} on Signtusk`
+    ),
     html,
     text,
   });

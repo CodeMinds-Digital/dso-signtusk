@@ -6,7 +6,7 @@ export type Generated<T> =
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export const IdentityProvider = {
-  DOCUMENSO: "DOCUMENSO",
+  SIGNTUSK: "SIGNTUSK",
   GOOGLE: "GOOGLE",
   OIDC: "OIDC",
 } as const;

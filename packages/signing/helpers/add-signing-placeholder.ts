@@ -7,15 +7,17 @@ import {
   PDFNumber,
   PDFString,
   rectangle,
-} from '@cantoo/pdf-lib';
+} from "@cantoo/pdf-lib";
 
-import { BYTE_RANGE_PLACEHOLDER } from '../constants/byte-range';
+import { BYTE_RANGE_PLACEHOLDER } from "../constants/byte-range";
 
 export type AddSigningPlaceholderOptions = {
   pdf: Buffer;
 };
 
-export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOptions) => {
+export const addSigningPlaceholder = async ({
+  pdf,
+}: AddSigningPlaceholderOptions) => {
   const doc = await PDFDocument.load(pdf);
   const [firstPage] = doc.getPages();
 
@@ -28,40 +30,42 @@ export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOption
 
   const signature = doc.context.register(
     doc.context.obj({
-      Type: 'Sig',
-      Filter: 'Adobe.PPKLite',
-      SubFilter: 'adbe.pkcs7.detached',
+      Type: "Sig",
+      Filter: "Adobe.PPKLite",
+      SubFilter: "adbe.pkcs7.detached",
       ByteRange: byteRange,
-      Contents: PDFHexString.fromText(' '.repeat(8192)),
-      Reason: PDFString.of('Signed by Documenso'),
+      Contents: PDFHexString.fromText(" ".repeat(8192)),
+      Reason: PDFString.of("Signed by Signtusk"),
       M: PDFString.fromDate(new Date()),
-    }),
+    })
   );
 
   const widget = doc.context.register(
     doc.context.obj({
-      Type: 'Annot',
-      Subtype: 'Widget',
-      FT: 'Sig',
+      Type: "Annot",
+      Subtype: "Widget",
+      FT: "Sig",
       Rect: [0, 0, 0, 0],
       V: signature,
-      T: PDFString.of('Signature1'),
+      T: PDFString.of("Signature1"),
       F: 4,
       P: firstPage.ref,
       AP: doc.context.obj({
-        N: doc.context.register(doc.context.formXObject([rectangle(0, 0, 0, 0)])),
+        N: doc.context.register(
+          doc.context.formXObject([rectangle(0, 0, 0, 0)])
+        ),
       }),
-    }),
+    })
   );
 
   let widgets: PDFArray;
 
   try {
-    widgets = firstPage.node.lookup(PDFName.of('Annots'), PDFArray);
+    widgets = firstPage.node.lookup(PDFName.of("Annots"), PDFArray);
   } catch {
     widgets = PDFArray.withContext(doc.context);
 
-    firstPage.node.set(PDFName.of('Annots'), widgets);
+    firstPage.node.set(PDFName.of("Annots"), widgets);
   }
 
   widgets.push(widget);
@@ -69,28 +73,28 @@ export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOption
   let arcoForm: PDFDict;
 
   try {
-    arcoForm = doc.catalog.lookup(PDFName.of('AcroForm'), PDFDict);
+    arcoForm = doc.catalog.lookup(PDFName.of("AcroForm"), PDFDict);
   } catch {
     arcoForm = doc.context.obj({
       Fields: PDFArray.withContext(doc.context),
     });
 
-    doc.catalog.set(PDFName.of('AcroForm'), arcoForm);
+    doc.catalog.set(PDFName.of("AcroForm"), arcoForm);
   }
 
   let fields: PDFArray;
 
   try {
-    fields = arcoForm.lookup(PDFName.of('Fields'), PDFArray);
+    fields = arcoForm.lookup(PDFName.of("Fields"), PDFArray);
   } catch {
     fields = PDFArray.withContext(doc.context);
 
-    arcoForm.set(PDFName.of('Fields'), fields);
+    arcoForm.set(PDFName.of("Fields"), fields);
   }
 
   fields.push(widget);
 
-  arcoForm.set(PDFName.of('SigFlags'), PDFNumber.of(3));
+  arcoForm.set(PDFName.of("SigFlags"), PDFNumber.of(3));
 
   return Buffer.from(await doc.save({ useObjectStreams: false }));
 };

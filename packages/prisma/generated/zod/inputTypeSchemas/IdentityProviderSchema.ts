@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const IdentityProviderSchema = z.enum(['DOCUMENSO','GOOGLE','OIDC']);
+export const IdentityProviderSchema = z.enum(["SIGNTUSK", "GOOGLE", "OIDC"]);
 
-export type IdentityProviderType = `${z.infer<typeof IdentityProviderSchema>}`
+export type IdentityProviderType = `${z.infer<typeof IdentityProviderSchema>}`;
 
 export default IdentityProviderSchema;

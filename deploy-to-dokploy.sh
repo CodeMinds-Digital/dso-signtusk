@@ -69,7 +69,7 @@ else
 - Resolves @react-email/render module not found error
 - Fixes documents stuck in Processing state after signing
 - Add diagnostic script for stuck documents
-- Remove old Documenso GitHub link from startup script
+- Remove old Signtusk GitHub link from startup script
 - Add comprehensive deployment and troubleshooting documentation"
 fi
 

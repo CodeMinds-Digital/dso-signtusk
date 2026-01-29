@@ -242,7 +242,7 @@ echo ""
 # ASSETS CATEGORY
 echo -e "${YELLOW}[ASSETS]${NC}"
 for file in \
-    DOCUMENSO_ASSETS_INVENTORY.md; do
+    SIGNTUSK_ASSETS_INVENTORY.md; do
     if [ -f "$file" ]; then
         mv "$file" docs/assets/
         echo "  ✓ $file → docs/assets/"

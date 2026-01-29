@@ -25,7 +25,7 @@ datasource db {
 
 // Todo: (RR7) Remove after RR7 migration.
 enum IdentityProvider {
-  DOCUMENSO
+  SIGNTUSK
   GOOGLE
   OIDC
 }

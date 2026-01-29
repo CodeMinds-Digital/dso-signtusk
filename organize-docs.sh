@@ -105,7 +105,7 @@ mv TSCONFIG*.md docs/guides/ 2>/dev/null || true
 mv TESTING*.md docs/guides/ 2>/dev/null || true
 mv SWITCH_TO*.md docs/guides/ 2>/dev/null || true
 mv MOVE_REFERENCE*.md docs/guides/ 2>/dev/null || true
-mv DOCUMENSO*.md docs/guides/ 2>/dev/null || true
+mv SIGNTUSK*.md docs/guides/ 2>/dev/null || true
 mv GIT_MERGE*.md docs/guides/ 2>/dev/null || true
 mv HEALTH*.md docs/guides/ 2>/dev/null || true
 mv BAD_GATEWAY*.md docs/guides/ 2>/dev/null || true

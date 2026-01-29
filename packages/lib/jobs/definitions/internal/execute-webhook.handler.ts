@@ -1,9 +1,9 @@
-import { Prisma, WebhookCallStatus } from '@prisma/client';
+import { Prisma, WebhookCallStatus } from "@prisma/client";
 
-import { prisma } from '@signtusk/prisma';
+import { prisma } from "@signtusk/prisma";
 
-import type { JobRunIO } from '../../client/_internal/job';
-import type { TExecuteWebhookJobDefinition } from './execute-webhook';
+import type { JobRunIO } from "../../client/_internal/job";
+import type { TExecuteWebhookJobDefinition } from "./execute-webhook";
 
 export const run = async ({
   payload,
@@ -30,17 +30,18 @@ export const run = async ({
   };
 
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(payloadData),
     headers: {
-      'Content-Type': 'application/json',
-      'X-Documenso-Secret': secret ?? '',
+      "Content-Type": "application/json",
+      "X-Signtusk-Secret": secret ?? "",
     },
   });
 
   const body = await response.text();
 
-  let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput = Prisma.JsonNull;
+  let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput =
+    Prisma.JsonNull;
 
   try {
     responseBody = JSON.parse(body);
@@ -52,7 +53,9 @@ export const run = async ({
     data: {
       url,
       event,
-      status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
+      status: response.ok
+        ? WebhookCallStatus.SUCCESS
+        : WebhookCallStatus.FAILED,
       requestBody: payloadData as Prisma.InputJsonValue,
       responseCode: response.status,
       responseBody,

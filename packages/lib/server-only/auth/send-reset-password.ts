@@ -1,30 +1,32 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { mailer } from '@signtusk/email/mailer';
-import { ResetPasswordTemplate } from '@signtusk/email/templates/reset-password';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { ResetPasswordTemplate } from "@signtusk/email/templates/reset-password";
+import { prisma } from "@signtusk/prisma";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { env } from "../../utils/env";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 
 export interface SendResetPasswordOptions {
   userId: number;
 }
 
-export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {
+export const sendResetPassword = async ({
+  userId,
+}: SendResetPasswordOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
   const template = createElement(ResetPasswordTemplate, {
     assetBaseUrl,
     userEmail: user.email,
-    userName: user.name || '',
+    userName: user.name || "",
   });
 
   const [html, text] = await Promise.all([
@@ -35,13 +37,13 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
   return await mailer.sendMail({
     to: {
       address: user.email,
-      name: user.name || '',
+      name: user.name || "",
     },
     from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
+      name: env("NEXT_PRIVATE_SMTP_FROM_NAME") || "Signtusk",
+      address: env("NEXT_PRIVATE_SMTP_FROM_ADDRESS") || "noreply@signtusk.com",
     },
-    subject: 'Password Reset Success!',
+    subject: "Password Reset Success!",
     html,
     text,
   });

@@ -40,7 +40,7 @@ function checkSigningSetup() {
 
       if (!certPath) {
         if (env("NODE_ENV") === "production") {
-          certPath = "/opt/documenso/cert.p12";
+          certPath = "/opt/signtusk/cert.p12";
         } else {
           certPath = "./example/cert.p12";
         }

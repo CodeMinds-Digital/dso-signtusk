@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '@signtusk/lib/constants/crypto';
-import { symmetricEncrypt } from '@signtusk/lib/universal/crypto';
+import { SIGNTUSK_ENCRYPTION_SECONDARY_KEY } from "@signtusk/lib/constants/crypto";
+import { symmetricEncrypt } from "@signtusk/lib/universal/crypto";
 
 export const ZEncryptedDataSchema = z.object({
   data: z.string(),
@@ -24,9 +24,12 @@ export type EncryptDataOptions = {
  *
  * @returns The encrypted data.
  */
-export const encryptSecondaryData = ({ data, expiresAt }: EncryptDataOptions) => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
-    throw new Error('Missing encryption key');
+export const encryptSecondaryData = ({
+  data,
+  expiresAt,
+}: EncryptDataOptions) => {
+  if (!SIGNTUSK_ENCRYPTION_SECONDARY_KEY) {
+    throw new Error("Missing encryption key");
   }
 
   const dataToEncrypt: z.infer<typeof ZEncryptedDataSchema> = {
@@ -35,7 +38,7 @@ export const encryptSecondaryData = ({ data, expiresAt }: EncryptDataOptions) =>
   };
 
   return symmetricEncrypt({
-    key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
+    key: SIGNTUSK_ENCRYPTION_SECONDARY_KEY,
     data: JSON.stringify(dataToEncrypt),
   });
 };

@@ -1,5 +1,5 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
-import { PASSKEY_TIMEOUT } from '../constants/auth';
+import { NEXT_PUBLIC_WEBAPP_URL } from "../constants/app";
+import { PASSKEY_TIMEOUT } from "../constants/auth";
 
 /**
  * Extracts common fields to identify the RP (relying party)
@@ -9,7 +9,7 @@ export const getAuthenticatorOptions = () => {
   const rpId = webAppBaseUrl.hostname;
 
   return {
-    rpName: 'Documenso',
+    rpName: "Signtusk",
     rpId,
     origin: NEXT_PUBLIC_WEBAPP_URL(),
     timeout: PASSKEY_TIMEOUT,

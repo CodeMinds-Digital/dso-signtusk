@@ -1,21 +1,21 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { OrganisationGroupType, type Team } from '@prisma/client';
-import { uniqueBy } from 'remeda';
+import { msg } from "@lingui/core/macro";
+import { OrganisationGroupType, type Team } from "@prisma/client";
+import { uniqueBy } from "remeda";
 
-import { mailer } from '@signtusk/email/mailer';
-import { TeamDeleteEmailTemplate } from '@signtusk/email/templates/team-delete';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { AppError, AppErrorCode } from '@signtusk/lib/errors/app-error';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { TeamDeleteEmailTemplate } from "@signtusk/email/templates/team-delete";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
-import { jobs } from '../../jobs/client';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "../../constants/teams";
+import { jobs } from "../../jobs/client";
+import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { buildTeamWhereQuery } from "../../utils/teams";
+import { getEmailContext } from "../email/get-email-context";
 
 export type DeleteTeamOptions = {
   userId: number;
@@ -27,7 +27,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     where: buildTeamWhereQuery({
       teamId,
       userId,
-      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_TEAM'],
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["DELETE_TEAM"],
     }),
     include: {
       organisation: {
@@ -63,7 +63,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
 
   if (!team) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You are not authorized to delete this team',
+      message: "You are not authorized to delete this team",
     });
   }
 
@@ -71,11 +71,11 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     team.teamGroups.flatMap((group) =>
       group.organisationGroup.organisationGroupMembers.map((member) => ({
         id: member.organisationMember.user.id,
-        name: member.organisationMember.user.name || '',
+        name: member.organisationMember.user.name || "",
         email: member.organisationMember.user.email,
-      })),
+      }))
     ),
-    (member) => member.id,
+    (member) => member.id
   );
 
   await prisma.$transaction(
@@ -97,7 +97,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
       });
 
       await jobs.triggerJob({
-        name: 'send.team-deleted.email',
+        name: "send.team-deleted.email",
         payload: {
           team: {
             name: team.name,
@@ -108,13 +108,13 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
         },
       });
     },
-    { timeout: 30_000 },
+    { timeout: 30_000 }
   );
 };
 
 type SendTeamDeleteEmailOptions = {
   email: string;
-  team: Pick<Team, 'url' | 'name'>;
+  team: Pick<Team, "url" | "name">;
   organisationId: string;
 };
 
@@ -130,16 +130,20 @@ export const sendTeamDeleteEmail = async ({
   });
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'organisation',
+      type: "organisation",
       organisationId,
     },
   });
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+    renderEmailWithI18N(template, {
+      lang: emailLanguage,
+      branding,
+      plainText: true,
+    }),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);
@@ -147,7 +151,7 @@ export const sendTeamDeleteEmail = async ({
   await mailer.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),
+    subject: i18n._(msg`Team "${team.name}" has been deleted on Signtusk`),
     html,
     text,
   });

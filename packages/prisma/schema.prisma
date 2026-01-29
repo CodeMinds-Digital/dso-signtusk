@@ -26,7 +26,7 @@ datasource db {
 
 // Todo: (RR7) Remove after RR7 migration.
 enum IdentityProvider {
-  DOCUMENSO
+  SIGNTUSK
   GOOGLE
   OIDC
 }
@@ -48,7 +48,7 @@ model User {
   updatedAt        DateTime         @default(now()) @updatedAt
   lastSignedIn     DateTime         @default(now())
   roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO) // Todo: (RR7) Remove after RR7 migration.
+  identityProvider IdentityProvider @default(SIGNTUSK) // Todo: (RR7) Remove after RR7 migration.
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
@@ -77,7 +77,7 @@ model User {
   // SSO-related fields
   ssoSessions    SSOSession[]
   ssoAuditEvents SSOAuditEvent[]
-  ssoProvisioned Boolean @default(false)
+  ssoProvisioned Boolean         @default(false)
   ssoConfigId    String? // Last used SSO config
 
   // Enhanced profile fields for JIT provisioning
@@ -1083,8 +1083,8 @@ model OrganisationAuthenticationPortal {
 
   // Enhanced SSO support
   ssoConfigurations SSOConfiguration[]
-  jitProvisioning   Json?              // JIT provisioning settings
-  attributeMapping  Json?              // Attribute mapping configuration
+  jitProvisioning   Json? // JIT provisioning settings
+  attributeMapping  Json? // Attribute mapping configuration
 
   // SAML-specific settings
   samlEnabled     Boolean @default(false)
@@ -1147,13 +1147,13 @@ model SSOConfiguration {
   domains        String[]        @default([])
   isDefault      Boolean         @default(false)
   status         SSOConfigStatus @default(DRAFT)
-  config         Json            // Provider-specific configuration (SAML2Config | OIDCSSOConfig)
+  config         Json // Provider-specific configuration (SAML2Config | OIDCSSOConfig)
   createdBy      String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   lastUsed       DateTime?
 
-  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  organisation Organisation    @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   sessions     SSOSession[]
   auditEvents  SSOAuditEvent[]
 
@@ -1172,14 +1172,14 @@ model SSOSession {
   ssoConfigId    String
   userId         Int
   provider       SSOProvider
-  sessionIndex   String?     // SAML session index
-  nameID         String?     // SAML name ID
-  subject        String?     // OIDC subject
+  sessionIndex   String? // SAML session index
+  nameID         String? // SAML name ID
+  subject        String? // OIDC subject
   createdAt      DateTime    @default(now())
   expiresAt      DateTime
   lastActivity   DateTime    @default(now())
 
-  organisation Organisation      @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  organisation Organisation     @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   ssoConfig    SSOConfiguration @relation(fields: [ssoConfigId], references: [id], onDelete: Cascade)
   user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1200,7 +1200,7 @@ model SSOAuditEvent {
   userAgent      String?
   timestamp      DateTime          @default(now())
 
-  organisation Organisation       @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  organisation Organisation      @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   ssoConfig    SSOConfiguration? @relation(fields: [ssoConfigId], references: [id], onDelete: SetNull)
   user         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
 

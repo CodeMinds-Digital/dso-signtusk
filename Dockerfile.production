@@ -1,5 +1,5 @@
 # Production Dockerfile for Remix App (Dokploy/Docker Ready)
-# Based on official Documenso Dockerfile but without turbo prune
+# Based on official Signtusk Dockerfile but without turbo prune
 
 ###########################
 #     BASE CONTAINER      #

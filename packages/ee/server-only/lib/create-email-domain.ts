@@ -4,7 +4,7 @@ import { EmailDomainStatus } from "@signtusk/lib/constants/prisma-enums";
 import { generateKeyPair } from "node:crypto";
 import { promisify } from "util";
 
-import { DOCUMENSO_ENCRYPTION_KEY } from "@signtusk/lib/constants/crypto";
+import { SIGNTUSK_ENCRYPTION_KEY } from "@signtusk/lib/constants/crypto";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
 import { symmetricEncrypt } from "@signtusk/lib/universal/crypto";
 import { generateDatabaseId } from "@signtusk/lib/universal/id";
@@ -70,10 +70,10 @@ export const createEmailDomain = async ({
   domain,
   organisationId,
 }: CreateEmailDomainOptions) => {
-  const encryptionKey = DOCUMENSO_ENCRYPTION_KEY;
+  const encryptionKey = SIGNTUSK_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error("Missing DOCUMENSO_ENCRYPTION_KEY");
+    throw new Error("Missing SIGNTUSK_ENCRYPTION_KEY");
   }
 
   const selector = `documenso-${organisationId}`.replace(/[_.]/g, "-");

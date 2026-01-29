@@ -1,5 +1,5 @@
 # Development Docker Compose configuration
-# Based on Documenso-Main best practices
+# Based on Signtusk-Main best practices
 # Usage: docker-compose -f docker-compose.dev.yml up
 
 name: signtusk-development

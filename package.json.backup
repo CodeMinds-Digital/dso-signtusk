@@ -3,7 +3,7 @@
     "name": "@docusign-alternative/root",
     "version": "2.2.6",
     "license": "Private - Part of DocuSign Alternative Platform",
-    "description": "Comprehensive enterprise-grade e-signature platform with simplified Documenso foundation",
+    "description": "Comprehensive enterprise-grade e-signature platform with simplified Signtusk foundation",
     "workspaces": [
         "apps/*",
         "packages/*"

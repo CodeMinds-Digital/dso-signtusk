@@ -1,20 +1,20 @@
 /* eslint-disable require-atomic-updates */
-import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import { PostHog } from 'posthog-node';
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { PostHog } from "posthog-node";
 
-import { version } from '../../../../package.json';
-import { prefixedId } from '../../universal/id';
-import { getSiteSetting } from '../site-settings/get-site-setting';
-import { SITE_SETTINGS_TELEMETRY_ID } from '../site-settings/schemas/telemetry';
-import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
+import { version } from "../../../../package.json";
+import { prefixedId } from "../../universal/id";
+import { getSiteSetting } from "../site-settings/get-site-setting";
+import { SITE_SETTINGS_TELEMETRY_ID } from "../site-settings/schemas/telemetry";
+import { upsertSiteSetting } from "../site-settings/upsert-site-setting";
 
 const TELEMETRY_KEY = process.env.NEXT_PRIVATE_TELEMETRY_KEY;
 const TELEMETRY_HOST = process.env.NEXT_PRIVATE_TELEMETRY_HOST;
-const TELEMETRY_DISABLED = !!process.env.DOCUMENSO_DISABLE_TELEMETRY;
+const TELEMETRY_DISABLED = !!process.env.SIGNTUSK_DISABLE_TELEMETRY;
 
-const NODE_ID_FILENAME = '.documenso-node-id';
+const NODE_ID_FILENAME = ".signtusk-node-id";
 const HEARTBEAT_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
 // Version is hardcoded to avoid rollup JSON import issues
@@ -38,19 +38,21 @@ export class TelemetryClient {
    * This will initialize the PostHog client, load or create the installation ID and node ID,
    * capture a startup event, and start a heartbeat interval.
    *
-   * If telemetry is disabled via `DOCUMENSO_DISABLE_TELEMETRY=true` or credentials are not
+   * If telemetry is disabled via `SIGNTUSK_DISABLE_TELEMETRY=true` or credentials are not
    * provided, this will be a no-op.
    */
   public static async start(): Promise<void> {
     if (TELEMETRY_DISABLED) {
       console.log(
-        '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
+        "[Telemetry] Telemetry is disabled. To enable, remove the SIGNTUSK_DISABLE_TELEMETRY environment variable."
       );
       return;
     }
 
     if (!TELEMETRY_KEY || !TELEMETRY_HOST) {
-      console.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
+      console.log(
+        "[Telemetry] Telemetry credentials not configured. Telemetry will not be sent."
+      );
       return;
     }
 
@@ -99,24 +101,24 @@ export class TelemetryClient {
     this.nodeId = await this.getOrCreateNodeId();
 
     console.log(
-      '[Telemetry] Telemetry is enabled. Documenso collects anonymous usage data to help improve the product.',
+      "[Telemetry] Telemetry is enabled. Signtusk collects anonymous usage data to help improve the product."
     );
     console.log(
-      '[Telemetry] We collect: app version, installation ID, and node ID. No personal data, document contents, or user information is collected.',
+      "[Telemetry] We collect: app version, installation ID, and node ID. No personal data, document contents, or user information is collected."
     );
     console.log(
-      '[Telemetry] To disable telemetry, set DOCUMENSO_DISABLE_TELEMETRY=true in your environment variables.',
+      "[Telemetry] To disable telemetry, set SIGNTUSK_DISABLE_TELEMETRY=true in your environment variables."
     );
-    console.log(
-      '[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry',
-    );
+    // console.log(
+    //   "[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry"
+    // );
 
     // Capture startup event
-    this.captureEvent('telemetry_selfhoster_startup');
+    this.captureEvent("telemetry_selfhoster_startup");
 
     // Start heartbeat
     this.heartbeatInterval = setInterval(() => {
-      this.captureEvent('telemetry_selfhoster_heartbeat');
+      this.captureEvent("telemetry_selfhoster_heartbeat");
     }, HEARTBEAT_INTERVAL_MS);
   }
 
@@ -139,7 +141,9 @@ export class TelemetryClient {
   private async getOrCreateInstallationId(): Promise<string> {
     try {
       // Try to get from site settings
-      const existing = await getSiteSetting({ id: SITE_SETTINGS_TELEMETRY_ID }).catch(() => null);
+      const existing = await getSiteSetting({
+        id: SITE_SETTINGS_TELEMETRY_ID,
+      }).catch(() => null);
 
       if (existing) {
         if (existing.data.installationId) {
@@ -148,7 +152,7 @@ export class TelemetryClient {
       }
 
       // Create new installation ID
-      const installationId = prefixedId('installation');
+      const installationId = prefixedId("installation");
 
       await upsertSiteSetting({
         id: SITE_SETTINGS_TELEMETRY_ID,
@@ -159,7 +163,7 @@ export class TelemetryClient {
       return installationId;
     } catch {
       // If database is not available, generate a temporary ID
-      return prefixedId('installation');
+      return prefixedId("installation");
     }
   }
 
@@ -167,7 +171,7 @@ export class TelemetryClient {
     const nodeIdPath = path.join(os.tmpdir(), NODE_ID_FILENAME);
 
     try {
-      const existingId = await fs.readFile(nodeIdPath, 'utf-8');
+      const existingId = await fs.readFile(nodeIdPath, "utf-8");
 
       if (existingId.trim()) {
         return existingId.trim();
@@ -177,10 +181,10 @@ export class TelemetryClient {
     }
 
     // Generate new node ID
-    const nodeId = prefixedId('node');
+    const nodeId = prefixedId("node");
 
     try {
-      await fs.writeFile(nodeIdPath, nodeId, 'utf-8');
+      await fs.writeFile(nodeIdPath, nodeId, "utf-8");
     } catch {
       // Read-only filesystem, use memory for nodeId
     }

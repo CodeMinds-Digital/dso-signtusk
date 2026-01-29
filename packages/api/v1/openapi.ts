@@ -1,17 +1,18 @@
-import { generateOpenApi } from '@ts-rest/open-api';
+import { generateOpenApi } from "@ts-rest/open-api";
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 
-import { ApiContractV1 } from './contract';
+import { ApiContractV1 } from "./contract";
 
 export const OpenAPIV1 = Object.assign(
   generateOpenApi(
     ApiContractV1,
     {
       info: {
-        title: 'Documenso API',
-        version: '1.0.0',
-        description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
+        title: "Signtusk API",
+        version: "1.0.0",
+        description:
+          "The Signtusk API for retrieving, creating, updating and deleting documents.",
       },
       servers: [
         {
@@ -21,15 +22,15 @@ export const OpenAPIV1 = Object.assign(
     },
     {
       setOperationId: true,
-    },
+    }
   ),
   {
     components: {
       securitySchemes: {
         authorization: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'Authorization',
+          type: "apiKey",
+          in: "header",
+          name: "Authorization",
         },
       },
     },
@@ -38,5 +39,5 @@ export const OpenAPIV1 = Object.assign(
         authorization: [],
       },
     ],
-  },
+  }
 );

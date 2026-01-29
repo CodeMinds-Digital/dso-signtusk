@@ -1,7 +1,7 @@
-import type { SubscriptionClaim } from '@signtusk/lib/constants/prisma-enums';
-import { z } from 'zod';
+import type { SubscriptionClaim } from "@signtusk/lib/constants/prisma-enums";
+import { z } from "zod";
 
-import { ZOrganisationNameSchema } from '@signtusk/trpc/server/organisation-router/create-organisation.types';
+import { ZOrganisationNameSchema } from "@signtusk/trpc/server/organisation-router/create-organisation.types";
 
 /**
  * README:
@@ -9,7 +9,7 @@ import { ZOrganisationNameSchema } from '@signtusk/trpc/server/organisation-rout
  */
 export const ZClaimFlagsSchema = z.object({
   /**
-   * Allows disabling of Documenso branding for:
+   * Allows disabling of Signtusk branding for:
    * - Certificates
    * - Emails
    * - Other?
@@ -45,61 +45,61 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   }
 > = {
   unlimitedDocuments: {
-    key: 'unlimitedDocuments',
-    label: 'Unlimited documents',
+    key: "unlimitedDocuments",
+    label: "Unlimited documents",
   },
   allowCustomBranding: {
-    key: 'allowCustomBranding',
-    label: 'Branding',
+    key: "allowCustomBranding",
+    label: "Branding",
   },
   hidePoweredBy: {
-    key: 'hidePoweredBy',
-    label: 'Hide Documenso branding by',
+    key: "hidePoweredBy",
+    label: "Hide Signtusk branding by",
   },
   emailDomains: {
-    key: 'emailDomains',
-    label: 'Email domains',
+    key: "emailDomains",
+    label: "Email domains",
   },
   embedAuthoring: {
-    key: 'embedAuthoring',
-    label: 'Embed authoring',
+    key: "embedAuthoring",
+    label: "Embed authoring",
   },
   embedSigning: {
-    key: 'embedSigning',
-    label: 'Embed signing',
+    key: "embedSigning",
+    label: "Embed signing",
   },
   embedAuthoringWhiteLabel: {
-    key: 'embedAuthoringWhiteLabel',
-    label: 'White label for embed authoring',
+    key: "embedAuthoringWhiteLabel",
+    label: "White label for embed authoring",
   },
   embedSigningWhiteLabel: {
-    key: 'embedSigningWhiteLabel',
-    label: 'White label for embed signing',
+    key: "embedSigningWhiteLabel",
+    label: "White label for embed signing",
   },
   cfr21: {
-    key: 'cfr21',
-    label: '21 CFR',
+    key: "cfr21",
+    label: "21 CFR",
   },
   authenticationPortal: {
-    key: 'authenticationPortal',
-    label: 'Authentication portal',
+    key: "authenticationPortal",
+    label: "Authentication portal",
   },
   allowLegacyEnvelopes: {
-    key: 'allowLegacyEnvelopes',
-    label: 'Allow Legacy Envelopes',
+    key: "allowLegacyEnvelopes",
+    label: "Allow Legacy Envelopes",
   },
 };
 
 export enum INTERNAL_CLAIM_ID {
-  FREE = 'free',
-  INDIVIDUAL = 'individual',
-  TEAM = 'team',
-  EARLY_ADOPTER = 'earlyAdopter',
-  PLATFORM = 'platform',
-  ENTERPRISE = 'enterprise',
+  FREE = "free",
+  INDIVIDUAL = "individual",
+  TEAM = "team",
+  EARLY_ADOPTER = "earlyAdopter",
+  PLATFORM = "platform",
+  ENTERPRISE = "enterprise",
 }
 
-export type InternalClaim = Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
+export type InternalClaim = Omit<SubscriptionClaim, "createdAt" | "updatedAt">;
 
 export type InternalClaims = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim;
@@ -108,7 +108,7 @@ export type InternalClaims = {
 export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.FREE]: {
     id: INTERNAL_CLAIM_ID.FREE,
-    name: 'Free',
+    name: "Free",
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
@@ -117,7 +117,7 @@ export const internalClaims: InternalClaims = {
   },
   [INTERNAL_CLAIM_ID.INDIVIDUAL]: {
     id: INTERNAL_CLAIM_ID.INDIVIDUAL,
-    name: 'Individual',
+    name: "Individual",
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
@@ -128,7 +128,7 @@ export const internalClaims: InternalClaims = {
   },
   [INTERNAL_CLAIM_ID.TEAM]: {
     id: INTERNAL_CLAIM_ID.TEAM,
-    name: 'Teams',
+    name: "Teams",
     teamCount: 1,
     memberCount: 5,
     envelopeItemCount: 5,
@@ -141,7 +141,7 @@ export const internalClaims: InternalClaims = {
   },
   [INTERNAL_CLAIM_ID.PLATFORM]: {
     id: INTERNAL_CLAIM_ID.PLATFORM,
-    name: 'Platform',
+    name: "Platform",
     teamCount: 1,
     memberCount: 0,
     envelopeItemCount: 10,
@@ -159,7 +159,7 @@ export const internalClaims: InternalClaims = {
   },
   [INTERNAL_CLAIM_ID.ENTERPRISE]: {
     id: INTERNAL_CLAIM_ID.ENTERPRISE,
-    name: 'Enterprise',
+    name: "Enterprise",
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 10,
@@ -179,7 +179,7 @@ export const internalClaims: InternalClaims = {
   },
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {
     id: INTERNAL_CLAIM_ID.EARLY_ADOPTER,
-    name: 'Early Adopter',
+    name: "Early Adopter",
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 5,
