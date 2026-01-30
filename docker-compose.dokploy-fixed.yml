@@ -1,0 +1,113 @@
+# Dokploy-optimized Docker Compose (NO nginx - Dokploy uses Traefik)
+# This file is for Dokploy deployment only
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      args:
+        NODE_ENV: production
+    ports:
+      - "3000:3000"
+    environment:
+      # Core
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+      NEXT_PRIVATE_DATABASE_URL: ${NEXT_PRIVATE_DATABASE_URL}
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: ${NEXT_PRIVATE_DIRECT_DATABASE_URL}
+      POSTGRES_PRISMA_URL: ${POSTGRES_PRISMA_URL}
+
+      # Auth
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      JWT_SECRET: ${JWT_SECRET}
+
+      # Encryption
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      NEXT_PRIVATE_ENCRYPTION_KEY: ${NEXT_PRIVATE_ENCRYPTION_KEY}
+      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY}
+
+      # URLs
+      NEXT_PUBLIC_WEBAPP_URL: ${NEXT_PUBLIC_WEBAPP_URL}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      NEXT_PRIVATE_INTERNAL_WEBAPP_URL: ${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+
+      # Storage (S3)
+      NEXT_PUBLIC_UPLOAD_TRANSPORT: ${NEXT_PUBLIC_UPLOAD_TRANSPORT}
+      NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ${NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID}
+      NEXT_PRIVATE_UPLOAD_BUCKET: ${NEXT_PRIVATE_UPLOAD_BUCKET}
+      NEXT_PRIVATE_UPLOAD_REGION: ${NEXT_PRIVATE_UPLOAD_REGION}
+      NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: ${NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+      # Email
+      NEXT_PRIVATE_SMTP_TRANSPORT: ${NEXT_PRIVATE_SMTP_TRANSPORT}
+      NEXT_PRIVATE_SMTP_HOST: ${NEXT_PRIVATE_SMTP_HOST}
+      NEXT_PRIVATE_SMTP_FROM_ADDRESS: ${NEXT_PRIVATE_SMTP_FROM_ADDRESS}
+      NEXT_PRIVATE_SMTP_FROM_NAME: ${NEXT_PRIVATE_SMTP_FROM_NAME}
+      NEXT_PRIVATE_RESEND_API_KEY: ${NEXT_PRIVATE_RESEND_API_KEY}
+
+      # Signing
+      NEXT_PRIVATE_SIGNING_TRANSPORT: ${NEXT_PRIVATE_SIGNING_TRANSPORT}
+      NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS: ${NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS}
+      NEXT_PRIVATE_SIGNING_PASSPHRASE: ${NEXT_PRIVATE_SIGNING_PASSPHRASE}
+      DISABLE_PDF_SIGNING: ${DISABLE_PDF_SIGNING}
+
+      # Redis
+      REDIS_URL: ${REDIS_URL}
+
+      # Analytics
+      NEXT_PUBLIC_POSTHOG_HOST: ${NEXT_PUBLIC_POSTHOG_HOST}
+      NEXT_PUBLIC_POSTHOG_KEY: ${NEXT_PUBLIC_POSTHOG_KEY}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_DSN_NODE: ${SENTRY_DSN_NODE}
+
+      # Features
+      NEXT_PUBLIC_FEATURE_BILLING_ENABLED: ${NEXT_PUBLIC_FEATURE_BILLING_ENABLED}
+      NEXT_PUBLIC_FEATURE_WEBHOOKS_ENABLED: ${NEXT_PUBLIC_FEATURE_WEBHOOKS_ENABLED}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED}
+
+      # Telemetry
+      SIGNTUSK_DISABLE_TELEMETRY: true
+
+    # NO depends_on - using external database and Redis
+    volumes:
+      - uploads:/app/uploads
+      - logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      # Traefik labels for Dokploy
+      - "traefik.enable=true"
+      - "traefik.http.routers.signtusk.rule=Host(`testone.intotni.com`)"
+      - "traefik.http.routers.signtusk.entrypoints=websecure"
+      - "traefik.http.routers.signtusk.tls=true"
+      - "traefik.http.routers.signtusk.tls.certresolver=letsencrypt"
+      - "traefik.http.services.signtusk.loadbalancer.server.port=3000"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.signtusk-http.rule=Host(`testone.intotni.com`)"
+      - "traefik.http.routers.signtusk-http.entrypoints=web"
+      - "traefik.http.routers.signtusk-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+volumes:
+  uploads:
+    driver: local
+  logs:
+    driver: local
+
+# NO networks defined - will use Dokploy's default network

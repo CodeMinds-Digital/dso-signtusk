@@ -149,6 +149,8 @@ ENV HUSKY=0
 ENV DOCKER_OUTPUT=1
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 
 # Create non-root user
 RUN groupadd --system --gid 1001 nodejs && \
