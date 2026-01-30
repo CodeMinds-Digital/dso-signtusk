@@ -32,6 +32,8 @@ else
 fi
 
 printf "🌟 Starting Signtusk server...\n"
-printf "📍 Server will be available at: http://0.0.0.0:3000\n\n"
+printf "📍 Server will be available at: http://0.0.0.0:3000\n"
+printf "🔧 Make sure HOSTNAME=0.0.0.0 is set for Docker\n\n"
 
-HOSTNAME=0.0.0.0 node build/server/main.js
+export HOSTNAME=0.0.0.0
+node build/server/main.js

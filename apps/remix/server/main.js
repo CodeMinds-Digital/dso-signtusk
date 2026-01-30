@@ -6,30 +6,40 @@
  *  This file will be copied to the build folder during build time.
  *  Running this file will not work without a build.
  */
-import { serve } from '@hono/node-server';
-import { serveStatic } from '@hono/node-server/serve-static';
-import handle from 'hono-react-router-adapter/node';
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import handle from "hono-react-router-adapter/node";
 
-import server from './hono/server/router.js';
-import * as build from './index.js';
+import server from "./hono/server/router.js";
+import * as build from "./index.js";
 
 server.use(
   serveStatic({
-    root: 'build/client',
+    root: "build/client",
     onFound: (path, c) => {
-      if (path.startsWith('./build/client/assets')) {
+      if (path.startsWith("./build/client/assets")) {
         // Hard cache assets with hashed file names.
-        c.header('Cache-Control', 'public, immutable, max-age=31536000');
+        c.header("Cache-Control", "public, immutable, max-age=31536000");
       } else {
         // Cache with revalidation for rest of static files.
-        c.header('Cache-Control', 'public, max-age=0, stale-while-revalidate=86400');
+        c.header(
+          "Cache-Control",
+          "public, max-age=0, stale-while-revalidate=86400"
+        );
       }
     },
-  }),
+  })
 );
 
 const handler = handle(build, server);
 
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = parseInt(process.env.PORT || "3000", 10);
+const hostname = process.env.HOSTNAME || "0.0.0.0";
 
-serve({ fetch: handler.fetch, port });
+console.log(`🚀 Server starting on ${hostname}:${port}`);
+
+serve({
+  fetch: handler.fetch,
+  port,
+  hostname,
+});
