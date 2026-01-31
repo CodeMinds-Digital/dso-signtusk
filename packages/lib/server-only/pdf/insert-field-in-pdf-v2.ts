@@ -21,19 +21,16 @@ export const insertFieldInPDFV2 = async ({
   pageHeight,
   fields,
 }: InsertFieldInPDFV2Options) => {
-  // In Docker, fonts are at /app/apps/remix/public/fonts
-  // In development, fonts are at process.cwd()/public/fonts
-  const fontPath =
-    process.env.DOCKER_OUTPUT === "1"
-      ? path.join(process.cwd(), "apps/remix/public/fonts")
-      : path.join(process.cwd(), "public/fonts");
+  // In Docker, process.cwd() is /app/apps/remix, so fonts are at public/fonts
+  // In development, process.cwd() is /app, so fonts are at public/fonts
+  const fontPath = path.join(process.cwd(), "public/fonts");
 
   FontLibrary.use({
     ["Dancing Script"]: [path.join(fontPath, "DancingScript-Bold.ttf")],
-    ["Noto Sans"]: [path.join(fontPath, "noto-sans.ttf")],
-    ["Noto Sans Japanese"]: [path.join(fontPath, "noto-sans-japanese.ttf")],
-    ["Noto Sans Chinese"]: [path.join(fontPath, "noto-sans-chinese.ttf")],
-    ["Noto Sans Korean"]: [path.join(fontPath, "noto-sans-korean.ttf")],
+    ["Noto Sans"]: [path.join(fontPath, "NotoSans-Regular.ttf")],
+    ["Noto Sans Japanese"]: [path.join(fontPath, "NotoSansJP-Regular.ttf")],
+    ["Noto Sans Chinese"]: [path.join(fontPath, "NotoSansSC-Regular.ttf")],
+    ["Noto Sans Korean"]: [path.join(fontPath, "NotoSansKR-Regular.ttf")],
   });
 
   const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });
