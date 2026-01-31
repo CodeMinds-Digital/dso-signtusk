@@ -1,14 +1,14 @@
 // sort-imports-ignore
-import 'konva/skia-backend';
+import "konva/skia-backend";
 
-import Konva from 'konva';
-import path from 'node:path';
-import type { Canvas } from 'skia-canvas';
-import { FontLibrary } from 'skia-canvas';
+import Konva from "konva";
+import path from "node:path";
+import type { Canvas } from "skia-canvas";
+import { FontLibrary } from "skia-canvas";
 
-import type { FieldWithSignature } from '@signtusk/prisma/types/field-with-signature';
+import type { FieldWithSignature } from "@signtusk/prisma/types/field-with-signature";
 
-import { renderField } from '../../universal/field-renderer/render-field';
+import { renderField } from "../../universal/field-renderer/render-field";
 
 type InsertFieldInPDFV2Options = {
   pageWidth: number;
@@ -21,14 +21,19 @@ export const insertFieldInPDFV2 = async ({
   pageHeight,
   fields,
 }: InsertFieldInPDFV2Options) => {
-  const fontPath = path.join(process.cwd(), 'public/fonts');
+  // In Docker, fonts are at /app/apps/remix/public/fonts
+  // In development, fonts are at process.cwd()/public/fonts
+  const fontPath =
+    process.env.DOCKER_OUTPUT === "1"
+      ? path.join(process.cwd(), "apps/remix/public/fonts")
+      : path.join(process.cwd(), "public/fonts");
 
   FontLibrary.use({
-    ['Dancing Script']: [path.join(fontPath, 'DancingScript-Bold.ttf')],
-    ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
-    ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
-    ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],
-    ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
+    ["Dancing Script"]: [path.join(fontPath, "DancingScript-Bold.ttf")],
+    ["Noto Sans"]: [path.join(fontPath, "noto-sans.ttf")],
+    ["Noto Sans Japanese"]: [path.join(fontPath, "noto-sans-japanese.ttf")],
+    ["Noto Sans Chinese"]: [path.join(fontPath, "noto-sans-chinese.ttf")],
+    ["Noto Sans Korean"]: [path.join(fontPath, "noto-sans-korean.ttf")],
   });
 
   const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });
@@ -50,7 +55,7 @@ export const insertFieldInPDFV2 = async ({
       pageLayer: layer,
       pageWidth,
       pageHeight,
-      mode: 'export',
+      mode: "export",
     });
   }
 
@@ -60,5 +65,5 @@ export const insertFieldInPDFV2 = async ({
   const canvas = layer.canvas._canvas as unknown as Canvas;
 
   // Embed the SVG into the PDF
-  return await canvas.toBuffer('pdf');
+  return await canvas.toBuffer("pdf");
 };
