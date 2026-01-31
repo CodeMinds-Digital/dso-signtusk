@@ -880,8 +880,8 @@ msgstr ""
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/create-team-email-verification.ts
-msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr "Documenso에서 {0}이(가) 귀하의 이메일 사용을 요청했습니다."
+msgid "A request to use your email has been initiated by {0} on Signtusk"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -8475,8 +8475,8 @@ msgstr "팀"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/delete-team.ts
-msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr "Documenso에서 팀 \"{0}\"이(가) 삭제되었습니다."
+msgid "Team \"{0}\" has been deleted on Signtusk"
+msgstr ""
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Admin"
@@ -11127,8 +11127,8 @@ msgstr "<0>{0}</0> 조직에서 귀하를 초대했습니다."
 
 #. placeholder {0}: organisation.name
 #: packages/lib/server-only/organisation/create-organisation-member-invites.ts
-msgid "You have been invited to join {0} on Documenso"
-msgstr "Documenso에서 {0} 조직에 초대되었습니다."
+msgid "You have been invited to join {0} on Signtusk"
+msgstr ""
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "You have been invited to join the following organisation"
