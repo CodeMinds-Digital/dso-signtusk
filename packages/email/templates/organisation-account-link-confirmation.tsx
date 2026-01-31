@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLinguiSSR as useLingui } from '../providers/i18n-ssr';
 import { Trans } from '@lingui/react/macro';
 
 import {

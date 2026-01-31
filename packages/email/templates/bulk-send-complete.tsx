@@ -1,5 +1,5 @@
 import { Trans, msg } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
+import { useLinguiSSR as useLingui } from '../providers/i18n-ssr';
 
 import { Body, Container, Head, Html, Preview, Section, Text } from '../components';
 import { TemplateFooter } from '../template-components/template-footer';
