@@ -15,11 +15,16 @@ export type RenderWithI18nWrapperOptions = ReactEmail.Options & {
 /**
  * Patch React hooks to work in SSR mode.
  * @react-email/render bundles its own React without context initialization.
+ * I18nProvider uses: useRef, useContext, useCallback, useMemo, useEffect, useLayoutEffect
  */
 function patchReactHooksForSSR() {
   const originalUseRef = React.useRef;
   const originalUseContext = React.useContext;
   const originalCreateContext = React.createContext;
+  const originalUseCallback = React.useCallback;
+  const originalUseMemo = React.useMemo;
+  const originalUseEffect = React.useEffect;
+  const originalUseLayoutEffect = React.useLayoutEffect;
 
   // Store for contexts created during rendering
   const contextStore = new Map<any, any>();
@@ -47,11 +52,47 @@ function patchReactHooksForSSR() {
     return (context as any)._currentValue ?? (context as any)._defaultValue;
   };
 
+  // Patch useCallback to just return the function (no memoization in SSR)
+  (React as any).useCallback = function useCallback<T extends Function>(
+    callback: T,
+    deps?: any[]
+  ): T {
+    return callback;
+  };
+
+  // Patch useMemo to just call the function (no memoization in SSR)
+  (React as any).useMemo = function useMemo<T>(
+    factory: () => T,
+    deps?: any[]
+  ): T {
+    return factory();
+  };
+
+  // Patch useEffect to do nothing in SSR
+  (React as any).useEffect = function useEffect(
+    effect: () => void | (() => void),
+    deps?: any[]
+  ): void {
+    // No-op in SSR
+  };
+
+  // Patch useLayoutEffect to do nothing in SSR
+  (React as any).useLayoutEffect = function useLayoutEffect(
+    effect: () => void | (() => void),
+    deps?: any[]
+  ): void {
+    // No-op in SSR
+  };
+
   return {
     restore: () => {
       React.useRef = originalUseRef;
       React.useContext = originalUseContext;
       React.createContext = originalCreateContext;
+      React.useCallback = originalUseCallback;
+      React.useMemo = originalUseMemo;
+      React.useEffect = originalUseEffect;
+      React.useLayoutEffect = originalUseLayoutEffect;
       contextStore.clear();
     },
   };
