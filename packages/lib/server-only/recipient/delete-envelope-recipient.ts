@@ -1,24 +1,25 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { EnvelopeType, SendStatus } from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import RecipientRemovedFromDocumentTemplate from '@signtusk/email/templates/recipient-removed-from-document';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@signtusk/lib/types/document-audit-logs';
-import type { ApiRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
+import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import { createDocumentAuditLogData } from "../../utils/document-audit-logs";
+import {
+  canRecipientBeModified,
+  isRecipientEmailValidForSending,
+} from "../../utils/recipients";
+import { buildTeamWhereQuery } from "../../utils/teams";
+import { getEmailContext } from "../email/get-email-context";
+import { getEnvelopeWhereInput } from "../envelope/get-envelope-by-id";
 
 export interface DeleteEnvelopeRecipientOptions {
   userId: number;
@@ -69,19 +70,19 @@ export const deleteEnvelopeRecipient = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: "Document not found",
     });
   }
 
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Document already complete',
+      message: "Document already complete",
     });
   }
 
   if (!user) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'User not found',
+      message: "User not found",
     });
   }
 
@@ -89,19 +90,19 @@ export const deleteEnvelopeRecipient = async ({
 
   if (!recipientToDelete || recipientToDelete.id !== recipientId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Recipient not found',
+      message: "Recipient not found",
     });
   }
 
   if (!canRecipientBeModified(recipientToDelete, recipientToDelete.fields)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Recipient has already interacted with the document.',
+      message: "Recipient has already interacted with the document.",
     });
   }
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id: {
-      type: 'envelopeId',
+      type: "envelopeId",
       id: envelope.id,
     },
     type: null,
@@ -135,7 +136,7 @@ export const deleteEnvelopeRecipient = async ({
   });
 
   const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
+    envelope.documentMeta
   ).recipientRemoved;
 
   // Send email to deleted recipient.
@@ -145,26 +146,45 @@ export const deleteEnvelopeRecipient = async ({
     envelope.type === EnvelopeType.DOCUMENT &&
     isRecipientEmailValidForSending(recipientToDelete)
   ) {
-    const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+    const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-    const template = createElement(RecipientRemovedFromDocumentTemplate, {
+    const { branding, emailLanguage, senderEmail, replyToEmail } =
+      await getEmailContext({
+        emailType: "RECIPIENT",
+        source: {
+          type: "team",
+          teamId: envelope.teamId,
+        },
+        meta: envelope.documentMeta,
+      });
+
+    // Get translations for the email
+    const translations = await getRecipientRemovedFromDocumentTranslations(
+      emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+      {
+        inviterName: envelope.team?.name || user.name || "Unknown",
+        documentName: envelope.title,
+      }
+    );
+
+    const template = createElement(RecipientRemovedFromDocumentSimple, {
       documentName: envelope.title,
       inviterName: envelope.team?.name || user.name || undefined,
       assetBaseUrl,
-    });
-
-    const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
+      translations,
+      branding: branding
+        ? {
+            brandingEnabled: branding.brandingEnabled,
+            brandingLogo: branding.brandingLogo || undefined,
+            brandingCompanyDetails:
+              branding.brandingCompanyDetails || undefined,
+          }
+        : undefined,
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+      renderSimple(template),
+      renderSimple(template, { plainText: true }),
     ]);
 
     const i18n = await getI18nInstance(emailLanguage);

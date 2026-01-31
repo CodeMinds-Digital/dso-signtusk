@@ -1,38 +1,39 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { EnvelopeType } from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import { AccessAuth2FAEmailTemplate } from '@signtusk/email/templates/access-auth-2fa';
-import { isRecipientEmailValidForSending } from '@signtusk/lib/utils/recipients';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { isRecipientEmailValidForSending } from "@signtusk/lib/utils/recipients";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { AppError, AppErrorCode } from '../../../errors/app-error';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
-import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
-import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { getEmailContext } from '../../email/get-email-context';
-import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from './constants';
-import { generateTwoFactorTokenFromEmail } from './generate-2fa-token-from-email';
+import { getI18nInstance } from "../../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
+import { AppError, AppErrorCode } from "../../../errors/app-error";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "../../../types/document-audit-logs";
+import { createDocumentAuditLogData } from "../../../utils/document-audit-logs";
+import { unsafeBuildEnvelopeIdQuery } from "../../../utils/envelope";
+import { getEmailContext } from "../../email/get-email-context";
+import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from "./constants";
+import { generateTwoFactorTokenFromEmail } from "./generate-2fa-token-from-email";
 
 export type Send2FATokenEmailOptions = {
   token: string;
   envelopeId: string;
 };
 
-export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmailOptions) => {
+export const send2FATokenEmail = async ({
+  token,
+  envelopeId,
+}: Send2FATokenEmailOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
       ...unsafeBuildEnvelopeIdQuery(
         {
-          type: 'envelopeId',
+          type: "envelopeId",
           id: envelopeId,
         },
-        EnvelopeType.DOCUMENT,
+        EnvelopeType.DOCUMENT
       ),
       recipients: {
         some: {
@@ -58,7 +59,7 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: "Document not found",
     });
   }
 
@@ -66,13 +67,13 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
 
   if (!recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Recipient not found',
+      message: "Recipient not found",
     });
   }
 
   if (!isRecipientEmailValidForSending(recipient)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Recipient is missing email address',
+      message: "Recipient is missing email address",
     });
   }
 
@@ -81,31 +82,50 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
     email: recipient.email,
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const i18n = await getI18nInstance(emailLanguage);
 
   const subject = i18n._(msg`Your two-factor authentication code`);
 
-  const template = createElement(AccessAuth2FAEmailTemplate, {
+  // Get translations for the email
+  const translations = await getAccessAuth2FATranslations(
+    emailLanguage as import("../../../constants/i18n").SupportedLanguageCodes,
+    {
+      code: twoFactorTokenToken,
+      documentTitle: envelope.title,
+      expiresInMinutes: TWO_FACTOR_EMAIL_EXPIRATION_MINUTES,
+    }
+  );
+
+  const template = createElement(AccessAuth2FAEmailSimple, {
     documentTitle: envelope.title,
     userName: recipient.name,
     userEmail: recipient.email,
     code: twoFactorTokenToken,
     expiresInMinutes: TWO_FACTOR_EMAIL_EXPIRATION_MINUTES,
     assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: branding.brandingEnabled,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
+        }
+      : undefined,
   });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   await prisma.$transaction(
@@ -134,6 +154,6 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
         }),
       });
     },
-    { timeout: 30_000 },
+    { timeout: 30_000 }
   );
 };

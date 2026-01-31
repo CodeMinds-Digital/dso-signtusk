@@ -1,17 +1,15 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 
-import { mailer } from '@signtusk/email/mailer';
-import { DocumentSuperDeleteEmailTemplate } from '@signtusk/email/templates/document-super-delete';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import { getEmailContext } from "../email/get-email-context";
 
 export interface SendDeleteEmailOptions {
   envelopeId: string;
@@ -19,7 +17,10 @@ export interface SendDeleteEmailOptions {
 }
 
 // Note: Currently only sent by Admin function
-export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOptions) => {
+export const sendDeleteEmail = async ({
+  envelopeId,
+  reason,
+}: SendDeleteEmailOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,
@@ -38,12 +39,12 @@ export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOpt
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: "Document not found",
     });
   }
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
+    envelope.documentMeta
   ).documentDeleted;
 
   if (!isDocumentDeletedEmailEnabled) {
@@ -51,9 +52,9 @@ export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOpt
   }
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'team',
+      type: "team",
       teamId: envelope.teamId,
     },
     meta: envelope.documentMeta,
@@ -61,21 +62,34 @@ export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOpt
 
   const { email, name } = envelope.user;
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-  const template = createElement(DocumentSuperDeleteEmailTemplate, {
+  // Get translations for the email
+  const translations = await getDocumentSuperDeleteTranslations(
+    emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+    {
+      documentName: envelope.title,
+      reason,
+    }
+  );
+
+  const template = createElement(DocumentSuperDeleteEmailSimple, {
     documentName: envelope.title,
     reason,
     assetBaseUrl,
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: branding.brandingEnabled,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
+        }
+      : undefined,
   });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-      plainText: true,
-    }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);
@@ -83,7 +97,7 @@ export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOpt
   await mailer.sendMail({
     to: {
       address: email,
-      name: name || '',
+      name: name || "",
     },
     from: senderEmail,
     subject: i18n._(msg`Document Deleted!`),

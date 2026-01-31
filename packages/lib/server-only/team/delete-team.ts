@@ -5,7 +5,8 @@ import { OrganisationGroupType, type Team } from "@prisma/client";
 import { uniqueBy } from "remeda";
 
 import { mailer } from "@signtusk/email/mailer";
-import { TeamDeleteEmailTemplate } from "@signtusk/email/templates/team-delete";
+import { renderSimple } from "@signtusk/email/render-simple";
+import { TeamDeletedEmailSimple } from "@signtusk/email/templates/team-deleted-simple";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
 import { prisma } from "@signtusk/prisma";
@@ -13,7 +14,7 @@ import { prisma } from "@signtusk/prisma";
 import { getI18nInstance } from "../../client-only/providers/i18n-server";
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "../../constants/teams";
 import { jobs } from "../../jobs/client";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { getTeamDeletedTranslations } from "../../utils/get-email-translations";
 import { buildTeamWhereQuery } from "../../utils/teams";
 import { getEmailContext } from "../email/get-email-context";
 
@@ -123,12 +124,6 @@ export const sendTeamDeleteEmail = async ({
   team,
   organisationId,
 }: SendTeamDeleteEmailOptions) => {
-  const template = createElement(TeamDeleteEmailTemplate, {
-    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    teamUrl: team.url,
-  });
-
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
     emailType: "INTERNAL",
     source: {
@@ -137,13 +132,32 @@ export const sendTeamDeleteEmail = async ({
     },
   });
 
+  // Get translations for the email
+  const translations = await getTeamDeletedTranslations(
+    emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+    {
+      teamName: team.name,
+    }
+  );
+
+  const template = createElement(TeamDeletedEmailSimple, {
+    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    teamUrl: team.url,
+    teamName: team.name,
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: branding.brandingEnabled,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
+        }
+      : undefined,
+  });
+
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-      plainText: true,
-    }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);

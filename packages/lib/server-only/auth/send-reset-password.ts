@@ -1,12 +1,13 @@
 import { createElement } from "react";
 
 import { mailer } from "@signtusk/email/mailer";
-import { ResetPasswordTemplate } from "@signtusk/email/templates/reset-password";
+import { renderSimple } from "@signtusk/email/render-simple";
+import PasswordResetEmailSimple from "@signtusk/email/templates/password-reset-simple";
 import { prisma } from "@signtusk/prisma";
 
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
 import { env } from "../../utils/env";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { getPasswordResetSuccessTranslations } from "../../utils/get-email-translations";
 
 export interface SendResetPasswordOptions {
   userId: number;
@@ -23,15 +24,21 @@ export const sendResetPassword = async ({
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-  const template = createElement(ResetPasswordTemplate, {
+  // Get translations for the email
+  const translations = await getPasswordResetSuccessTranslations("en", {
+    userName: user.name || undefined,
+  });
+
+  const template = createElement(PasswordResetEmailSimple, {
     assetBaseUrl,
     userEmail: user.email,
     userName: user.name || "",
+    translations,
   });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template),
-    renderEmailWithI18N(template, { plainText: true }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   return await mailer.sendMail({

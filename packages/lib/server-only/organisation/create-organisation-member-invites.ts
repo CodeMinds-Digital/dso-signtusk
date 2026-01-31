@@ -7,7 +7,6 @@ import { nanoid } from "nanoid";
 
 import { syncMemberCountWithStripeSeatPlan } from "@signtusk/ee/server-only/stripe/update-subscription-item-quantity";
 import { mailer } from "@signtusk/email/mailer";
-import { OrganisationInviteEmailTemplate } from "@signtusk/email/templates/organisation-invite";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/organisations";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
@@ -19,7 +18,6 @@ import { getI18nInstance } from "../../client-only/providers/i18n-server";
 import { generateDatabaseId } from "../../universal/id";
 import { validateIfSubscriptionIsRequired } from "../../utils/billing";
 import { buildOrganisationWhereQuery } from "../../utils/organisations";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 import { getEmailContext } from "../email/get-email-context";
 import { getMemberOrganisationRole } from "../team/get-member-roles";
 
@@ -190,14 +188,6 @@ export const sendOrganisationMemberInviteEmail = async ({
   token,
   organisation,
 }: SendOrganisationMemberInviteEmailOptions) => {
-  const template = createElement(OrganisationInviteEmailTemplate, {
-    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    senderName,
-    token,
-    organisationName: organisation.name,
-  });
-
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
     emailType: "INTERNAL",
     source: {
@@ -206,16 +196,32 @@ export const sendOrganisationMemberInviteEmail = async ({
     },
   });
 
+  const inviteLink = `${NEXT_PUBLIC_WEBAPP_URL()}/organisation/invite/${token}`;
+
+  // Get translations for the email
+  const translations = await getOrganisationInviteTranslations(emailLanguage, {
+    organisationName: organisation.name,
+    inviterName: senderName,
+  });
+
+  const template = createElement(OrganisationInviteEmailSimple, {
+    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    organisationName: organisation.name,
+    inviterName: senderName,
+    inviteLink,
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: true,
+          brandingLogo: branding.logo || undefined,
+          brandingCompanyDetails: branding.companyDetails || undefined,
+        }
+      : undefined,
+  });
+
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-    }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-      plainText: true,
-    }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);

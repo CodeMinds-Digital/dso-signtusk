@@ -1,37 +1,45 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import type { Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { SendStatus, SigningStatus } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
-
-import { mailer } from '@signtusk/email/mailer';
-import RecipientRemovedFromDocumentTemplate from '@signtusk/email/templates/recipient-removed-from-document';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@signtusk/lib/types/document-audit-logs';
-import type { TRecipientAccessAuthTypes } from '@signtusk/lib/types/document-auth';
+import { msg } from "@lingui/core/macro";
+import type { Recipient } from "@prisma/client";
 import {
-  type TRecipientActionAuthTypes,
+  EnvelopeType,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from "@prisma/client";
+import { isDeepEqual } from "remeda";
+
+import { mailer } from "@signtusk/email/mailer";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
+import type { TRecipientAccessAuthTypes } from "@signtusk/lib/types/document-auth";
+import {
   ZRecipientAuthOptionsSchema,
-} from '@signtusk/lib/types/document-auth';
-import type { ApiRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { nanoid } from '@signtusk/lib/universal/id';
+  type TRecipientActionAuthTypes,
+} from "@signtusk/lib/types/document-auth";
+import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { nanoid } from "@signtusk/lib/universal/id";
 import {
   createDocumentAuditLogData,
   diffRecipientChanges,
-} from '@signtusk/lib/utils/document-audit-logs';
-import { createRecipientAuthOptions } from '@signtusk/lib/utils/document-auth';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/utils/document-audit-logs";
+import { createRecipientAuthOptions } from "@signtusk/lib/utils/document-auth";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
-import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import {
+  mapSecondaryIdToDocumentId,
+  type EnvelopeIdOptions,
+} from "../../utils/envelope";
+import {
+  canRecipientBeModified,
+  isRecipientEmailValidForSending,
+} from "../../utils/recipients";
+import { getEmailContext } from "../email/get-email-context";
+import { getEnvelopeWhereInput } from "../envelope/get-envelope-by-id";
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -85,30 +93,34 @@ export const setDocumentRecipients = async ({
   });
 
   if (!envelope) {
-    throw new Error('Document not found');
+    throw new Error("Document not found");
   }
 
   if (envelope.completedAt) {
-    throw new Error('Document already complete');
+    throw new Error("Document already complete");
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const recipientsHaveActionAuth = recipients.some(
-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+  if (
+    recipientsHaveActionAuth &&
+    !envelope.team.organisation.organisationClaim.flags.cfr21
+  ) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
+      message: "You do not have permission to set the action auth",
     });
   }
 
@@ -121,12 +133,14 @@ export const setDocumentRecipients = async ({
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) =>
-      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+      !normalizedRecipients.find(
+        (recipient) => recipient.id === existingRecipient.id
+      )
   );
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
     const existing = existingRecipients.find(
-      (existingRecipient) => existingRecipient.id === recipient.id,
+      (existingRecipient) => existingRecipient.id === recipient.id
     );
 
     const canPersistedRecipientBeModified =
@@ -138,7 +152,8 @@ export const setDocumentRecipients = async ({
       !canRecipientBeModified(existing, envelope.fields)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a recipient who has already interacted with the document',
+        message:
+          "Cannot modify a recipient who has already interacted with the document",
       });
     }
 
@@ -152,16 +167,24 @@ export const setDocumentRecipients = async ({
   const persistedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedRecipients.map(async (recipient) => {
-        let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
+        let authOptions = ZRecipientAuthOptionsSchema.parse(
+          recipient._persisted?.authOptions
+        );
 
-        if (recipient.actionAuth !== undefined || recipient.accessAuth !== undefined) {
+        if (
+          recipient.actionAuth !== undefined ||
+          recipient.accessAuth !== undefined
+        ) {
           authOptions = createRecipientAuthOptions({
             accessAuth: recipient.accessAuth || authOptions.accessAuth,
             actionAuth: recipient.actionAuth || authOptions.actionAuth,
           });
         }
 
-        if (recipient._persisted && !recipient.canPersistedRecipientBeModified) {
+        if (
+          recipient._persisted &&
+          !recipient.canPersistedRecipientBeModified
+        ) {
           return {
             ...recipient._persisted,
             clientId: recipient.clientId,
@@ -179,9 +202,14 @@ export const setDocumentRecipients = async ({
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             envelopeId: envelope.id,
-            sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+            sendStatus:
+              recipient.role === RecipientRole.CC
+                ? SendStatus.SENT
+                : SendStatus.NOT_SENT,
             signingStatus:
-              recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+              recipient.role === RecipientRole.CC
+                ? SigningStatus.SIGNED
+                : SigningStatus.NOT_SIGNED,
             authOptions,
           },
           create: {
@@ -191,9 +219,14 @@ export const setDocumentRecipients = async ({
             signingOrder: recipient.signingOrder,
             token: nanoid(),
             envelopeId: envelope.id,
-            sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+            sendStatus:
+              recipient.role === RecipientRole.CC
+                ? SendStatus.SENT
+                : SendStatus.NOT_SENT,
             signingStatus:
-              recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+              recipient.role === RecipientRole.CC
+                ? SigningStatus.SIGNED
+                : SigningStatus.NOT_SIGNED,
             authOptions,
           },
         });
@@ -204,7 +237,8 @@ export const setDocumentRecipients = async ({
         if (
           recipient._persisted &&
           recipient._persisted.role !== recipient.role &&
-          (recipient.role === RecipientRole.CC || recipient.role === RecipientRole.VIEWER)
+          (recipient.role === RecipientRole.CC ||
+            recipient.role === RecipientRole.VIEWER)
         ) {
           await tx.field.deleteMany({
             where: {
@@ -259,7 +293,7 @@ export const setDocumentRecipients = async ({
           ...upsertedRecipient,
           clientId: recipient.clientId,
         };
-      }),
+      })
     );
   });
 
@@ -285,13 +319,13 @@ export const setDocumentRecipients = async ({
               recipientId: recipient.id,
               recipientRole: recipient.role,
             },
-          }),
+          })
         ),
       });
     });
 
     const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-      envelope.documentMeta,
+      envelope.documentMeta
     ).recipientRemoved;
 
     // Send emails to deleted recipients who have emails.
@@ -306,17 +340,36 @@ export const setDocumentRecipients = async ({
           return;
         }
 
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+        const assetBaseUrl =
+          NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-        const template = createElement(RecipientRemovedFromDocumentTemplate, {
+        // Get translations for the email
+        const translations = await getRecipientRemovedFromDocumentTranslations(
+          emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+          {
+            inviterName: user.name || "Unknown",
+            documentName: envelope.title,
+          }
+        );
+
+        const template = createElement(RecipientRemovedFromDocumentSimple, {
           documentName: envelope.title,
           inviterName: user.name || undefined,
           assetBaseUrl,
+          translations,
+          branding: branding
+            ? {
+                brandingEnabled: branding.brandingEnabled,
+                brandingLogo: branding.brandingLogo || undefined,
+                brandingCompanyDetails:
+                  branding.brandingCompanyDetails || undefined,
+              }
+            : undefined,
         });
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+          renderSimple(template),
+          renderSimple(template, { plainText: true }),
         ]);
 
         const i18n = await getI18nInstance(emailLanguage);
@@ -332,28 +385,31 @@ export const setDocumentRecipients = async ({
           html,
           text,
         });
-      }),
+      })
     );
   }
 
   // Filter out recipients that have been removed or have been updated.
-  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
-    const isRemoved = removedRecipients.find(
-      (removedRecipient) => removedRecipient.id === recipient.id,
-    );
-    const isUpdated = persistedRecipients.find(
-      (persistedRecipient) => persistedRecipient.id === recipient.id,
-    );
+  const filteredRecipients: RecipientDataWithClientId[] =
+    existingRecipients.filter((recipient) => {
+      const isRemoved = removedRecipients.find(
+        (removedRecipient) => removedRecipient.id === recipient.id
+      );
+      const isUpdated = persistedRecipients.find(
+        (persistedRecipient) => persistedRecipient.id === recipient.id
+      );
 
-    return !isRemoved && !isUpdated;
-  });
+      return !isRemoved && !isUpdated;
+    });
 
   return {
-    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
-      ...recipient,
-      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-      templateId: null,
-    })),
+    recipients: [...filteredRecipients, ...persistedRecipients].map(
+      (recipient) => ({
+        ...recipient,
+        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+        templateId: null,
+      })
+    ),
   };
 };
 
@@ -375,7 +431,10 @@ type RecipientDataWithClientId = Recipient & {
   clientId?: string | null;
 };
 
-const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
+const hasRecipientBeenChanged = (
+  recipient: Recipient,
+  newRecipientData: RecipientData
+) => {
   const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
   const newRecipientAccessAuth = newRecipientData.accessAuth || [];

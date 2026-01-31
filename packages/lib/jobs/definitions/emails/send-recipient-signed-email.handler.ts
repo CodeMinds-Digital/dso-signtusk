@@ -1,21 +1,22 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { EnvelopeType } from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import { DocumentRecipientSignedEmailTemplate } from '@signtusk/email/templates/document-recipient-signed';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import RecipientSignedEmailSimple from "@signtusk/email/templates/recipient-signed-simple";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { getEmailContext } from '../../../server-only/email/get-email-context';
-import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
-import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../../utils/recipients';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import type { JobRunIO } from '../../client/_internal/job';
-import type { TSendRecipientSignedEmailJobDefinition } from './send-recipient-signed-email';
+import { getI18nInstance } from "../../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
+import { getEmailContext } from "../../../server-only/email/get-email-context";
+import { extractDerivedDocumentEmailSettings } from "../../../types/document-email";
+import { unsafeBuildEnvelopeIdQuery } from "../../../utils/envelope";
+import { getRecipientSignedTranslations } from "../../../utils/get-email-translations";
+import { isRecipientEmailValidForSending } from "../../../utils/recipients";
+import type { JobRunIO } from "../../client/_internal/job";
+import type { TSendRecipientSignedEmailJobDefinition } from "./send-recipient-signed-email";
 
 export const run = async ({
   payload,
@@ -30,10 +31,10 @@ export const run = async ({
     where: {
       ...unsafeBuildEnvelopeIdQuery(
         {
-          type: 'documentId',
+          type: "documentId",
           id: documentId,
         },
-        EnvelopeType.DOCUMENT,
+        EnvelopeType.DOCUMENT
       ),
       recipients: {
         some: {
@@ -59,15 +60,15 @@ export const run = async ({
   });
 
   if (!envelope) {
-    throw new Error('Document not found');
+    throw new Error("Document not found");
   }
 
   if (envelope.recipients.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error("Document has no recipients");
   }
 
   const isRecipientSignedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
+    envelope.documentMeta
   ).recipientSigned;
 
   if (!isRecipientSignedEmailEnabled) {
@@ -81,47 +82,62 @@ export const run = async ({
   const recipientReference = recipientName || recipientEmail;
 
   // Don't send notification if the owner is the one who signed.
-  if (owner.email === recipientEmail || !isRecipientEmailValidForSending(recipient)) {
+  if (
+    owner.email === recipientEmail ||
+    !isRecipientEmailValidForSending(recipient)
+  ) {
     return;
   }
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'team',
+      type: "team",
       teamId: envelope.teamId,
     },
     meta: envelope.documentMeta,
   });
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  const template = createElement(DocumentRecipientSignedEmailTemplate, {
+  // Get translations for the email
+  const translations = await getRecipientSignedTranslations(emailLanguage, {
+    recipientName,
+    documentName: envelope.title,
+  });
+
+  const template = createElement(RecipientSignedEmailSimple, {
     documentName: envelope.title,
     recipientName,
     recipientEmail,
     assetBaseUrl,
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: true,
+          brandingLogo: branding.logo || undefined,
+          brandingCompanyDetails: branding.companyDetails || undefined,
+        }
+      : undefined,
   });
 
-  await io.runTask('send-recipient-signed-email', async () => {
+  await io.runTask("send-recipient-signed-email", async () => {
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
+      renderSimple(template),
+      renderSimple(template, { plainText: true }),
     ]);
 
     await mailer.sendMail({
       to: {
-        name: owner.name ?? '',
+        name: owner.name ?? "",
         address: owner.email,
       },
       from: senderEmail,
-      subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
+      subject: i18n._(
+        msg`${recipientReference} has signed "${envelope.title}"`
+      ),
       html,
       text,
     });

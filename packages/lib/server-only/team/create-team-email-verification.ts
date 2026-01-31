@@ -6,7 +6,6 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { mailer } from "@signtusk/email/mailer";
-import { ConfirmTeamEmailTemplate } from "@signtusk/email/templates/confirm-team-email";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
 import { AppError, AppErrorCode } from "@signtusk/lib/errors/app-error";
@@ -15,7 +14,6 @@ import { prisma } from "@signtusk/prisma";
 
 import { getI18nInstance } from "../../client-only/providers/i18n-server";
 import { env } from "../../utils/env";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 import { buildTeamWhereQuery } from "../../utils/teams";
 import { getEmailContext } from "../email/get-email-context";
 
@@ -119,14 +117,7 @@ export const sendTeamEmailVerificationEmail = async (
   team: Team
 ) => {
   const assetBaseUrl = env("NEXT_PUBLIC_WEBAPP_URL") || "http://localhost:3000";
-
-  const template = createElement(ConfirmTeamEmailTemplate, {
-    assetBaseUrl,
-    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    teamName: team.name,
-    teamUrl: team.url,
-    token,
-  });
+  const confirmationLink = `${NEXT_PUBLIC_WEBAPP_URL()}/team/verify-email/${token}`;
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
     emailType: "INTERNAL",
@@ -136,13 +127,21 @@ export const sendTeamEmailVerificationEmail = async (
     },
   });
 
+  // Get translations for the email
+  const translations = await getConfirmTeamEmailTranslations(emailLanguage, {
+    teamName: team.name,
+  });
+
+  const template = createElement(ConfirmTeamEmailSimple, {
+    assetBaseUrl,
+    teamName: team.name,
+    confirmationLink,
+    translations,
+  });
+
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-      plainText: true,
-    }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);

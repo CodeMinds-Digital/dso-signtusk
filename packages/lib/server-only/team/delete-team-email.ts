@@ -1,18 +1,16 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 
-import { mailer } from '@signtusk/email/mailer';
-import { TeamEmailRemovedTemplate } from '@signtusk/email/templates/team-email-removed';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@signtusk/lib/constants/app';
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@signtusk/lib/constants/teams';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@signtusk/lib/constants/app";
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from "@signtusk/lib/constants/teams";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { env } from '../../utils/env';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { env } from "../../utils/env";
+import { buildTeamWhereQuery } from "../../utils/teams";
+import { getEmailContext } from "../email/get-email-context";
 
 export type DeleteTeamEmailOptions = {
   userId: number;
@@ -25,11 +23,15 @@ export type DeleteTeamEmailOptions = {
  *
  * The user must either be part of the team with the required permissions, or the owner of the email.
  */
-export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamEmailOptions) => {
+export const deleteTeamEmail = async ({
+  userId,
+  userEmail,
+  teamId,
+}: DeleteTeamEmailOptions) => {
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'team',
+      type: "team",
       teamId,
     },
   });
@@ -40,7 +42,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
         buildTeamWhereQuery({
           teamId,
           userId,
-          roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+          roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP["MANAGE_TEAM"],
         }),
         {
           id: teamId,
@@ -72,19 +74,38 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
   });
 
   try {
-    const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
+    const assetBaseUrl =
+      env("NEXT_PUBLIC_WEBAPP_URL") || "http://localhost:3000";
 
-    const template = createElement(TeamEmailRemovedTemplate, {
+    // Get translations for the email
+    const translations = await getTeamEmailRemovedTranslations(
+      emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+      {
+        teamEmail: team.teamEmail?.email ?? "",
+        teamName: team.name,
+      }
+    );
+
+    const template = createElement(TeamEmailRemovedSimple, {
       assetBaseUrl,
       baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-      teamEmail: team.teamEmail?.email ?? '',
+      teamEmail: team.teamEmail?.email ?? "",
       teamName: team.name,
       teamUrl: team.url,
+      translations,
+      branding: branding
+        ? {
+            brandingEnabled: branding.brandingEnabled,
+            brandingLogo: branding.brandingLogo || undefined,
+            brandingCompanyDetails:
+              branding.brandingCompanyDetails || undefined,
+          }
+        : undefined,
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+      renderSimple(template),
+      renderSimple(template, { plainText: true }),
     ]);
 
     const i18n = await getI18nInstance(emailLanguage);
@@ -92,7 +113,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
     await mailer.sendMail({
       to: {
         address: team.organisation.owner.email,
-        name: team.organisation.owner.name ?? '',
+        name: team.organisation.owner.name ?? "",
       },
       from: senderEmail,
       subject: i18n._(msg`Team email has been revoked for ${team.name}`),

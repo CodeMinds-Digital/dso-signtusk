@@ -1,33 +1,34 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { DocumentSource, EnvelopeType } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import { DocumentSource, EnvelopeType } from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import { DocumentCompletedEmailTemplate } from '@signtusk/email/templates/document-completed';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "../../types/document-audit-logs";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import type { RequestMetadata } from "../../universal/extract-request-metadata";
+import { getFileServerSide } from "../../universal/upload/get-file.server";
+import { createDocumentAuditLogData } from "../../utils/document-audit-logs";
+import type { EnvelopeIdOptions } from "../../utils/envelope";
+import { unsafeBuildEnvelopeIdQuery } from "../../utils/envelope";
+import { isRecipientEmailValidForSending } from "../../utils/recipients";
+import { renderCustomEmailTemplate } from "../../utils/render-custom-email-template";
+import { formatDocumentsPath } from "../../utils/teams";
+import { getEmailContext } from "../email/get-email-context";
 
 export interface SendDocumentOptions {
   id: EnvelopeIdOptions;
   requestMetadata?: RequestMetadata;
 }
 
-export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOptions) => {
+export const sendCompletedEmail = async ({
+  id,
+  requestMetadata,
+}: SendDocumentOptions) => {
   const envelope = await prisma.envelope.findUnique({
     where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     include: {
@@ -61,23 +62,25 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
   });
 
   if (!envelope) {
-    throw new Error('Document not found');
+    throw new Error("Document not found");
   }
 
-  const isDirectTemplate = envelope?.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+  const isDirectTemplate =
+    envelope?.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
   if (envelope.recipients.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error("Document has no recipients");
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const { user: owner } = envelope;
 
@@ -87,20 +90,24 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
       const fileNameToUse =
-        envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
+        envelope.internalVersion === 1
+          ? envelope.title
+          : envelopeItem.title + ".pdf";
 
       return {
-        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
+        filename: fileNameToUse.endsWith(".pdf")
+          ? fileNameToUse
+          : fileNameToUse + ".pdf",
         content: Buffer.from(file),
-        contentType: 'application/pdf',
+        contentType: "application/pdf",
       };
-    }),
+    })
   );
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
   let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(
-    envelope.team?.url,
+    envelope.team?.url
   )}/${envelope.id}`;
 
   if (envelope.team?.url) {
@@ -109,9 +116,12 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
     }`;
   }
 
-  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
+  const emailSettings = extractDerivedDocumentEmailSettings(
+    envelope.documentMeta
+  );
   const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
-  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled =
+    emailSettings.ownerDocumentCompleted;
 
   // Send email to document owner if:
   // 1. Owner document completed emails are enabled AND
@@ -120,22 +130,33 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
   //    - Recipient emails are disabled
   if (
     isOwnerDocumentCompletedEmailEnabled &&
-    (!envelope.recipients.find((recipient) => recipient.email === owner.email) ||
+    (!envelope.recipients.find(
+      (recipient) => recipient.email === owner.email
+    ) ||
       !isDocumentCompletedEmailEnabled)
   ) {
-    const template = createElement(DocumentCompletedEmailTemplate, {
+    // Get translations for the email
+    const translations = await getDocumentCompletedTranslations(emailLanguage, {
+      documentName: envelope.title,
+    });
+
+    const template = createElement(DocumentCompletedEmailSimple, {
       documentName: envelope.title,
       assetBaseUrl,
       downloadLink: documentOwnerDownloadLink,
+      translations,
+      branding: branding
+        ? {
+            brandingEnabled: true,
+            brandingLogo: branding.logo || undefined,
+            brandingCompanyDetails: branding.companyDetails || undefined,
+          }
+        : undefined,
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
+      renderSimple(template),
+      renderSimple(template, { plainText: true }),
     ]);
 
     const i18n = await getI18nInstance(emailLanguage);
@@ -143,7 +164,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
     await mailer.sendMail({
       to: [
         {
-          name: owner.name || '',
+          name: owner.name || "",
           address: owner.email,
         },
       ],
@@ -162,11 +183,11 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
         user: null,
         requestMetadata,
         data: {
-          emailType: 'DOCUMENT_COMPLETED',
+          emailType: "DOCUMENT_COMPLETED",
           recipientEmail: owner.email,
-          recipientName: owner.name ?? '',
+          recipientName: owner.name ?? "",
           recipientId: owner.id,
-          recipientRole: 'OWNER',
+          recipientRole: "OWNER",
           isResending: false,
         },
       }),
@@ -178,36 +199,54 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
   }
 
   const recipientsToNotify = envelope.recipients.filter((recipient) =>
-    isRecipientEmailValidForSending(recipient),
+    isRecipientEmailValidForSending(recipient)
   );
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {
       const customEmailTemplate = {
-        'signer.name': recipient.name,
-        'signer.email': recipient.email,
-        'document.name': envelope.title,
+        "signer.name": recipient.name,
+        "signer.email": recipient.email,
+        "document.name": envelope.title,
       };
 
       const downloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}/complete`;
 
-      const template = createElement(DocumentCompletedEmailTemplate, {
+      // Get translations for the email
+      const translations = await getDocumentCompletedTranslations(
+        emailLanguage,
+        {
+          documentName: envelope.title,
+        }
+      );
+
+      const template = createElement(DocumentCompletedEmailSimple, {
         documentName: envelope.title,
         assetBaseUrl,
-        downloadLink: recipient.email === owner.email ? documentOwnerDownloadLink : downloadLink,
+        downloadLink:
+          recipient.email === owner.email
+            ? documentOwnerDownloadLink
+            : downloadLink,
         customBody:
           isDirectTemplate && envelope.documentMeta?.message
-            ? renderCustomEmailTemplate(envelope.documentMeta.message, customEmailTemplate)
+            ? renderCustomEmailTemplate(
+                envelope.documentMeta.message,
+                customEmailTemplate
+              )
             : undefined,
+        translations,
+        branding: branding
+          ? {
+              brandingEnabled: true,
+              brandingLogo: branding.logo || undefined,
+              brandingCompanyDetails: branding.companyDetails || undefined,
+            }
+          : undefined,
       });
 
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
+        renderSimple(template),
+        renderSimple(template, { plainText: true }),
       ]);
 
       const i18n = await getI18nInstance(emailLanguage);
@@ -223,7 +262,10 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
         replyTo: replyToEmail,
         subject:
           isDirectTemplate && envelope.documentMeta?.subject
-            ? renderCustomEmailTemplate(envelope.documentMeta.subject, customEmailTemplate)
+            ? renderCustomEmailTemplate(
+                envelope.documentMeta.subject,
+                customEmailTemplate
+              )
             : i18n._(msg`Signing Complete!`),
         html,
         text,
@@ -237,7 +279,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
           user: null,
           requestMetadata,
           data: {
-            emailType: 'DOCUMENT_COMPLETED',
+            emailType: "DOCUMENT_COMPLETED",
             recipientEmail: recipient.email,
             recipientName: recipient.name,
             recipientId: recipient.id,
@@ -246,6 +288,6 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
           },
         }),
       });
-    }),
+    })
   );
 };

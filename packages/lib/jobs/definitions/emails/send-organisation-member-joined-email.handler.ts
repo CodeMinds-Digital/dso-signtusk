@@ -1,18 +1,19 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 
-import { mailer } from '@signtusk/email/mailer';
-import OrganisationJoinEmailTemplate from '@signtusk/email/templates/organisation-join';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import OrganisationMemberJoinedEmailSimple from "@signtusk/email/templates/organisation-member-joined-simple";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
-import { getEmailContext } from '../../../server-only/email/get-email-context';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import type { JobRunIO } from '../../client/_internal/job';
-import type { TSendOrganisationMemberJoinedEmailJobDefinition } from './send-organisation-member-joined-email';
+import { getI18nInstance } from "../../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from "../../../constants/organisations";
+import { getEmailContext } from "../../../server-only/email/get-email-context";
+import { getOrganisationMemberJoinedTranslations } from "../../../utils/get-email-translations";
+import type { JobRunIO } from "../../client/_internal/job";
+import type { TSendOrganisationMemberJoinedEmailJobDefinition } from "./send-organisation-member-joined-email";
 
 export const run = async ({
   payload,
@@ -32,7 +33,9 @@ export const run = async ({
             some: {
               group: {
                 organisationRole: {
-                  in: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+                  in: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP[
+                    "MANAGE_ORGANISATION"
+                  ],
                 },
               },
             },
@@ -68,9 +71,9 @@ export const run = async ({
   });
 
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
-    emailType: 'INTERNAL',
+    emailType: "INTERNAL",
     source: {
-      type: 'organisation',
+      type: "organisation",
       organisationId: organisation.id,
     },
   });
@@ -83,26 +86,38 @@ export const run = async ({
     await io.runTask(
       `send-organisation-member-joined-email--${invitedMember.id}_${member.id}`,
       async () => {
-        const emailContent = createElement(OrganisationJoinEmailTemplate, {
-          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          memberName: invitedMember.user.name || '',
-          memberEmail: invitedMember.user.email,
-          organisationName: organisation.name,
-          organisationUrl: organisation.url,
-        });
+        const translations = await getOrganisationMemberJoinedTranslations(
+          emailLanguage,
+          {
+            memberName: invitedMember.user.name || "",
+            memberEmail: invitedMember.user.email,
+            organisationName: organisation.name,
+          }
+        );
 
-        // !: Replace with the actual language of the recipient later
+        const emailContent = createElement(
+          OrganisationMemberJoinedEmailSimple,
+          {
+            assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+            baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+            memberName: invitedMember.user.name || "",
+            memberEmail: invitedMember.user.email,
+            organisationName: organisation.name,
+            organisationUrl: organisation.url,
+            translations,
+            branding: branding
+              ? {
+                  brandingEnabled: true,
+                  brandingLogo: branding.logo || undefined,
+                  brandingCompanyDetails: branding.companyDetails || undefined,
+                }
+              : undefined,
+          }
+        );
+
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-          }),
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
+          renderSimple(emailContent),
+          renderSimple(emailContent, { plainText: true }),
         ]);
 
         const i18n = await getI18nInstance(emailLanguage);
@@ -114,7 +129,7 @@ export const run = async ({
           html,
           text,
         });
-      },
+      }
     );
   }
 };

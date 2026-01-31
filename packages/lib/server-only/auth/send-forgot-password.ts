@@ -3,13 +3,14 @@ import { createElement } from "react";
 import { msg } from "@lingui/core/macro";
 
 import { mailer } from "@signtusk/email/mailer";
-import { ForgotPasswordTemplate } from "@signtusk/email/templates/forgot-password";
+import { renderSimple } from "@signtusk/email/render-simple";
+import ForgotPasswordEmailSimple from "@signtusk/email/templates/forgot-password-simple";
 import { prisma } from "@signtusk/prisma";
 
 import { getI18nInstance } from "../../client-only/providers/i18n-server";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
 import { env } from "../../utils/env";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
+import { getForgotPasswordTranslations } from "../../utils/get-email-translations";
 
 export interface SendForgotPasswordOptions {
   userId: number;
@@ -40,14 +41,18 @@ export const sendForgotPassword = async ({
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
   const resetPasswordLink = `${NEXT_PUBLIC_WEBAPP_URL()}/reset-password/${token}`;
 
-  const template = createElement(ForgotPasswordTemplate, {
+  // Get translations for the email
+  const translations = await getForgotPasswordTranslations("en");
+
+  const template = createElement(ForgotPasswordEmailSimple, {
     assetBaseUrl,
     resetPasswordLink,
+    translations,
   });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template),
-    renderEmailWithI18N(template, { plainText: true }),
+    renderSimple(template),
+    renderSimple(template, { plainText: true }),
   ]);
 
   const i18n = await getI18nInstance();

@@ -1,21 +1,27 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { msg } from "@lingui/core/macro";
+import {
+  EnvelopeType,
+  ReadStatus,
+  SendStatus,
+  SigningStatus,
+} from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import DocumentCancelTemplate from '@signtusk/email/templates/document-cancel';
-import { isRecipientEmailValidForSending } from '@signtusk/lib/utils/recipients';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import DocumentCancelledEmailSimple from "@signtusk/email/templates/document-cancelled-simple";
+import { isRecipientEmailValidForSending } from "@signtusk/lib/utils/recipients";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { getEmailContext } from '../../../server-only/email/get-email-context';
-import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
-import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import type { JobRunIO } from '../../client/_internal/job';
-import type { TSendDocumentCancelledEmailsJobDefinition } from './send-document-cancelled-emails';
+import { getI18nInstance } from "../../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
+import { getEmailContext } from "../../../server-only/email/get-email-context";
+import { extractDerivedDocumentEmailSettings } from "../../../types/document-email";
+import { unsafeBuildEnvelopeIdQuery } from "../../../utils/envelope";
+import { getDocumentCancelledTranslations } from "../../../utils/get-email-translations";
+import type { JobRunIO } from "../../client/_internal/job";
+import type { TSendDocumentCancelledEmailsJobDefinition } from "./send-document-cancelled-emails";
 
 export const run = async ({
   payload,
@@ -29,10 +35,10 @@ export const run = async ({
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: unsafeBuildEnvelopeIdQuery(
       {
-        type: 'documentId',
+        type: "documentId",
         id: documentId,
       },
-      EnvelopeType.DOCUMENT,
+      EnvelopeType.DOCUMENT
     ),
     include: {
       user: {
@@ -54,19 +60,21 @@ export const run = async ({
     },
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const { documentMeta, user: documentOwner } = envelope;
 
   // Check if document cancellation emails are enabled
-  const isEmailEnabled = extractDerivedDocumentEmailSettings(documentMeta).documentDeleted;
+  const isEmailEnabled =
+    extractDerivedDocumentEmailSettings(documentMeta).documentDeleted;
 
   if (!isEmailEnabled) {
     return;
@@ -77,29 +85,44 @@ export const run = async ({
   // Send cancellation emails to all recipients who have been sent the document or viewed it
   const recipientsToNotify = envelope.recipients.filter(
     (recipient) =>
-      (recipient.sendStatus === SendStatus.SENT || recipient.readStatus === ReadStatus.OPENED) &&
+      (recipient.sendStatus === SendStatus.SENT ||
+        recipient.readStatus === ReadStatus.OPENED) &&
       recipient.signingStatus !== SigningStatus.REJECTED &&
-      isRecipientEmailValidForSending(recipient),
+      isRecipientEmailValidForSending(recipient)
   );
 
-  await io.runTask('send-cancellation-emails', async () => {
+  await io.runTask("send-cancellation-emails", async () => {
     await Promise.all(
       recipientsToNotify.map(async (recipient) => {
-        const template = createElement(DocumentCancelTemplate, {
+        const translations = await getDocumentCancelledTranslations(
+          emailLanguage,
+          {
+            documentName: envelope.title,
+            inviterName: documentOwner.name || undefined,
+            cancellationReason: cancellationReason || undefined,
+          }
+        );
+
+        const template = createElement(DocumentCancelledEmailSimple, {
           documentName: envelope.title,
           inviterName: documentOwner.name || undefined,
           inviterEmail: documentOwner.email,
           assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          cancellationReason: cancellationReason || 'The document has been cancelled.',
+          cancellationReason:
+            cancellationReason || "The document has been cancelled.",
+          translations,
+          branding: branding
+            ? {
+                brandingEnabled: true,
+                brandingLogo: branding.logo || undefined,
+                brandingCompanyDetails: branding.companyDetails || undefined,
+              }
+            : undefined,
         });
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
+          renderSimple(template),
+          renderSimple(template, { plainText: true }),
         ]);
 
         await mailer.sendMail({
@@ -113,7 +136,7 @@ export const run = async ({
           html,
           text,
         });
-      }),
+      })
     );
   });
 };

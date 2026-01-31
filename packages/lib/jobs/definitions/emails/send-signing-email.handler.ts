@@ -1,6 +1,6 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 import {
   DocumentSource,
   DocumentStatus,
@@ -8,28 +8,29 @@ import {
   OrganisationType,
   RecipientRole,
   SendStatus,
-} from '@prisma/client';
+} from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import DocumentInviteEmailTemplate from '@signtusk/email/templates/document-invite';
-import { isRecipientEmailValidForSending } from '@signtusk/lib/utils/recipients';
-import { prisma } from '@signtusk/prisma';
+import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import DocumentInviteEmailSimple from "@signtusk/email/templates/document-invite-simple";
+import { getDocumentInviteTranslations } from "@signtusk/lib/utils/get-email-translations";
+import { isRecipientEmailValidForSending } from "@signtusk/lib/utils/recipients";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { getI18nInstance } from "../../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '../../../constants/recipient-roles';
-import { getEmailContext } from '../../../server-only/email/get-email-context';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
-import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
-import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import type { JobRunIO } from '../../client/_internal/job';
-import type { TSendSigningEmailJobDefinition } from './send-signing-email';
+} from "../../../constants/recipient-roles";
+import { getEmailContext } from "../../../server-only/email/get-email-context";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "../../../types/document-audit-logs";
+import { extractDerivedDocumentEmailSettings } from "../../../types/document-email";
+import { createDocumentAuditLogData } from "../../../utils/document-audit-logs";
+import { unsafeBuildEnvelopeIdQuery } from "../../../utils/envelope";
+import { renderCustomEmailTemplate } from "../../../utils/render-custom-email-template";
+import type { JobRunIO } from "../../client/_internal/job";
+import type { TSendSigningEmailJobDefinition } from "./send-signing-email";
 
 export const run = async ({
   payload,
@@ -55,10 +56,10 @@ export const run = async ({
       where: {
         ...unsafeBuildEnvelopeIdQuery(
           {
-            type: 'documentId',
+            type: "documentId",
             id: documentId,
           },
-          EnvelopeType.DOCUMENT,
+          EnvelopeType.DOCUMENT
         ),
         status: DocumentStatus.PENDING,
       },
@@ -85,26 +86,34 @@ export const run = async ({
     return;
   }
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
+  const isRecipientSigningRequestEmailEnabled =
+    extractDerivedDocumentEmailSettings(
+      envelope.documentMeta
+    ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
     return;
   }
 
-  const { branding, emailLanguage, settings, organisationType, senderEmail, replyToEmail } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    settings,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+  } = await getEmailContext({
+    emailType: "RECIPIENT",
+    source: {
+      type: "team",
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
   const customEmail = envelope?.documentMeta;
-  const isDirectTemplate = envelope.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+  const isDirectTemplate =
+    envelope.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
   const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -117,76 +126,90 @@ export const run = async ({
     ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
     .toLowerCase();
 
-  let emailMessage = customEmail?.message || '';
+  let emailMessage = customEmail?.message || "";
   let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
 
   if (selfSigner) {
     emailMessage = i18n._(
-      msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`,
+      msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`
     );
     emailSubject = i18n._(msg`Please ${recipientActionVerb} your document`);
   }
 
   if (isDirectTemplate) {
     emailMessage = i18n._(
-      msg`A document was created by your direct template that requires you to ${recipientActionVerb} it.`,
+      msg`A document was created by your direct template that requires you to ${recipientActionVerb} it.`
     );
     emailSubject = i18n._(
-      msg`Please ${recipientActionVerb} this document created by your direct template`,
+      msg`Please ${recipientActionVerb} this document created by your direct template`
     );
   }
 
   if (organisationType === OrganisationType.ORGANISATION) {
-    emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
-    emailMessage = customEmail?.message ?? '';
+    emailSubject = i18n._(
+      msg`${team.name} invited you to ${recipientActionVerb} a document`
+    );
+    emailMessage = customEmail?.message ?? "";
 
     if (!emailMessage) {
-      const inviterName = user.name || '';
+      const inviterName = user.name || "";
 
       emailMessage = i18n._(
         settings.includeSenderDetails
           ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`
-          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
+          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${envelope.title}".`
       );
     }
   }
 
   const customEmailTemplate = {
-    'signer.name': name,
-    'signer.email': email,
-    'document.name': envelope.title,
+    "signer.name": name,
+    "signer.email": email,
+    "document.name": envelope.title,
   };
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
-  const template = createElement(DocumentInviteEmailTemplate, {
+  // Get translations for the email
+  const translations = await getDocumentInviteTranslations(
+    emailLanguage,
+    recipient.role,
+    {
+      recipientName: recipient.name,
+      inviterName: user.name || user.email,
+      documentName: envelope.title,
+    }
+  );
+
+  // Create simple template with all data as props (no React hooks!)
+  const template = createElement(DocumentInviteEmailSimple, {
     documentName: envelope.title,
-    inviterName: user.name || undefined,
+    inviterName: user.name || user.email,
     inviterEmail:
       organisationType === OrganisationType.ORGANISATION
         ? team?.teamEmail?.email || user.email
         : user.email,
+    recipientName: recipient.name,
+    recipientRole: recipient.role,
+    signDocumentActionUrl: signDocumentLink,
     assetBaseUrl,
-    signDocumentLink,
-    customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-    role: recipient.role,
-    selfSigner,
-    organisationType,
-    teamName: team?.name,
-    teamEmail: team?.teamEmail?.email,
-    includeSenderDetails: settings.includeSenderDetails,
+    translations,
+    branding: branding
+      ? {
+          brandingEnabled: true,
+          brandingLogo: branding.logo || undefined,
+          brandingCompanyDetails: branding.companyDetails || undefined,
+        }
+      : undefined,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {
-    await io.runTask('send-signing-email', async () => {
+    await io.runTask("send-signing-email", async () => {
+      // Use renderSimple - no React hooks, no issues!
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
+        renderSimple(template),
+        renderSimple(template, { plainText: true }),
       ]);
 
       await mailer.sendMail({
@@ -198,7 +221,7 @@ export const run = async ({
         replyTo: replyToEmail,
         subject: renderCustomEmailTemplate(
           documentMeta?.subject || emailSubject,
-          customEmailTemplate,
+          customEmailTemplate
         ),
         html,
         text,
@@ -206,7 +229,7 @@ export const run = async ({
     });
   }
 
-  await io.runTask('update-recipient', async () => {
+  await io.runTask("update-recipient", async () => {
     await prisma.recipient.update({
       where: {
         id: recipient.id,
@@ -217,7 +240,7 @@ export const run = async ({
     });
   });
 
-  await io.runTask('store-audit-log', async () => {
+  await io.runTask("store-audit-log", async () => {
     await prisma.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
