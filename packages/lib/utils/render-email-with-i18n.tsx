@@ -1,5 +1,5 @@
-import type { SimpleRenderOptions } from "@signtusk/email/render-simple";
-import { renderSimple } from "@signtusk/email/render-simple";
+import type { RenderWithI18nWrapperOptions } from "@signtusk/email/render-with-i18n-wrapper";
+import { renderWithI18nWrapper } from "@signtusk/email/render-with-i18n-wrapper";
 
 import { getI18nInstance } from "../client-only/providers/i18n-server";
 import {
@@ -8,8 +8,8 @@ import {
   type SupportedLanguageCodes,
 } from "../constants/i18n";
 
-// Extend SimpleRenderOptions to include branding and lang
-export type RenderEmailOptions = SimpleRenderOptions & {
+// Extend options to include lang and branding
+export type RenderEmailOptions = Omit<RenderWithI18nWrapperOptions, "i18n"> & {
   // eslint-disable-next-line @typescript-eslint/ban-types
   lang?: SupportedLanguageCodes | (string & {});
   branding?: any; // Accept branding but ignore it for now
@@ -30,9 +30,9 @@ export const renderEmailWithI18N = async (
 
     i18n.activate(lang);
 
-    // Use renderSimple to avoid React context issues with I18nProvider in serverless environments
-    // Note: branding is ignored in simple render mode
-    return renderSimple(component, otherOptions);
+    // Use renderWithI18nWrapper which properly wraps in I18nProvider
+    // This allows useLingui() hooks to work in email templates
+    return renderWithI18nWrapper(component, { i18n, ...otherOptions });
   } catch (err) {
     console.error(err);
     throw new Error("Failed to render email");
