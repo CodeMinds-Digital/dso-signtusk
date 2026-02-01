@@ -1,35 +1,31 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
+import { msg } from "@lingui/core/macro";
 import {
   DocumentStatus,
   EnvelopeType,
   OrganisationType,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from "@prisma/client";
 
-import { mailer } from '@signtusk/email/mailer';
-import { DocumentInviteEmailTemplate } from '@signtusk/email/templates/document-invite';
+import { mailer } from "@signtusk/email/mailer";
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '@signtusk/lib/constants/recipient-roles';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@signtusk/lib/types/document-audit-logs';
-import type { ApiRequestMetadata } from '@signtusk/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@signtusk/lib/utils/document-audit-logs';
-import { renderCustomEmailTemplate } from '@signtusk/lib/utils/render-custom-email-template';
-import { prisma } from '@signtusk/prisma';
+} from "@signtusk/lib/constants/recipient-roles";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
+import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
+import { createDocumentAuditLogData } from "@signtusk/lib/utils/document-audit-logs";
+import { renderCustomEmailTemplate } from "@signtusk/lib/utils/render-custom-email-template";
+import { prisma } from "@signtusk/prisma";
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { isDocumentCompleted } from '../../utils/document';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import { isDocumentCompleted } from "../../utils/document";
+import type { EnvelopeIdOptions } from "../../utils/envelope";
+import { isRecipientEmailValidForSending } from "../../utils/recipients";
+import { getEmailContext } from "../email/get-email-context";
+import { getEnvelopeWhereInput } from "../envelope/get-envelope-by-id";
 
 export type ResendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -79,47 +75,57 @@ export const resendDocument = async ({
   });
 
   if (!envelope) {
-    throw new Error('Document not found');
+    throw new Error("Document not found");
   }
 
   if (envelope.recipients.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error("Document has no recipients");
   }
 
   if (envelope.status === DocumentStatus.DRAFT) {
-    throw new Error('Can not send draft document');
+    throw new Error("Can not send draft document");
   }
 
   if (isDocumentCompleted(envelope.status)) {
-    throw new Error('Can not send completed document');
+    throw new Error("Can not send completed document");
   }
 
   const recipientsToRemind = envelope.recipients.filter(
     (recipient) =>
-      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+      recipients.includes(recipient.id) &&
+      recipient.signingStatus === SigningStatus.NOT_SIGNED
   );
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
+  const isRecipientSigningRequestEmailEnabled =
+    extractDerivedDocumentEmailSettings(
+      envelope.documentMeta
+    ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
     return envelope;
   }
 
-  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+  } = await getEmailContext({
+    emailType: "RECIPIENT",
+    source: {
+      type: "team",
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
   await Promise.all(
     recipientsToRemind.map(async (recipient) => {
-      if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
+      if (
+        recipient.role === RecipientRole.CC ||
+        !isRecipientEmailValidForSending(recipient)
+      ) {
         return;
       }
 
@@ -134,62 +140,96 @@ export const resendDocument = async ({
         ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
         .toLowerCase();
 
-      let emailMessage = envelope.documentMeta.message || '';
-      let emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} this document`);
+      let emailMessage = envelope.documentMeta.message || "";
+      let emailSubject = i18n._(
+        msg`Reminder: Please ${recipientActionVerb} this document`
+      );
 
       if (selfSigner) {
         emailMessage = i18n._(
-          msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`,
+          msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`
         );
-        emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} your document`);
+        emailSubject = i18n._(
+          msg`Reminder: Please ${recipientActionVerb} your document`
+        );
       }
 
       if (organisationType === OrganisationType.ORGANISATION) {
         emailSubject = i18n._(
-          msg`Reminder: ${envelope.team.name} invited you to ${recipientActionVerb} a document`,
+          msg`Reminder: ${envelope.team.name} invited you to ${recipientActionVerb} a document`
         );
         emailMessage =
           envelope.documentMeta.message ||
           i18n._(
-            msg`${user.name || user.email} on behalf of "${envelope.team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
+            msg`${user.name || user.email} on behalf of "${envelope.team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`
           );
       }
 
       const customEmailTemplate = {
-        'signer.name': name,
-        'signer.email': email,
-        'document.name': envelope.title,
+        "signer.name": name,
+        "signer.email": email,
+        "document.name": envelope.title,
       };
 
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
       const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
-      const template = createElement(DocumentInviteEmailTemplate, {
-        documentName: envelope.title,
-        inviterName: user.name || undefined,
-        inviterEmail:
-          organisationType === OrganisationType.ORGANISATION
-            ? envelope.team?.teamEmail?.email || user.email
-            : user.email,
-        assetBaseUrl,
-        signDocumentLink,
-        customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-        role: recipient.role,
-        selfSigner,
-        organisationType,
-        teamName: envelope.team?.name,
-      });
+      // Get translations
+      const translations = await getDocumentInviteTranslations(
+        emailLanguage,
+        recipient.role,
+        {
+          recipientName: name,
+          inviterName: user.name || user.email,
+          documentName: envelope.title,
+        }
+      );
 
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
+        renderSimple(DocumentInviteEmailTemplateSimple, {
+          documentName: envelope.title,
+          inviterName: user.name || undefined,
+          inviterEmail:
+            organisationType === OrganisationType.ORGANISATION
+              ? envelope.team?.teamEmail?.email || user.email
+              : user.email,
+          assetBaseUrl,
+          signDocumentLink,
+          customBody: renderCustomEmailTemplate(
+            emailMessage,
+            customEmailTemplate
+          ),
+          role: recipient.role,
+          selfSigner,
+          organisationType,
+          teamName: envelope.team?.name,
           branding,
+          translations,
         }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
+        renderSimple(
+          DocumentInviteEmailTemplateSimple,
+          {
+            documentName: envelope.title,
+            inviterName: user.name || undefined,
+            inviterEmail:
+              organisationType === OrganisationType.ORGANISATION
+                ? envelope.team?.teamEmail?.email || user.email
+                : user.email,
+            assetBaseUrl,
+            signDocumentLink,
+            customBody: renderCustomEmailTemplate(
+              emailMessage,
+              customEmailTemplate
+            ),
+            role: recipient.role,
+            selfSigner,
+            organisationType,
+            teamName: envelope.team?.name,
+            branding,
+            translations,
+          },
+          { plainText: true }
+        ),
       ]);
 
       await prisma.$transaction(
@@ -204,7 +244,7 @@ export const resendDocument = async ({
             subject: envelope.documentMeta.subject
               ? renderCustomEmailTemplate(
                   i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
-                  customEmailTemplate,
+                  customEmailTemplate
                 )
               : emailSubject,
             html,
@@ -227,9 +267,9 @@ export const resendDocument = async ({
             }),
           });
         },
-        { timeout: 30_000 },
+        { timeout: 30_000 }
       );
-    }),
+    })
   );
 
   return envelope;

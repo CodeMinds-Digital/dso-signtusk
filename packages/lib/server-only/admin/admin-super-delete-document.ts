@@ -1,22 +1,18 @@
-import { createElement } from 'react';
+import { msg } from "@lingui/core/macro";
+import { DocumentStatus, SendStatus } from "@prisma/client";
 
-import { msg } from '@lingui/core/macro';
-import { DocumentStatus, SendStatus } from '@prisma/client';
+import { mailer } from "@signtusk/email/mailer";
+import { prisma } from "@signtusk/prisma";
 
-import { mailer } from '@signtusk/email/mailer';
-import DocumentCancelTemplate from '@signtusk/email/templates/document-cancel';
-import { prisma } from '@signtusk/prisma';
-
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from "../../client-only/providers/i18n-server";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
+import { AppError, AppErrorCode } from "../../errors/app-error";
+import { DOCUMENT_AUDIT_LOG_TYPE } from "../../types/document-audit-logs";
+import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
+import type { RequestMetadata } from "../../universal/extract-request-metadata";
+import { createDocumentAuditLogData } from "../../utils/document-audit-logs";
+import { isRecipientEmailValidForSending } from "../../utils/recipients";
+import { getEmailContext } from "../email/get-email-context";
 
 export type AdminSuperDeleteDocumentOptions = {
   envelopeId: string;
@@ -46,27 +42,28 @@ export const adminSuperDeleteDocument = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: "Document not found",
     });
   }
 
-  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, settings, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: "RECIPIENT",
+      source: {
+        type: "team",
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const { status, user } = envelope;
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
+    envelope.documentMeta
   ).documentDeleted;
 
   const recipientsToNotify = envelope.recipients.filter((recipient) =>
-    isRecipientEmailValidForSending(recipient),
+    isRecipientEmailValidForSending(recipient)
   );
 
   // if the document is pending, send cancellation emails to all recipients
@@ -81,23 +78,39 @@ export const adminSuperDeleteDocument = async ({
           return;
         }
 
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-        const template = createElement(DocumentCancelTemplate, {
+        const assetBaseUrl =
+          NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
+
+        const lang =
+          envelope.documentMeta?.language ?? settings.documentLanguage;
+
+        // Get translations
+        const translations = await getDocumentCancelledTranslations(lang, {
           documentName: envelope.title,
           inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
         });
 
-        const lang = envelope.documentMeta?.language ?? settings.documentLanguage;
-
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang, branding }),
-          renderEmailWithI18N(template, {
-            lang,
+          renderSimple(DocumentCancelledEmailTemplateSimple, {
+            documentName: envelope.title,
+            inviterName: user.name || undefined,
+            inviterEmail: user.email,
+            assetBaseUrl,
             branding,
-            plainText: true,
+            translations,
           }),
+          renderSimple(
+            DocumentCancelledEmailTemplateSimple,
+            {
+              documentName: envelope.title,
+              inviterName: user.name || undefined,
+              inviterEmail: user.email,
+              assetBaseUrl,
+              branding,
+              translations,
+            },
+            { plainText: true }
+          ),
         ]);
 
         const i18n = await getI18nInstance(lang);
@@ -113,7 +126,7 @@ export const adminSuperDeleteDocument = async ({
           html,
           text,
         });
-      }),
+      })
     );
   }
 
@@ -126,7 +139,7 @@ export const adminSuperDeleteDocument = async ({
         user,
         requestMetadata,
         data: {
-          type: 'HARD',
+          type: "HARD",
         },
       }),
     });

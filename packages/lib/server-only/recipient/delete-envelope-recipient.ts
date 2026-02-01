@@ -1,9 +1,9 @@
-import { createElement } from "react";
-
 import { msg } from "@lingui/core/macro";
 import { EnvelopeType, SendStatus } from "@prisma/client";
 
 import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import { RecipientRemovedFromDocumentSimple } from "@signtusk/email/templates/recipient-removed-from-document-simple";
 import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
 import type { ApiRequestMetadata } from "@signtusk/lib/universal/extract-request-metadata";
 import { prisma } from "@signtusk/prisma";
@@ -13,6 +13,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "../../constants/app";
 import { AppError, AppErrorCode } from "../../errors/app-error";
 import { extractDerivedDocumentEmailSettings } from "../../types/document-email";
 import { createDocumentAuditLogData } from "../../utils/document-audit-logs";
+import { getRecipientRemovedFromDocumentTranslations } from "../../utils/get-email-translations";
 import {
   canRecipientBeModified,
   isRecipientEmailValidForSending,
@@ -160,31 +161,32 @@ export const deleteEnvelopeRecipient = async ({
 
     // Get translations for the email
     const translations = await getRecipientRemovedFromDocumentTranslations(
-      emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+      emailLanguage,
       {
         inviterName: envelope.team?.name || user.name || "Unknown",
         documentName: envelope.title,
       }
     );
 
-    const template = createElement(RecipientRemovedFromDocumentSimple, {
-      documentName: envelope.title,
-      inviterName: envelope.team?.name || user.name || undefined,
-      assetBaseUrl,
-      translations,
-      branding: branding
-        ? {
-            brandingEnabled: branding.brandingEnabled,
-            brandingLogo: branding.brandingLogo || undefined,
-            brandingCompanyDetails:
-              branding.brandingCompanyDetails || undefined,
-          }
-        : undefined,
-    });
-
     const [html, text] = await Promise.all([
-      renderSimple(template),
-      renderSimple(template, { plainText: true }),
+      renderSimple(RecipientRemovedFromDocumentSimple, {
+        documentName: envelope.title,
+        inviterName: envelope.team?.name || user.name || undefined,
+        assetBaseUrl,
+        translations,
+        branding,
+      }),
+      renderSimple(
+        RecipientRemovedFromDocumentSimple,
+        {
+          documentName: envelope.title,
+          inviterName: envelope.team?.name || user.name || undefined,
+          assetBaseUrl,
+          translations,
+          branding,
+        },
+        { plainText: true }
+      ),
     ]);
 
     const i18n = await getI18nInstance(emailLanguage);

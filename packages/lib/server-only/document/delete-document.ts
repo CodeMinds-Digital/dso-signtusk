@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 import { msg } from "@lingui/core/macro";
 import type { DocumentMeta, Envelope, Recipient, User } from "@prisma/client";
 import {
@@ -10,7 +8,6 @@ import {
 } from "@prisma/client";
 
 import { mailer } from "@signtusk/email/mailer";
-import DocumentCancelTemplate from "@signtusk/email/templates/document-cancel";
 import { prisma } from "@signtusk/prisma";
 
 import { getI18nInstance } from "../../client-only/providers/i18n-server";
@@ -30,7 +27,6 @@ import {
   type EnvelopeIdOptions,
 } from "../../utils/envelope";
 import { isRecipientEmailValidForSending } from "../../utils/recipients";
-import { renderEmailWithI18N } from "../../utils/render-email-with-i18n";
 import { getEmailContext } from "../email/get-email-context";
 import { getMemberRoles } from "../team/get-member-roles";
 import { triggerWebhook } from "../webhooks/trigger/trigger-webhook";
@@ -235,20 +231,36 @@ const handleDocumentOwnerDelete = async ({
         const assetBaseUrl =
           NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-        const template = createElement(DocumentCancelTemplate, {
-          documentName: envelope.title,
-          inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
-        });
+        // Get translations
+        const translations = await getDocumentCancelledTranslations(
+          emailLanguage,
+          {
+            documentName: envelope.title,
+            inviterName: user.name || undefined,
+          }
+        );
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, {
-            lang: emailLanguage,
+          renderSimple(DocumentCancelledEmailTemplateSimple, {
+            documentName: envelope.title,
+            inviterName: user.name || undefined,
+            inviterEmail: user.email,
+            assetBaseUrl,
             branding,
-            plainText: true,
+            translations,
           }),
+          renderSimple(
+            DocumentCancelledEmailTemplateSimple,
+            {
+              documentName: envelope.title,
+              inviterName: user.name || undefined,
+              inviterEmail: user.email,
+              assetBaseUrl,
+              branding,
+              translations,
+            },
+            { plainText: true }
+          ),
         ]);
 
         const i18n = await getI18nInstance(emailLanguage);

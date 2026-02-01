@@ -1,10 +1,10 @@
-import { createElement } from "react";
-
 import { msg } from "@lingui/macro";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 
 import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import { BulkSendCompleteEmailSimple } from "@signtusk/email/templates/bulk-send-complete-simple";
 import { sendDocument } from "@signtusk/lib/server-only/document/send-document";
 import { createDocumentFromTemplate } from "@signtusk/lib/server-only/template/create-document-from-template";
 import { getTemplateById } from "@signtusk/lib/server-only/template/get-template-by-id";
@@ -14,6 +14,7 @@ import { getI18nInstance } from "../../../client-only/providers/i18n-server";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../../../constants/app";
 import { AppError } from "../../../errors/app-error";
 import { getEmailContext } from "../../../server-only/email/get-email-context";
+import { getBulkSendCompleteTranslations } from "../../../utils/get-email-translations";
 import type { JobRunIO } from "../../client/_internal/job";
 import type { TBulkSendTemplateJobDefinition } from "./bulk-send-template";
 
@@ -190,39 +191,41 @@ export const run = async ({
     });
 
     // Get translations for the email
-    const translations = await getBulkSendCompleteTranslations(
-      emailLanguage as import("../../../constants/i18n").SupportedLanguageCodes,
-      {
-        userName: user.name || user.email,
-        templateName: template.title,
-      }
-    );
-
-    const completionTemplate = createElement(BulkSendCompleteEmailSimple, {
+    const translations = await getBulkSendCompleteTranslations(emailLanguage, {
       userName: user.name || user.email,
       templateName: template.title,
-      totalProcessed: rows.length,
-      successCount: results.success,
-      failedCount: results.failed,
-      errors: results.errors,
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-      translations,
-      branding: branding
-        ? {
-            brandingEnabled: branding.brandingEnabled,
-            brandingLogo: branding.brandingLogo || undefined,
-            brandingCompanyDetails:
-              branding.brandingCompanyDetails || undefined,
-          }
-        : undefined,
     });
 
-    const i18n = await getI18nInstance(emailLanguage);
-
     const [html, text] = await Promise.all([
-      renderSimple(completionTemplate),
-      renderSimple(completionTemplate, { plainText: true }),
+      renderSimple(BulkSendCompleteEmailSimple, {
+        userName: user.name || user.email,
+        templateName: template.title,
+        totalProcessed: rows.length,
+        successCount: results.success,
+        failedCount: results.failed,
+        errors: results.errors,
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+        translations,
+        branding,
+      }),
+      renderSimple(
+        BulkSendCompleteEmailSimple,
+        {
+          userName: user.name || user.email,
+          templateName: template.title,
+          totalProcessed: rows.length,
+          successCount: results.success,
+          failedCount: results.failed,
+          errors: results.errors,
+          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+          translations,
+          branding,
+        },
+        { plainText: true }
+      ),
     ]);
+
+    const i18n = await getI18nInstance(emailLanguage);
 
     await mailer.sendMail({
       to: {

@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 import { msg } from "@lingui/core/macro";
 import { EnvelopeType } from "@prisma/client";
 
@@ -79,18 +77,28 @@ export const sendPendingEmail = async ({
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-  const template = createElement(DocumentPendingEmailTemplate, {
+  // Get translations
+  const translations = await getDocumentPendingTranslations(emailLanguage, {
     documentName: envelope.title,
-    assetBaseUrl,
   });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
+    renderSimple(DocumentPendingEmailTemplateSimple, {
+      documentName: envelope.title,
+      assetBaseUrl,
       branding,
-      plainText: true,
+      translations,
     }),
+    renderSimple(
+      DocumentPendingEmailTemplateSimple,
+      {
+        documentName: envelope.title,
+        assetBaseUrl,
+        branding,
+        translations,
+      },
+      { plainText: true }
+    ),
   ]);
 
   const i18n = await getI18nInstance(emailLanguage);

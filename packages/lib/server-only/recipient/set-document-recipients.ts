@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 import { msg } from "@lingui/core/macro";
 import type { Recipient } from "@prisma/client";
 import {
@@ -11,6 +9,8 @@ import {
 import { isDeepEqual } from "remeda";
 
 import { mailer } from "@signtusk/email/mailer";
+import { renderSimple } from "@signtusk/email/render-simple";
+import { RecipientRemovedFromDocumentSimple } from "@signtusk/email/templates/recipient-removed-from-document-simple";
 import { DOCUMENT_AUDIT_LOG_TYPE } from "@signtusk/lib/types/document-audit-logs";
 import type { TRecipientAccessAuthTypes } from "@signtusk/lib/types/document-auth";
 import {
@@ -34,6 +34,7 @@ import {
   mapSecondaryIdToDocumentId,
   type EnvelopeIdOptions,
 } from "../../utils/envelope";
+import { getRecipientRemovedFromDocumentTranslations } from "../../utils/get-email-translations";
 import {
   canRecipientBeModified,
   isRecipientEmailValidForSending,
@@ -345,31 +346,32 @@ export const setDocumentRecipients = async ({
 
         // Get translations for the email
         const translations = await getRecipientRemovedFromDocumentTranslations(
-          emailLanguage as import("../../constants/i18n").SupportedLanguageCodes,
+          emailLanguage,
           {
             inviterName: user.name || "Unknown",
             documentName: envelope.title,
           }
         );
 
-        const template = createElement(RecipientRemovedFromDocumentSimple, {
-          documentName: envelope.title,
-          inviterName: user.name || undefined,
-          assetBaseUrl,
-          translations,
-          branding: branding
-            ? {
-                brandingEnabled: branding.brandingEnabled,
-                brandingLogo: branding.brandingLogo || undefined,
-                brandingCompanyDetails:
-                  branding.brandingCompanyDetails || undefined,
-              }
-            : undefined,
-        });
-
         const [html, text] = await Promise.all([
-          renderSimple(template),
-          renderSimple(template, { plainText: true }),
+          renderSimple(RecipientRemovedFromDocumentSimple, {
+            documentName: envelope.title,
+            inviterName: user.name || undefined,
+            assetBaseUrl,
+            translations,
+            branding,
+          }),
+          renderSimple(
+            RecipientRemovedFromDocumentSimple,
+            {
+              documentName: envelope.title,
+              inviterName: user.name || undefined,
+              assetBaseUrl,
+              translations,
+              branding,
+            },
+            { plainText: true }
+          ),
         ]);
 
         const i18n = await getI18nInstance(emailLanguage);
