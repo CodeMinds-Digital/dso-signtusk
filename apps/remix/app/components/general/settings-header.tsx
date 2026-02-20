@@ -19,17 +19,17 @@ export const SettingsHeader = ({
 }: SettingsHeaderProps) => {
   return (
     <>
-      <div className={cn('flex flex-row items-center justify-between', className)}>
+      <div className={cn('flex flex-row items-start justify-between gap-4', className)}>
         <div>
-          <h3 className="text-lg font-medium">{title}</h3>
+          <h3 className="text-base font-semibold tracking-tight">{title}</h3>
 
-          <p className="text-muted-foreground text-sm md:mt-2">{subtitle}</p>
+          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{subtitle}</p>
         </div>
 
         {children}
       </div>
 
-      {!hideDivider && <hr className="my-4" />}
+      {!hideDivider && <hr className="my-5" />}
     </>
   );
 };

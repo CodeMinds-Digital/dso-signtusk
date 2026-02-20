@@ -54,7 +54,7 @@ export default function OrganisationSettingsEmailDomains() {
               <Trans>Email Domains</Trans>
             </AlertTitle>
 
-            <AlertDescription className="mr-2">
+            <AlertDescription>
               <Trans>
                 Currently email domains can only be configured for Platform and above plans.
               </Trans>

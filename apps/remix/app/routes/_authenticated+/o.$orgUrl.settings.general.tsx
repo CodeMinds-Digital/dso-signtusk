@@ -38,7 +38,7 @@ export default function OrganisationSettingsGeneral() {
         organisation.currentOrganisationRole,
       ) && (
         <>
-          <hr className="my-4" />
+          <div className="mt-6" />
 
           <Alert
             className="flex flex-col justify-between p-6 sm:flex-row sm:items-center"
@@ -49,7 +49,7 @@ export default function OrganisationSettingsGeneral() {
                 <Trans>Delete organisation</Trans>
               </AlertTitle>
 
-              <AlertDescription className="mr-2">
+              <AlertDescription>
                 <Trans>
                   This organisation, and any associated data will be permanently deleted.
                 </Trans>

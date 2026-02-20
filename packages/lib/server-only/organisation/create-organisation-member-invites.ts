@@ -199,7 +199,7 @@ export const sendOrganisationMemberInviteEmail = async ({
   const inviteLink = `${NEXT_PUBLIC_WEBAPP_URL()}/organisation/invite/${token}`;
 
   // Get translations for the email
-  const translations = await getOrganisationInviteTranslations(emailLanguage, {
+  const translations = await getOrganisationInviteTranslations(emailLanguage as any, {
     organisationName: organisation.name,
     inviterName: senderName,
   });
@@ -213,8 +213,8 @@ export const sendOrganisationMemberInviteEmail = async ({
     branding: branding
       ? {
           brandingEnabled: true,
-          brandingLogo: branding.logo || undefined,
-          brandingCompanyDetails: branding.companyDetails || undefined,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
         }
       : undefined,
   });
@@ -224,7 +224,7 @@ export const sendOrganisationMemberInviteEmail = async ({
     renderSimple(template, { plainText: true }),
   ]);
 
-  const i18n = await getI18nInstance(emailLanguage);
+  const i18n = await getI18nInstance(emailLanguage as any);
 
   await mailer.sendMail({
     to: email,

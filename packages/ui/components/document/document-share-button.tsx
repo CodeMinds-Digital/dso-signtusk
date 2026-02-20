@@ -130,7 +130,7 @@ export const DocumentShareButton = ({
             className={cn('h-11 w-full max-w-lg flex-1', className)}
             loading={isLoading}
           >
-            {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
+            {!isLoading && <Sparkles className="h-5 w-5" />}
             <Trans>Share</Trans>
           </Button>
         )}
@@ -154,11 +154,11 @@ export const DocumentShareButton = ({
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
             I just {token ? 'signed' : 'sent'} a document in style with{' '}
-            <span className="font-medium text-blue-400">@signtusk</span>
+            <span className="font-medium text-primary">@signtusk</span>
             . Check it out!
             <span className="mt-2 block" />
             <span
-              className={cn('break-all font-medium text-blue-400', {
+              className={cn('break-all font-medium text-primary', {
                 'animate-pulse': !shareLink?.slug,
               })}
             >
@@ -184,12 +184,12 @@ export const DocumentShareButton = ({
 
           <div className="mt-6 flex items-center gap-4">
             <Button variant="outline" className="flex-1" onClick={onTweetClick}>
-              <FaXTwitter className="mr-2 h-4 w-4" />
+              <FaXTwitter className="h-4 w-4" />
               Tweet
             </Button>
 
             <Button variant="outline" className="flex-1" onClick={onCopyClick}>
-              <Copy className="mr-2 h-4 w-4" />
+              <Copy className="h-4 w-4" />
               <Trans>Copy Link</Trans>
             </Button>
           </div>

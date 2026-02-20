@@ -123,97 +123,91 @@ export default function DocumentsPage() {
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.DOCUMENT}>
-      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-6">
         <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
-          <div className="flex flex-row items-center">
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+        {/* ── Page header ── */}
+        <div className="mt-6 mb-5 flex flex-wrap items-center justify-between gap-4 border-b pb-5">
+          <div className="flex items-center gap-3">
+            <Avatar className="border-border h-9 w-9 border">
               {team.avatarImageId && (
                 <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
               )}
-              <AvatarFallback className="text-muted-foreground text-xs">
+              <AvatarFallback className="text-muted-foreground text-xs font-medium">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
-
-            <h2 className="text-4xl font-semibold">
+            <h1 className="text-xl font-semibold tracking-tight">
               <Trans>Documents</Trans>
-            </h2>
+            </h1>
           </div>
 
-          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-            <Tabs
-              value={findDocumentSearchParams.status || "ALL"}
-              className="overflow-x-auto"
-            >
-              <TabsList>
-                {[
-                  ExtendedDocumentStatus.INBOX,
-                  ExtendedDocumentStatus.PENDING,
-                  ExtendedDocumentStatus.COMPLETED,
-                  ExtendedDocumentStatus.DRAFT,
-                  ExtendedDocumentStatus.ALL,
-                ]
-                  .filter((value) => {
-                    if (organisation.type === OrganisationType.PERSONAL) {
-                      return value !== ExtendedDocumentStatus.INBOX;
-                    }
-
-                    return true;
-                  })
-                  .map((value) => (
-                    <TabsTrigger
-                      key={value}
-                      className="hover:text-foreground min-w-[60px]"
-                      value={value}
-                      asChild
-                    >
-                      <Link to={getTabHref(value)} preventScrollReset>
-                        <DocumentStatus status={value} />
-
-                        {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">
-                            {stats[value]}
-                          </span>
-                        )}
-                      </Link>
-                    </TabsTrigger>
-                  ))}
-              </TabsList>
-            </Tabs>
-
+          {/* ── Filters ── */}
+          <div className="flex flex-wrap items-center gap-2">
             {team && <DocumentsTableSenderFilter teamId={team.id} />}
-
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <PeriodSelector />
-            </div>
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <DocumentSearch initialValue={findDocumentSearchParams.query} />
-            </div>
+            <PeriodSelector />
+            <DocumentSearch initialValue={findDocumentSearchParams.query} />
           </div>
         </div>
 
-        <div className="mt-8">
-          <div>
-            {data && data.count === 0 ? (
-              <DocumentsTableEmptyState
-                status={
-                  findDocumentSearchParams.status || ExtendedDocumentStatus.ALL
-                }
-              />
-            ) : (
-              <DocumentsTable
-                data={data}
-                isLoading={isLoading}
-                isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
-                  setIsMovingDocument(true);
-                }}
-              />
-            )}
-          </div>
+        {/* ── Status tabs ── */}
+        <div className="mb-6">
+          <Tabs
+            value={findDocumentSearchParams.status || "ALL"}
+            className="w-full overflow-x-auto"
+          >
+            <TabsList className="h-9 gap-0.5 rounded-lg p-1">
+              {[
+                ExtendedDocumentStatus.INBOX,
+                ExtendedDocumentStatus.PENDING,
+                ExtendedDocumentStatus.COMPLETED,
+                ExtendedDocumentStatus.DRAFT,
+                ExtendedDocumentStatus.ALL,
+              ]
+                .filter((value) => {
+                  if (organisation.type === OrganisationType.PERSONAL) {
+                    return value !== ExtendedDocumentStatus.INBOX;
+                  }
+                  return true;
+                })
+                .map((value) => (
+                  <TabsTrigger
+                    key={value}
+                    className="hover:text-foreground h-7 min-w-[64px] rounded-md px-3 text-xs"
+                    value={value}
+                    asChild
+                  >
+                    <Link to={getTabHref(value)} preventScrollReset>
+                      <DocumentStatus status={value} />
+                      {value !== ExtendedDocumentStatus.ALL && (
+                        <span className="text-muted-foreground ml-1.5 tabular-nums">
+                          {stats[value]}
+                        </span>
+                      )}
+                    </Link>
+                  </TabsTrigger>
+                ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* ── Table ── */}
+        <div>
+          {data && data.count === 0 ? (
+            <DocumentsTableEmptyState
+              status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
+            />
+          ) : (
+            <DocumentsTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              onMoveDocument={(documentId) => {
+                setDocumentToMove(documentId);
+                setIsMovingDocument(true);
+              }}
+            />
+          )}
         </div>
 
         {documentToMove && (
@@ -223,7 +217,6 @@ export default function DocumentsPage() {
             currentFolderId={folderId}
             onOpenChange={(open) => {
               setIsMovingDocument(open);
-
               if (!open) {
                 setDocumentToMove(null);
               }

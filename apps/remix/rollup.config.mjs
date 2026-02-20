@@ -3,7 +3,6 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
-import typescript from "@rollup/plugin-typescript";
 import path from "node:path";
 
 /** @type {import('rollup').RollupOptions} */
@@ -22,16 +21,6 @@ const config = {
   },
   external: [/node_modules/],
   plugins: [
-    typescript({
-      noEmitOnError: false, // Don't fail on type errors during Docker build
-      moduleResolution: "bundler",
-      include: [
-        "server/**/*",
-        "../../packages/**/*",
-        "../../packages/lib/translations/**/*",
-      ],
-      jsx: "preserve",
-    }),
     resolve({
       rootDir: path.join(process.cwd(), "../.."),
       preferBuiltins: true,
@@ -48,7 +37,7 @@ const config = {
     commonjs(),
     babel({
       babelHelpers: "bundled",
-      extensions: [".ts", ".tsx"],
+      extensions: [".ts", ".tsx", ".js", ".jsx"],
       presets: [
         "@babel/preset-typescript",
         ["@babel/preset-react", { runtime: "automatic" }],

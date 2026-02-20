@@ -59,9 +59,9 @@ export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
             }}
           >
             {isResendingEmailVerification ? (
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              <Loader className="h-4 w-4 animate-spin" />
             ) : (
-              <Mail className="mr-2 h-4 w-4" />
+              <Mail className="h-4 w-4" />
             )}
             <Trans>Resend verification</Trans>
           </DropdownMenuItem>
@@ -72,7 +72,7 @@ export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
             teamEmail={team.teamEmail}
             trigger={
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="h-4 w-4" />
                 <Trans>Edit</Trans>
               </DropdownMenuItem>
             }
@@ -84,7 +84,7 @@ export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
           teamName={team.name}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <X className="mr-2 h-4 w-4" />
+              <X className="h-4 w-4" />
               <Trans>Remove</Trans>
             </DropdownMenuItem>
           }

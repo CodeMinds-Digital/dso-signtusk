@@ -82,28 +82,30 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
-      <SheetContent className="flex w-full max-w-[350px] flex-col">
-        <Link to="/" onClick={handleMenuItemClick}>
-          <img
-            src={LogoImage}
-            alt="Signtusk Logo"
-            className="dark:invert"
-            width={170}
-            height={25}
-          />
-        </Link>
+      <SheetContent className="flex w-full max-w-[320px] flex-col gap-0 p-0">
+        <div className="border-b px-5 py-4">
+          <Link to="/" onClick={handleMenuItemClick}>
+            <img
+              src={LogoImage}
+              alt="Signtusk Logo"
+              className="dark:invert"
+              width={140}
+              height={20}
+            />
+          </Link>
+        </div>
 
-        <div className="mt-8 flex w-full flex-col items-start gap-y-4">
+        <nav className="flex flex-1 flex-col gap-y-1 overflow-y-auto px-3 py-4">
           {menuNavigationLinks.map(({ href, text }) => (
             <Link
               key={href}
-              className="text-foreground hover:text-foreground/80 flex items-center gap-2 text-2xl font-semibold"
+              className="text-foreground hover:bg-accent flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
               to={href}
               onClick={() => handleMenuItemClick()}
             >
-              {text}
+              <span>{text}</span>
               {href === '/inbox' && unreadCountData && unreadCountData.count > 0 && (
-                <span className="bg-primary text-primary-foreground flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-semibold">
+                <span className="bg-primary text-primary-foreground flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-bold tabular-nums">
                   {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
                 </span>
               )}
@@ -111,21 +113,20 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           ))}
 
           <button
-            className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
+            className="text-destructive hover:bg-destructive/10 mt-2 flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
             onClick={async () => authClient.signOut()}
           >
             <Trans>Sign Out</Trans>
           </button>
-        </div>
+        </nav>
 
-        <div className="mt-auto flex w-full flex-col space-y-4 self-end">
-          <div className="w-fit">
+        <div className="border-t px-5 py-4">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-xs">
+              © {new Date().getFullYear()} Signtusk, Inc.
+            </p>
             <ThemeSwitcher />
           </div>
-
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Signtusk, Inc. <br /> All rights reserved.
-          </p>
         </div>
       </SheetContent>
     </Sheet>

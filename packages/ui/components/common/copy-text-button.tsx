@@ -44,7 +44,7 @@ export const CopyTextButton = ({
     <Button
       type="button"
       variant="none"
-      className="ml-2 h-7 rounded border bg-neutral-50 px-0.5 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
+      className="ml-2 h-7 rounded border bg-muted px-0.5 font-normal hover:bg-muted/80"
       onClick={async () => onCopy()}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -59,7 +59,7 @@ export const CopyTextButton = ({
 
           <div
             className={cn(
-              'flex h-6 w-6 items-center justify-center rounded transition-all hover:bg-neutral-200 hover:active:bg-neutral-300 dark:hover:bg-neutral-500 dark:hover:active:bg-neutral-400',
+              'flex h-6 w-6 items-center justify-center rounded transition-all hover:bg-accent hover:text-accent-foreground',
               {
                 'ml-1': Boolean(badgeContentCopied || badgeContentUncopied),
               },

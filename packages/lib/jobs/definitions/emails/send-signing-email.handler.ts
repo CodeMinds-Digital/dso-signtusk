@@ -120,7 +120,7 @@ export const run = async ({
   const { email, name } = recipient;
   const selfSigner = email === user.email;
 
-  const i18n = await getI18nInstance(emailLanguage);
+  const i18n = await getI18nInstance(emailLanguage as any);
 
   const recipientActionVerb = i18n
     ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
@@ -173,7 +173,7 @@ export const run = async ({
 
   // Get translations for the email
   const translations = await getDocumentInviteTranslations(
-    emailLanguage,
+    emailLanguage as any,
     recipient.role,
     {
       recipientName: recipient.name,
@@ -198,8 +198,8 @@ export const run = async ({
     branding: branding
       ? {
           brandingEnabled: true,
-          brandingLogo: branding.logo || undefined,
-          brandingCompanyDetails: branding.companyDetails || undefined,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
         }
       : undefined,
   });

@@ -67,7 +67,7 @@ export const AppNavDesktop = ({
   return (
     <div
       className={cn(
-        'ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between',
+        'ml-6 hidden flex-1 items-center gap-x-8 md:flex md:justify-between',
         className,
       )}
       {...props}
@@ -79,22 +79,25 @@ export const AppNavDesktop = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-baseline gap-x-6"
+              className="flex items-center gap-x-1"
             >
-              {menuNavigationLinks.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  to={href}
-                  className={cn(
-                    'text-muted-foreground dark:text-muted-foreground/60 focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
-                    {
-                      'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
-                    },
-                  )}
-                >
-                  {_(label)}
-                </Link>
-              ))}
+              {menuNavigationLinks.map(({ href, label }) => {
+                const isActive = pathname?.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    to={href}
+                    className={cn(
+                      'focus-visible:ring-ring ring-offset-background relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2',
+                      isActive
+                        ? 'text-foreground bg-accent'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/60',
+                    )}
+                  >
+                    {_(label)}
+                  </Link>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
@@ -102,19 +105,17 @@ export const AppNavDesktop = ({
 
       <Button
         variant="outline"
-        className="text-muted-foreground flex w-full max-w-96 items-center justify-between rounded-lg"
+        className="text-muted-foreground hover:text-muted-foreground flex w-full max-w-72 items-center justify-between rounded-lg border-border/70 bg-muted/40 px-3 text-sm shadow-none hover:bg-muted/60"
         onClick={() => setIsCommandMenuOpen(true)}
       >
-        <div className="flex items-center">
-          <Search className="mr-2 h-5 w-5" />
-          <Trans>Search</Trans>
+        <div className="flex items-center gap-2">
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <Trans>Search...</Trans>
         </div>
 
-        <div>
-          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5 text-xs tracking-wider">
-            {modifierKey}+K
-          </div>
-        </div>
+        <kbd className="bg-background text-muted-foreground pointer-events-none hidden select-none items-center gap-0.5 rounded border px-1.5 py-0.5 font-mono text-[10px] font-medium opacity-70 sm:flex">
+          {modifierKey}K
+        </kbd>
       </Button>
     </div>
   );

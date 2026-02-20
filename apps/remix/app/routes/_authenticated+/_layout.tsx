@@ -120,7 +120,7 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
 
         <main
           className={cn({
-            'mt-8 pb-8 md:mt-12 md:pb-12': !hideHeader,
+            'mt-6 pb-10 md:mt-10 md:pb-16': !hideHeader,
           })}
         >
           <Outlet />

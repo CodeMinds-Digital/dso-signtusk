@@ -414,7 +414,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             control={form.control}
             name="enabled"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
+              <FormItem className="flex items-center justify-between rounded-xl border px-4 py-3">
                 <div className="space-y-0.5">
                   <FormLabel>
                     <Trans>Enable SSO portal</Trans>

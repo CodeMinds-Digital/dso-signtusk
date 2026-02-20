@@ -395,7 +395,7 @@ export const SignInForm = ({
             type="submit"
             size="lg"
             loading={isSubmitting}
-            className="dark:bg-primary dark:hover:opacity-90"
+            className="w-full"
           >
             {isSubmitting ? (
               <Trans>Signing in...</Trans>
@@ -407,9 +407,9 @@ export const SignInForm = ({
           {!isEmbeddedRedirect && (
             <>
               {hasSocialAuthEnabled && (
-                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                <div className="relative flex items-center gap-x-3 py-1">
                   <div className="bg-border h-px flex-1" />
-                  <span className="text-muted-foreground bg-transparent">
+                  <span className="text-muted-foreground text-xs">
                     <Trans>Or continue with</Trans>
                   </span>
                   <div className="bg-border h-px flex-1" />
@@ -421,11 +421,11 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="w-full"
                   disabled={isSubmitting}
                   onClick={onSignInWithGoogleClick}
                 >
-                  <FcGoogle className="mr-2 h-5 w-5" />
+                  <FcGoogle className="h-5 w-5" />
                   Google
                 </Button>
               )}
@@ -435,12 +435,12 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="w-full"
                   disabled={isSubmitting}
                   onClick={onSignInWithMicrosoftClick}
                 >
                   <img
-                    className="mr-2 h-4 w-4"
+                    className="h-4 w-4"
                     alt="Microsoft Logo"
                     src={"/static/microsoft.svg"}
                   />
@@ -453,11 +453,11 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="w-full"
                   disabled={isSubmitting}
                   onClick={onSignInWithOIDCClick}
                 >
-                  <FaIdCardClip className="mr-2 h-5 w-5" />
+                  <FaIdCardClip className="h-5 w-5" />
                   {oidcProviderLabel || "OIDC"}
                 </Button>
               )}
@@ -470,11 +470,11 @@ export const SignInForm = ({
             variant="outline"
             disabled={isSubmitting}
             loading={isPasskeyLoading}
-            className="bg-background text-muted-foreground border"
+            className="w-full"
             onClick={onSignInWithPasskey}
           >
             {!isPasskeyLoading && (
-              <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
+              <KeyRoundIcon className="h-5 w-5" />
             )}
             <Trans>Passkey</Trans>
           </Button>

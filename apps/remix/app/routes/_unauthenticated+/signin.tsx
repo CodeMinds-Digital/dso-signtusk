@@ -68,16 +68,16 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
   }, []);
 
   return (
-    <div className="w-screen max-w-lg px-4">
-      <div className="border-border dark:bg-background z-10 rounded-xl border bg-neutral-100 p-6">
-        <h1 className="text-2xl font-semibold">
-          <Trans>Sign in to your account</Trans>
-        </h1>
-
-        <p className="text-muted-foreground mt-2 text-sm">
-          <Trans>Welcome back, we are lucky to have you.</Trans>
-        </p>
-        <hr className="-mx-6 my-4" />
+    <div className="w-screen max-w-md px-4">
+      <div className="border-border bg-card z-10 rounded-2xl border p-8 shadow-lg">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            <Trans>Sign in to your account</Trans>
+          </h1>
+          <p className="text-muted-foreground mt-1.5 text-sm">
+            <Trans>Welcome back, we are lucky to have you.</Trans>
+          </p>
+        </div>
 
         <SignInForm
           isGoogleSSOEnabled={isGoogleSSOEnabled}
@@ -93,7 +93,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
               Don't have an account?{' '}
               <Link
                 to={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : '/signup'}
-                className="text-primary duration-200 hover:opacity-70"
+                className="text-primary font-medium duration-200 hover:opacity-75"
               >
                 Sign up
               </Link>

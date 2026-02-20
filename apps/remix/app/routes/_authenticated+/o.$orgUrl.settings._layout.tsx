@@ -15,8 +15,8 @@ import { Link, NavLink, Outlet } from 'react-router';
 import { useCurrentOrganisation } from '@signtusk/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED } from '@signtusk/lib/constants/app';
 import { canExecuteOrganisationAction } from '@signtusk/lib/utils/organisations';
-import { cn } from '@signtusk/ui/lib/utils';
 import { Button } from '@signtusk/ui/primitives/button';
+import { cn } from '@signtusk/ui/lib/utils';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
@@ -135,34 +135,59 @@ export default function SettingsLayout() {
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">
-        <Trans>Organisation Settings</Trans>
-      </h1>
+      <div className="mb-6 border-b pb-5">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <Trans>Organisation Settings</Trans>
+        </h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          <Trans>Manage your organisation preferences and members.</Trans>
+        </p>
+      </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
+      <div className="grid grid-cols-12 gap-x-8">
         {/* Navigation */}
-        <div
-          className={cn(
-            'col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2',
-          )}
-        >
+        <div className="col-span-12 mb-6 hidden md:col-span-3 md:flex md:flex-col md:gap-1">
           {organisationSettingRoutes.map((route) => (
             <NavLink
               to={route.path}
-              className={cn('group w-full justify-start', route.isSubNav && 'pl-8')}
               key={route.path}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
+                  route.isSubNav && 'ml-4',
+                  isActive && !route.hideHighlight
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+                )
+              }
             >
-              <Button
-                variant="ghost"
-                className={cn('w-full justify-start', {
-                  'group-aria-[current]:bg-secondary': !route.hideHighlight,
-                })}
-              >
-                {route.icon && <route.icon className="mr-2 h-5 w-5" />}
-                <Trans>{route.label}</Trans>
-              </Button>
+              {route.icon && <route.icon className="h-4 w-4 shrink-0" />}
+              <Trans>{route.label}</Trans>
             </NavLink>
           ))}
+        </div>
+
+        {/* Mobile nav */}
+        <div className="col-span-12 mb-6 flex flex-wrap gap-2 md:hidden">
+          {organisationSettingRoutes
+            .filter((r) => !r.isSubNav)
+            .map((route) => (
+              <NavLink
+                to={route.path}
+                key={route.path}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-150',
+                    isActive && !route.hideHighlight
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )
+                }
+              >
+                {route.icon && <route.icon className="h-3.5 w-3.5 shrink-0" />}
+                <Trans>{route.label}</Trans>
+              </NavLink>
+            ))}
         </div>
 
         <div className="col-span-12 md:col-span-9">

@@ -20,7 +20,7 @@ export const SignaturePadType = ({ className, value, onChange }: SignaturePadTyp
       <input
         data-testid="signature-pad-type-input"
         placeholder={t`Type your signature`}
-        className="w-full bg-transparent px-4 text-center font-signature text-7xl text-black placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white"
+        className="text-foreground w-full bg-transparent px-4 text-center font-signature text-7xl placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
         // style={{ color: selectedColor }}
         value={value}
         onChange={(event) => onChange(event.target.value.trimStart())}

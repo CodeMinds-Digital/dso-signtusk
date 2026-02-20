@@ -142,5 +142,23 @@ packages/lib/translations/
 .env*.local
 .env.dokploy
 
-# Documentation folder (docs/) is tracked and committed to git
-# All markdown documentation should be version controlled
+# Temporary documentation and scripts (generated during development/debugging)
+# These are working notes and should not be committed
+/*.md
+/*.sh
+/docs/
+/scripts/diagnostic/
+/scripts/deployment/
+/scripts/fixes/
+
+# Exception: Keep important project documentation
+!README.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+!LICENSE.md
+!CODE_OF_CONDUCT.md
+
+# Exception: Keep legitimate scripts in scripts/ folder
+!scripts/generate-all-simple-email-templates.sh
+!scripts/fix-invalid-emails-prisma.ts
+!scripts/test-all-email-triggers.ts

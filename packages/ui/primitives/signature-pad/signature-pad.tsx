@@ -146,21 +146,21 @@ export const SignaturePad = ({
       <TabsList>
         {drawSignatureEnabled && (
           <TabsTrigger value="draw">
-            <SignatureIcon className="mr-2 size-4" />
+            <SignatureIcon className="size-4" />
             <Trans context="Draw signature">Draw</Trans>
           </TabsTrigger>
         )}
 
         {typedSignatureEnabled && (
           <TabsTrigger value="text">
-            <KeyboardIcon className="mr-2 size-4" />
+            <KeyboardIcon className="size-4" />
             <Trans context="Type signature">Type</Trans>
           </TabsTrigger>
         )}
 
         {uploadSignatureEnabled && (
           <TabsTrigger value="image">
-            <UploadCloudIcon className="mr-2 size-4" />
+            <UploadCloudIcon className="size-4" />
             <Trans context="Upload signature">Upload</Trans>
           </TabsTrigger>
         )}
@@ -168,7 +168,7 @@ export const SignaturePad = ({
 
       <TabsContent
         value="draw"
-        className="border-border aspect-signature-pad dark:bg-background relative flex items-center justify-center rounded-md border bg-neutral-50 text-center"
+        className="border-border bg-muted/40 dark:bg-muted/20 aspect-signature-pad relative flex items-center justify-center rounded-md border text-center"
       >
         <SignaturePadDraw
           className="h-full w-full"
@@ -179,7 +179,7 @@ export const SignaturePad = ({
 
       <TabsContent
         value="text"
-        className="border-border aspect-signature-pad dark:bg-background relative flex items-center justify-center rounded-md border bg-neutral-50 text-center"
+        className="border-border bg-muted/40 dark:bg-muted/20 aspect-signature-pad relative flex items-center justify-center rounded-md border text-center"
       >
         <SignaturePadType value={typedSignature} onChange={onTypedSignatureChange} />
       </TabsContent>
@@ -187,9 +187,9 @@ export const SignaturePad = ({
       <TabsContent
         value="image"
         className={cn(
-          'border-border aspect-signature-pad dark:bg-background relative rounded-md border bg-neutral-50',
+          'border-border bg-muted/40 dark:bg-muted/20 aspect-signature-pad relative rounded-md border',
           {
-            'bg-white': imageSignature,
+            'bg-background dark:bg-background': imageSignature,
           },
         )}
       >

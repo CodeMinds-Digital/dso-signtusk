@@ -6,18 +6,20 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 const alertVariants = cva(
-  'relative w-full rounded-lg p-4 [&>svg]:absolute [&>svg]:text-foreground [&>svg]:left-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&>svg~*]:pl-8',
+  'relative w-full rounded-xl p-4 [&>svg]:absolute [&>svg]:text-foreground [&>svg]:left-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&>svg~*]:pl-8',
   {
     variants: {
       variant: {
         default:
-          'bg-green-50 text-green-700 [&_.alert-title]:text-green-800 [&>svg]:text-green-400',
+          'bg-emerald-50 text-emerald-700 [&_.alert-title]:text-emerald-800 [&>svg]:text-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300 dark:[&_.alert-title]:text-emerald-200 dark:[&>svg]:text-emerald-400',
         neutral:
-          'bg-gray-50 dark:bg-neutral-900/20 text-muted-foreground [&_.alert-title]:text-foreground',
-        secondary: 'bg-blue-50 text-blue-700 [&_.alert-title]:text-blue-800 [&>svg]:text-blue-400',
-        destructive: 'bg-red-50 text-red-700 [&_.alert-title]:text-red-800 [&>svg]:text-red-400',
+          'bg-muted/60 text-muted-foreground [&_.alert-title]:text-foreground dark:bg-muted/30',
+        secondary:
+          'bg-blue-50 text-blue-700 [&_.alert-title]:text-blue-800 [&>svg]:text-blue-500 dark:bg-blue-950/40 dark:text-blue-300 dark:[&_.alert-title]:text-blue-200 dark:[&>svg]:text-blue-400',
+        destructive:
+          'bg-destructive/10 text-destructive [&_.alert-title]:text-destructive [&>svg]:text-destructive dark:bg-destructive/20',
         warning:
-          'bg-yellow-50 text-yellow-700 [&_.alert-title]:text-yellow-800 [&>svg]:text-yellow-400',
+          'bg-amber-50 text-amber-700 [&_.alert-title]:text-amber-800 [&>svg]:text-amber-500 dark:bg-amber-950/40 dark:text-amber-300 dark:[&_.alert-title]:text-amber-200 dark:[&>svg]:text-amber-400',
       },
       padding: {
         tighter: 'p-2',
@@ -48,7 +50,7 @@ Alert.displayName = 'Alert';
 
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h5 ref={ref} className={cn('alert-title text-base font-medium', className)} {...props} />
+    <h5 ref={ref} className={cn('alert-title text-sm font-semibold', className)} {...props} />
   ),
 );
 

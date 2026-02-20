@@ -100,10 +100,10 @@ export const run = async ({
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || "http://localhost:3000";
 
-  const i18n = await getI18nInstance(emailLanguage);
+  const i18n = await getI18nInstance(emailLanguage as any);
 
   // Get translations for the email
-  const translations = await getRecipientSignedTranslations(emailLanguage, {
+  const translations = await getRecipientSignedTranslations(emailLanguage as any, {
     recipientName,
     documentName: envelope.title,
   });
@@ -117,8 +117,8 @@ export const run = async ({
     branding: branding
       ? {
           brandingEnabled: true,
-          brandingLogo: branding.logo || undefined,
-          brandingCompanyDetails: branding.companyDetails || undefined,
+          brandingLogo: branding.brandingLogo || undefined,
+          brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
         }
       : undefined,
   });

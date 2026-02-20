@@ -32,10 +32,10 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
       {data && data.length > 0 && !isLoading && (
         <AnimateGenericFadeInOut>
           <Alert variant="secondary" className={className}>
-            <div className="flex h-full flex-row items-center p-2">
-              <BellIcon className="mr-4 h-5 w-5 text-blue-800" />
+            <div className="flex h-full flex-row items-center gap-3 p-2">
+              <BellIcon className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
 
-              <AlertDescription className="mr-2">
+              <AlertDescription className="mr-auto">
                 <Plural
                   value={data.length}
                   one={
@@ -53,7 +53,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="ml-auto text-sm font-medium text-blue-700 hover:text-blue-600">
+                  <button className="text-primary hover:text-primary/80 text-sm font-medium transition-colors duration-150">
                     <Trans>View invites</Trans>
                   </button>
                 </DialogTrigger>
@@ -64,7 +64,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
                       <Trans>Pending invitations</Trans>
                     </DialogTitle>
 
-                    <DialogDescription className="mt-4">
+                    <DialogDescription>
                       <Plural
                         value={data.length}
                         one={

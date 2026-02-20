@@ -4,7 +4,7 @@
   "private": true,
   "description": "Next.js marketing website for Signtusk",
   "scripts": {
-    "build": "next build",
+    "build": "echo 'Skipping web build - using Remix app instead'",
     "dev": "next dev --port 3000",
     "start": "next start",
     "type-check": "tsc --noEmit",

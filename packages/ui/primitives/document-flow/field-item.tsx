@@ -267,7 +267,7 @@ export const FieldItem = ({
         field.fieldMeta?.label && (
           <div
             className={cn(
-              'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
+              'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-foreground',
               {
                 'bg-foreground/5 border-primary border': !fieldHasCheckedValues,
                 'bg-primary-200 border-primary border': fieldHasCheckedValues,
@@ -285,7 +285,7 @@ export const FieldItem = ({
           !hasErrors && signerStyles.fieldItem,
           fieldClassName,
           {
-            'rounded-[2px] border bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)] ring-red-400':
+            'rounded-[2px] border bg-destructive/20 shadow-[0_0_0_5px_hsl(var(--destructive)/10%),0_0_0_2px_hsl(var(--destructive)/40%),0_0_0_0.5px_hsl(var(--destructive))] ring-destructive':
               hasErrors,
           },
           !fixedSize && '[container-type:size]',
@@ -329,11 +329,11 @@ export const FieldItem = ({
 
       {!disabled && settingsActive && (
         <div className="absolute z-[60] mt-1 flex w-full items-center justify-center">
-          <div className="group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
+          <div className="group flex items-center justify-evenly gap-x-1 rounded-md border bg-foreground/90 p-0.5">
             {advancedField && (
               <button
                 title={_(msg`Advanced settings`)}
-                className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+                className="rounded-sm p-1.5 text-background/60 transition-colors hover:bg-background/10 hover:text-background"
                 onClick={onAdvancedSettings}
                 onTouchEnd={onAdvancedSettings}
               >
@@ -343,7 +343,7 @@ export const FieldItem = ({
 
             <button
               title={_(msg`Duplicate`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-sm p-1.5 text-background/60 transition-colors hover:bg-background/10 hover:text-background"
               onClick={onDuplicate}
               onTouchEnd={onDuplicate}
             >
@@ -352,7 +352,7 @@ export const FieldItem = ({
 
             <button
               title={_(msg`Duplicate on all pages`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-sm p-1.5 text-background/60 transition-colors hover:bg-background/10 hover:text-background"
               onClick={onDuplicateAllPages}
               onTouchEnd={onDuplicateAllPages}
             >
@@ -361,7 +361,7 @@ export const FieldItem = ({
 
             <button
               title={_(msg`Remove`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-sm p-1.5 text-background/60 transition-colors hover:bg-background/10 hover:text-background"
               onClick={onRemove}
               onTouchEnd={onRemove}
             >

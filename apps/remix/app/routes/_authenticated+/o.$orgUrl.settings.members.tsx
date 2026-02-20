@@ -56,7 +56,7 @@ export default function TeamsSettingsMembersPage() {
       </SettingsHeader>
 
       <div>
-        <div className="my-4 flex flex-row items-center justify-between space-x-4">
+        <div className="my-4 flex flex-row items-center justify-between gap-4">
           <Input
             defaultValue={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

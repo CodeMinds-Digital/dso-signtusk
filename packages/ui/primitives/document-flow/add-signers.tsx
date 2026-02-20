@@ -939,18 +939,17 @@ export const AddSignersFormPartial = ({
                 disabled={isSubmitting || signers.length >= remaining.recipients}
                 onClick={() => onAddSigner()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="h-5 w-5" />
                 <Trans>Add Signer</Trans>
               </Button>
 
               <Button
                 type="button"
                 variant="secondary"
-                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
                 disabled={isSubmitting || isUserAlreadyARecipient}
                 onClick={() => onAddSelfSigner()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="h-5 w-5" />
                 <Trans>Add myself</Trans>
               </Button>
             </div>

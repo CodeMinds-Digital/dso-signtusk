@@ -87,7 +87,7 @@ export const run = async ({
       `send-organisation-member-joined-email--${invitedMember.id}_${member.id}`,
       async () => {
         const translations = await getOrganisationMemberJoinedTranslations(
-          emailLanguage,
+          emailLanguage as any,
           {
             memberName: invitedMember.user.name || "",
             memberEmail: invitedMember.user.email,
@@ -108,8 +108,8 @@ export const run = async ({
             branding: branding
               ? {
                   brandingEnabled: true,
-                  brandingLogo: branding.logo || undefined,
-                  brandingCompanyDetails: branding.companyDetails || undefined,
+                  brandingLogo: branding.brandingLogo || undefined,
+                  brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
                 }
               : undefined,
           }
@@ -120,7 +120,7 @@ export const run = async ({
           renderSimple(emailContent, { plainText: true }),
         ]);
 
-        const i18n = await getI18nInstance(emailLanguage);
+        const i18n = await getI18nInstance(emailLanguage as any);
 
         await mailer.sendMail({
           to: member.user.email,

@@ -85,28 +85,26 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
   return (
     <>
-      <div className="bg-yellow-200 dark:bg-yellow-400">
-        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium text-yellow-900">
-          <div className="flex items-center">
-            <AlertTriangle className="mr-2.5 h-5 w-5" />
-            <Trans>Verify your email address to unlock all features.</Trans>
+      <div className="border-b border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30">
+        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-3 px-4 py-2.5 text-sm font-medium text-amber-800 dark:text-amber-200">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <span><Trans>Verify your email address to unlock all features.</Trans></span>
           </div>
 
-          <div>
-            <Button
-              variant="ghost"
-              className="h-auto px-2.5 py-1.5 text-yellow-900 hover:bg-yellow-100 hover:text-yellow-900 dark:hover:bg-yellow-500"
-              disabled={isButtonDisabled}
-              onClick={() => setIsOpen(true)}
-              size="sm"
-            >
-              {isButtonDisabled ? (
-                <Trans>Verification Email Sent</Trans>
-              ) : (
-                <Trans>Verify Now</Trans>
-              )}
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            className="h-7 rounded-md px-2.5 py-0 text-xs text-amber-800 hover:bg-amber-100 hover:text-amber-900 dark:text-amber-200 dark:hover:bg-amber-900/40"
+            disabled={isButtonDisabled}
+            onClick={() => setIsOpen(true)}
+            size="sm"
+          >
+            {isButtonDisabled ? (
+              <Trans>Email Sent</Trans>
+            ) : (
+              <Trans>Verify Now</Trans>
+            )}
+          </Button>
         </div>
       </div>
 

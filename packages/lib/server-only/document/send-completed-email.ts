@@ -136,7 +136,7 @@ export const sendCompletedEmail = async ({
       !isDocumentCompletedEmailEnabled)
   ) {
     // Get translations for the email
-    const translations = await getDocumentCompletedTranslations(emailLanguage, {
+    const translations = await getDocumentCompletedTranslations(emailLanguage as any, {
       documentName: envelope.title,
     });
 
@@ -148,8 +148,8 @@ export const sendCompletedEmail = async ({
       branding: branding
         ? {
             brandingEnabled: true,
-            brandingLogo: branding.logo || undefined,
-            brandingCompanyDetails: branding.companyDetails || undefined,
+            brandingLogo: branding.brandingLogo || undefined,
+            brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
           }
         : undefined,
     });
@@ -159,7 +159,7 @@ export const sendCompletedEmail = async ({
       renderSimple(template, { plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance(emailLanguage);
+    const i18n = await getI18nInstance(emailLanguage as any);
 
     await mailer.sendMail({
       to: [
@@ -238,8 +238,8 @@ export const sendCompletedEmail = async ({
         branding: branding
           ? {
               brandingEnabled: true,
-              brandingLogo: branding.logo || undefined,
-              brandingCompanyDetails: branding.companyDetails || undefined,
+              brandingLogo: branding.brandingLogo || undefined,
+              brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
             }
           : undefined,
       });
@@ -249,7 +249,7 @@ export const sendCompletedEmail = async ({
         renderSimple(template, { plainText: true }),
       ]);
 
-      const i18n = await getI18nInstance(emailLanguage);
+      const i18n = await getI18nInstance(emailLanguage as any);
 
       await mailer.sendMail({
         to: [

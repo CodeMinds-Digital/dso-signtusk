@@ -69,16 +69,16 @@ export const OrganisationBillingBanner = () => {
   return (
     <>
       <div
-        className={cn({
-          'bg-yellow-200 text-yellow-900 dark:bg-yellow-400':
+        className={cn('border-b', {
+          'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200':
             subscriptionStatus === SubscriptionStatus.PAST_DUE,
           'bg-destructive text-destructive-foreground':
             subscriptionStatus === SubscriptionStatus.INACTIVE,
         })}
       >
-        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium">
-          <div className="flex items-center">
-            <AlertTriangle className="mr-2.5 h-5 w-5" />
+        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-3 px-4 py-2 text-sm font-medium">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
 
             {match(subscriptionStatus)
               .with(SubscriptionStatus.PAST_DUE, () => <Trans>Payment overdue</Trans>)
@@ -88,15 +88,14 @@ export const OrganisationBillingBanner = () => {
 
           <Button
             variant="outline"
-            className={cn({
-              'text-yellow-900 hover:bg-yellow-100 dark:hover:bg-yellow-500':
+            className={cn('h-7 rounded-md px-2.5 text-xs', {
+              'border-amber-300 text-amber-900 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/40':
                 subscriptionStatus === SubscriptionStatus.PAST_DUE,
-              'text-destructive-foreground hover:bg-destructive hover:text-white':
+              'border-destructive-foreground/30 text-destructive-foreground hover:bg-destructive/80':
                 subscriptionStatus === SubscriptionStatus.INACTIVE,
             })}
             disabled={isPending}
             onClick={() => setIsOpen(true)}
-            size="sm"
           >
             <Trans>Resolve</Trans>
           </Button>

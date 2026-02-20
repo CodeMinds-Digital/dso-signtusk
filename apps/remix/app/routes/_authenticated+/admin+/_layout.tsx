@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Trans } from '@lingui/react/macro';
 import {
   BarChart3,
@@ -13,7 +15,6 @@ import { Link, Outlet, redirect, useLocation } from 'react-router';
 import { getSession } from '@signtusk/auth/server/lib/utils/get-session';
 import { isAdmin } from '@signtusk/lib/utils/is-admin';
 import { cn } from '@signtusk/ui/lib/utils';
-import { Button } from '@signtusk/ui/primitives/button';
 
 import type { Route } from './+types/_layout';
 
@@ -25,121 +26,81 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
+const navItem = (
+  path: string,
+  label: React.ReactNode,
+  Icon: React.ComponentType<{ className?: string }>,
+  pathname: string,
+) => (
+  <Link
+    key={path}
+    to={path}
+    className={cn(
+      'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
+      pathname?.startsWith(path)
+        ? 'bg-accent text-accent-foreground'
+        : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+    )}
+  >
+    <Icon className="h-4 w-4 shrink-0" />
+    {label}
+  </Link>
+);
+
 export default function AdminLayout() {
   const { pathname } = useLocation();
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">
-        <Trans>Admin Panel</Trans>
-      </h1>
+      <div className="mb-6 border-b pb-5">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <Trans>Admin Panel</Trans>
+        </h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          <Trans>Instance management and monitoring.</Trans>
+        </p>
+      </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
-        <div
-          className={cn(
-            'col-span-12 flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto md:col-span-3 md:flex md:flex-col',
-          )}
-        >
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/stats') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/stats">
-              <BarChart3 className="mr-2 h-5 w-5" />
-              <Trans>Stats</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/organisations') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/organisations">
-              <Building2Icon className="mr-2 h-5 w-5" />
-              <Trans>Organisations</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/claims') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/claims">
-              <Wallet2 className="mr-2 h-5 w-5" />
-              <Trans>Claims</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/users') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/users">
-              <Users className="mr-2 h-5 w-5" />
-              <Trans>Users</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/documents') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/documents">
-              <FileStack className="mr-2 h-5 w-5" />
-              <Trans>Documents</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/organisation-insights') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/organisation-insights">
-              <Trophy className="mr-2 h-5 w-5" />
-              <Trans>Organisation Insights</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/site-settings') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/site-settings">
-              <Settings className="mr-2 h-5 w-5" />
-              <Trans>Site Settings</Trans>
-            </Link>
-          </Button>
+      <div className="grid grid-cols-12 gap-x-8">
+        {/* Desktop nav */}
+        <div className="hidden md:col-span-3 md:flex md:flex-col md:gap-1">
+          {navItem('/admin/stats', <Trans>Stats</Trans>, BarChart3, pathname)}
+          {navItem('/admin/organisations', <Trans>Organisations</Trans>, Building2Icon, pathname)}
+          {navItem('/admin/claims', <Trans>Claims</Trans>, Wallet2, pathname)}
+          {navItem('/admin/users', <Trans>Users</Trans>, Users, pathname)}
+          {navItem('/admin/documents', <Trans>Documents</Trans>, FileStack, pathname)}
+          {navItem('/admin/organisation-insights', <Trans>Organisation Insights</Trans>, Trophy, pathname)}
+          {navItem('/admin/site-settings', <Trans>Site Settings</Trans>, Settings, pathname)}
         </div>
 
-        <div className="col-span-12 mt-12 md:col-span-9 md:mt-0">
+        {/* Mobile nav */}
+        <div className="col-span-12 mb-6 flex flex-wrap gap-2 md:hidden">
+          {[
+            { path: '/admin/stats', label: <Trans>Stats</Trans>, Icon: BarChart3 },
+            { path: '/admin/organisations', label: <Trans>Organisations</Trans>, Icon: Building2Icon },
+            { path: '/admin/claims', label: <Trans>Claims</Trans>, Icon: Wallet2 },
+            { path: '/admin/users', label: <Trans>Users</Trans>, Icon: Users },
+            { path: '/admin/documents', label: <Trans>Documents</Trans>, Icon: FileStack },
+            { path: '/admin/organisation-insights', label: <Trans>Insights</Trans>, Icon: Trophy },
+            { path: '/admin/site-settings', label: <Trans>Settings</Trans>, Icon: Settings },
+          ].map(({ path, label, Icon }) => (
+            <Link
+              key={path}
+              to={path}
+              className={cn(
+                'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-150',
+                pathname?.startsWith(path)
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" />
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="col-span-12 md:col-span-9">
           <Outlet />
         </div>
       </div>

@@ -2,10 +2,10 @@ import { createElement } from "react";
 
 import { msg } from "@lingui/core/macro";
 import {
-  EnvelopeType,
-  ReadStatus,
-  SendStatus,
-  SigningStatus,
+    EnvelopeType,
+    ReadStatus,
+    SendStatus,
+    SigningStatus,
 } from "@prisma/client";
 
 import { mailer } from "@signtusk/email/mailer";
@@ -80,7 +80,7 @@ export const run = async ({
     return;
   }
 
-  const i18n = await getI18nInstance(emailLanguage);
+  const i18n = await getI18nInstance(emailLanguage as any);
 
   // Send cancellation emails to all recipients who have been sent the document or viewed it
   const recipientsToNotify = envelope.recipients.filter(
@@ -95,7 +95,7 @@ export const run = async ({
     await Promise.all(
       recipientsToNotify.map(async (recipient) => {
         const translations = await getDocumentCancelledTranslations(
-          emailLanguage,
+          emailLanguage as any,
           {
             documentName: envelope.title,
             inviterName: documentOwner.name || undefined,
@@ -114,8 +114,8 @@ export const run = async ({
           branding: branding
             ? {
                 brandingEnabled: true,
-                brandingLogo: branding.logo || undefined,
-                brandingCompanyDetails: branding.companyDetails || undefined,
+                brandingLogo: branding.brandingLogo || undefined,
+                brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
               }
             : undefined,
         });

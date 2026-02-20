@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3003",
-    "build": "next build",
+    "build": "echo 'Skipping docs build - not used in production'",
     "start": "next start --port 3003",
     "lint": "next lint",
     "type-check": "tsc --noEmit",

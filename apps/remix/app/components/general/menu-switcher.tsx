@@ -62,50 +62,52 @@ export const MenuSwitcher = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className={cn('z-[60] ml-6 w-full min-w-[12rem] md:ml-0')}
+        className={cn('z-[60] ml-6 w-52 md:ml-0')}
         align="end"
         forceMount
       >
-        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+        <DropdownMenuItem className="px-3 py-2 text-sm" asChild>
           <Link
             to="/settings/organisations?action=add-organisation"
             className="flex items-center justify-between"
           >
             <Trans>Create Organisation</Trans>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="h-3.5 w-3.5 text-muted-foreground" />
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         {isUserAdmin && (
-          <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+          <DropdownMenuItem className="px-3 py-2 text-sm" asChild>
             <Link to="/admin">
               <Trans>Admin panel</Trans>
             </Link>
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+        <DropdownMenuItem className="px-3 py-2 text-sm" asChild>
           <Link to="/inbox">
             <Trans>Personal Inbox</Trans>
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+        <DropdownMenuItem className="px-3 py-2 text-sm" asChild>
           <Link to="/settings/profile">
             <Trans>User settings</Trans>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          className="text-muted-foreground px-4 py-2"
+          className="px-3 py-2 text-sm"
           onClick={() => setLanguageSwitcherOpen(true)}
         >
           <Trans>Language</Trans>
         </DropdownMenuItem>
 
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
-          className="text-destructive/90 hover:!text-destructive px-4 py-2"
+          className="text-destructive focus:text-destructive px-3 py-2 text-sm"
           onSelect={async () => authClient.signOut()}
         >
           <Trans>Sign Out</Trans>

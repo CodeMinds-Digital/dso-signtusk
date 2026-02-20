@@ -13,27 +13,20 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
   return (
     <div
       className={cn(
-        'border-border bg-background hover:shadow-border/80 h-32 max-h-32 max-w-full overflow-hidden rounded-lg border shadow shadow-transparent duration-200',
+        'border-border bg-card rounded-xl border p-5 transition-shadow duration-200 hover:shadow-sm',
         className,
       )}
     >
-      <div className="flex h-full max-h-full flex-col px-4 pb-6 pt-4 sm:px-4 sm:pb-8 sm:pt-4">
-        <div className="flex items-start">
-          {Icon && (
-            <div className="mr-2 h-4 w-4">
-              <Icon className="text-muted-foreground h-4 w-4" />
-            </div>
-          )}
-
-          <h3 className="text-primary-forground mb-2 flex items-end text-sm font-medium leading-tight">
-            {title}
-          </h3>
-        </div>
-
-        <p className="text-foreground mt-auto text-4xl font-semibold leading-8">
-          {typeof value === 'number' ? value.toLocaleString('en-US') : value}
-        </p>
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="text-muted-foreground h-4 w-4 shrink-0" />}
+        <h3 className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          {title}
+        </h3>
       </div>
+
+      <p className="text-foreground mt-3 text-3xl font-semibold leading-none tabular-nums">
+        {typeof value === 'number' ? value.toLocaleString('en-US') : value}
+      </p>
     </div>
   );
 };

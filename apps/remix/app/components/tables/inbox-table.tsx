@@ -148,11 +148,9 @@ export const InboxTable = () => {
           enable: isLoadingError || false,
         }}
         emptyState={
-          <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
-            <p>
-              <Trans>
-                Documents that require your attention will appear here
-              </Trans>
+          <div className="flex h-48 flex-col items-center justify-center gap-y-2">
+            <p className="text-muted-foreground text-sm">
+              <Trans>Documents that require your attention will appear here</Trans>
             </p>
           </div>
         }
@@ -237,24 +235,24 @@ export const InboxTableActionButton = ({
     internalVersion: row.internalVersion,
   })
     .with({ isPending: true, isSigned: false }, () => (
-      <Button className="w-32" asChild>
+      <Button className="w-28" asChild>
         <Link to={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
-                <PencilIcon className="-ml-1 mr-2 h-4 w-4" />
+                <PencilIcon className="h-4 w-4" />
                 <Trans>Sign</Trans>
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
-                <CheckCircleIcon className="-ml-1 mr-2 h-4 w-4" />
+                <CheckCircleIcon className="h-4 w-4" />
                 <Trans>Approve</Trans>
               </>
             ))
             .otherwise(() => (
               <>
-                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                <EyeIcon className="h-4 w-4" />
                 <Trans>View</Trans>
               </>
             ))}
@@ -262,8 +260,8 @@ export const InboxTableActionButton = ({
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (
-      <Button className="w-32" disabled={true}>
-        <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+      <Button className="w-28" disabled={true}>
+        <EyeIcon className="h-4 w-4" />
         <Trans>View</Trans>
       </Button>
     ))
@@ -273,8 +271,8 @@ export const InboxTableActionButton = ({
         envelopeStatus={row.status}
         token={recipient?.token}
         trigger={
-          <Button className="w-32">
-            <DownloadIcon className="-ml-1 mr-2 inline h-4 w-4" />
+          <Button className="w-28">
+            <DownloadIcon className="h-4 w-4" />
             <Trans>Download</Trans>
           </Button>
         }

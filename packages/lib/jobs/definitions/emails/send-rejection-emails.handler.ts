@@ -17,8 +17,8 @@ import { getEmailContext } from "../../../server-only/email/get-email-context";
 import { extractDerivedDocumentEmailSettings } from "../../../types/document-email";
 import { unsafeBuildEnvelopeIdQuery } from "../../../utils/envelope";
 import {
-  getDocumentRejectedTranslations,
-  getDocumentRejectionConfirmedTranslations,
+    getDocumentRejectedTranslations,
+    getDocumentRejectionConfirmedTranslations,
 } from "../../../utils/get-email-translations";
 import { formatDocumentsPath } from "../../../utils/teams";
 import type { JobRunIO } from "../../client/_internal/job";
@@ -88,13 +88,13 @@ export const run = async ({
       meta: envelope.documentMeta,
     });
 
-  const i18n = await getI18nInstance(emailLanguage);
+  const i18n = await getI18nInstance(emailLanguage as any);
 
   // Send confirmation email to the recipient who rejected
   if (isRecipientEmailValidForSending(recipient)) {
     await io.runTask("send-rejection-confirmation-email", async () => {
       const translations = await getDocumentRejectionConfirmedTranslations(
-        emailLanguage,
+        emailLanguage as any,
         {
           recipientName: recipient.name,
           documentName: envelope.title,
@@ -115,8 +115,8 @@ export const run = async ({
           branding: branding
             ? {
                 brandingEnabled: true,
-                brandingLogo: branding.logo || undefined,
-                brandingCompanyDetails: branding.companyDetails || undefined,
+                brandingLogo: branding.brandingLogo || undefined,
+                brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
               }
             : undefined,
         }
@@ -145,7 +145,7 @@ export const run = async ({
 
   // Send notification email to document owner
   await io.runTask("send-owner-notification-email", async () => {
-    const translations = await getDocumentRejectedTranslations(emailLanguage, {
+    const translations = await getDocumentRejectedTranslations(emailLanguage as any, {
       recipientName: recipient.name,
       documentName: envelope.title,
       reason: recipient.rejectionReason || undefined,
@@ -163,8 +163,8 @@ export const run = async ({
       branding: branding
         ? {
             brandingEnabled: true,
-            brandingLogo: branding.logo || undefined,
-            brandingCompanyDetails: branding.companyDetails || undefined,
+            brandingLogo: branding.brandingLogo || undefined,
+            brandingCompanyDetails: branding.brandingCompanyDetails || undefined,
           }
         : undefined,
     });

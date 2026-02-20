@@ -55,13 +55,13 @@ export default function TeamsSettingBillingPage() {
 
   return (
     <div>
-      <div className="flex flex-row items-end justify-between">
+      <div className="mb-6 flex flex-row items-start justify-between border-b pb-5">
         <div>
-          <h3 className="text-2xl font-semibold">
+          <h3 className="text-2xl font-semibold tracking-tight">
             <Trans>Billing</Trans>
           </h3>
 
-          <div className="text-muted-foreground mt-2 text-sm">
+          <div className="text-muted-foreground mt-1 text-sm">
             {!organisationSubscription && (
               <p>
                 <Trans>
@@ -142,8 +142,6 @@ export default function TeamsSettingBillingPage() {
 
         <OrganisationBillingPortalButton />
       </div>
-
-      <hr className="my-4" />
 
       {(!subscription ||
         subscription.organisationSubscription.status ===

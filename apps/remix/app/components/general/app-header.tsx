@@ -52,45 +52,57 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   return (
     <header
       className={cn(
-        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200',
-        scrollY > 5 && 'border-b-border',
+        'supports-backdrop-blur:bg-background/80 bg-background/95 sticky top-0 z-[60] flex h-14 w-full items-center border-b border-b-transparent backdrop-blur-md transition-all duration-200',
+        scrollY > 5 && 'border-b-border shadow-sm',
         className,
       )}
       {...props}
     >
-      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
+      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-3 px-4 md:justify-normal md:px-6">
         <Link
           to={getRootHref(params)}
-          className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
+          className="focus-visible:ring-ring ring-offset-background hidden shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
-          <BrandingLogo className="h-6 w-auto" />
+          <BrandingLogo className="h-5 w-auto" />
         </Link>
 
         <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
-        <Button asChild variant="outline" className="relative hidden h-10 w-10 rounded-lg md:flex">
-          <Link to="/inbox" className="relative block h-10 w-10">
-            <InboxIcon className="text-muted-foreground hover:text-foreground h-5 w-5 flex-shrink-0 transition-colors" />
+        <Button
+          asChild
+          variant="ghost"
+          className="relative hidden h-9 w-9 shrink-0 rounded-lg p-0 md:flex"
+        >
+          <Link to="/inbox" className="relative flex items-center justify-center">
+            <InboxIcon className="text-muted-foreground hover:text-foreground h-4 w-4 transition-colors" />
 
             {unreadCountData && unreadCountData.count > 0 && (
-              <span className="bg-primary text-primary-foreground absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">
+              <span className="bg-primary text-primary-foreground absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold tabular-nums">
                 {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
               </span>
             )}
           </Link>
         </Button>
 
-        <div className="md:ml-4">
+        <div className="md:ml-2">
           {isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}
         </div>
 
-        <div className="flex flex-row items-center space-x-4 md:hidden">
-          <button onClick={() => setIsCommandMenuOpen(true)}>
-            <SearchIcon className="text-muted-foreground h-6 w-6" />
+        <div className="flex flex-row items-center gap-x-1 md:hidden">
+          <button
+            onClick={() => setIsCommandMenuOpen(true)}
+            className="text-muted-foreground hover:text-foreground hover:bg-accent flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+            aria-label="Search"
+          >
+            <SearchIcon className="h-4 w-4" />
           </button>
 
-          <button onClick={() => setIsHamburgerMenuOpen(true)}>
-            <MenuIcon className="text-muted-foreground h-6 w-6" />
+          <button
+            onClick={() => setIsHamburgerMenuOpen(true)}
+            className="text-muted-foreground hover:text-foreground hover:bg-accent flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+            aria-label="Open menu"
+          >
+            <MenuIcon className="h-4 w-4" />
           </button>
 
           <AppCommandMenu open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />

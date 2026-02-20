@@ -32,7 +32,7 @@ const SelectTrigger = React.forwardRef<
     <AnimatePresence>
       {loading ? (
         <div className="flex w-full items-center justify-center">
-          <Loader className="h-5 w-5 animate-spin text-gray-500 dark:text-gray-100" />
+          <Loader className="text-muted-foreground h-4 w-4 animate-spin" />
         </div>
       ) : (
         <AnimateGenericFadeInOut className="flex w-full justify-between">
@@ -56,7 +56,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'bg-popover text-popover-foreground animate-in fade-in-80 relative z-[1001] min-w-[8rem] overflow-hidden rounded-md border shadow-md',
+        'bg-popover text-popover-foreground animate-in fade-in-80 relative z-[1001] min-w-[8rem] overflow-hidden rounded-xl border shadow-lg',
         position === 'popper' && 'translate-y-1',
         className,
       )}
@@ -98,7 +98,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     {...props}

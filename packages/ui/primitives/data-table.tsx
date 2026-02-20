@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-xl border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -176,7 +176,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {children && <div className="mt-8 w-full">{children(table)}</div>}
+      {children && <div className="mt-4 w-full">{children(table)}</div>}
     </>
   );
 }

@@ -22,31 +22,31 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
     label: msg`Pending`,
     labelExtended: msg`Document pending`,
     icon: Clock,
-    color: 'text-blue-600 dark:text-blue-300',
+    color: 'text-blue-600 dark:text-blue-400',
   },
   COMPLETED: {
     label: msg`Completed`,
     labelExtended: msg`Document completed`,
     icon: CheckCircle2,
-    color: 'text-green-500 dark:text-green-300',
+    color: 'text-emerald-600 dark:text-emerald-400',
   },
   DRAFT: {
     label: msg`Draft`,
     labelExtended: msg`Document draft`,
     icon: File,
-    color: 'text-yellow-500 dark:text-yellow-200',
+    color: 'text-amber-600 dark:text-amber-400',
   },
   REJECTED: {
     label: msg`Rejected`,
     labelExtended: msg`Document rejected`,
     icon: XCircle,
-    color: 'text-red-500 dark:text-red-300',
+    color: 'text-red-600 dark:text-red-400',
   },
   INBOX: {
     label: msg`Inbox`,
     labelExtended: msg`Document inbox`,
     icon: SignatureIcon,
-    color: 'text-muted-foreground',
+    color: 'text-indigo-600 dark:text-indigo-400',
   },
   ALL: {
     label: msg`All`,
@@ -71,10 +71,10 @@ export const DocumentStatus = ({
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
 
   return (
-    <span className={cn('flex items-center', className)} {...props}>
+    <span className={cn('flex items-center gap-1.5', className)} {...props}>
       {Icon && (
         <Icon
-          className={cn('mr-2 inline-block h-4 w-4', {
+          className={cn('inline-block h-3.5 w-3.5 shrink-0', {
             [color]: !inheritColor,
           })}
         />

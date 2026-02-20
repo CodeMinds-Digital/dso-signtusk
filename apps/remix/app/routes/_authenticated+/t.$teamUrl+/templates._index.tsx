@@ -47,53 +47,53 @@ export default function TemplatesPage() {
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>
-      <div className="mx-auto max-w-screen-xl px-4 md:px-8">
+      <div className="mx-auto max-w-screen-xl px-4 md:px-6">
         <FolderGrid type={FolderType.TEMPLATE} parentId={folderId ?? null} />
 
-        <div className="mt-8">
-          <div className="flex flex-row items-center">
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && (
-                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
-              )}
-              <AvatarFallback className="text-muted-foreground text-xs">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
-
-            <h1 className="truncate text-2xl font-semibold md:text-3xl">
-              <Trans>Templates</Trans>
-            </h1>
-          </div>
-
-          <div className="mt-8">
-            {data && data.count === 0 ? (
-              <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
-                <Bird className="h-12 w-12" strokeWidth={1.5} />
-
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold">
-                    <Trans>We're all empty</Trans>
-                  </h3>
-
-                  <p className="mt-2 max-w-[50ch]">
-                    <Trans>
-                      You have not yet created any templates. To create a
-                      template please upload one.
-                    </Trans>
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <TemplatesTable
-                data={data}
-                isLoading={isLoading}
-                isLoadingError={isLoadingError}
-                documentRootPath={documentRootPath}
-                templateRootPath={templateRootPath}
-              />
+        {/* ── Page header ── */}
+        <div className="mt-6 mb-6 flex items-center gap-3 border-b pb-5">
+          <Avatar className="border-border h-9 w-9 border">
+            {team.avatarImageId && (
+              <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
             )}
-          </div>
+            <AvatarFallback className="text-muted-foreground text-xs font-medium">
+              {team.name.slice(0, 1)}
+            </AvatarFallback>
+          </Avatar>
+
+          <h1 className="truncate text-xl font-semibold tracking-tight">
+            <Trans>Templates</Trans>
+          </h1>
+        </div>
+
+        {/* ── Content ── */}
+        <div>
+          {data && data.count === 0 ? (
+            <div className="flex h-80 flex-col items-center justify-center rounded-xl border border-dashed">
+              <div className="bg-muted flex h-14 w-14 items-center justify-center rounded-full">
+                <Bird className="text-muted-foreground h-6 w-6" strokeWidth={1.5} />
+              </div>
+
+              <div className="mt-4 text-center">
+                <h3 className="font-semibold">
+                  <Trans>No templates yet</Trans>
+                </h3>
+                <p className="text-muted-foreground mt-1 max-w-[40ch] text-sm">
+                  <Trans>
+                    You have not yet created any templates. Upload a document to create one.
+                  </Trans>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <TemplatesTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              documentRootPath={documentRootPath}
+              templateRootPath={templateRootPath}
+            />
+          )}
         </div>
       </div>
     </EnvelopeDropZoneWrapper>

@@ -22,8 +22,8 @@ export function DataTablePagination<TData>({
   additionalInformation = 'VisibleCount',
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
-      <div className="text-muted-foreground flex-1 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-2 py-1">
+      <div className="text-muted-foreground flex-1 text-xs">
         {match(additionalInformation)
           .with('SelectedCount', () => (
             <span>
@@ -60,7 +60,7 @@ export function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-x-2">
-        <p className="whitespace-nowrap text-sm font-medium">
+        <p className="text-muted-foreground whitespace-nowrap text-xs">
           <Trans>Rows per page</Trans>
         </p>
         <Select
@@ -69,7 +69,7 @@ export function DataTablePagination<TData>({
             table.setPageSize(Number(value));
           }}
         >
-          <SelectTrigger className="h-8 w-[70px]">
+          <SelectTrigger className="h-7 w-[64px] text-xs">
             <SelectValue placeholder={table.getState().pagination.pageSize} />
           </SelectTrigger>
           <SelectContent side="top">
@@ -81,57 +81,57 @@ export function DataTablePagination<TData>({
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:gap-x-8">
-        <div className="flex items-center text-sm font-medium md:justify-center">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 lg:gap-x-6">
+        <div className="text-muted-foreground flex items-center text-xs md:justify-center">
           <Trans>
             Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount() || 1}
           </Trans>
         </div>
 
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-1">
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-7 w-7 p-0 lg:flex"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">
               <Trans>Go to first page</Trans>
             </span>
-            <ChevronsLeft className="h-4 w-4" />
+            <ChevronsLeft className="h-3.5 w-3.5" />
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">
               <Trans>Go to previous page</Trans>
             </span>
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">
               <Trans>Go to next page</Trans>
             </span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-7 w-7 p-0 lg:flex"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">
               <Trans>Go to last page</Trans>
             </span>
-            <ChevronsRight className="h-4 w-4" />
+            <ChevronsRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

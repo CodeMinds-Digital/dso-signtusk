@@ -123,8 +123,8 @@ export default function WebhookPage() {
         <WebhookCreateDialog />
       </SettingsHeader>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        <div className="bg-background/60 absolute inset-0 flex items-center justify-center">
+          <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
         </div>
       )}
 
@@ -138,11 +138,10 @@ export default function WebhookPage() {
           enable: isError,
         }}
         emptyState={
-          <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
-            <p>
+          <div className="flex h-48 flex-col items-center justify-center gap-y-2">
+            <p className="text-muted-foreground text-sm">
               <Trans>
-                You have no webhooks yet. Your webhooks will be shown here once
-                you create them.
+                You have no webhooks yet. Your webhooks will be shown here once you create them.
               </Trans>
             </p>
           </div>
@@ -191,7 +190,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
 
         <DropdownMenuItem asChild>
           <Link to={`/t/${team.url}/settings/webhooks/${webhook.id}`}>
-            <ScrollTextIcon className="mr-2 h-4 w-4" />
+            <ScrollTextIcon className="h-4 w-4" />
             <Trans>Logs</Trans>
           </Link>
         </DropdownMenuItem>
@@ -201,7 +200,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
               <div>
-                <EditIcon className="mr-2 h-4 w-4" />
+                <EditIcon className="h-4 w-4" />
                 <Trans>Edit</Trans>
               </div>
             </DropdownMenuItem>
@@ -211,7 +210,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
         <WebhookDeleteDialog webhook={webhook}>
           <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
             <div>
-              <Trash2Icon className="mr-2 h-4 w-4" />
+              <Trash2Icon className="h-4 w-4" />
               <Trans>Delete</Trans>
             </div>
           </DropdownMenuItem>

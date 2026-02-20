@@ -70,10 +70,10 @@ const AvatarWithText = ({
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar
-      className={cn('dark:border-border h-10 w-10 border-2 border-solid border-white', avatarClass)}
+      className={cn('border-background dark:border-border h-10 w-10 border-2 border-solid', avatarClass)}
     >
       {avatarSrc && <AvatarImage src={avatarSrc} />}
-      <AvatarFallback className="text-xs text-gray-400">{avatarFallback}</AvatarFallback>
+      <AvatarFallback className="text-muted-foreground text-xs">{avatarFallback}</AvatarFallback>
     </Avatar>
 
     <div

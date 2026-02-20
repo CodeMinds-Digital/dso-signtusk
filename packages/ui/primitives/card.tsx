@@ -30,16 +30,13 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           } as React.CSSProperties
         }
         className={cn(
-          'bg-background text-foreground group relative rounded-lg border-2',
+          'bg-card text-card-foreground group relative rounded-xl border shadow-sm transition-shadow duration-200',
           {
             'backdrop-blur-[2px]': backdropBlur,
-            'gradient-border-mask before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-lg before:p-[2px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/50%)_5%,theme(colors.border/80%)_30%)]':
+            'gradient-border-mask before:pointer-events-none before:absolute before:-inset-[1px] before:rounded-xl before:p-[1px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/60%)_5%,theme(colors.border/70%)_35%)]':
               gradient,
-            'dark:gradient-border-mask before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-lg before:p-[2px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/70%)_5%,theme(colors.border/80%)_30%)]':
+            'dark:gradient-border-mask before:pointer-events-none before:absolute before:-inset-[1px] before:rounded-xl before:p-[1px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/80%)_5%,theme(colors.border/60%)_35%)]':
               gradient,
-            'shadow-[0_0_0_4px_theme(colors.gray.100/70%),0_0_0_1px_theme(colors.gray.100/70%),0_0_0_0.5px_var(colors.primary.DEFAULT/70%)]':
-              true,
-            'dark:shadow-[0]': true,
           },
           className,
         )}
@@ -55,7 +52,7 @@ Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+    <div ref={ref} className={cn('flex flex-col gap-1.5 p-6 pb-4', className)} {...props} />
   ),
 );
 
@@ -65,7 +62,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+      className={cn('text-base font-semibold leading-snug tracking-tight text-foreground', className)}
       {...props}
     />
   ),
@@ -77,7 +74,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
+  <p ref={ref} className={cn('text-sm text-muted-foreground leading-relaxed', className)} {...props} />
 ));
 
 CardDescription.displayName = 'CardDescription';
@@ -92,7 +89,7 @@ CardContent.displayName = 'CardContent';
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
+    <div ref={ref} className={cn('flex items-center gap-2 p-6 pt-0', className)} {...props} />
   ),
 );
 

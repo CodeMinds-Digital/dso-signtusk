@@ -51,7 +51,7 @@ export const DocumentFlowFormContainerHeader = ({
 
       <p className="text-muted-foreground mt-2 text-sm">{_(description)}</p>
 
-      <hr className="border-border mb-8 mt-4" />
+      <div className="border-border mb-8 mt-4 border-b" />
     </>
   );
 };
@@ -150,7 +150,7 @@ export const DocumentFlowFormContainerActions = ({
     <div className="mt-4 flex gap-x-4">
       <Button
         type="button"
-        className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+        className="flex-1"
         size="lg"
         variant="secondary"
         disabled={disabled || loading || !canGoBack || !onGoBackClick}

@@ -38,15 +38,16 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
 
   return (
     <div
-      className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4"
+      className="flex h-64 flex-col items-center justify-center gap-y-3"
       data-testid="empty-document-state"
     >
-      <Icon className="h-12 w-12" strokeWidth={1.5} />
+      <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
+        <Icon className="text-muted-foreground h-6 w-6" strokeWidth={1.5} />
+      </div>
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{_(title)}</h3>
-
-        <p className="mt-2 max-w-[60ch]">{_(message)}</p>
+        <h3 className="font-semibold">{_(title)}</h3>
+        <p className="text-muted-foreground mt-1 max-w-[52ch] text-sm">{_(message)}</p>
       </div>
     </div>
   );

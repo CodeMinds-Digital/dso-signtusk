@@ -177,7 +177,7 @@ export default function PublicProfilePage({
             </div>
           </TooltipTrigger>
 
-          <TooltipContent className="text-muted-foreground max-w-[40ch] space-y-2 py-2">
+          <TooltipContent className="text-muted-foreground flex max-w-[40ch] flex-col gap-2 py-2">
             {isPublicProfileVisible ? (
               <>
                 <p>

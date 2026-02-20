@@ -223,13 +223,13 @@ export const SignUpForm = ({
         </div>
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
-        <div className="h-20">
-          <h1 className="text-xl font-semibold md:text-2xl">
+      <div className="border-border bg-card relative z-10 flex w-full max-w-lg flex-col rounded-2xl border p-8 shadow-lg">
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="text-muted-foreground mt-2 text-xs md:text-sm">
+          <p className="text-muted-foreground mt-1.5 text-sm">
             <Trans>
               Create your account and start using state-of-the-art document signing. Open and
               beautiful signing is within your grasp.
@@ -237,18 +237,13 @@ export const SignUpForm = ({
           </p>
         </div>
 
-        <hr className="-mx-6 my-4" />
-
         <Form {...form}>
           <form
             className="flex w-full flex-1 flex-col gap-y-4"
             onSubmit={form.handleSubmit(onFormSubmit)}
           >
             <fieldset
-              className={cn(
-                'flex h-[550px] w-full flex-col gap-y-4',
-                hasSocialAuthEnabled && 'h-[650px]',
-              )}
+              className="flex w-full flex-col gap-y-4"
               disabled={isSubmitting}
             >
               <FormField
@@ -323,73 +318,65 @@ export const SignUpForm = ({
               />
 
               {hasSocialAuthEnabled && (
-                <>
-                  <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                    <div className="bg-border h-px flex-1" />
-                    <span className="text-muted-foreground bg-transparent">
-                      <Trans>Or</Trans>
-                    </span>
-                    <div className="bg-border h-px flex-1" />
-                  </div>
-                </>
+                <div className="relative flex items-center gap-x-3 py-1">
+                  <div className="bg-border h-px flex-1" />
+                  <span className="text-muted-foreground text-xs">
+                    <Trans>Or</Trans>
+                  </span>
+                  <div className="bg-border h-px flex-1" />
+                </div>
               )}
 
               {isGoogleSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="bg-background text-muted-foreground border"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithGoogleClick}
-                  >
-                    <FcGoogle className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with Google</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithGoogleClick}
+                >
+                  <FcGoogle className="h-5 w-5" />
+                  <Trans>Sign Up with Google</Trans>
+                </Button>
               )}
 
               {isMicrosoftSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="bg-background text-muted-foreground border"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithMicrosoftClick}
-                  >
-                    <img
-                      className="mr-2 h-4 w-4"
-                      alt="Microsoft Logo"
-                      src={'/static/microsoft.svg'}
-                    />
-                    <Trans>Sign Up with Microsoft</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithMicrosoftClick}
+                >
+                  <img
+                    className="h-4 w-4"
+                    alt="Microsoft Logo"
+                    src={'/static/microsoft.svg'}
+                  />
+                  <Trans>Sign Up with Microsoft</Trans>
+                </Button>
               )}
 
               {isOIDCSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="bg-background text-muted-foreground border"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithOIDCClick}
-                  >
-                    <FaIdCardClip className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with OIDC</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithOIDCClick}
+                >
+                  <FaIdCardClip className="h-5 w-5" />
+                  <Trans>Sign Up with OIDC</Trans>
+                </Button>
               )}
 
               <p className="text-muted-foreground mt-4 text-sm">
                 <Trans>
                   Already have an account?{' '}
-                  <Link to="/signin" className="text-primary duration-200 hover:opacity-70">
+                  <Link to="/signin" className="text-primary font-medium duration-200 hover:opacity-75">
                     Sign in instead
                   </Link>
                 </Trans>
@@ -400,7 +387,7 @@ export const SignUpForm = ({
               loading={form.formState.isSubmitting}
               type="submit"
               size="lg"
-              className="mt-6 w-full"
+              className="mt-4 w-full"
             >
               <Trans>Complete</Trans>
             </Button>

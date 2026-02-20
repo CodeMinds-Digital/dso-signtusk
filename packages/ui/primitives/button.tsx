@@ -8,23 +8,26 @@ import { Loader } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium tracking-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background select-none',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default:
+          'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-[0.98] active:shadow-none',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive',
-        outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'underline-offset-4 hover:underline text-primary',
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:scale-[0.98] focus-visible:ring-destructive',
+        outline:
+          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/70 active:scale-[0.98]',
+        ghost: 'hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
+        link: 'underline-offset-4 hover:underline text-primary p-0 h-auto shadow-none',
         none: '',
       },
       size: {
-        default: 'h-10 py-2 px-4',
-        sm: 'h-9 px-3 rounded-md',
-        lg: 'h-11 px-8 rounded-md',
+        default: 'h-10 px-4 py-2',
+        sm: 'h-8 px-3 text-xs rounded-md',
+        lg: 'h-11 px-6 rounded-md text-base',
       },
     },
     defaultVariants: {
@@ -34,7 +37,7 @@ const buttonVariants = cva(
   },
 );
 
-const loaderVariants = cva('mr-2 animate-spin', {
+const loaderVariants = cva('animate-spin', {
   variants: {
     size: {
       default: 'h-5 w-5',
@@ -76,7 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={isDisabled}
       >
-        {isLoading && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+        {isLoading && <Loader className={cn(loaderVariants({ size }))} />}
         {props.children}
       </button>
     );

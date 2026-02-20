@@ -12,11 +12,16 @@ export function meta() {
 export default function SettingsLayout() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">
-        <Trans>Settings</Trans>
-      </h1>
+      <div className="mb-6 border-b pb-5">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <Trans>Settings</Trans>
+        </h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          <Trans>Manage your account preferences and settings.</Trans>
+        </p>
+      </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
+      <div className="grid grid-cols-12 gap-x-8">
         <SettingsDesktopNav className="hidden md:col-span-3 md:flex" />
         <SettingsMobileNav className="col-span-12 mb-8 md:hidden" />
 

@@ -40,7 +40,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
 
   return (
     <div className="max-w-2xl">
-      <SettingsHeader title="General settings" subtitle="Here you can edit your team's details." />
+      <SettingsHeader title={<Trans>General settings</Trans>} subtitle={<Trans>Here you can edit your team's details.</Trans>} />
 
       <AvatarImageForm team={currentTeam} className="mb-8" />
 
@@ -60,9 +60,9 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               </Trans>
             </AlertDescription>
 
-            <hr className="border-border/50 mt-2" />
+            <hr className="border-border/40 my-4" />
 
-            <div className="flex flex-row items-center justify-between pt-4">
+            <div className="flex flex-row items-center justify-between">
               <AvatarWithText
                 avatarClass="h-12 w-12"
                 avatarSrc={formatAvatarUrl(team.avatarImageId)}
@@ -82,14 +82,14 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               />
 
               <div className="flex flex-row items-center pr-2">
-                <div className="text-muted-foreground mr-4 flex flex-row items-center text-sm xl:mr-8">
+                <div className="text-muted-foreground mr-4 flex flex-row items-center gap-1.5 text-sm xl:mr-8">
                   {match({
                     teamEmail: team.teamEmail,
                     emailVerification: team.emailVerification,
                   })
                     .with({ teamEmail: P.not(null) }, () => (
                       <>
-                        <CheckCircle2 className="mr-1.5 text-green-500 dark:text-green-300" />
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500 dark:text-green-300" />
                         <Trans>Active</Trans>
                       </>
                     ))
@@ -102,14 +102,14 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                       },
                       () => (
                         <>
-                          <Clock className="mr-1.5 text-yellow-500 dark:text-yellow-200" />
+                          <Clock className="h-4 w-4 shrink-0 text-yellow-500 dark:text-yellow-200" />
                           <Trans>Expired</Trans>
                         </>
                       ),
                     )
                     .with({ emailVerification: P.not(null) }, () => (
                       <>
-                        <Clock className="mr-1.5 text-blue-600 dark:text-blue-300" />
+                        <Clock className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" />
                         <Trans>Awaiting email confirmation</Trans>
                       </>
                     ))
@@ -132,7 +132,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                 <Trans>Team email</Trans>
               </AlertTitle>
 
-              <AlertDescription className="mr-2">
+              <AlertDescription>
                 <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">
                   {/* Feature not available yet. */}
                   {/* <li>Display this name and email when sending documents</li> */}
@@ -159,7 +159,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                 <Trans>Delete team</Trans>
               </AlertTitle>
 
-              <AlertDescription className="mr-2">
+              <AlertDescription>
                 <Trans>
                   This team, and any associated data excluding billing invoices will be permanently
                   deleted.

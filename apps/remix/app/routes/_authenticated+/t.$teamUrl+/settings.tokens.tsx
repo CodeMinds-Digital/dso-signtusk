@@ -56,7 +56,7 @@ export default function ApiTokensPage() {
             <AlertTitle>
               <Trans>Unauthorized</Trans>
             </AlertTitle>
-            <AlertDescription className="mr-2">
+            <AlertDescription>
               <Trans>You need to be an admin to manage API tokens.</Trans>
             </AlertDescription>
           </div>
@@ -65,9 +65,9 @@ export default function ApiTokensPage() {
         <>
           <ApiTokenForm className="max-w-xl" tokens={tokens} />
 
-          <hr className="mb-4 mt-8" />
+          <hr className="my-6" />
 
-          <h4 className="text-xl font-medium">
+          <h4 className="text-base font-semibold tracking-tight">
             <Trans>Your existing tokens</Trans>
           </h4>
 
@@ -86,11 +86,11 @@ export default function ApiTokensPage() {
               {tokens.map((token) => (
                 <div
                   key={token.id}
-                  className="border-border rounded-lg border p-4"
+                  className="border-border bg-card rounded-xl border p-4 transition-shadow duration-150 hover:shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-x-4">
                     <div>
-                      <h5 className="text-base">{token.name}</h5>
+                      <h5 className="text-sm font-semibold">{token.name}</h5>
 
                       <p className="text-muted-foreground mt-2 text-xs">
                         <Trans>

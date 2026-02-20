@@ -78,11 +78,16 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
-        <Trans>Instance Stats</Trans>
-      </h2>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold tracking-tight">
+          <Trans>Instance Stats</Trans>
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm">
+          <Trans>Overview of your instance usage and performance.</Trans>
+        </p>
+      </div>
 
-      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <CardMetric icon={Users} title={_(msg`Total Users`)} value={usersCount} />
         <CardMetric icon={File} title={_(msg`Total Documents`)} value={docStats.ALL} />
         <CardMetric
@@ -90,17 +95,15 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
           title={_(msg`Active Subscriptions`)}
           value={organisationsWithSubscriptionsCount}
         />
-
         <CardMetric icon={FileCog} title={_(msg`App Version`)} value={`v${version}`} />
       </div>
 
-      <div className="mt-16 gap-8">
+      <div className="mt-10 space-y-8">
         <div>
-          <h3 className="text-3xl font-semibold">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             <Trans>Document metrics</Trans>
           </h3>
-
-          <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric icon={FileEdit} title={_(msg`Drafted Documents`)} value={docStats.DRAFT} />
             <CardMetric
               icon={FileClock}
@@ -116,11 +119,10 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div>
-          <h3 className="text-3xl font-semibold">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             <Trans>Recipients metrics</Trans>
           </h3>
-
-          <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric
               icon={UserSquare2}
               title={_(msg`Total Recipients`)}
@@ -145,11 +147,11 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="mt-16">
-        <h3 className="text-3xl font-semibold">
+      <div className="mt-10">
+        <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           <Trans>Charts</Trans>
         </h3>
-        <div className="mt-5 grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-6">
           <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={monthlyActiveUsers} />
 
           <AdminStatsUsersWithDocumentsChart
