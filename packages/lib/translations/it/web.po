@@ -3075,6 +3075,10 @@ msgstr "Crea team"
 msgid "Create Team"
 msgstr "Crea Team"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+msgid "Create template"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create the document as pending and ready to sign."
 msgstr "Crea il documento come in attesa e pronto per la firma."
@@ -3977,6 +3981,7 @@ msgstr "Documentazione"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
@@ -5357,6 +5362,7 @@ msgstr ""
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Inbox"
 msgstr "Posta in arrivo"
@@ -6187,6 +6193,10 @@ msgstr "Mai"
 msgid "Never expire"
 msgstr "Mai scadere"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
+msgid "New Document"
+msgstr ""
+
 #: packages/lib/utils/get-email-translations.ts
 msgid "New Member Joined"
 msgstr ""
@@ -6194,6 +6204,10 @@ msgstr ""
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
 msgstr "Nuova Password"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+msgid "New Template"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -8102,6 +8116,7 @@ msgstr "Configura le proprietà del modello e le informazioni sui destinatari"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -9039,6 +9054,7 @@ msgstr "Modello caricato"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -9617,7 +9633,7 @@ msgid "This document was created using a direct link."
 msgstr "Questo documento è stato creato utilizzando un link diretto."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Signtusk</0>."
+msgid "This document was sent using <0>SignTusk</0>."
 msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx

@@ -3075,6 +3075,10 @@ msgstr "팀 생성"
 msgid "Create Team"
 msgstr "팀 만들기"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+msgid "Create template"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create the document as pending and ready to sign."
 msgstr "문서를 보류 상태이자 서명 준비 상태로 생성합니다."
@@ -3977,6 +3981,7 @@ msgstr "문서"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
@@ -5357,6 +5362,7 @@ msgstr ""
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Inbox"
 msgstr "받은편지함"
@@ -6187,6 +6193,10 @@ msgstr "없음"
 msgid "Never expire"
 msgstr "만료되지 않음"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
+msgid "New Document"
+msgstr ""
+
 #: packages/lib/utils/get-email-translations.ts
 msgid "New Member Joined"
 msgstr ""
@@ -6194,6 +6204,10 @@ msgstr ""
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
 msgstr "새 비밀번호"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+msgid "New Template"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -8102,6 +8116,7 @@ msgstr "템플릿 속성과 수신자 정보를 설정하세요."
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -9039,6 +9054,7 @@ msgstr "템플릿이 업로드되었습니다."
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-sidebar.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -9617,7 +9633,7 @@ msgid "This document was created using a direct link."
 msgstr "이 문서는 직접 링크를 사용해 생성되었습니다."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Signtusk</0>."
+msgid "This document was sent using <0>SignTusk</0>."
 msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx

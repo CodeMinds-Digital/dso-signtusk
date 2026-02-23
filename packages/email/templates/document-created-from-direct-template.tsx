@@ -90,7 +90,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
 
                 <Section className="my-6 text-center">
                   <Button
-                    className="bg-signtusk-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                    className="bg-[#2563EB] inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-white no-underline"
                     href={documentLink}
                   >
                     <Trans>View document</Trans>

@@ -26,11 +26,11 @@ export const insertFieldInPDFV2 = async ({
   const fontPath = path.join(process.cwd(), "public/fonts");
 
   FontLibrary.use({
-    ["Dancing Script"]: [path.join(fontPath, "DancingScript-Bold.ttf")],
-    ["Noto Sans"]: [path.join(fontPath, "NotoSans-Regular.ttf")],
-    ["Noto Sans Japanese"]: [path.join(fontPath, "NotoSansJP-Regular.ttf")],
-    ["Noto Sans Chinese"]: [path.join(fontPath, "NotoSansSC-Regular.ttf")],
-    ["Noto Sans Korean"]: [path.join(fontPath, "NotoSansKR-Regular.ttf")],
+    ["Alex Brush"]: [path.join(fontPath, "alex-brush-regular.ttf")],
+    ["Noto Sans"]: [path.join(fontPath, "noto-sans.ttf")],
+    ["Noto Sans Japanese"]: [path.join(fontPath, "noto-sans-japanese.ttf")],
+    ["Noto Sans Chinese"]: [path.join(fontPath, "noto-sans-chinese.ttf")],
+    ["Noto Sans Korean"]: [path.join(fontPath, "noto-sans-korean.ttf")],
   });
 
   const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });

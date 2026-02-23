@@ -1,7 +1,8 @@
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 
-import { ResendTransport } from "@documenso/nodemailer-resend";
+import { ResendTransport } from "@signtusk/nodemailer-resend";
+import { UnosendTransport } from "@signtusk/nodemailer-unosend";
 import { env } from "@signtusk/lib/utils/env";
 
 import { MailChannelsTransport } from "./transports/mailchannels";
@@ -11,7 +12,7 @@ import { MailChannelsTransport } from "./transports/mailchannels";
  *
  * This function uses various environment variables to configure the appropriate
  * email transport mechanism. It supports multiple types of email transports,
- * including MailChannels, Resend, and different SMTP configurations.
+ * including MailChannels, Resend, Unosend, and different SMTP configurations.
  *
  * @returns {Transporter} A configured Nodemailer transporter instance.
  *
@@ -21,6 +22,9 @@ import { MailChannelsTransport } from "./transports/mailchannels";
  *   - `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`: Endpoint for MailChannels (optional)
  * - **resend**: Uses ResendTransport, requiring:
  *   - `NEXT_PRIVATE_RESEND_API_KEY`: API key for Resend
+ * - **unosend**: Uses UnosendTransport, requiring:
+ *   - `NEXT_PRIVATE_UNOSEND_API_KEY`: API key for Unosend (starts with `un_`)
+ *   - `NEXT_PRIVATE_UNOSEND_BASE_URL`: Base URL override (optional)
  * - **smtp-api**: Uses a custom SMTP API configuration, requiring:
  *   - `NEXT_PRIVATE_SMTP_HOST`: The SMTP server host
  *   - `NEXT_PRIVATE_SMTP_APIKEY`: The API key for SMTP authentication
@@ -35,15 +39,27 @@ import { MailChannelsTransport } from "./transports/mailchannels";
  *   - `NEXT_PRIVATE_SMTP_SERVICE`: The SMTP service provider (e.g., "gmail"). This option is used
  *     when integrating with well-known services (like Gmail), enabling simplified configuration.
  *
- * Example Usage:
+ * Example Usage (Resend):
  * ```env
- * NEXT_PRIVATE_SMTP_TRANSPORT='smtp-auth';
- * NEXT_PRIVATE_SMTP_HOST='smtp.example.com';
- * NEXT_PRIVATE_SMTP_PORT=587;
- * NEXT_PRIVATE_SMTP_SERVICE='gmail';
- * NEXT_PRIVATE_SMTP_SECURE='true';
- * NEXT_PRIVATE_SMTP_USERNAME='your-email@gmail.com';
- * NEXT_PRIVATE_SMTP_PASSWORD='your-password';
+ * NEXT_PRIVATE_SMTP_TRANSPORT='resend'
+ * NEXT_PRIVATE_RESEND_API_KEY='re_xxxxxxxxxx'
+ * ```
+ *
+ * Example Usage (Unosend):
+ * ```env
+ * NEXT_PRIVATE_SMTP_TRANSPORT='unosend'
+ * NEXT_PRIVATE_UNOSEND_API_KEY='un_xxxxxxxxxx'
+ * ```
+ *
+ * Example Usage (SMTP):
+ * ```env
+ * NEXT_PRIVATE_SMTP_TRANSPORT='smtp-auth'
+ * NEXT_PRIVATE_SMTP_HOST='smtp.example.com'
+ * NEXT_PRIVATE_SMTP_PORT=587
+ * NEXT_PRIVATE_SMTP_SERVICE='gmail'
+ * NEXT_PRIVATE_SMTP_SECURE='true'
+ * NEXT_PRIVATE_SMTP_USERNAME='your-email@gmail.com'
+ * NEXT_PRIVATE_SMTP_PASSWORD='your-password'
  * ```
  *
  * Notes:
@@ -53,14 +69,8 @@ import { MailChannelsTransport } from "./transports/mailchannels";
  */
 const getTransport = (): Transporter => {
   const transport = env("NEXT_PRIVATE_SMTP_TRANSPORT") ?? "smtp-auth";
-  const apiKey = env("NEXT_PRIVATE_RESEND_API_KEY");
 
   console.log("[MAILER] Creating transport:", transport);
-  console.log("[MAILER] Resend API key present:", !!apiKey);
-  console.log(
-    "[MAILER] Resend API key prefix:",
-    apiKey?.substring(0, 10) + "..."
-  );
 
   if (transport === "mailchannels") {
     return createTransport(
@@ -72,12 +82,35 @@ const getTransport = (): Transporter => {
   }
 
   if (transport === "resend") {
+    const apiKey = env("NEXT_PRIVATE_RESEND_API_KEY");
+
     if (!apiKey) {
       console.error("[MAILER] ERROR: NEXT_PRIVATE_RESEND_API_KEY is not set!");
+    } else {
+      console.log("[MAILER] Resend API key configured (re_...)");
     }
+
     return createTransport(
       ResendTransport.makeTransport({
         apiKey: apiKey || "",
+      })
+    );
+  }
+
+  if (transport === "unosend") {
+    const apiKey = env("NEXT_PRIVATE_UNOSEND_API_KEY");
+    const baseUrl = env("NEXT_PRIVATE_UNOSEND_BASE_URL");
+
+    if (!apiKey) {
+      console.error("[MAILER] ERROR: NEXT_PRIVATE_UNOSEND_API_KEY is not set!");
+    } else {
+      console.log("[MAILER] Unosend API key configured (un_...)");
+    }
+
+    return createTransport(
+      UnosendTransport.makeTransport({
+        apiKey: apiKey || "",
+        ...(baseUrl ? { baseUrl } : {}),
       })
     );
   }

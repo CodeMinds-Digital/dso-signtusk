@@ -11,8 +11,8 @@ export function meta() {
 
 export default function SettingsLayout() {
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <div className="mb-6 border-b pb-5">
+    <div>
+      <div className="bg-muted/30 sticky top-0 z-10 border-b px-6 py-5 md:px-10">
         <h1 className="text-2xl font-semibold tracking-tight">
           <Trans>Settings</Trans>
         </h1>
@@ -21,12 +21,14 @@ export default function SettingsLayout() {
         </p>
       </div>
 
-      <div className="grid grid-cols-12 gap-x-8">
-        <SettingsDesktopNav className="hidden md:col-span-3 md:flex" />
-        <SettingsMobileNav className="col-span-12 mb-8 md:hidden" />
+      <div className="mx-auto w-full max-w-screen-xl px-6 pt-6 md:px-10">
+        <div className="grid grid-cols-12 gap-x-8">
+          <SettingsDesktopNav className="hidden md:col-span-3 md:flex" />
+          <SettingsMobileNav className="col-span-12 mb-8 md:hidden" />
 
-        <div className="col-span-12 md:col-span-9">
-          <Outlet />
+          <div className="col-span-12 md:col-span-9">
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>

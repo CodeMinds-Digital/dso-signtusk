@@ -72,7 +72,7 @@ export const ResetPasswordTemplate = ({
                 <Trans>
                   Didn't request a password change? We are here to help you secure your account,
                   just{' '}
-                  <Link className="text-signtusk-700 font-normal" href="mailto:hi@signtusk.com">
+                  <Link className="text-[#2563EB] font-normal" href="mailto:hi@signtusk.com">
                     contact us
                   </Link>
                   .

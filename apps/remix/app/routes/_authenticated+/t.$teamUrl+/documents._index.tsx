@@ -6,6 +6,7 @@ import {
   FolderType,
   OrganisationType,
 } from "@signtusk/lib/constants/prisma-enums";
+import { PlusIcon } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { z } from "zod";
 
@@ -126,27 +127,38 @@ export default function DocumentsPage() {
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-6">
         <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />
 
-        {/* ── Page header ── */}
-        <div className="mt-6 mb-5 flex flex-wrap items-center justify-between gap-4 border-b pb-5">
-          <div className="flex items-center gap-3">
-            <Avatar className="border-border h-9 w-9 border">
-              {team.avatarImageId && (
-                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
-              )}
-              <AvatarFallback className="text-muted-foreground text-xs font-medium">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
-            <h1 className="text-xl font-semibold tracking-tight">
-              <Trans>Documents</Trans>
-            </h1>
-          </div>
+        {/* ── Sticky page header ── */}
+        <div className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-2 py-4">
+            <div className="flex items-center gap-3">
+              <Avatar className="border-border h-9 w-9 border">
+                {team.avatarImageId && (
+                  <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
+                )}
+                <AvatarFallback className="text-muted-foreground text-xs font-medium">
+                  {team.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  <Trans>Documents</Trans>
+                </h1>
+                <p className="text-muted-foreground text-xs">{team.name}</p>
+              </div>
+            </div>
 
-          {/* ── Filters ── */}
-          <div className="flex flex-wrap items-center gap-2">
-            {team && <DocumentsTableSenderFilter teamId={team.id} />}
-            <PeriodSelector />
-            <DocumentSearch initialValue={findDocumentSearchParams.query} />
+            <div className="flex flex-wrap items-center gap-2">
+              {team && <DocumentsTableSenderFilter teamId={team.id} />}
+              <PeriodSelector />
+              <DocumentSearch initialValue={findDocumentSearchParams.query} />
+              <Link
+                to={`/t/${team.url}/documents/new`}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <Trans>New Document</Trans>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -156,7 +168,7 @@ export default function DocumentsPage() {
             value={findDocumentSearchParams.status || "ALL"}
             className="w-full overflow-x-auto"
           >
-            <TabsList className="h-9 gap-0.5 rounded-lg p-1">
+            <TabsList className="h-10 gap-1 rounded-none border-b-0 bg-transparent p-0">
               {[
                 ExtendedDocumentStatus.INBOX,
                 ExtendedDocumentStatus.PENDING,
@@ -173,14 +185,14 @@ export default function DocumentsPage() {
                 .map((value) => (
                   <TabsTrigger
                     key={value}
-                    className="hover:text-foreground h-7 min-w-[64px] rounded-md px-3 text-xs"
+                    className="hover:text-foreground data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))] h-10 rounded-none px-3 text-sm data-[state=active]:bg-transparent"
                     value={value}
                     asChild
                   >
                     <Link to={getTabHref(value)} preventScrollReset>
                       <DocumentStatus status={value} />
-                      {value !== ExtendedDocumentStatus.ALL && (
-                        <span className="text-muted-foreground ml-1.5 tabular-nums">
+                      {value !== ExtendedDocumentStatus.ALL && stats[value] > 0 && (
+                        <span className="bg-muted text-muted-foreground ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
                           {stats[value]}
                         </span>
                       )}

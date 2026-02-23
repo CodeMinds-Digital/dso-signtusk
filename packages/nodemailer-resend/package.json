@@ -1,0 +1,22 @@
+{
+  "name": "@signtusk/nodemailer-resend",
+  "version": "1.0.0",
+  "description": "Nodemailer transport for Resend",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src/"
+  ],
+  "dependencies": {
+    "resend": "^4.0.0"
+  },
+  "peerDependencies": {
+    "nodemailer": "^6.9.3 || ^7.0.0"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@signtusk/tsconfig": "*"
+  },
+  "private": true
+}

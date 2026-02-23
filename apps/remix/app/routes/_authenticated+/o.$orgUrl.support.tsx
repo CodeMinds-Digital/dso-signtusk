@@ -72,7 +72,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <Link2Icon className="text-muted-foreground h-5 w-5" />
               <Link
-                to="https://documen.so/discord"
+                to="https://discord.gg/signtusk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -84,7 +84,7 @@ export default function SupportPage() {
               <Trans>
                 Join our community on{" "}
                 <Link
-                  to="https://documen.so/discord"
+                  to="https://discord.gg/signtusk"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"

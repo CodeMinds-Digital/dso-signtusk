@@ -135,7 +135,7 @@ export default function SettingsLayout() {
 
   return (
     <div>
-      <div className="mb-6 border-b pb-5">
+      <div className="bg-muted/30 sticky top-0 z-10 border-b px-6 py-5 md:px-10">
         <h1 className="text-2xl font-semibold tracking-tight">
           <Trans>Organisation Settings</Trans>
         </h1>
@@ -144,54 +144,56 @@ export default function SettingsLayout() {
         </p>
       </div>
 
-      <div className="grid grid-cols-12 gap-x-8">
-        {/* Navigation */}
-        <div className="col-span-12 mb-6 hidden md:col-span-3 md:flex md:flex-col md:gap-1">
-          {organisationSettingRoutes.map((route) => (
-            <NavLink
-              to={route.path}
-              key={route.path}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
-                  route.isSubNav && 'ml-4',
-                  isActive && !route.hideHighlight
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-                )
-              }
-            >
-              {route.icon && <route.icon className="h-4 w-4 shrink-0" />}
-              <Trans>{route.label}</Trans>
-            </NavLink>
-          ))}
-        </div>
-
-        {/* Mobile nav */}
-        <div className="col-span-12 mb-6 flex flex-wrap gap-2 md:hidden">
-          {organisationSettingRoutes
-            .filter((r) => !r.isSubNav)
-            .map((route) => (
+      <div className="mx-auto w-full max-w-screen-xl px-6 pt-6 md:px-10">
+        <div className="grid grid-cols-12 gap-x-8">
+          {/* Navigation */}
+          <div className="col-span-12 mb-6 hidden md:col-span-3 md:flex md:flex-col md:gap-1">
+            {organisationSettingRoutes.map((route) => (
               <NavLink
                 to={route.path}
                 key={route.path}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-150',
+                    'flex items-center gap-2.5 rounded-r-lg border-l-2 px-3 py-2 text-sm font-medium transition-colors duration-150',
+                    route.isSubNav && 'ml-4',
                     isActive && !route.hideHighlight
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground',
+                      ? 'border-primary bg-accent/50 text-foreground'
+                      : 'border-transparent text-muted-foreground hover:border-primary/30 hover:bg-accent/30 hover:text-foreground',
                   )
                 }
               >
-                {route.icon && <route.icon className="h-3.5 w-3.5 shrink-0" />}
+                {route.icon && <route.icon className="h-4 w-4 shrink-0" />}
                 <Trans>{route.label}</Trans>
               </NavLink>
             ))}
-        </div>
+          </div>
 
-        <div className="col-span-12 md:col-span-9">
-          <Outlet />
+          {/* Mobile nav */}
+          <div className="col-span-12 mb-6 flex flex-wrap gap-2 md:hidden">
+            {organisationSettingRoutes
+              .filter((r) => !r.isSubNav)
+              .map((route) => (
+                <NavLink
+                  to={route.path}
+                  key={route.path}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-150',
+                      isActive && !route.hideHighlight
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )
+                  }
+                >
+                  {route.icon && <route.icon className="h-3.5 w-3.5 shrink-0" />}
+                  <Trans>{route.label}</Trans>
+                </NavLink>
+              ))}
+          </div>
+
+          <div className="col-span-12 md:col-span-9">
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>

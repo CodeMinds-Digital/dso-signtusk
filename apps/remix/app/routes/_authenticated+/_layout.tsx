@@ -1,18 +1,25 @@
+import { useState } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import { MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, Outlet, redirect } from 'react-router';
 
 import { getOptionalSession } from '@signtusk/auth/server/lib/utils/get-session';
 import { OrganisationProvider } from '@signtusk/lib/client-only/providers/organisation';
 import { useSession } from '@signtusk/lib/client-only/providers/session';
+import { isPersonalLayout } from '@signtusk/lib/utils/organisations';
 import { getSiteSettings } from '@signtusk/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@signtusk/lib/server-only/site-settings/schemas/banner';
-import { cn } from '@signtusk/ui/lib/utils';
 import { Button } from '@signtusk/ui/primitives/button';
 
 import { AppBanner } from '~/components/general/app-banner';
-import { Header } from '~/components/general/app-header';
+import { AppCommandMenu } from '~/components/general/app-command-menu';
+import { AppNavMobile } from '~/components/general/app-nav-mobile';
+import { AppSidebar } from '~/components/general/app-sidebar';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { MenuSwitcher } from '~/components/general/menu-switcher';
+import { OrgMenuSwitcher } from '~/components/general/org-menu-switcher';
 import { OrganisationBillingBanner } from '~/components/general/organisations/organisation-billing-banner';
 import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 import { TeamProvider } from '~/providers/team';
@@ -48,6 +55,9 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
 
   const { user, organisations } = useSession();
 
+  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const teamUrl = params.teamUrl;
   const orgUrl = params.orgUrl;
 
@@ -58,7 +68,6 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
       return organisations.find((org) => org.url === orgUrl);
     }
 
-    // Search organisations to find the team since we don't have access to the orgUrl in the URL.
     if (teamUrl) {
       return organisations.find((org) => org.teams.some((team) => team.url === teamUrl));
     }
@@ -72,8 +81,8 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
   const orgNotFound = params.orgUrl && !currentOrganisation;
   const teamNotFound = params.teamUrl && !currentTeam;
 
-  // Hide the header for editor routes.
-  const hideHeader = matches.some(
+  // Hide the full shell for editor routes.
+  const hideShell = matches.some(
     (match) =>
       match?.id === 'routes/_authenticated+/t.$teamUrl+/documents.$id.edit' ||
       match?.id === 'routes/_authenticated+/t.$teamUrl+/templates.$id.edit',
@@ -107,24 +116,69 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
     );
   }
 
+  if (hideShell) {
+    return (
+      <OrganisationProvider organisation={currentOrganisation}>
+        <TeamProvider team={currentTeam || null}>
+          <Outlet />
+        </TeamProvider>
+      </OrganisationProvider>
+    );
+  }
+
   return (
     <OrganisationProvider organisation={currentOrganisation}>
       <TeamProvider team={currentTeam || null}>
-        <OrganisationBillingBanner />
+        <div className="flex h-screen overflow-hidden">
+          {/* Desktop sidebar — hidden on mobile */}
+          <AppSidebar onCommandMenuOpen={() => setIsCommandMenuOpen(true)} />
 
-        {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
+          {/* Main content area */}
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <OrganisationBillingBanner />
 
-        {banner && !hideHeader && <AppBanner banner={banner} />}
+            {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
-        {!hideHeader && <Header />}
+            {banner && <AppBanner banner={banner} />}
 
-        <main
-          className={cn({
-            'mt-6 pb-10 md:mt-10 md:pb-16': !hideHeader,
-          })}
-        >
-          <Outlet />
-        </main>
+            {/* Mobile top bar — hidden on desktop */}
+            <header className="flex h-14 items-center gap-3 border-b border-border bg-background px-4 md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                aria-label="Open menu"
+              >
+                <MenuIcon className="h-5 w-5" />
+              </button>
+
+              <div className="flex-1" />
+
+              <button
+                onClick={() => setIsCommandMenuOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                aria-label="Search"
+              >
+                <SearchIcon className="h-4 w-4" />
+              </button>
+
+              <div className="ml-1">
+                {isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}
+              </div>
+            </header>
+
+            {/* Scrollable main content */}
+            <main className="page-enter flex-1 overflow-y-auto">
+              <Outlet />
+            </main>
+          </div>
+        </div>
+
+        <AppCommandMenu open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
+
+        <AppNavMobile
+          isMenuOpen={isMobileMenuOpen}
+          onMenuOpenChange={setIsMobileMenuOpen}
+        />
       </TeamProvider>
     </OrganisationProvider>
   );

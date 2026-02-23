@@ -151,8 +151,8 @@ const styles = {
     marginBottom: "24px",
   },
   button: {
-    backgroundColor: "#7AC455",
-    color: "#000000",
+    backgroundColor: "#2563EB",
+    color: "#ffffff",
     padding: "12px 24px",
     borderRadius: "8px",
     fontSize: "14px",

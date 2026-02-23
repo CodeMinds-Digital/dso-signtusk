@@ -29,8 +29,8 @@ import {
 import { getPageSize } from './get-page-size';
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const [fontCaveat, fontNoto] = await Promise.all([
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/DancingScript-Bold.ttf`).then(async (res) =>
+  const [fontSignature, fontNoto] = await Promise.all([
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/alex-brush-regular.ttf`).then(async (res) =>
       res.arrayBuffer(),
     ),
     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
@@ -119,12 +119,12 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   }
 
   const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? fontSignature : fontNoto,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-    await pdf.embedFont(fontCaveat);
+    await pdf.embedFont(fontSignature);
   }
 
   await match(field)

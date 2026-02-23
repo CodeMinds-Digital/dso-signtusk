@@ -29,14 +29,11 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
 
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
 
-  const [interSemiBold, interRegular, caveatRegular] = await Promise.all([
-    fetch(new URL(`${baseUrl}/fonts/IBMPlexSans-SemiBold.ttf`, import.meta.url)).then(async (res) =>
+  const [geistSansRegular, alexBrushRegular] = await Promise.all([
+    fetch(new URL(`${baseUrl}/fonts/geist-sans-regular.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL(`${baseUrl}/fonts/IBMPlexSans-Regular.ttf`, import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL(`${baseUrl}/fonts/DancingScript-Regular.ttf`, import.meta.url)).then(async (res) =>
+    fetch(new URL(`${baseUrl}/fonts/alex-brush-regular.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
@@ -125,7 +122,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
             justifyContent: 'center',
             textAlign: 'center',
             color: '#64748b',
-            fontFamily: 'Dancing Script',
+            fontFamily: 'Alex Brush',
             fontSize: Math.max(Math.min((CARD_WIDTH * 1.5) / signatureName.length, 80), 36),
             top: CARD_OFFSET_TOP,
             left: CARD_OFFSET_LEFT,
@@ -150,7 +147,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
           style={{
             fontSize: '20px',
             color: '#828282',
-            fontFamily: 'IBM Plex Sans',
+            fontFamily: 'Geist Sans',
             fontWeight: 700,
           }}
         >
@@ -163,19 +160,14 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
       height: IMAGE_SIZE.height,
       fonts: [
         {
-          name: 'Dancing Script',
-          data: caveatRegular,
-          style: 'italic',
+          name: 'Alex Brush',
+          data: alexBrushRegular,
+          style: 'normal',
         },
         {
-          name: 'IBM Plex Sans',
-          data: interRegular,
+          name: 'Geist Sans',
+          data: geistSansRegular,
           weight: 400,
-        },
-        {
-          name: 'IBM Plex Sans',
-          data: interSemiBold,
-          weight: 600,
         },
       ],
     },

@@ -60,7 +60,7 @@ module.exports = {
                 ring: '#3b82f6',
             },
             fontFamily: {
-                sans: ['IBM Plex Sans', 'system-ui', 'sans-serif'],
+                sans: ['Geist Sans', 'system-ui', 'sans-serif'],
                 mono: ['JetBrains Mono', 'monospace'],
             },
             spacing: {

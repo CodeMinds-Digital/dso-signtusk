@@ -415,7 +415,7 @@ const BillingPlanForm = ({
         ))}
 
         <Link
-          to="https://documen.so/enterprise-cta"
+          to="https://signtusk.com/enterprise"
           target="_blank"
           className="bg-muted/30 flex items-center space-x-2 rounded-md border p-4"
         >

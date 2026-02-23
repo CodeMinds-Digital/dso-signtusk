@@ -1,0 +1,18 @@
+{
+  "extends": "@signtusk/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2022",
+    "resolveJsonModule": true,
+    "types": [
+      "@types/node"
+    ]
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}

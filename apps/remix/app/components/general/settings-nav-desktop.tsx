@@ -44,11 +44,11 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
         key={href}
         to={href}
         className={cn(
-          'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
+          'flex items-center gap-2.5 rounded-r-lg border-l-2 px-3 py-2 text-sm font-medium transition-colors duration-150',
           indent && 'ml-6',
           isActive
-            ? 'bg-accent text-accent-foreground'
-            : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+            ? 'border-primary bg-accent/50 text-foreground'
+            : 'border-transparent text-muted-foreground hover:border-primary/30 hover:bg-accent/30 hover:text-foreground',
         )}
       >
         {icon}

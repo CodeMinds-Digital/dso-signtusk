@@ -397,7 +397,7 @@ export const SignUpForm = ({
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
-              to="https://documen.so/terms"
+              to="https://signtusk.com/terms"
               target="_blank"
               className="text-primary duration-200 hover:opacity-70"
             >
@@ -405,7 +405,7 @@ export const SignUpForm = ({
             </Link>{' '}
             and{' '}
             <Link
-              to="https://documen.so/privacy"
+              to="https://signtusk.com/privacy"
               target="_blank"
               className="text-primary duration-200 hover:opacity-70"
             >

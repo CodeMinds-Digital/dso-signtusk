@@ -12,15 +12,15 @@ export async function insertTextInPDF(
   useHandwritingFont = true,
   customFontSize?: number,
 ): Promise<string> {
-  // Fetch the font file from the public URL.
+  // Fetch the signature font file from the public URL.
   const fontResponse = await fetch(CAVEAT_FONT_PATH());
-  const fontCaveat = await fontResponse.arrayBuffer();
+  const fontSignature = await fontResponse.arrayBuffer();
 
   const pdfDoc = await PDFDocument.load(pdfAsBase64);
 
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(useHandwritingFont ? fontCaveat : StandardFonts.Helvetica);
+  const font = await pdfDoc.embedFont(useHandwritingFont ? fontSignature : StandardFonts.Helvetica);
 
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
