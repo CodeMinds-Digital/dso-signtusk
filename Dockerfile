@@ -55,7 +55,11 @@ RUN npm ci --legacy-peer-deps
 # Install turbo globally for easier access
 RUN npm install -g turbo
 
-# Copy source code
+# Cache-busting: invalidate Docker layer cache on every deploy
+# Dokploy sets CACHEBUST automatically, or use: docker build --build-arg CACHEBUST=$(date +%s)
+ARG CACHEBUST=1
+
+# Copy source code (cache invalidated by CACHEBUST above)
 COPY . .
 
 # Build only the Remix app and its dependencies (exclude docs)
@@ -85,9 +89,22 @@ COPY --chown=nodejs:nodejs package.json package-lock.json ./
 COPY --chown=nodejs:nodejs packages/*/package.json ./packages/
 COPY --chown=nodejs:nodejs apps/*/package.json ./apps/
 
-# Copy shared config packages that are needed at runtime
+# Copy ALL workspace packages needed at runtime
+# These are required because rollup bundles @signtusk/* packages but some
+# modules are resolved at runtime via node_modules symlinks
 COPY --from=installer --chown=nodejs:nodejs /app/packages/tailwind-config ./packages/tailwind-config
 COPY --from=installer --chown=nodejs:nodejs /app/packages/tsconfig ./packages/tsconfig
+COPY --from=installer --chown=nodejs:nodejs /app/packages/api ./packages/api
+COPY --from=installer --chown=nodejs:nodejs /app/packages/auth ./packages/auth
+COPY --from=installer --chown=nodejs:nodejs /app/packages/lib ./packages/lib
+COPY --from=installer --chown=nodejs:nodejs /app/packages/trpc ./packages/trpc
+COPY --from=installer --chown=nodejs:nodejs /app/packages/email ./packages/email
+COPY --from=installer --chown=nodejs:nodejs /app/packages/ee ./packages/ee
+COPY --from=installer --chown=nodejs:nodejs /app/packages/ui ./packages/ui
+COPY --from=installer --chown=nodejs:nodejs /app/packages/i18n ./packages/i18n
+COPY --from=installer --chown=nodejs:nodejs /app/packages/assets ./packages/assets
+COPY --from=installer --chown=nodejs:nodejs /app/packages/nodemailer-resend ./packages/nodemailer-resend
+COPY --from=installer --chown=nodejs:nodejs /app/packages/nodemailer-unosend ./packages/nodemailer-unosend
 
 # Install production dependencies only (as root to avoid permission issues)
 RUN npm ci --omit=dev --legacy-peer-deps

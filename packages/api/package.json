@@ -11,7 +11,7 @@
   },
   "files": [
     "index.ts",
-    "next.ts",
+    "hono.ts",
     "v1/"
   ],
   "dependencies": {
