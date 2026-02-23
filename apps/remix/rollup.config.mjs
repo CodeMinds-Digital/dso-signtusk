@@ -3,6 +3,7 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
+import typescript from "@rollup/plugin-typescript";
 import path from "node:path";
 
 /** @type {import('rollup').RollupOptions} */
@@ -21,17 +22,27 @@ const config = {
   },
   external: [/node_modules/],
   plugins: [
+    typescript({
+      noEmitOnError: true,
+      moduleResolution: "bundler",
+      include: [
+        "server/**/*",
+        "../../packages/**/*",
+        "../../packages/lib/translations/**/*",
+      ],
+      jsx: "preserve",
+    }),
     resolve({
       rootDir: path.join(process.cwd(), "../.."),
       preferBuiltins: true,
       resolveOnly: [
-        "@signtusk/api/*",
-        "@signtusk/auth/*",
-        "@signtusk/lib/*",
-        "@signtusk/trpc/*",
-        "@signtusk/email/*",
-        "@signtusk/prisma/*",
-        "@signtusk/ee/*",
+        "@signtusk/api/**",
+        "@signtusk/auth/**",
+        "@signtusk/lib/**",
+        "@signtusk/trpc/**",
+        "@signtusk/email/**",
+        "@signtusk/prisma/**",
+        "@signtusk/ee/**",
       ],
       extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
     }),
