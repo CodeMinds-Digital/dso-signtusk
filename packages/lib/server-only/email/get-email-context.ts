@@ -14,6 +14,7 @@ import type {
 import { EmailDomainStatus } from "@signtusk/prisma/client";
 
 import { SIGNTUSK_INTERNAL_EMAIL } from "../../constants/email";
+import type { SupportedLanguageCodes } from "../../constants/i18n";
 import { AppError, AppErrorCode } from "../../errors/app-error";
 import {
   organisationGlobalSettingsToBranding,
@@ -79,7 +80,7 @@ type EmailContextResponse = {
     address: string;
   };
   replyToEmail: string | undefined;
-  emailLanguage: string;
+  emailLanguage: SupportedLanguageCodes;
 };
 
 export const getEmailContext = async (
@@ -98,8 +99,8 @@ export const getEmailContext = async (
     emailContext = await handleTeamEmailContext(source.teamId);
   }
 
-  const emailLanguage =
-    meta?.language || emailContext.settings.documentLanguage;
+  const emailLanguage = (meta?.language ||
+    emailContext.settings.documentLanguage) as SupportedLanguageCodes;
 
   // Immediate return for internal emails.
   if (options.emailType === "INTERNAL") {
