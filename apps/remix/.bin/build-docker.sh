@@ -12,6 +12,7 @@ cd -
 
 echo "[Build]: Extracting and compiling translations"
 cd ../..
+export THREADS_WORKER_INIT_TIMEOUT=60000
 npm run translate
 cd apps/remix
 

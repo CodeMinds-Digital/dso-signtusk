@@ -105,7 +105,10 @@ COPY apps/remix ./apps/remix
 RUN cd packages/prisma && npx prisma generate
 
 # Extract and compile translations
-RUN npx lingui extract --clean && npx lingui compile
+# Use increased timeout for worker threads in resource-constrained Docker builds
+# Run extract and compile separately to avoid timeout issues
+RUN npx lingui extract --clean
+RUN THREADS_WORKER_INIT_TIMEOUT=60000 npx lingui compile
 
 # Build the pdf-sign native module for Linux x64 GNU
 # Try to build, but don't fail if it doesn't work (optional native module)
